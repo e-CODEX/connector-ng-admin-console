@@ -8,10 +8,13 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import type {Metadata} from "next";
+import type { Metadata } from "next";
 import "../styles/globals.css";
-import {siteConfig} from "@/config/site";
-import {GeistMono, GeistSans} from "@/config/fonts";
+import { siteConfig } from "@/config/site";
+import { GeistMono, GeistSans } from "@/config/fonts";
+import { MainNavbar } from "@/components/common/MainNavbar";
+import { Footer } from "@/components/common/Footer";
+import React from "react";
 
 export const metadata: Metadata = {
     title: siteConfig.title,
@@ -28,7 +31,15 @@ export default function RootLayout({
             lang="en"
             className={`${GeistSans.variable} ${GeistMono.variable} h-full antialiased`}
         >
-        <body className="min-h-full flex flex-col">{children}</body>
+        <body className="min-h-full flex flex-col">
+        <div className="relative flex flex-col min-h-screen">
+            <MainNavbar/>
+            <main className="grow pr-3 pl-3 pt-3">
+                {children}
+            </main>
+            <Footer/>
+        </div>
+        </body>
         </html>
     );
 }

@@ -8,17 +8,16 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import {MainNavbar} from "@/components/common/MainNavbar";
-import {Footer} from "@/components/common/Footer";
+import { PageHeader } from "@/components/common/page-hearder";
 
 export default function ConfigurationsAdminPage() {
     return (
-        <div className="relative flex flex-col min-h-screen">
-            <MainNavbar/>
-            <main className="grow">
-                Configurations admin page
-            </main>
-            <Footer/>
-        </div>
+        <>
+            <PageHeader
+                icon="icon-park-outline:config"
+                title="Configurations"
+                subtitle="List of configurations"
+            />
+        </>
     )
 }

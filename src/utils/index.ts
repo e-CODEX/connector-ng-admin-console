@@ -8,12 +8,53 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-export const formatDate = (date: string) => new Date(date).toLocaleString("UTC", { timeZone: "UTC" });
+export const formatDate = (date: string) => new Date(date).toLocaleString(
+    "UTC",
+    { timeZone: "UTC" }
+);
 
-export const truncate = (s: string, n = 36) => s.length > n ? `${s.slice(0, n)}…` : s;
+export const truncate = (s: string, n = 36) => {
+    if (s == null) return "";
+    return s.length > n ? `${s.slice(0, n)}…` : s;
+}
 
 export const getDeliveryLabel = (isDelivered: boolean): string =>
     isDelivered ? "Delivered" : "Not delivered";
 
 export const getDeliveryColor = (isDelivered: boolean): "success" | "danger" =>
     isDelivered ? "success" : "danger";
+
+export const getTransportDeliveryLabel = (status: string): string => {
+    switch (status) {
+        case "DELIVERED":
+            return "Delivered";
+        case "SUBMITTED":
+            return "Submitted";
+        case "DOWNLOADED":
+            return "Downloaded";
+        case "READY_FOR_DOWNLOAD":
+            return "Ready for download";
+        case "FAILED":
+            return "Failed";
+        default:
+            return "Unknown";
+    }
+}
+
+export const getTransportDeliveryColor = (status: string):
+    "success" | "danger" | "warning" | "accent" | "default" => {
+    switch (status) {
+        case "DELIVERED":
+            return "success";
+        case "SUBMITTED":
+            return "warning";
+        case "DOWNLOADED":
+            return "success";
+        case "READY_FOR_DOWNLOAD":
+            return "accent";
+        case "FAILED":
+            return "danger";
+        default:
+            return "default";
+    }
+}

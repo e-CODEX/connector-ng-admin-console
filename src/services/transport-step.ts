@@ -8,3 +8,18 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
+import { PaginatedResponse } from "@/types/paginated-response";
+import { restApiCall } from "@/lib/http";
+
+export async function listTransportSteps(params?: {
+    page?: number,
+    size?: number,
+    messageOrRemoteSystemIdentifier?: string,
+    linkPartnerName?: string
+}):
+    Promise<PaginatedResponse<ConnectorTransportStep>> {
+    return restApiCall<PaginatedResponse<ConnectorTransportStep>>(
+        "api/v1/admin/transport-steps",
+        { params }
+    );
+}

@@ -8,9 +8,89 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
+"use client"
+
 import { PageHeader } from "@/components/common/page-hearder";
+import { useEffect, useState } from "react";
+import { useDebouncedValue } from "@/hooks/use-debounced-value";
+import { Button, Chip, Spinner, Table, toast, Tooltip, useOverlayState } from "@heroui/react";
+import { listTransportSteps } from "@/services/transport-step";
+import { TransportStepFilters } from "@/components/transport-step/transport-step-filters";
+import {
+    formatDate,
+    getTransportDeliveryColor,
+    getTransportDeliveryLabel,
+    truncate
+} from "@/utils";
+import { Icon } from "@iconify/react";
+import { PaginationControls } from "@/components/paging/pagination-controls";
+import { ConnectorTransportStep } from "@/types/transport-step";
+import {
+    TransportStepDetailsModal
+} from "@/components/transport-step/transport-step-details-modal";
 
 export default function TransportStepsAdminPage() {
+    const [loading, setLoading] = useState(true)
+    const [page, setPage] = useState(1)
+    const [totalElements, setTotalElements] = useState(0)
+    const [pageSize, setPageSize] = useState(20);
+    const [selectedTransportStep, setSelectedTransportStep] = useState<ConnectorTransportStep | null>(
+        null);
+    const [transportSteps, setTransportSteps] = useState<ConnectorTransportStep[]>([])
+    const [messageOrRemoteSystemIdentifierQuery, setMessageOrRemoteSystemIdentifierQuery] = useState(
+        "")
+    const [linkPartnerNameQuery, setLinkPartnerNameQuery] = useState("")
+
+    const debouncedMessageOrRemoteSystemIdentifier = useDebouncedValue(
+        messageOrRemoteSystemIdentifierQuery)
+    const debouncedLinkPartnerName = useDebouncedValue(linkPartnerNameQuery)
+
+    const onMessageOrRemoteSystemIdentifierChange = (value: string) => {
+        setMessageOrRemoteSystemIdentifierQuery(value)
+        setPage(1)
+    }
+
+    const onLinkPartnerNameChange = (value: string) => {
+        setLinkPartnerNameQuery(value)
+        setPage(1)
+    }
+
+    const detailsModal = useOverlayState();
+
+    const onDetailsClick = (step: ConnectorTransportStep) => {
+        setSelectedTransportStep(step);
+        detailsModal.open();
+    };
+
+    useEffect(() => {
+        let active = true;
+
+        (async () => {
+            setLoading(true)
+            try {
+                const data = await listTransportSteps({
+                    page: page - 1,
+                    size: pageSize,
+                    messageOrRemoteSystemIdentifier: debouncedMessageOrRemoteSystemIdentifier || undefined,
+                    linkPartnerName: debouncedLinkPartnerName || undefined,
+                })
+                if (!active) return
+                setTransportSteps(data.content || [])
+                setTotalElements(data.totalElements || 0)
+            } catch (error) {
+                if (!active) return
+                toast("Error fetching messages")
+                console.error("Error fetching messages:", error)
+            } finally {
+                if (active) setLoading(false)
+            }
+        })()
+
+        return () => {
+            active = false
+        }
+    }, [page, pageSize, debouncedMessageOrRemoteSystemIdentifier, debouncedLinkPartnerName])
+
     return (
         <>
             <PageHeader
@@ -18,6 +98,112 @@ export default function TransportStepsAdminPage() {
                 title="Message Transport Steps"
                 subtitle="Track message transport steps"
             />
+            <TransportStepFilters
+                messageOrRemoteSystemIdentifier={messageOrRemoteSystemIdentifierQuery}
+                linkPartnerName={linkPartnerNameQuery}
+                onMessageOrRemoteSystemIdentifierChange={onMessageOrRemoteSystemIdentifierChange}
+                onLinkPartnerNameChange={onLinkPartnerNameChange}
+            />
+
+            {loading ? (
+                <div className="flex justify-center items-center min-h-400]">
+                    <Spinner size="lg"/>
+                </div>
+            ) : (
+                <>
+                    <Table variant="secondary">
+                        <Table.ScrollContainer>
+                            <Table.Content aria-label="Connector messages transport steps">
+                                <Table.Header>
+                                    <Table.Column isRowHeader>Identifier</Table.Column>
+                                    <Table.Column>Transported Message ID</Table.Column>
+                                    <Table.Column>Link Partner Name</Table.Column>
+                                    <Table.Column>Remote System Identifier</Table.Column>
+                                    <Table.Column>Message Type</Table.Column>
+                                    <Table.Column>Attempts</Table.Column>
+                                    <Table.Column>status</Table.Column>
+                                    <Table.Column>Created at</Table.Column>
+                                    <Table.Column>Action.s</Table.Column>
+                                </Table.Header>
+                                <Table.Body>
+                                    {transportSteps.map((transportStep) => (
+                                        <Table.Row key={transportStep.identifier}>
+                                            <Table.Cell>
+                                                <Tooltip delay={0}>
+                                                        <span
+                                                            className="font-semibold truncate inline-block">
+                                                            {truncate(transportStep.identifier)}
+                                                        </span>
+                                                    <Tooltip.Content showArrow>
+                                                        <Tooltip.Arrow/>
+                                                        <p>{transportStep.identifier}</p>
+                                                    </Tooltip.Content>
+                                                </Tooltip>
+                                            </Table.Cell>
+                                            <Table.Cell>{truncate(transportStep.transportedMessageIdentifier)}</Table.Cell>
+                                            <Table.Cell>{transportStep.linkPartnerName}</Table.Cell>
+                                            <Table.Cell>{truncate(transportStep.remoteSystemIdentifier)}</Table.Cell>
+                                            <Table.Cell>{transportStep.messageType}</Table.Cell>
+                                            <Table.Cell>{transportStep.numberOfAttempts}</Table.Cell>
+                                            <Table.Cell>
+                                                <Chip
+                                                    color={getTransportDeliveryColor(transportStep.status)}
+                                                    size="sm"
+                                                    variant="soft"
+                                                >
+                                                    <Chip.Label>{getTransportDeliveryLabel(
+                                                        transportStep.status)}</Chip.Label>
+                                                </Chip>
+                                            </Table.Cell>
+                                            <Table.Cell>{formatDate(transportStep.createdAt)}</Table.Cell>
+                                            <Table.Cell>
+                                                <div className="flex items-center gap-1">
+                                                    <Tooltip delay={0}>
+                                                        <Button
+                                                            isIconOnly
+                                                            size="sm"
+                                                            variant="tertiary"
+                                                            onPress={() => onDetailsClick(
+                                                                transportStep)}
+                                                        >
+                                                            <Icon
+                                                                className="size-4"
+                                                                icon="gravity-ui:eye"
+                                                            />
+                                                        </Button>
+                                                        <Tooltip.Content showArrow>
+                                                            <Tooltip.Arrow/>
+                                                            <p>Details</p>
+                                                        </Tooltip.Content>
+                                                    </Tooltip>
+                                                </div>
+                                            </Table.Cell>
+                                        </Table.Row>
+                                    ))}
+                                </Table.Body>
+                            </Table.Content>
+                        </Table.ScrollContainer>
+                    </Table>
+
+                    {
+                        totalElements > 0 && (
+
+                            <div className="flex justify-center mt-4">
+                                <PaginationControls
+                                    page={page}
+                                    pageSize={pageSize}
+                                    totalElements={totalElements}
+                                    onPageChange={setPage}
+                                    onPageSizeChange={setPageSize}
+                                />
+                            </div>
+                        )
+                    }
+
+                    <TransportStepDetailsModal transportStep={selectedTransportStep}
+                                               state={detailsModal}/>
+                </>
+            )}
         </>
     )
 }

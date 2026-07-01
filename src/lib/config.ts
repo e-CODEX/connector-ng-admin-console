@@ -8,3 +8,4 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL!;

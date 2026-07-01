@@ -8,3 +8,12 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
+export const formatDate = (date: string) => new Date(date).toLocaleString("UTC", { timeZone: "UTC" });
+
+export const truncate = (s: string, n = 36) => s.length > n ? `${s.slice(0, n)}…` : s;
+
+export const getDeliveryLabel = (isDelivered: boolean): string =>
+    isDelivered ? "Delivered" : "Not delivered";
+
+export const getDeliveryColor = (isDelivered: boolean): "success" | "danger" =>
+    isDelivered ? "success" : "danger";

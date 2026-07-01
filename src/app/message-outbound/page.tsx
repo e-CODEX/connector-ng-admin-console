@@ -13,7 +13,7 @@ import {Footer} from "@/components/common/Footer";
 
 export default function MessageOutboundPage() {
     return (
-        <div className="">
+        <div className="relative flex flex-col min-h-screen">
             <MainNavbar/>
             <main className="grow">
                 Message outbound page

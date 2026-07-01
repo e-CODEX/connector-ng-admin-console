@@ -8,12 +8,17 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
+import {MainNavbar} from "@/components/common/MainNavbar";
+import {Footer} from "@/components/common/Footer";
+
 export default function AttachmentsAdminPage() {
     return (
         <div className="relative flex flex-col min-h-screen">
+            <MainNavbar/>
             <main className="grow">
                 Messages admin pages
             </main>
+            <Footer/>
         </div>
     )
 }

@@ -12,7 +12,6 @@ import { ConnectorAttachment } from "@/types/attachments";
 
 export interface ConnectorMessage {
     businessDomainIdentifier: string;
-    conversationIdentifier: string;
     identifier: string;
     backendMessageIdentifier: string;
     backendName: string;

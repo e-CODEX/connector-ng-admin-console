@@ -14,6 +14,7 @@ import { Button, Chip, Modal, useOverlayState } from "@heroui/react";
 import { ConnectorMessage } from "@/types/message";
 import { formatDate, getDeliveryColor, getDeliveryLabel } from "@/utils";
 import React from "react";
+import { Eye } from "@gravity-ui/icons";
 
 interface MessageDetailsModalProps {
     message: ConnectorMessage | null;
@@ -35,9 +36,12 @@ export function MessageDetailsModal({ message, state }: MessageDetailsModalProps
         <Modal state={state}>
             <Modal.Backdrop>
                 <Modal.Container>
-                    <Modal.Dialog>
+                    <Modal.Dialog className="sm:max-w-200">
                         <Modal.Header>
-                            <Modal.Heading>Message details</Modal.Heading>
+                            <Modal.Icon className="bg-default text-foreground">
+                                <Eye className="size-5"/>
+                            </Modal.Icon>
+                            <Modal.Heading className="font-semibold">Message details</Modal.Heading>
                         </Modal.Header>
                         <Modal.Body>
                             {message && (

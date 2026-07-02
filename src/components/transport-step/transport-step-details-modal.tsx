@@ -14,6 +14,7 @@ import { Button, Chip, Modal, useOverlayState } from "@heroui/react";
 import { formatDate, getTransportDeliveryColor, getTransportDeliveryLabel } from "@/utils";
 import React from "react";
 import { ConnectorTransportStep } from "@/types/transport-step";
+import { Eye } from "@gravity-ui/icons";
 
 interface TransportStepDetailsModalProps {
     transportStep: ConnectorTransportStep | null;
@@ -38,9 +39,12 @@ export function TransportStepDetailsModal({
         <Modal state={state}>
             <Modal.Backdrop>
                 <Modal.Container size="lg">
-                    <Modal.Dialog>
+                    <Modal.Dialog className="sm:max-w-200">
                         <Modal.Header>
-                            <Modal.Heading>Message details</Modal.Heading>
+                            <Modal.Icon className="bg-default text-foreground">
+                                <Eye className="size-5"/>
+                            </Modal.Icon>
+                            <Modal.Heading className="font-semibold">Message details</Modal.Heading>
                         </Modal.Header>
                         <Modal.Body>
                             {transportStep && (

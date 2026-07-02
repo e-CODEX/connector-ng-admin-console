@@ -33,6 +33,8 @@ export default function MessagesAdminPage() {
     const [identifierQuery, setIdentifierQuery] = useState("")
     const [backendNameQuery, setBackendNameQuery] = useState("")
 
+    const IDENTIFIER_LENGTH = 15;
+
     const debouncedIdentifier = useDebouncedValue(identifierQuery)
     const debouncedBackendName = useDebouncedValue(backendNameQuery)
 
@@ -112,6 +114,7 @@ export default function MessagesAdminPage() {
                             <Table.Content aria-label="Connector business messages">
                                 <Table.Header>
                                     <Table.Column isRowHeader>Identifier</Table.Column>
+                                    <Table.Column>Conversation ID</Table.Column>
                                     <Table.Column>Business domain</Table.Column>
                                     <Table.Column>Backend ID</Table.Column>
                                     <Table.Column>From</Table.Column>
@@ -132,7 +135,7 @@ export default function MessagesAdminPage() {
                                                 <Tooltip delay={0}>
                                                         <span
                                                             className="font-semibold truncate inline-block">
-                                                            {truncate(message.identifier)}
+                                                            {truncate(message.identifier, IDENTIFIER_LENGTH)}
                                                         </span>
                                                     <Tooltip.Content showArrow>
                                                         <Tooltip.Arrow/>
@@ -140,8 +143,9 @@ export default function MessagesAdminPage() {
                                                     </Tooltip.Content>
                                                 </Tooltip>
                                             </Table.Cell>
+                                            <Table.Cell>{truncate(message.as4Properties.conversationIdentifier, IDENTIFIER_LENGTH)}</Table.Cell>
                                             <Table.Cell>{message.businessDomainIdentifier}</Table.Cell>
-                                            <Table.Cell>{truncate(message.backendMessageIdentifier)}</Table.Cell>
+                                            <Table.Cell>{truncate(message.backendMessageIdentifier, IDENTIFIER_LENGTH)}</Table.Cell>
                                             <Table.Cell>{message.as4Properties.fromParty.identifier}</Table.Cell>
                                             <Table.Cell>{message.as4Properties.toParty.identifier}</Table.Cell>
                                             <Table.Cell>{message.backendName}</Table.Cell>

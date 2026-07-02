@@ -12,6 +12,11 @@ import { PaginatedResponse } from "@/types/paginated-response";
 import { ConnectorMessage, ConnectorMessageDetails } from "@/types/message";
 import { restApiCall } from "@/lib/http";
 import { ConnectorTransportStep } from "@/types/transport-step";
+import {
+  SendMessageArgs,
+  SendMessageResponse,
+} from "@/types/send-message-form";
+
 
 export async function listMessages(params?: {
     page?: number,
@@ -36,4 +41,39 @@ export async function getMessageTransportStep(identifier: string): Promise<Conne
     return restApiCall<ConnectorTransportStep>(
         `api/v1/admin/messages/${identifier}/transport-steps`
     );
+}
+export async function sendMessage({
+                                      formData,
+                                      parameters,
+                                      document,
+                                  }: SendMessageArgs): Promise<SendMessageResponse> {
+    if (parameters.mode === "REST") {
+        return sendRestMessage({ formData, parameters, document });
+    }
+
+    return sendSoapMessage({ formData, parameters, document });
+}
+
+async function sendRestMessage({
+                                   formData,
+                                   parameters,
+                                   document,
+                               }: SendMessageArgs): Promise<SendMessageResponse> {
+    void formData;
+    void parameters;
+    void document;
+
+    throw new Error("REST send message not implemented yet");
+}
+
+async function sendSoapMessage({
+                                   formData,
+                                   parameters,
+                                   document,
+                               }: SendMessageArgs): Promise<SendMessageResponse> {
+    void formData;
+    void parameters;
+    void document;
+
+    throw new Error("SOAP send message not implemented yet");
 }

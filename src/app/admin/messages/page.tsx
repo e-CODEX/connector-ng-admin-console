@@ -17,11 +17,11 @@ import { Button, Chip, Spinner, Table, toast, Tooltip, useOverlayState } from "@
 import { Icon } from "@iconify/react";
 import { formatDate, getDeliveryColor, getDeliveryLabel, truncate } from "@/utils";
 import { PaginationControls } from "@/components/paging/pagination-controls";
-import { MessageDetailsModal } from "@/components/message/message-details-modal";
-import { MessageTransportStepsDetailModal } from "@/components/message/message-transport-steps-detail-modal";
+import { MessageTransportStepsDetailModal } from "@/components/message/detail/message-transport-steps-detail-modal";
 import { PageHeader } from "@/components/common/page-hearder";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { MessageFilters } from "@/components/message/message-filters";
+import { MessageDetailsModal } from "@/components/message/detail/message-details-modal";
 
 export default function MessagesAdminPage() {
     const [loading, setLoading] = useState(true)

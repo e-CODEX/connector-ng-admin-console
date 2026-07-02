@@ -73,7 +73,7 @@ export default function ProcessingModesAdminPage() {
                 <>
                     <Table variant="secondary">
                         <Table.ScrollContainer>
-                            <Table.Content aria-label="Connector messages attachments">
+                            <Table.Content aria-label="Connector processing modes">
                                 <Table.Header>
                                     <Table.Column isRowHeader>Identifier</Table.Column>
                                     <Table.Column>Business domain</Table.Column>

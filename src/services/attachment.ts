@@ -8,3 +8,17 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
+import { PaginatedResponse } from "@/types/paginated-response";
+import { restApiCall } from "@/lib/http";
+import { ConnectorAttachment } from "@/types/attachments";
+
+export async function listAttachments(params?: {
+    page?: number,
+    size?: number
+}):
+    Promise<PaginatedResponse<ConnectorAttachment>> {
+    return restApiCall<PaginatedResponse<ConnectorAttachment>>(
+        "api/v1/admin/attachments",
+        { params }
+    );
+}

@@ -8,9 +8,60 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
+"use client"
+
 import { PageHeader } from "@/components/common/page-hearder";
+import { useEffect, useState } from "react";
+import { ConnectorAttachment } from "@/types/attachments";
+import { Button, Spinner, Table, toast, Tooltip, useOverlayState } from "@heroui/react";
+import { listAttachments } from "@/services/attachment";
+import { formatBytes, formatDate, truncate } from "@/utils";
+import { Icon } from "@iconify/react";
+import { PaginationControls } from "@/components/paging/pagination-controls";
+import { AttachmentDetailsModal } from "@/components/attachment/attachment-details-modal";
 
 export default function AttachmentsAdminPage() {
+    const [loading, setLoading] = useState(true)
+    const [page, setPage] = useState(1)
+    const [totalElements, setTotalElements] = useState(0)
+    const [pageSize, setPageSize] = useState(20);
+    const [attachments, setAttachments] = useState<ConnectorAttachment[]>([])
+    const [selectedAttachment, setSelectedAttachment] = useState<ConnectorAttachment | null>(null);
+
+    const detailsModal = useOverlayState();
+
+    const onDetailsClick = (attachment: ConnectorAttachment) => {
+        setSelectedAttachment(attachment);
+        detailsModal.open();
+    };
+
+    useEffect(() => {
+        let active = true;
+
+        (async () => {
+            setLoading(true)
+            try {
+                const data = await listAttachments({
+                    page: page - 1,
+                    size: pageSize,
+                })
+                if (!active) return
+                setAttachments(data.content || [])
+                setTotalElements(data.totalElements || 0)
+            } catch (error) {
+                if (!active) return
+                toast("Error fetching attachments")
+                console.error("Error fetching attachments:", error)
+            } finally {
+                if (active) setLoading(false)
+            }
+        })()
+
+        return () => {
+            active = false
+        }
+    }, [page, pageSize])
+
     return (
         <>
             <PageHeader
@@ -18,6 +69,89 @@ export default function AttachmentsAdminPage() {
                 title="Message attachments"
                 subtitle="Attachments associated to messages"
             />
+
+            {loading ? (
+                <div className="flex justify-center items-center min-h-400]">
+                    <Spinner size="lg"/>
+                </div>
+            ) : (
+                <>
+                    <Table variant="secondary">
+                        <Table.ScrollContainer>
+                            <Table.Content aria-label="Connector messages attachments">
+                                <Table.Header>
+                                    <Table.Column isRowHeader>Identifier</Table.Column>
+                                    <Table.Column>Name</Table.Column>
+                                    <Table.Column>Content Type</Table.Column>
+                                    <Table.Column>Description</Table.Column>
+                                    <Table.Column>Size</Table.Column>
+                                    <Table.Column>Storage</Table.Column>
+                                    <Table.Column>Type</Table.Column>
+                                    <Table.Column>Created at</Table.Column>
+                                    <Table.Column>Action.s</Table.Column>
+                                </Table.Header>
+                                <Table.Body>
+                                    {attachments.map((attachment) => (
+                                        <Table.Row key={attachment.identifier}>
+                                            <Table.Cell>
+                                                <span
+                                                    className="font-semibold truncate inline-block">
+                                                    {truncate(attachment.identifier)}
+                                                </span>
+                                            </Table.Cell>
+                                            <Table.Cell>{attachment.name}</Table.Cell>
+                                            <Table.Cell>{attachment.contentType}</Table.Cell>
+                                            <Table.Cell>{truncate(attachment.description)}</Table.Cell>
+                                            <Table.Cell>{formatBytes(attachment.size)}</Table.Cell>
+                                            <Table.Cell>{attachment.storage}</Table.Cell>
+                                            <Table.Cell>{attachment.type}</Table.Cell>
+                                            <Table.Cell>{formatDate(attachment.createdAt)}</Table.Cell>
+                                            <Table.Cell>
+                                                <div className="flex items-center gap-1">
+                                                    <Tooltip delay={0}>
+                                                        <Button
+                                                            isIconOnly
+                                                            size="sm"
+                                                            variant="tertiary"
+                                                            onPress={() => onDetailsClick(attachment)}
+                                                        >
+                                                            <Icon
+                                                                className="size-4"
+                                                                icon="gravity-ui:eye"
+                                                            />
+                                                        </Button>
+                                                        <Tooltip.Content showArrow>
+                                                            <Tooltip.Arrow/>
+                                                            <p>Details</p>
+                                                        </Tooltip.Content>
+                                                    </Tooltip>
+                                                </div>
+                                            </Table.Cell>
+                                        </Table.Row>
+                                    ))}
+                                </Table.Body>
+                            </Table.Content>
+                        </Table.ScrollContainer>
+                    </Table>
+
+                    {
+                        totalElements > 0 && (
+
+                            <div className="flex justify-center mt-4">
+                                <PaginationControls
+                                    page={page}
+                                    pageSize={pageSize}
+                                    totalElements={totalElements}
+                                    onPageChange={setPage}
+                                    onPageSizeChange={setPageSize}
+                                />
+                            </div>
+                        )
+                    }
+
+                    <AttachmentDetailsModal attachment={selectedAttachment} state={detailsModal}/>
+                </>
+            )}
         </>
     )
 }

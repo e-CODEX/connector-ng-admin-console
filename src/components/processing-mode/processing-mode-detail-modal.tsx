@@ -15,20 +15,11 @@ import { formatDate } from "@/utils";
 import React from "react";
 import { Eye } from "@gravity-ui/icons";
 import { ConnectorProcessingMode } from "@/types/processing-mode";
+import { DetailRow } from "@/components/common/detail-row";
 
 interface ProcessingModeDetailsModalProps {
     processingMode: ConnectorProcessingMode | null;
     state: ReturnType<typeof useOverlayState>;
-}
-
-function Row({ label, value }: { label: string; value: React.ReactNode }) {
-    return (
-        <div
-            className="flex justify-between gap-4 py-1.5 border-b border-separator last:border-b-0">
-            <span className="font-semibold text-muted whitespace-nowrap">{label}</span>
-            <span className="text-right break-all">{value}</span>
-        </div>
-    );
 }
 
 export function ProcessingModeDetailsModal({
@@ -49,17 +40,12 @@ export function ProcessingModeDetailsModal({
                         <Modal.Body>
                             {processingMode && (
                                 <div className="flex flex-col">
-                                    <Row label="Identifier" value={processingMode.uuid}/>
-                                    <Row label="Business domain"
-                                         value={processingMode.businessDomainIdentifier}/>
-                                    <Row label="Description"
-                                         value={processingMode.description}/>
-                                    <Row label="Filename"
-                                         value={processingMode.filename}/>
-                                    <Row label="Created at"
-                                         value={formatDate(processingMode.createdAt)}/>
-                                    <Row label="Updated at"
-                                         value={formatDate(processingMode.updatedAt)}/>
+                                    <DetailRow label="Identifier" value={processingMode.uuid}/>
+                                    <DetailRow label="Business domain" value={processingMode.businessDomainIdentifier}/>
+                                    <DetailRow label="Description" value={processingMode.description}/>
+                                    <DetailRow label="Filename" value={processingMode.filename}/>
+                                    <DetailRow label="Created at" value={formatDate(processingMode.createdAt)}/>
+                                    <DetailRow label="Updated at" value={formatDate(processingMode.updatedAt)}/>
                                 </div>
                             )}
                         </Modal.Body>

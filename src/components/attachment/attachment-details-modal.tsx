@@ -15,20 +15,11 @@ import { formatBytes, formatDate } from "@/utils";
 import React from "react";
 import { ConnectorAttachment } from "@/types/attachments";
 import { Eye } from "@gravity-ui/icons";
+import { DetailRow } from "@/components/common/detail-row";
 
 interface AttachmentDetailsModalProps {
     attachment: ConnectorAttachment | null;
     state: ReturnType<typeof useOverlayState>;
-}
-
-function Row({ label, value }: { label: string; value: React.ReactNode }) {
-    return (
-        <div
-            className="flex justify-between gap-4 py-1.5 border-b border-separator last:border-b-0">
-            <span className="font-semibold text-muted whitespace-nowrap">{label}</span>
-            <span className="text-right break-all">{value}</span>
-        </div>
-    );
 }
 
 export function AttachmentDetailsModal({
@@ -50,21 +41,15 @@ export function AttachmentDetailsModal({
                         <Modal.Body>
                             {attachment && (
                                 <div className="flex flex-col">
-                                    <Row label="Identifier" value={attachment.identifier}/>
-                                    <Row label="Name"
-                                         value={attachment.name}/>
-                                    <Row label="Content type"
-                                         value={attachment.contentType}/>
-                                    <Row label="Description"
-                                         value={attachment.description}/>
-                                    <Row label="Size"
-                                         value={formatBytes(attachment.size)}/>
-                                    <Row label="Storage" value={attachment.storage}/>
-                                    <Row label="Type" value={attachment.type}/>
-                                    <Row label="Created at"
-                                         value={formatDate(attachment.createdAt)}/>
-                                    <Row label="Updated at"
-                                         value={formatDate(attachment.updatedAt)}/>
+                                    <DetailRow label="Identifier" value={attachment.identifier}/>
+                                    <DetailRow label="Name" value={attachment.name}/>
+                                    <DetailRow label="Content type" value={attachment.contentType}/>
+                                    <DetailRow label="Description" value={attachment.description}/>
+                                    <DetailRow label="Size" value={formatBytes(attachment.size)}/>
+                                    <DetailRow label="Storage" value={attachment.storage}/>
+                                    <DetailRow label="Type" value={attachment.type}/>
+                                    <DetailRow label="Created at" value={formatDate(attachment.createdAt)}/>
+                                    <DetailRow label="Updated at" value={formatDate(attachment.updatedAt)}/>
                                 </div>
                             )}
                         </Modal.Body>

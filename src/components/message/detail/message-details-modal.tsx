@@ -79,14 +79,15 @@ export function MessageDetailsModal({ message, state }: MessageDetailsModalProps
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8">
                                         <DetailRow label="Identifier" value={message.identifier}/>
                                         <DetailRow label="Business domain" value={message.businessDomainIdentifier}/>
+                                        <DetailRow label="Conversation" value={message.as4Properties.conversationIdentifier}/>
                                         <DetailRow label="Backend ID" value={message.backendMessageIdentifier}/>
-                                        <DetailRow label="Direction" value={message.direction}/>
                                         <DetailRow label="From" value={detailParty(message.as4Properties.fromParty)}/>
                                         <DetailRow label="To" value={detailParty(message.as4Properties.toParty)}/>
                                         <DetailRow label="Backend" value={message.backendName}/>
                                         <DetailRow label="Gateway" value={message.gatewayName}/>
                                         <DetailRow label="Service" value={message.as4Properties.service.name}/>
                                         <DetailRow label="Action" value={message.as4Properties.action.name}/>
+                                        <DetailRow label="Direction" value={message.direction}/>
                                         <DetailRow
                                             label="Status"
                                             value={

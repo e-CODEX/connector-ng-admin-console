@@ -10,7 +10,16 @@
 
 export const formatDate = (date: string) => {
     if (!date) return "";
-    return new Date(date).toLocaleString("UTC", { timeZone: "UTC" });
+    return new Date(date).toLocaleString(undefined, {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        fractionalSecondDigits: 3,
+        hour12: false,
+    });
 }
 
 export const truncate = (s: string, n = 36) => {

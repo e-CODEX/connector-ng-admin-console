@@ -10,6 +10,7 @@
 
 import { PaginatedResponse } from "@/types/paginated-response";
 import { restApiCall } from "@/lib/http";
+import { ConnectorTransportStep } from "@/types/transport-step";
 
 export async function listTransportSteps(params?: {
     page?: number,

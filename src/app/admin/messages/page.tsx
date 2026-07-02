@@ -18,7 +18,7 @@ import { Icon } from "@iconify/react";
 import { formatDate, getDeliveryColor, getDeliveryLabel, truncate } from "@/utils";
 import { PaginationControls } from "@/components/paging/pagination-controls";
 import { MessageDetailsModal } from "@/components/message/message-details-modal";
-import { TransportStepsDetailModal } from "@/components/message/transport-steps-detail-modal";
+import { MessageTransportStepsDetailModal } from "@/components/message/message-transport-steps-detail-modal";
 import { PageHeader } from "@/components/common/page-hearder";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { MessageFilters } from "@/components/message/message-filters";
@@ -225,7 +225,7 @@ export default function MessagesAdminPage() {
             )}
 
             <MessageDetailsModal message={selectedMessage} state={detailsModal}/>
-            <TransportStepsDetailModal message={selectedMessage} state={transportModal}/>
+            <MessageTransportStepsDetailModal message={selectedMessage} state={transportModal}/>
         </>
     )
 }

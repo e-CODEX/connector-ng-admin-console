@@ -11,6 +11,7 @@
 import { PaginatedResponse } from "@/types/paginated-response";
 import { ConnectorMessage, ConnectorMessageDetails } from "@/types/message";
 import { restApiCall } from "@/lib/http";
+import { ConnectorTransportStep } from "@/types/transport-step";
 
 export async function listMessages(params?: {
     page?: number,
@@ -28,5 +29,11 @@ export async function listMessages(params?: {
 export async function getMessage(identifier: string): Promise<ConnectorMessageDetails> {
     return restApiCall<ConnectorMessageDetails>(
         `api/v1/admin/messages/${identifier}`
+    );
+}
+
+export async function getMessageTransportStep(identifier: string): Promise<ConnectorTransportStep> {
+    return restApiCall<ConnectorTransportStep>(
+        `api/v1/admin/messages/${identifier}/transport-steps`
     );
 }

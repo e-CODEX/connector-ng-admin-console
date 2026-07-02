@@ -10,13 +10,11 @@
 
 "use client";
 
-import { Button, Chip, Modal, Table, useOverlayState } from "@heroui/react";
-import { formatDate, getTransportDeliveryColor, getTransportDeliveryLabel, truncate } from "@/utils";
+import { Button, Modal, useOverlayState } from "@heroui/react";
 import React from "react";
 import { ConnectorTransportStep } from "@/types/transport-step";
 import { Eye } from "@gravity-ui/icons";
-import { DetailRow } from "@/components/common/detail-row";
-import { DetailSection } from "@/components/common/detail-section";
+import { TransportStepDetails } from "@/components/transport-step/transport-step-details";
 
 interface TransportStepDetailsModalProps {
     transportStep: ConnectorTransportStep | null;
@@ -39,64 +37,7 @@ export function TransportStepDetailsModal({
                             <Modal.Heading className="font-semibold">Message details</Modal.Heading>
                         </Modal.Header>
                         <Modal.Body>
-                            {transportStep && (
-                                <div className="flex flex-col">
-                                    <div>
-                                        <DetailRow label="Identifier" value={transportStep.identifier}/>
-                                        <DetailRow label="Transported Message ID"
-                                                   value={transportStep.transportedMessageIdentifier}/>
-                                        <DetailRow label="Link Partner Name"
-                                                   value={transportStep.linkPartnerName}/>
-                                        <DetailRow label="Remote System Identifier"
-                                                   value={transportStep.remoteSystemIdentifier}/>
-                                        <DetailRow label="Message Type"
-                                                   value={transportStep.messageType}/>
-                                        <DetailRow label="Attempts" value={transportStep.numberOfAttempts}/>
-                                        <DetailRow
-                                            label="Status"
-                                            value={
-                                                <Chip
-                                                    color={getTransportDeliveryColor(transportStep.status)}
-                                                    size="sm" variant="soft">
-                                                    <Chip.Label>{getTransportDeliveryLabel(transportStep.status)}</Chip.Label>
-                                                </Chip>
-                                            }
-                                        />
-                                        <DetailRow label="Created at"
-                                                   value={formatDate(transportStep.createdAt)}/>
-                                        <DetailRow label="Updated at"
-                                                   value={formatDate(transportStep.updatedAt)}/>
-                                    </div>
-                                    <DetailSection title="Status history"
-                                                   isEmpty={!transportStep.statuses?.length}
-                                                   emptyLabel="No status history available.">
-                                        <Table>
-                                            <Table.ScrollContainer>
-                                                <Table.Content aria-label="Transport step history">
-                                                    <Table.Header>
-                                                        <Table.Column isRowHeader>Status</Table.Column>
-                                                        <Table.Column>Created at</Table.Column>
-                                                    </Table.Header>
-                                                    <Table.Body>
-                                                        {transportStep.statuses.map((status, i) => (
-                                                            <Table.Row key={`${status.status}-${i}`}>
-                                                                <Table.Cell>
-                                                                    <Chip
-                                                                        color={getTransportDeliveryColor(transportStep.status)}
-                                                                        size="sm" variant="soft">
-                                                                        <Chip.Label>{getTransportDeliveryLabel(transportStep.status)}</Chip.Label>
-                                                                    </Chip>
-                                                                </Table.Cell>
-                                                                <Table.Cell>{formatDate(status.createdAt)}</Table.Cell>
-                                                            </Table.Row>
-                                                        ))}
-                                                    </Table.Body>
-                                                </Table.Content>
-                                            </Table.ScrollContainer>
-                                        </Table>
-                                    </DetailSection>
-                                </div>
-                            )}
+                            {transportStep && <TransportStepDetails transportStep={transportStep}/>}
                         </Modal.Body>
                         <Modal.Footer>
                             <Button slot="close" variant="tertiary">Close</Button>

@@ -240,7 +240,9 @@ export function MessageDetailsModal({ message, state }: MessageDetailsModalProps
                                     )}
 
                                     {error && (
-                                        <p className="text-danger text-sm py-4">{error}</p>
+                                        <div className="flex justify-center py-6">
+                                            <div className="text-destructive">{error}</div>
+                                        </div>
                                     )}
                                 </div>
                             )}

@@ -8,10 +8,10 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-export const formatDate = (date: string) => new Date(date).toLocaleString(
-    "UTC",
-    { timeZone: "UTC" }
-);
+export const formatDate = (date: string) => {
+    if (!date) return "";
+    return new Date(date).toLocaleString("UTC", { timeZone: "UTC" });
+}
 
 export const truncate = (s: string, n = 36) => {
     if (s == null) return "";

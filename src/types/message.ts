@@ -8,6 +8,8 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
+import { ConnectorAttachment } from "@/types/attachments";
+
 export interface ConnectorMessage {
     businessDomainIdentifier: string;
     identifier: string;
@@ -26,6 +28,18 @@ export interface ConnectorMessage {
     deliveredToBackendAt: string;
 }
 
+export interface ConnectorMessageDetails extends ConnectorMessage {
+    businessContent: ConnectorMessageBusinessContent;
+    attachments: ConnectorAttachment[];
+    evidences: ConnectorMessageEvidence[];
+    errors: ConnectorMessageError[];
+}
+
+interface ConnectorMessageBusinessContent {
+    type: string;
+    content: string;
+}
+
 interface ConnectorAS4Properties {
     ebmsMessageIdentifier: string;
     referenceToIdentifier: string;
@@ -38,7 +52,7 @@ interface ConnectorAS4Properties {
     action: ConnectorAction;
 }
 
-interface ConnectorParty {
+export interface ConnectorParty {
     name: string;
     identifier: string;
     identifierType: string;
@@ -54,4 +68,20 @@ interface ConnectorService {
 
 interface ConnectorAction {
     name: string;
+}
+
+interface ConnectorMessageEvidence {
+    uuid: string;
+    type: string;
+    createdAt: string;
+    updatedAt: string;
+    deliveredToLinkPartnerAt: string;
+}
+
+interface ConnectorMessageError {
+    label: string;
+    details: string;
+    source: string;
+    createdAt: string;
+    updatedAt: string;
 }

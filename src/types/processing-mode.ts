@@ -8,3 +8,11 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
+export interface ConnectorProcessingMode {
+    uuid: string;
+    description: string;
+    filename: string;
+    businessDomainIdentifier: string;
+    createdAt: string;
+    updatedAt: string;
+}

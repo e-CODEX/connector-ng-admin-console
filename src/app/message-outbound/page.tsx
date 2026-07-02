@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { PageHeader } from "@/components/common/page-hearder";
-import { MessageOutboundForm } from "@/components/message/message-outbound-form";
-import { SendParametersSection } from "@/components/message/message-send-params-section";
-import { MessageActionBar } from "@/components/message/message-action-bar";
-import { MessageConsolePanel } from "@/components/message/message-console-panel";
+import { MessageOutboundForm } from "@/components/message/outbound/message-outbound-form";
+import { SendParametersSection } from "@/components/message/outbound/message-send-params-section";
+import { MessageActionBar } from "@/components/message/outbound/message-action-bar";
+import { MessageConsolePanel } from "@/components/message/outbound/message-console-panel";
 import {
     SendMessageFormData,
     SendParameters,
@@ -13,6 +13,7 @@ import {
 import { sendMessage } from "@/services/message";
 
 const initialMessageFormData: SendMessageFormData = {
+    conversationIdentifier: "",
     backendMessageIdentifier: "",
     backendName: "backend_alice",
     as4Properties: {
@@ -90,7 +91,7 @@ export default function MessageOutboundPage() {
                 subtitle="Send a business message to a party"
             />
 
-            <div className="space-y-6">
+            <div className="space-y-3">
                 <MessageOutboundForm
                     data={messageFormData}
                     onChange={setMessageFormData}

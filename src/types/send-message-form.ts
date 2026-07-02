@@ -8,14 +8,14 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { ConnectorMessage } from '@/types/message';
+import { ConnectorMessage } from "@/types/message";
 
 export type SendMessageFormData = Pick<
   ConnectorMessage,
-  'backendMessageIdentifier' | 'backendName' | 'as4Properties'
+    "conversationIdentifier" | "backendMessageIdentifier" | "backendName" | "as4Properties"
 >;
 
-export type RequestMode = 'SOAP' | 'REST';
+export type RequestMode = "SOAP" | "REST";
 
 export interface SendParameters {
   mode: RequestMode;

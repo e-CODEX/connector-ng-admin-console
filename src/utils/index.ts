@@ -18,6 +18,23 @@ export const truncate = (s: string, n = 36) => {
     return s.length > n ? `${s.slice(0, n)}…` : s;
 }
 
+export function formatBytes(bytes: number, decimals = 1): string {
+    if (!Number.isFinite(bytes) || bytes < 0) return "—";
+    if (bytes === 0) return "0 B";
+
+    const units = ["B", "KB", "MB", "GB", "TB", "PB"];
+    const k = 1024;
+    const i = Math.min(
+        Math.floor(Math.log(bytes) / Math.log(k)),
+        units.length - 1,
+    );
+    const value = bytes / Math.pow(k, i);
+
+    // No decimals for whole bytes; trim trailing zeros otherwise
+    const formatted = i === 0 ? String(value) : value.toFixed(decimals);
+    return `${parseFloat(formatted)} ${units[i]}`;
+}
+
 export const getDeliveryLabel = (isDelivered: boolean): string =>
     isDelivered ? "Delivered" : "Not delivered";
 

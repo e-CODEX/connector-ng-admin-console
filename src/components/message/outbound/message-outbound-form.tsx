@@ -71,8 +71,8 @@ export function MessageOutboundForm({
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-5 gap-y-2">
                     <FormTextField
                         label="Conversation Id"
-                        value={data.conversationIdentifier}
-                        onChange={(value) => update({ conversationIdentifier: value })}
+                        value={as4Properties.conversationIdentifier}
+                        onChange={(value) => updateAs4({ conversationIdentifier: value })}
                     />
 
                     <FormTextField

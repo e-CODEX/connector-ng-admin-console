@@ -9,7 +9,7 @@
  */
 
 import { PaginatedResponse } from "@/types/paginated-response";
-import { ConnectorMessage } from "@/types/message";
+import { ConnectorMessage, ConnectorMessageDetails } from "@/types/message";
 import { restApiCall } from "@/lib/http";
 
 export async function listMessages(params?: {
@@ -22,5 +22,11 @@ export async function listMessages(params?: {
     return restApiCall<PaginatedResponse<ConnectorMessage>>(
         "api/v1/admin/messages",
         { params }
+    );
+}
+
+export async function getMessage(identifier: string): Promise<ConnectorMessageDetails> {
+    return restApiCall<ConnectorMessageDetails>(
+        `api/v1/admin/messages/${identifier}`
     );
 }

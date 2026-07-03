@@ -88,7 +88,12 @@ export default function MessageOutboundPage() {
                 icon="boxicons:send"
                 title="Send Bussiness Message"
                 subtitle="Send a business message to a party"
-            />
+            >
+                <MessageActionBar
+                    onSend={handleSend}
+                    onSaveAsXml={handleSaveAsXml}
+                />
+            </PageHeader>
 
             <div className="space-y-3">
                 <MessageOutboundForm
@@ -99,11 +104,6 @@ export default function MessageOutboundPage() {
                 <SendParametersSection
                     data={sendParameters}
                     onChange={setSendParameters}
-                />
-
-                <MessageActionBar
-                    onSend={handleSend}
-                    onSaveAsXml={handleSaveAsXml}
                 />
 
                 <MessageConsolePanel content={logs} />

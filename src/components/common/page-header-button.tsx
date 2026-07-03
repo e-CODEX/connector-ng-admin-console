@@ -1,0 +1,29 @@
+/*
+ * Copyright 2026 European Union Agency for the Operational Management of Large-Scale IT Systems
+ * in the Area of Freedom, Security and Justice (eu-LISA)
+ *
+ * Licensed under the EUPL, Version 1.2 or – as soon they will be approved by the
+ * European Commission - subsequent versions of the EUPL (the "Licence");
+ * You may not use this work except in compliance with the Licence.
+ * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
+ */
+
+import { Button, ButtonProps } from "@heroui/react";
+import React, { ComponentType } from "react";
+
+interface PageHeaderButtonProps extends Omit<ButtonProps, "children"> {
+    icon: ComponentType<{ className?: string }>;
+    isSpinning?: boolean;
+}
+
+export function PageHeaderButton({
+                                     icon: Icon,
+                                     isSpinning = false,
+                                     ...props
+                                 }: PageHeaderButtonProps) {
+    return (
+        <Button isIconOnly size="lg" {...props}>
+            <Icon className={`size-4 ${isSpinning ? "animate-spin" : ""}`}/>
+        </Button>
+    );
+}

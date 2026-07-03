@@ -10,10 +10,19 @@
 
 import { restApiCall } from "@/lib/http";
 import { ConnectorBusinessDomain } from "@/types/business-domain";
+import { BusinessDomainCreationRequest } from "@/types/request/business-domain";
 
-export async function listBusinessDomains():
-    Promise<ConnectorBusinessDomain[]> {
-    return restApiCall<ConnectorBusinessDomain[]>(
-        "api/v1/admin/business-domains"
-    );
+export async function listBusinessDomains(): Promise<ConnectorBusinessDomain[]> {
+    return restApiCall<ConnectorBusinessDomain[]>("api/v1/admin/business-domains");
+}
+
+export async function createBusinessDomain(payload: BusinessDomainCreationRequest): Promise<ConnectorBusinessDomain> {
+    return restApiCall<ConnectorBusinessDomain>("api/v1/admin/business-domains", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        }
+    )
 }

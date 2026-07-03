@@ -8,9 +8,6 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { Footer } from "@/components/common/Footer";
-import { MainNavbar } from "@/components/common/MainNavbar";
-
 export default function Home() {
     return (
         <div className="relative flex flex-1 w-full max-w-3xl flex-col">

@@ -10,7 +10,6 @@
 
 import { PaginatedResponse } from "@/types/paginated-response";
 import { restApiCall } from "@/lib/http";
-import { UploadAttachmentResponse } from "@/lib/http/attachment";
 import { ConnectorAttachment } from "@/types/attachments";
 
 export async function listAttachments(params?: {
@@ -28,7 +27,7 @@ export function uploadMessageAttachment(file: Blob) {
   const data = new FormData();
   data.append("attachments", file, "business-document.pdf");
 
-  return restApiCall<UploadAttachmentResponse[]>(
+  return restApiCall<string[]>(
     "api/v1/attachments/upload",
     {
       method: "POST",

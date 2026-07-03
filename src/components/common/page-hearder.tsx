@@ -10,19 +10,20 @@
 
 import { Typography } from "@heroui/react";
 import { Icon } from "@iconify/react";
+import React from "react";
 
 interface PageHeaderProps {
     title: string;
     icon: string;
     subtitle?: string;
     className?: string;
+    children?: React.ReactNode;
 }
 
-export function PageHeader({ title, icon, subtitle, className }: PageHeaderProps) {
+export function PageHeader({ title, icon, subtitle, className, children }: PageHeaderProps) {
     return (
         <div className={`flex items-center gap-3.5 ${className ?? "mb-6"}`}>
-            <div
-                className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-accent-soft">
+            <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-accent-soft">
                 <Icon icon={icon} className="size-6 text-accent"/>
             </div>
             <div>
@@ -32,6 +33,11 @@ export function PageHeader({ title, icon, subtitle, className }: PageHeaderProps
                 </Typography.Heading>
                 {subtitle && <span className="text-sm text-muted">{subtitle}</span>}
             </div>
+            {children && (
+                <div className="ml-auto flex items-center gap-2">
+                    {children}
+                </div>
+            )}
         </div>
     );
 }

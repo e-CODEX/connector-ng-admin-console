@@ -10,7 +10,7 @@
 
 "use client";
 
-import { Button, Form, Input, Label, ListBox, Modal, Select, Spinner, Switch, TextField, useOverlayState } from "@heroui/react";
+import { Button, FieldError, Form, Input, Label, ListBox, Modal, Select, Spinner, Switch, TextField, useOverlayState } from "@heroui/react";
 import React, { useEffect, useState } from "react";
 import { Plus } from "@gravity-ui/icons";
 import { BusinessDomainCreationRequest } from "@/types/request/business-domain";
@@ -20,14 +20,39 @@ interface ProcessingModeAddModalProps {
     onSubmit?: (domain: BusinessDomainCreationRequest) => Promise<void> | void;
 }
 
+const IDENTIFIER_PATTERN = /^[a-z0-9]+(?:[-_][a-z0-9]+)*$/;
 const SOURCES = ["DATABASE"];
 
-export function BusinessDomainAddModal({ state, onSubmit }: ProcessingModeAddModalProps) {
+export function BusinessDomainCreationModal({ state, onSubmit }: ProcessingModeAddModalProps) {
     const [identifier, setIdentifier] = useState("");
     const [description, setDescription] = useState("");
     const [enabled, setEnabled] = useState(true);
     const [source, setSource] = useState<string>("DATABASE");
     const [submitting, setSubmitting] = useState(false);
+    const [identifierError, setIdentifierError] = useState<string | null>(null);
+    const [identifierTouched, setIdentifierTouched] = useState(false);
+
+    const handleIdentifierChange = (v: string) => {
+        setIdentifier(v);
+        if (identifierTouched) {
+            setIdentifierError(validateIdentifier(v));
+        }
+    };
+
+    const handleIdentifierBlur = () => {
+        setIdentifierTouched(true);
+        setIdentifierError(validateIdentifier(identifier));
+    };
+
+    const validateIdentifier = (value: string): string | null => {
+        if (!value.trim()) return "Identifier is required";
+
+        if (!IDENTIFIER_PATTERN.test(value.trim())) {
+            return "Use letters/numbers separated by a single '-' or '_' (e.g. my-default-domain).";
+        }
+
+        return null;
+    }
 
     const reset = () => {
         setIdentifier("");
@@ -43,8 +68,13 @@ export function BusinessDomainAddModal({ state, onSubmit }: ProcessingModeAddMod
         })()
     }, [state.isOpen]);
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        const idError = validateIdentifier(identifier);
+        setIdentifierError(idError);
+        if (idError) return;
+
         setSubmitting(true);
         try {
             await onSubmit?.({ identifier: identifier.trim(), description: description.trim(), enabled, source });
@@ -69,14 +99,19 @@ export function BusinessDomainAddModal({ state, onSubmit }: ProcessingModeAddMod
                                 <TextField
                                     isRequired
                                     value={identifier}
-                                    onChange={setIdentifier}
-                                    autoFocus
+                                    onChange={handleIdentifierChange}
+                                    onBlur={handleIdentifierBlur}
+                                    isInvalid={!!identifierError}
                                 >
                                     <Label>Identifier</Label>
                                     <Input placeholder="e.g. my-default-domain"/>
+                                    <FieldError>
+                                        {identifierError}
+                                    </FieldError>
                                 </TextField>
 
                                 <TextField
+                                    autoFocus
                                     isRequired
                                     value={description}
                                     onChange={setDescription}
@@ -122,7 +157,7 @@ export function BusinessDomainAddModal({ state, onSubmit }: ProcessingModeAddMod
                                 form="add-business-domain-form"
                                 variant="primary"
                                 isPending={submitting}
-                                isDisabled={!identifier.trim() || !description.trim()}
+                                isDisabled={!identifier.trim() || !description.trim() || !!identifierError}
                             >
                                 {submitting ? <Spinner color="current" size="sm"/> : <Plus className="mr-2 size-4"/>}
                                 Add

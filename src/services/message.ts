@@ -8,12 +8,15 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { PaginatedResponse } from "@/types/paginated-response";
-import { ConnectorMessage, ConnectorMessageDetails } from "@/types/message";
-import { ConnectorTransportStep } from "@/types/transport-step";
-import { SendMessageArgs, SendMessageResponse, } from "@/types/send-message-form";
-import { restApiCall } from "@/lib/rest";
+import {PaginatedResponse} from "@/types/paginated-response";
+import {ConnectorMessage, ConnectorMessageDetails} from "@/types/message";
+import {ConnectorTransportStep} from "@/types/transport-step";
+import {SendMessageArgs, SendMessageResponse,} from "@/types/send-message-form";
+import {createSoapOutboundMessagePayload} from "@/utils/message-outbound/soap-message-builder";
+import {createRestOutboundMessagePayLoad} from "@/utils/message-outbound/rest-message-builder";
 import { ConnectorMessageStats } from "@/types/stats";
+import {restApiCall} from "@/lib/rest";
+import {BFF_API_BASE_URL} from "@/lib/config";
 
 
 export async function listMessages(params?: {
@@ -49,10 +52,10 @@ export async function sendMessage({
                                       document,
                                   }: SendMessageArgs): Promise<SendMessageResponse> {
     if (parameters.mode === "REST") {
-        return sendRestMessage({ formData, parameters, document });
+        return sendRestMessage({formData, parameters, document});
     }
 
-    return sendSoapMessage({ formData, parameters, document });
+    return sendSoapMessage({formData, parameters, document});
 }
 
 async function sendRestMessage({
@@ -64,7 +67,13 @@ async function sendRestMessage({
     void parameters;
     void document;
 
-    throw new Error("REST send message not implemented yet");
+    const payload = await createRestOutboundMessagePayLoad(formData, parameters, document);
+
+    return restApiCall('api/v1/messages/outbound',
+        {
+            method: "POST",
+            body: payload,
+        })
 }
 
 async function sendSoapMessage({
@@ -76,5 +85,17 @@ async function sendSoapMessage({
     void parameters;
     void document;
 
-    throw new Error("SOAP send message not implemented yet");
+    const payload = await createSoapOutboundMessagePayload(formData, parameters, document);
+
+    return restApiCall<SendMessageResponse>(
+        "bff/api/v1/submit-message",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+        },
+        BFF_API_BASE_URL
+    )
 }

@@ -13,6 +13,7 @@ import {
 import { sendMessage } from "@/services/message";
 
 const initialMessageFormData: SendMessageFormData = {
+    businessDomainIdentifier: "",
     backendMessageIdentifier: "",
     backendName: "backend_alice",
     as4Properties: {

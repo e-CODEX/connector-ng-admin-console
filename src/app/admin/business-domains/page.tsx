@@ -13,9 +13,9 @@
 import { PageHeader } from "@/components/common/page-hearder";
 import { useEffect, useState } from "react";
 import { ConnectorBusinessDomain } from "@/types/business-domain";
-import { Chip, Spinner, Table, toast, useOverlayState } from "@heroui/react";
+import { Chip, Spinner, Table, useOverlayState } from "@heroui/react";
 import { createBusinessDomain, listBusinessDomains } from "@/services/business-domain";
-import { formatDate, toastErrorMessage, toastSuccessMessage, truncate } from "@/utils";
+import { formatDate, toastError, toastSuccess, truncate } from "@/utils";
 import { ArrowsRotateRight, Plus } from "@gravity-ui/icons";
 import { BusinessDomainAddModal } from "@/components/business-domain/business-domain-add-modal";
 import { PageHeaderButton } from "@/components/common/page-header-button";
@@ -54,15 +54,14 @@ export default function BusinessDomainsAdminPage() {
     }
 
     const loadBusinessDomains = async () => {
+        setLoading(true)
         try {
-            setLoading(true)
             const data = await listBusinessDomains()
             setBusinessDomain(data || [])
-            setLoading(false)
         } catch (error) {
+            toastError(error)
+        } finally {
             setLoading(false)
-            toast("Error fetching business domain")
-            console.error("Error fetching business domain:", error)
         }
     }
 
@@ -145,14 +144,10 @@ export default function BusinessDomainsAdminPage() {
                             try {
                                 await createBusinessDomain(payload);
                                 await onRefreshClick();
-                                toastSuccessMessage("Business domain created successfully");
+                                toastSuccess("Business domain created successfully");
                                 addModal.close();
                             } catch (error) {
-                                if (error instanceof Error) {
-                                    toastErrorMessage(error.message);
-                                } else {
-                                    toastErrorMessage("An unexpected error occurred.");
-                                }
+                                toastError(error)
                             }
                         }}
                     />

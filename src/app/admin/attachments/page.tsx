@@ -13,9 +13,9 @@
 import { PageHeader } from "@/components/common/page-hearder";
 import { useEffect, useState } from "react";
 import { ConnectorAttachment } from "@/types/attachments";
-import { Button, Spinner, Table, toast, Tooltip, useOverlayState } from "@heroui/react";
+import { Button, Spinner, Table, Tooltip, useOverlayState } from "@heroui/react";
 import { listAttachments } from "@/services/attachment";
-import { formatBytes, formatDate, truncate } from "@/utils";
+import { formatBytes, formatDate, toastError, truncate } from "@/utils";
 import { Icon } from "@iconify/react";
 import { PaginationControls } from "@/components/paging/pagination-controls";
 import { AttachmentDetailsModal } from "@/components/attachment/attachment-details-modal";
@@ -50,8 +50,7 @@ export default function AttachmentsAdminPage() {
                 setTotalElements(data.totalElements || 0)
             } catch (error) {
                 if (!active) return
-                toast("Error fetching attachments")
-                console.error("Error fetching attachments:", error)
+                toastError(error)
             } finally {
                 if (active) setLoading(false)
             }

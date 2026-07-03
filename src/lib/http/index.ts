@@ -10,6 +10,21 @@
 
 import { API_BASE_URL } from "@/lib/config";
 
+interface ApiError {
+    status: number;
+    message: string;
+}
+
+export class RestApiError extends Error {
+    readonly status: number;
+
+    constructor(status: number, message: string) {
+        super(message);
+        this.name = "RestApiError";
+        this.status = status;
+    }
+}
+
 export async function restApiCall<T>(url: string, options: RequestInit & {
     params?: Record<string, string | number | boolean>
 } = {}): Promise<T> {
@@ -18,7 +33,16 @@ export async function restApiCall<T>(url: string, options: RequestInit & {
     const response = await fetch(`${API_BASE_URL}/${url}${qs}`, init);
 
     if (!response.ok) {
-        throw new Error(`HTTP error! ${response.status} ${response.statusText}`);
+        let message = `HTTP error! ${response.status} ${response.statusText}`;
+        try {
+            const body = await response.json() as Partial<ApiError>;
+            if (body && typeof body.message === "string") {
+                message = body.message;
+            }
+        } catch {
+            // Body was empty or not JSON — keep the default message
+        }
+        throw new RestApiError(response.status, message);
     }
 
     return response.json() as Promise<T>;

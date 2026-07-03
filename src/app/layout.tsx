@@ -15,6 +15,7 @@ import { GeistMono, GeistSans } from "@/config/fonts";
 import { MainNavbar } from "@/components/common/MainNavbar";
 import { Footer } from "@/components/common/Footer";
 import React from "react";
+import { Toast } from "@heroui/react";
 
 export const metadata: Metadata = {
     title: siteConfig.title,
@@ -38,6 +39,7 @@ export default function RootLayout({
                 {children}
             </main>
             <Footer/>
+            <Toast.Provider/>
         </div>
         </body>
         </html>

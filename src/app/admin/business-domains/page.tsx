@@ -13,13 +13,29 @@
 import { PageHeader } from "@/components/common/page-hearder";
 import { useEffect, useState } from "react";
 import { ConnectorBusinessDomain } from "@/types/business-domain";
-import { Chip, Spinner, Table, toast } from "@heroui/react";
-import { listBusinessDomains } from "@/services/business-domain";
-import { formatDate, truncate } from "@/utils";
+import { Chip, Spinner, Table, toast, useOverlayState } from "@heroui/react";
+import { createBusinessDomain, listBusinessDomains } from "@/services/business-domain";
+import { formatDate, toastErrorMessage, toastSuccessMessage, truncate } from "@/utils";
+import { ArrowsRotateRight, Plus } from "@gravity-ui/icons";
+import { BusinessDomainAddModal } from "@/components/business-domain/business-domain-add-modal";
+import { PageHeaderButton } from "@/components/common/page-header-button";
 
 export default function BusinessDomainsAdminPage() {
     const [loading, setLoading] = useState(true)
+    const [refreshing, setRefreshing] = useState(false)
     const [businessDomains, setBusinessDomain] = useState<ConnectorBusinessDomain[]>([])
+
+    const addModal = useOverlayState();
+
+    const onAddClick = () => {
+        addModal.open();
+    }
+
+    const onRefreshClick = async () => {
+        setRefreshing(true)
+        await loadBusinessDomains()
+        setRefreshing(false)
+    }
 
     const getStatusLabel = (enabled: boolean): string => {
         if (enabled) {
@@ -37,27 +53,23 @@ export default function BusinessDomainsAdminPage() {
         }
     }
 
-    useEffect(() => {
-        let active = true;
-
-        (async () => {
+    const loadBusinessDomains = async () => {
+        try {
             setLoading(true)
-            try {
-                const data = await listBusinessDomains()
-                if (!active) return
-                setBusinessDomain(data || [])
-            } catch (error) {
-                if (!active) return
-                toast("Error fetching business domain")
-                console.error("Error fetching business domain:", error)
-            } finally {
-                if (active) setLoading(false)
-            }
-        })()
-
-        return () => {
-            active = false
+            const data = await listBusinessDomains()
+            setBusinessDomain(data || [])
+            setLoading(false)
+        } catch (error) {
+            setLoading(false)
+            toast("Error fetching business domain")
+            console.error("Error fetching business domain:", error)
         }
+    }
+
+    useEffect(() => {
+        (async () => {
+            await loadBusinessDomains()
+        })()
     }, [])
 
     return (
@@ -66,7 +78,20 @@ export default function BusinessDomainsAdminPage() {
                 icon="grommet-icons:domain"
                 title="Business Domains"
                 subtitle="Used for multi-tenancy"
-            />
+            >
+                <PageHeaderButton
+                    variant="primary"
+                    icon={Plus}
+                    onPress={onAddClick}
+                />
+                <PageHeaderButton
+                    variant="secondary"
+                    icon={ArrowsRotateRight}
+                    onPress={onRefreshClick}
+                    isDisabled={refreshing}
+                    isSpinning={refreshing}
+                />
+            </PageHeader>
 
             {loading ? (
                 <div className="flex justify-center items-center min-h-400]">
@@ -113,6 +138,24 @@ export default function BusinessDomainsAdminPage() {
                             </Table.Content>
                         </Table.ScrollContainer>
                     </Table>
+
+                    <BusinessDomainAddModal
+                        state={addModal}
+                        onSubmit={async (payload) => {
+                            try {
+                                await createBusinessDomain(payload);
+                                await onRefreshClick();
+                                toastSuccessMessage("Business domain created successfully");
+                                addModal.close();
+                            } catch (error) {
+                                if (error instanceof Error) {
+                                    toastErrorMessage(error.message);
+                                } else {
+                                    toastErrorMessage("An unexpected error occurred.");
+                                }
+                            }
+                        }}
+                    />
                 </>
             )}
         </>

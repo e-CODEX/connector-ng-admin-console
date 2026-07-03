@@ -8,6 +8,8 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
+import { toast } from "@heroui/react";
+
 export const formatDate = (date: string) => {
     if (!date) return "";
     return new Date(date).toLocaleString(undefined, {
@@ -83,4 +85,24 @@ export const getTransportDeliveryColor = (status: string):
         default:
             return "default";
     }
+}
+
+export const toastSuccessMessage = (message: string) => {
+    toastMessage("Success", message, "success");
+}
+
+export const toastErrorMessage = (message: string) => {
+    toastMessage("Error", message, "danger");
+}
+
+const toastMessage = (title: string, description: string, variant: "default" | "accent" | "success" | "warning" | "danger" | undefined) => {
+    toast(title, {
+        variant,
+        description,
+        actionProps: {
+            children: "Dismiss",
+            onPress: () => toast.clear(),
+            variant: "tertiary",
+        },
+    });
 }

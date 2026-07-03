@@ -33,8 +33,11 @@ export default function BusinessDomainsAdminPage() {
 
     const onRefreshClick = async () => {
         setRefreshing(true)
-        await loadBusinessDomains()
-        setRefreshing(false)
+        try {
+            await loadBusinessDomains();
+        } finally {
+            setRefreshing(false);
+        }
     }
 
     const getStatusLabel = (enabled: boolean): string => {
@@ -88,7 +91,7 @@ export default function BusinessDomainsAdminPage() {
                     icon={ArrowsRotateRight}
                     onPress={onRefreshClick}
                     isDisabled={refreshing}
-                    isSpinning={refreshing}
+                    isSpinning={refreshing || loading}
                 />
             </PageHeader>
 

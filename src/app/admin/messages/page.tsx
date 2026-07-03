@@ -10,7 +10,7 @@
 
 "use client"
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ConnectorMessage } from "@/types/message";
 import { listMessages } from "@/services/message";
 import { Button, Chip, Spinner, Table, Tooltip, useOverlayState } from "@heroui/react";
@@ -22,21 +22,25 @@ import { PageHeader } from "@/components/common/page-hearder";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { MessageFilters } from "@/components/message/message-filters";
 import { MessageDetailsModal } from "@/components/message/detail/message-details-modal";
+import { ArrowsRotateRight } from "@gravity-ui/icons";
+import { PageHeaderButton } from "@/components/common/page-header-button";
+
+const IDENTIFIER_LENGTH = 15;
 
 export default function MessagesAdminPage() {
-    const [loading, setLoading] = useState(true)
-    const [messages, setMessages] = useState<ConnectorMessage[]>([])
-    const [page, setPage] = useState(1)
-    const [totalElements, setTotalElements] = useState(0)
+    const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
+    const [messages, setMessages] = useState<ConnectorMessage[]>([]);
+    const [page, setPage] = useState(1);
+    const [totalElements, setTotalElements] = useState(0);
     const [pageSize, setPageSize] = useState(20);
     const [selectedMessage, setSelectedMessage] = useState<ConnectorMessage | null>(null);
-    const [identifierQuery, setIdentifierQuery] = useState("")
-    const [backendNameQuery, setBackendNameQuery] = useState("")
+    const [identifierQuery, setIdentifierQuery] = useState("");
+    const [backendNameQuery, setBackendNameQuery] = useState("");
+    const requestId = useRef(0);
 
-    const IDENTIFIER_LENGTH = 15;
-
-    const debouncedIdentifier = useDebouncedValue(identifierQuery)
-    const debouncedBackendName = useDebouncedValue(backendNameQuery)
+    const debouncedIdentifier = useDebouncedValue(identifierQuery);
+    const debouncedBackendName = useDebouncedValue(backendNameQuery);
 
     const onIdentifierChange = (value: string) => {
         setIdentifierQuery(value)
@@ -61,33 +65,48 @@ export default function MessagesAdminPage() {
         transportModal.open();
     };
 
-    useEffect(() => {
-        let active = true;
-
-        (async () => {
-            setLoading(true)
-            try {
-                const data = await listMessages({
-                    page: page - 1,
-                    size: pageSize,
-                    identifier: debouncedIdentifier || undefined,
-                    backendName: debouncedBackendName || undefined,
-                })
-                if (!active) return
-                setMessages(data.content || [])
-                setTotalElements(data.totalElements || 0)
-            } catch (error) {
-                if (!active) return
-                toastError(error)
-            } finally {
-                if (active) setLoading(false)
-            }
-        })()
-
-        return () => {
-            active = false
+    const onRefreshClick = async () => {
+        setRefreshing(true)
+        try {
+            await loadMessages();
+        } finally {
+            setRefreshing(false);
         }
-    }, [page, pageSize, debouncedIdentifier, debouncedBackendName])
+    }
+
+    const loadMessages = useCallback(async () => {
+        const id = ++requestId.current;
+        setLoading(true);
+        try {
+            const data = await listMessages({
+                page: page - 1,
+                size: pageSize,
+                identifier: debouncedIdentifier || undefined,
+                backendName: debouncedBackendName || undefined,
+            });
+
+            if (id !== requestId.current) {
+                return;
+            }
+
+            setMessages(data.content || []);
+            setTotalElements(data.totalElements || 0);
+        } catch (error) {
+            if (id !== requestId.current) {
+                return;
+            }
+
+            toastError(error);
+        } finally {
+            if (id === requestId.current) {
+                setLoading(false);
+            }
+        }
+    }, [page, pageSize, debouncedIdentifier, debouncedBackendName]);
+
+    useEffect(() => {
+        void loadMessages();
+    }, [loadMessages]);
 
     return (
         <>
@@ -95,7 +114,15 @@ export default function MessagesAdminPage() {
                 icon="gravity-ui:envelope"
                 title="Business Messages"
                 subtitle="Connector eDelivery inbox"
-            />
+            >
+                <PageHeaderButton
+                    variant="secondary"
+                    icon={ArrowsRotateRight}
+                    onPress={onRefreshClick}
+                    isDisabled={refreshing}
+                    isSpinning={refreshing || loading}
+                />
+            </PageHeader>
             <MessageFilters
                 identifier={identifierQuery}
                 backendName={backendNameQuery}
@@ -227,8 +254,15 @@ export default function MessagesAdminPage() {
                 </>
             )}
 
-            <MessageDetailsModal message={selectedMessage} state={detailsModal}/>
-            <MessageTransportStepsDetailModal message={selectedMessage} state={transportModal}/>
+            <MessageDetailsModal
+                message={selectedMessage}
+                state={detailsModal}
+            />
+
+            <MessageTransportStepsDetailModal
+                message={selectedMessage}
+                state={transportModal}
+            />
         </>
     )
 }

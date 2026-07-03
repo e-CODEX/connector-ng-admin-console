@@ -11,7 +11,7 @@
 "use client"
 
 import { PageHeader } from "@/components/common/page-hearder";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { Button, Chip, Spinner, Table, Tooltip, useOverlayState } from "@heroui/react";
 import { listTransportSteps } from "@/services/transport-step";
@@ -21,22 +21,22 @@ import { Icon } from "@iconify/react";
 import { PaginationControls } from "@/components/paging/pagination-controls";
 import { ConnectorTransportStep } from "@/types/transport-step";
 import { TransportStepDetailsModal } from "@/components/transport-step/transport-step-details-modal";
+import { ArrowsRotateRight } from "@gravity-ui/icons";
+import { PageHeaderButton } from "@/components/common/page-header-button";
 
 export default function TransportStepsAdminPage() {
     const [loading, setLoading] = useState(true)
+    const [refreshing, setRefreshing] = useState(false);
     const [page, setPage] = useState(1)
     const [totalElements, setTotalElements] = useState(0)
     const [pageSize, setPageSize] = useState(20);
-    const [selectedTransportStep, setSelectedTransportStep] = useState<ConnectorTransportStep | null>(
-        null);
+    const [selectedTransportStep, setSelectedTransportStep] = useState<ConnectorTransportStep | null>(null);
     const [transportSteps, setTransportSteps] = useState<ConnectorTransportStep[]>([])
-    const [messageOrRemoteSystemIdentifierQuery, setMessageOrRemoteSystemIdentifierQuery] = useState(
-        "")
+    const [messageOrRemoteSystemIdentifierQuery, setMessageOrRemoteSystemIdentifierQuery] = useState("")
     const [linkPartnerNameQuery, setLinkPartnerNameQuery] = useState("")
-
-    const debouncedMessageOrRemoteSystemIdentifier = useDebouncedValue(
-        messageOrRemoteSystemIdentifierQuery)
+    const debouncedMessageOrRemoteSystemIdentifier = useDebouncedValue(messageOrRemoteSystemIdentifierQuery)
     const debouncedLinkPartnerName = useDebouncedValue(linkPartnerNameQuery)
+    const requestId = useRef(0);
 
     const onMessageOrRemoteSystemIdentifierChange = (value: string) => {
         setMessageOrRemoteSystemIdentifierQuery(value)
@@ -55,33 +55,48 @@ export default function TransportStepsAdminPage() {
         detailsModal.open();
     };
 
-    useEffect(() => {
-        let active = true;
-
-        (async () => {
-            setLoading(true)
-            try {
-                const data = await listTransportSteps({
-                    page: page - 1,
-                    size: pageSize,
-                    messageOrRemoteSystemIdentifier: debouncedMessageOrRemoteSystemIdentifier || undefined,
-                    linkPartnerName: debouncedLinkPartnerName || undefined,
-                })
-                if (!active) return
-                setTransportSteps(data.content || [])
-                setTotalElements(data.totalElements || 0)
-            } catch (error) {
-                if (!active) return
-                toastError(error)
-            } finally {
-                if (active) setLoading(false)
-            }
-        })()
-
-        return () => {
-            active = false
+    const onRefreshClick = async () => {
+        setRefreshing(true)
+        try {
+            await loadTransportSteps();
+        } finally {
+            setRefreshing(false);
         }
-    }, [page, pageSize, debouncedMessageOrRemoteSystemIdentifier, debouncedLinkPartnerName])
+    }
+
+    const loadTransportSteps = useCallback(async () => {
+        const id = ++requestId.current;
+        setLoading(true)
+        try {
+            const data = await listTransportSteps({
+                page: page - 1,
+                size: pageSize,
+                messageOrRemoteSystemIdentifier: debouncedMessageOrRemoteSystemIdentifier || undefined,
+                linkPartnerName: debouncedLinkPartnerName || undefined,
+            })
+
+            if (id !== requestId.current) {
+                return;
+            }
+
+            setTransportSteps(data.content || [])
+            setTotalElements(data.totalElements || 0)
+        } catch (error) {
+            if (id !== requestId.current) {
+                return;
+            }
+
+            toastError(error)
+        } finally {
+            if (id === requestId.current) {
+                setLoading(false);
+            }
+        }
+    }, [page, pageSize, debouncedMessageOrRemoteSystemIdentifier, debouncedLinkPartnerName]);
+
+    useEffect(() => {
+        void loadTransportSteps();
+    }, [loadTransportSteps]);
 
     return (
         <>
@@ -89,7 +104,15 @@ export default function TransportStepsAdminPage() {
                 icon="streamline-pixel:transportation-truck"
                 title="Message Transport Steps"
                 subtitle="Track message transport steps"
-            />
+            >
+                <PageHeaderButton
+                    variant="secondary"
+                    icon={ArrowsRotateRight}
+                    onPress={onRefreshClick}
+                    isDisabled={refreshing}
+                    isSpinning={refreshing || loading}
+                />
+            </PageHeader>
             <TransportStepFilters
                 messageOrRemoteSystemIdentifier={messageOrRemoteSystemIdentifierQuery}
                 linkPartnerName={linkPartnerNameQuery}

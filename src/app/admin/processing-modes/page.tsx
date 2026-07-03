@@ -14,12 +14,13 @@ import { PageHeader } from "@/components/common/page-hearder";
 import { useEffect, useRef, useState } from "react";
 import { Button, Spinner, Table, Tooltip, useOverlayState } from "@heroui/react";
 import { ConnectorProcessingMode } from "@/types/processing-mode";
-import { listProcessingModes } from "@/services/processing-mode";
-import { formatDate, toastError, truncate } from "@/utils";
+import { createProcessingMode, listProcessingModes } from "@/services/processing-mode";
+import { formatDate, toastError, toastSuccess, truncate } from "@/utils";
 import { Icon } from "@iconify/react";
 import { ProcessingModeDetailsModal } from "@/components/processing-mode/processing-mode-detail-modal";
-import { ArrowsRotateRight } from "@gravity-ui/icons";
+import { ArrowsRotateRight, Plus } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/page-header-button";
+import { ProcessingModeCreationModal } from "@/components/processing-mode/processing-mode-creation-modal";
 
 export default function ProcessingModesAdminPage() {
     const [loading, setLoading] = useState(true)
@@ -27,8 +28,12 @@ export default function ProcessingModesAdminPage() {
     const [processingModes, setProcessingModes] = useState<ConnectorProcessingMode[]>([])
     const [selectedProcessingMode, setSelectedProcessingMode] = useState<ConnectorProcessingMode | null>(null);
     const requestId = useRef(0);
-
     const detailsModal = useOverlayState();
+    const addModal = useOverlayState();
+
+    const onAddClick = () => {
+        addModal.open();
+    }
 
     const onRefreshClick = async () => {
         setRefreshing(true)
@@ -79,6 +84,12 @@ export default function ProcessingModesAdminPage() {
                 title="Processing Modes"
                 subtitle="Stored processing modes"
             >
+                <PageHeaderButton
+                    variant="primary"
+                    icon={Plus}
+                    onPress={onAddClick}
+                />
+
                 <PageHeaderButton
                     variant="secondary"
                     icon={ArrowsRotateRight}
@@ -145,6 +156,20 @@ export default function ProcessingModesAdminPage() {
                             </Table.Content>
                         </Table.ScrollContainer>
                     </Table>
+
+                    <ProcessingModeCreationModal
+                        state={addModal}
+                        onSubmit={async (payload) => {
+                            try {
+                                await createProcessingMode(payload);
+                                await onRefreshClick();
+                                toastSuccess("Processing mode created successfully");
+                                addModal.close();
+                            } catch (error) {
+                                toastError(error)
+                            }
+                        }}
+                    />
 
                     <ProcessingModeDetailsModal
                         processingMode={selectedProcessingMode}

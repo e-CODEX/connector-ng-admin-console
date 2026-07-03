@@ -11,7 +11,7 @@
 "use client"
 
 import { PageHeader } from "@/components/common/page-hearder";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ConnectorAttachment } from "@/types/attachments";
 import { Button, Spinner, Table, Tooltip, useOverlayState } from "@heroui/react";
 import { listAttachments } from "@/services/attachment";
@@ -19,14 +19,18 @@ import { formatBytes, formatDate, toastError, truncate } from "@/utils";
 import { Icon } from "@iconify/react";
 import { PaginationControls } from "@/components/paging/pagination-controls";
 import { AttachmentDetailsModal } from "@/components/attachment/attachment-details-modal";
+import { ArrowsRotateRight } from "@gravity-ui/icons";
+import { PageHeaderButton } from "@/components/common/page-header-button";
 
 export default function AttachmentsAdminPage() {
-    const [loading, setLoading] = useState(true)
-    const [page, setPage] = useState(1)
-    const [totalElements, setTotalElements] = useState(0)
+    const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
+    const [page, setPage] = useState(1);
+    const [totalElements, setTotalElements] = useState(0);
     const [pageSize, setPageSize] = useState(20);
-    const [attachments, setAttachments] = useState<ConnectorAttachment[]>([])
+    const [attachments, setAttachments] = useState<ConnectorAttachment[]>([]);
     const [selectedAttachment, setSelectedAttachment] = useState<ConnectorAttachment | null>(null);
+    const requestId = useRef(0);
 
     const detailsModal = useOverlayState();
 
@@ -35,31 +39,47 @@ export default function AttachmentsAdminPage() {
         detailsModal.open();
     };
 
-    useEffect(() => {
-        let active = true;
-
-        (async () => {
-            setLoading(true)
-            try {
-                const data = await listAttachments({
-                    page: page - 1,
-                    size: pageSize,
-                })
-                if (!active) return
-                setAttachments(data.content || [])
-                setTotalElements(data.totalElements || 0)
-            } catch (error) {
-                if (!active) return
-                toastError(error)
-            } finally {
-                if (active) setLoading(false)
-            }
-        })()
-
-        return () => {
-            active = false
+    const onRefreshClick = async () => {
+        setRefreshing(true)
+        try {
+            await loadAttachments();
+        } finally {
+            setRefreshing(false);
         }
-    }, [page, pageSize])
+    }
+
+    const loadAttachments = useCallback(async () => {
+        const id = ++requestId.current;
+        setLoading(true);
+        try {
+            const data = await listAttachments({
+                page: page - 1,
+                size: pageSize,
+            });
+
+            if (id !== requestId.current) {
+                return;
+            }
+
+            setAttachments(data.content || []);
+            setTotalElements(data.totalElements || 0);
+        } catch (error) {
+
+            if (id !== requestId.current) {
+                return;
+            }
+
+            toastError(error);
+        } finally {
+            if (id === requestId.current) {
+                setLoading(false);
+            }
+        }
+    }, [page, pageSize]);
+
+    useEffect(() => {
+        void loadAttachments();
+    }, [loadAttachments]);
 
     return (
         <>
@@ -67,7 +87,15 @@ export default function AttachmentsAdminPage() {
                 icon="lsicon:attachments-filled"
                 title="Message attachments"
                 subtitle="Attachments associated to messages"
-            />
+            >
+                <PageHeaderButton
+                    variant="secondary"
+                    icon={ArrowsRotateRight}
+                    onPress={onRefreshClick}
+                    isDisabled={refreshing}
+                    isSpinning={refreshing || loading}
+                />
+            </PageHeader>
 
             {loading ? (
                 <div className="flex justify-center items-center min-h-400]">

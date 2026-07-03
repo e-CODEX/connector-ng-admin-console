@@ -11,47 +11,65 @@
 "use client";
 
 import { PageHeader } from "@/components/common/page-hearder";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button, Spinner, Table, Tooltip, useOverlayState } from "@heroui/react";
 import { ConnectorProcessingMode } from "@/types/processing-mode";
 import { listProcessingModes } from "@/services/processing-mode";
 import { formatDate, toastError, truncate } from "@/utils";
 import { Icon } from "@iconify/react";
 import { ProcessingModeDetailsModal } from "@/components/processing-mode/processing-mode-detail-modal";
+import { ArrowsRotateRight } from "@gravity-ui/icons";
+import { PageHeaderButton } from "@/components/common/page-header-button";
 
 export default function ProcessingModesAdminPage() {
     const [loading, setLoading] = useState(true)
+    const [refreshing, setRefreshing] = useState(false)
     const [processingModes, setProcessingModes] = useState<ConnectorProcessingMode[]>([])
-    const [selectedProcessingMode, setSelectedProcessingMode] = useState<ConnectorProcessingMode | null>(
-        null);
+    const [selectedProcessingMode, setSelectedProcessingMode] = useState<ConnectorProcessingMode | null>(null);
+    const requestId = useRef(0);
 
     const detailsModal = useOverlayState();
+
+    const onRefreshClick = async () => {
+        setRefreshing(true)
+        try {
+            await loadProcessingModes();
+        } finally {
+            setRefreshing(false);
+        }
+    }
 
     const onDetailsClick = (processingMode: ConnectorProcessingMode) => {
         setSelectedProcessingMode(processingMode);
         detailsModal.open();
     };
 
-    useEffect(() => {
-        let active = true;
+    const loadProcessingModes = async () => {
+        const id = ++requestId.current;
+        setLoading(true)
+        try {
+            const data = await listProcessingModes()
 
-        (async () => {
-            setLoading(true)
-            try {
-                const data = await listProcessingModes()
-                if (!active) return
-                setProcessingModes(data || [])
-            } catch (error) {
-                if (!active) return
-                toastError(error)
-            } finally {
-                if (active) setLoading(false)
+            if (id !== requestId.current) {
+                return;
             }
-        })()
 
-        return () => {
-            active = false
+            setProcessingModes(data || [])
+        } catch (error) {
+            if (id !== requestId.current) {
+                return;
+            }
+
+            toastError(error)
+        } finally {
+            if (id === requestId.current) {
+                setLoading(false);
+            }
         }
+    }
+
+    useEffect(() => {
+        void loadProcessingModes()
     }, [])
 
     return (
@@ -60,7 +78,15 @@ export default function ProcessingModesAdminPage() {
                 icon="fluent-mdl2:processing"
                 title="Processing Modes"
                 subtitle="Stored processing modes"
-            />
+            >
+                <PageHeaderButton
+                    variant="secondary"
+                    icon={ArrowsRotateRight}
+                    onPress={onRefreshClick}
+                    isDisabled={refreshing}
+                    isSpinning={refreshing || loading}
+                />
+            </PageHeader>
 
             {loading ? (
                 <div className="flex justify-center items-center min-h-400]">
@@ -120,8 +146,10 @@ export default function ProcessingModesAdminPage() {
                         </Table.ScrollContainer>
                     </Table>
 
-                    <ProcessingModeDetailsModal processingMode={selectedProcessingMode}
-                                                state={detailsModal}/>
+                    <ProcessingModeDetailsModal
+                        processingMode={selectedProcessingMode}
+                        state={detailsModal}
+                    />
                 </>
             )}
         </>

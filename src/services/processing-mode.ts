@@ -8,12 +8,10 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { restApiCall } from "@/lib/http";
 import { ConnectorProcessingMode } from "@/types/processing-mode";
+import { restApiCall } from "@/lib/rest";
 
 export async function listProcessingModes():
     Promise<ConnectorProcessingMode[]> {
-    return restApiCall<ConnectorProcessingMode[]>(
-        "api/v1/admin/processing-modes"
-    );
+    return restApiCall<ConnectorProcessingMode[]>("api/v1/admin/processing-modes");
 }

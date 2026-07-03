@@ -10,12 +10,9 @@
 
 import { PaginatedResponse } from "@/types/paginated-response";
 import { ConnectorMessage, ConnectorMessageDetails } from "@/types/message";
-import { restApiCall } from "@/lib/http";
 import { ConnectorTransportStep } from "@/types/transport-step";
-import {
-  SendMessageArgs,
-  SendMessageResponse,
-} from "@/types/send-message-form";
+import { SendMessageArgs, SendMessageResponse, } from "@/types/send-message-form";
+import { restApiCall } from "@/lib/rest";
 
 
 export async function listMessages(params?: {
@@ -25,23 +22,20 @@ export async function listMessages(params?: {
     backendName?: string
 }):
     Promise<PaginatedResponse<ConnectorMessage>> {
-    return restApiCall<PaginatedResponse<ConnectorMessage>>(
-        "api/v1/admin/messages",
-        { params }
+    return restApiCall<PaginatedResponse<ConnectorMessage>>("api/v1/admin/messages", {
+            params
+        }
     );
 }
 
 export async function getMessage(identifier: string): Promise<ConnectorMessageDetails> {
-    return restApiCall<ConnectorMessageDetails>(
-        `api/v1/admin/messages/${identifier}`
-    );
+    return restApiCall<ConnectorMessageDetails>(`api/v1/admin/messages/${identifier}`);
 }
 
 export async function getMessageTransportStep(identifier: string): Promise<ConnectorTransportStep> {
-    return restApiCall<ConnectorTransportStep>(
-        `api/v1/admin/messages/${identifier}/transport-steps`
-    );
+    return restApiCall<ConnectorTransportStep>(`api/v1/admin/messages/${identifier}/transport-steps`);
 }
+
 export async function sendMessage({
                                       formData,
                                       parameters,

@@ -9,29 +9,26 @@
  */
 
 import { PaginatedResponse } from "@/types/paginated-response";
-import { restApiCall } from "@/lib/http";
 import { ConnectorAttachment } from "@/types/attachments";
+import { restApiCall } from "@/lib/rest";
 
 export async function listAttachments(params?: {
     page?: number,
     size?: number
 }):
     Promise<PaginatedResponse<ConnectorAttachment>> {
-    return restApiCall<PaginatedResponse<ConnectorAttachment>>(
-        "api/v1/admin/attachments",
-        { params }
-    );
+    return restApiCall<PaginatedResponse<ConnectorAttachment>>("api/v1/admin/attachments", {
+        params
+    });
 }
 
 export function uploadMessageAttachment(file: Blob) {
-  const data = new FormData();
-  data.append("attachments", file, "business-document.pdf");
+    const data = new FormData();
+    data.append("attachments", file, "business-document.pdf");
 
-  return restApiCall<string[]>(
-    "api/v1/attachments/upload",
-    {
-      method: "POST",
-      body: data,
-    }
-  );
+    return restApiCall<string[]>("api/v1/attachments/upload", {
+            method: "POST",
+            body: data,
+        }
+    );
 }

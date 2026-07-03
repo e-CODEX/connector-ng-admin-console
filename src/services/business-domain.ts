@@ -8,9 +8,9 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { restApiCall } from "@/lib/http";
 import { ConnectorBusinessDomain } from "@/types/business-domain";
 import { BusinessDomainCreationRequest } from "@/types/request/business-domain";
+import { restApiCall } from "@/lib/rest";
 
 export async function listBusinessDomains(): Promise<ConnectorBusinessDomain[]> {
     return restApiCall<ConnectorBusinessDomain[]>("api/v1/admin/business-domains");

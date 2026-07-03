@@ -17,7 +17,7 @@ import { Chip, Spinner, Table, useOverlayState } from "@heroui/react";
 import { createBusinessDomain, listBusinessDomains } from "@/services/business-domain";
 import { formatDate, toastError, toastSuccess, truncate } from "@/utils";
 import { ArrowsRotateRight, Plus } from "@gravity-ui/icons";
-import { BusinessDomainAddModal } from "@/components/business-domain/business-domain-add-modal";
+import { BusinessDomainCreationModal } from "@/components/business-domain/business-domain-creation-modal";
 import { PageHeaderButton } from "@/components/common/page-header-button";
 
 export default function BusinessDomainsAdminPage() {
@@ -138,7 +138,7 @@ export default function BusinessDomainsAdminPage() {
                         </Table.ScrollContainer>
                     </Table>
 
-                    <BusinessDomainAddModal
+                    <BusinessDomainCreationModal
                         state={addModal}
                         onSubmit={async (payload) => {
                             try {

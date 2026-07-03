@@ -87,8 +87,12 @@ export const getTransportDeliveryColor = (status: string):
     }
 }
 
-export const toastSuccessMessage = (message: string) => {
+export const toastSuccess = (message: string) => {
     toastMessage("Success", message, "success");
+}
+
+export function toastError(error: unknown, fallback = "An unexpected error occurred.") {
+    toastErrorMessage(error instanceof Error ? error.message : fallback);
 }
 
 export const toastErrorMessage = (message: string) => {

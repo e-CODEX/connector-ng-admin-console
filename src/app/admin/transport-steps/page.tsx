@@ -13,21 +13,14 @@
 import { PageHeader } from "@/components/common/page-hearder";
 import { useEffect, useState } from "react";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
-import { Button, Chip, Spinner, Table, toast, Tooltip, useOverlayState } from "@heroui/react";
+import { Button, Chip, Spinner, Table, Tooltip, useOverlayState } from "@heroui/react";
 import { listTransportSteps } from "@/services/transport-step";
 import { TransportStepFilters } from "@/components/transport-step/transport-step-filters";
-import {
-    formatDate,
-    getTransportDeliveryColor,
-    getTransportDeliveryLabel,
-    truncate
-} from "@/utils";
+import { formatDate, getTransportDeliveryColor, getTransportDeliveryLabel, toastError, truncate } from "@/utils";
 import { Icon } from "@iconify/react";
 import { PaginationControls } from "@/components/paging/pagination-controls";
 import { ConnectorTransportStep } from "@/types/transport-step";
-import {
-    TransportStepDetailsModal
-} from "@/components/transport-step/transport-step-details-modal";
+import { TransportStepDetailsModal } from "@/components/transport-step/transport-step-details-modal";
 
 export default function TransportStepsAdminPage() {
     const [loading, setLoading] = useState(true)
@@ -79,8 +72,7 @@ export default function TransportStepsAdminPage() {
                 setTotalElements(data.totalElements || 0)
             } catch (error) {
                 if (!active) return
-                toast("Error fetching messages")
-                console.error("Error fetching messages:", error)
+                toastError(error)
             } finally {
                 if (active) setLoading(false)
             }

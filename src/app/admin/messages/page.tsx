@@ -13,9 +13,9 @@
 import { useEffect, useState } from "react";
 import { ConnectorMessage } from "@/types/message";
 import { listMessages } from "@/services/message";
-import { Button, Chip, Spinner, Table, toast, Tooltip, useOverlayState } from "@heroui/react";
+import { Button, Chip, Spinner, Table, Tooltip, useOverlayState } from "@heroui/react";
 import { Icon } from "@iconify/react";
-import { formatDate, getDeliveryColor, getDeliveryLabel, truncate } from "@/utils";
+import { formatDate, getDeliveryColor, getDeliveryLabel, toastError, truncate } from "@/utils";
 import { PaginationControls } from "@/components/paging/pagination-controls";
 import { MessageTransportStepsDetailModal } from "@/components/message/detail/message-transport-steps-detail-modal";
 import { PageHeader } from "@/components/common/page-hearder";
@@ -78,8 +78,7 @@ export default function MessagesAdminPage() {
                 setTotalElements(data.totalElements || 0)
             } catch (error) {
                 if (!active) return
-                toast("Error fetching messages")
-                console.error("Error fetching messages:", error)
+                toastError(error)
             } finally {
                 if (active) setLoading(false)
             }

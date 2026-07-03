@@ -12,14 +12,12 @@
 
 import { PageHeader } from "@/components/common/page-hearder";
 import { useEffect, useState } from "react";
-import { Button, Spinner, Table, toast, Tooltip, useOverlayState } from "@heroui/react";
+import { Button, Spinner, Table, Tooltip, useOverlayState } from "@heroui/react";
 import { ConnectorProcessingMode } from "@/types/processing-mode";
 import { listProcessingModes } from "@/services/processing-mode";
-import { formatDate, truncate } from "@/utils";
+import { formatDate, toastError, truncate } from "@/utils";
 import { Icon } from "@iconify/react";
-import {
-    ProcessingModeDetailsModal
-} from "@/components/processing-mode/processing-mode-detail-modal";
+import { ProcessingModeDetailsModal } from "@/components/processing-mode/processing-mode-detail-modal";
 
 export default function ProcessingModesAdminPage() {
     const [loading, setLoading] = useState(true)
@@ -45,8 +43,7 @@ export default function ProcessingModesAdminPage() {
                 setProcessingModes(data || [])
             } catch (error) {
                 if (!active) return
-                toast("Error fetching processing mode")
-                console.error("Error fetching processing mode:", error)
+                toastError(error)
             } finally {
                 if (active) setLoading(false)
             }

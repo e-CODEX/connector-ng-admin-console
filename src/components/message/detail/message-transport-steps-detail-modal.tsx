@@ -17,6 +17,7 @@ import React, { useEffect, useState } from "react";
 import { ConnectorTransportStep } from "@/types/transport-step";
 import { getMessageTransportStep } from "@/services/message";
 import { TransportStepDetails } from "@/components/transport-step/transport-step-details";
+import { toastError } from "@/utils";
 
 interface TransportStepsModalProps {
     message: ConnectorMessage | null;
@@ -45,8 +46,7 @@ export function MessageTransportStepsDetailModal({ message, state }: TransportSt
                 setTransportStep(data);
             } catch (e) {
                 if (!active) return;
-                console.error("Error fetching message transport steps details:", e);
-                setError("Could not load additional details.");
+                toastError(e)
             } finally {
                 if (active) setLoading(false);
             }

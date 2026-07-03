@@ -12,7 +12,7 @@
 
 import { Button, Chip, Modal, Spinner, Table, useOverlayState } from "@heroui/react";
 import { ConnectorMessage, ConnectorMessageDetails, ConnectorParty } from "@/types/message";
-import { formatBytes, formatDate, getDeliveryColor, getDeliveryLabel, truncate } from "@/utils";
+import { formatBytes, formatDate, getDeliveryColor, getDeliveryLabel, toastError, truncate } from "@/utils";
 import React, { useEffect, useState } from "react";
 import { Eye } from "@gravity-ui/icons";
 import { getMessage } from "@/services/message";
@@ -50,8 +50,7 @@ export function MessageDetailsModal({ message, state }: MessageDetailsModalProps
                 setDetails(data);
             } catch (e) {
                 if (!active) return;
-                console.error("Error fetching message details:", e);
-                setError("Could not load additional details.");
+                toastError(e)
             } finally {
                 if (active) setLoading(false);
             }

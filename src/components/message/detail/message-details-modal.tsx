@@ -11,13 +11,14 @@
 "use client";
 
 import { Button, Chip, Modal, Spinner, Table, useOverlayState } from "@heroui/react";
-import { ConnectorMessage, ConnectorMessageDetails, ConnectorParty } from "@/types/message";
+import { ConnectorMessage, ConnectorMessageDetails } from "@/types/message";
 import { formatBytes, formatDate, getDeliveryColor, getDeliveryLabel, toastError, truncate } from "@/utils";
 import React, { useEffect, useState } from "react";
 import { Eye } from "@gravity-ui/icons";
 import { getMessage } from "@/services/message";
 import { DetailRow } from "@/components/common/detail-row";
 import { DetailSection } from "@/components/common/detail-section";
+import { ConnectorParty } from "@/types/processing-mode";
 
 interface MessageDetailsModalProps {
     message: ConnectorMessage | null;
@@ -36,7 +37,9 @@ export function MessageDetailsModal({ message, state }: MessageDetailsModalProps
     const identifier = message?.identifier;
 
     useEffect(() => {
-        if (!state.isOpen || !identifier) return;
+        if (!state.isOpen || !identifier) {
+            return;
+        }
 
         let active = true;
 
@@ -46,13 +49,22 @@ export function MessageDetailsModal({ message, state }: MessageDetailsModalProps
             setDetails(null);
             try {
                 const data = await getMessage(identifier);
-                if (!active) return;
+
+                if (!active) {
+                    return;
+                }
+
                 setDetails(data);
             } catch (e) {
-                if (!active) return;
+                if (!active) {
+                    return;
+                }
+
                 toastError(e)
             } finally {
-                if (active) setLoading(false);
+                if (active) {
+                    setLoading(false);
+                }
             }
         })();
 
@@ -70,7 +82,7 @@ export function MessageDetailsModal({ message, state }: MessageDetailsModalProps
                             <Modal.Icon className="bg-default text-foreground">
                                 <Eye className="size-5"/>
                             </Modal.Icon>
-                            <Modal.Heading className="font-semibold">Message details</Modal.Heading>
+                            <Modal.Heading className="font-semibold">Message Details</Modal.Heading>
                         </Modal.Header>
                         <Modal.Body>
                             {message && (
@@ -112,7 +124,6 @@ export function MessageDetailsModal({ message, state }: MessageDetailsModalProps
                                                    value={formatDate(message.deliveredToBackendAt)}/>
                                     </div>
 
-                                    {/* Fetched on open */}
                                     {loading ? (
                                         <div className="flex justify-center py-6">
                                             <Spinner size="sm"/>

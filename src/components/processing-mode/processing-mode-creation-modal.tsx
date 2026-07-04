@@ -12,7 +12,7 @@
 
 import { Button, FieldError, Form, Input, Label, ListBox, Modal, Select, Spinner, TextField, useOverlayState } from "@heroui/react";
 import React, { useEffect, useState } from "react";
-import { Plus } from "@gravity-ui/icons";
+import { ArrowShapeUp, Plus } from "@gravity-ui/icons";
 import { ProcessingModeCreationRequest } from "@/types/request/processing-mode";
 import { listBusinessDomains } from "@/services/business-domain";
 import { FileTrigger } from "react-aria-components";
@@ -95,7 +95,7 @@ export function ProcessingModeCreationModal({ state, onSubmit }: ProcessingModeA
                             <Modal.Icon className="bg-default text-foreground">
                                 <Plus className="size-5"/>
                             </Modal.Icon>
-                            <Modal.Heading className="font-semibold">Add Processing Mode</Modal.Heading>
+                            <Modal.Heading className="font-semibold">Load A Processing Mode</Modal.Heading>
                         </Modal.Header>
                         <Modal.Body>
                             <Form id="add-processing-mode-form" onSubmit={handleSubmit} className="space-y-6">
@@ -162,8 +162,8 @@ export function ProcessingModeCreationModal({ state, onSubmit }: ProcessingModeA
                                 isPending={submitting}
                                 isDisabled={!file || !description.trim() || !businessDomainIdentifier}
                             >
-                                {submitting ? <Spinner color="current" size="sm"/> : <Plus className="mr-2 size-4"/>}
-                                Add
+                                {submitting ? <Spinner color="current" size="sm"/> : <ArrowShapeUp className="mr-2 size-4"/>}
+                                Load
                             </Button>
                             <Button slot="close" variant="tertiary">Close</Button>
                         </Modal.Footer>

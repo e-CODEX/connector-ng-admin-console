@@ -16,3 +16,27 @@ export interface ConnectorProcessingMode {
     createdAt: string;
     updatedAt: string;
 }
+
+export interface ConnectorProcessingModeDetail extends ConnectorProcessingMode {
+    parties: ConnectorParty[];
+    services: ConnectorService[];
+    actions: ConnectorAction[];
+}
+
+export interface ConnectorParty {
+    name: string;
+    identifier: string;
+    identifierType: string;
+    role: string;
+    roleType: string;
+    isHome: boolean;
+}
+
+export interface ConnectorService {
+    name: string;
+    type: string;
+}
+
+export interface ConnectorAction {
+    name: string;
+}

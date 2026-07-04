@@ -92,7 +92,7 @@ export function BusinessDomainCreationModal({ state, onSubmit }: ProcessingModeA
                             <Modal.Icon className="bg-default text-foreground">
                                 <Plus className="size-5"/>
                             </Modal.Icon>
-                            <Modal.Heading className="font-semibold">Add Business Domain</Modal.Heading>
+                            <Modal.Heading className="font-semibold">Create  A Business Domain</Modal.Heading>
                         </Modal.Header>
                         <Modal.Body>
                             <Form id="add-business-domain-form" onSubmit={handleSubmit} className="space-y-6">

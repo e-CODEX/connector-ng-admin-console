@@ -10,20 +10,21 @@
 
 "use client"
 
-import {Navbar as HeroNavbar, NavbarBrand, NavbarContent, NavbarItem} from "@heroui/navbar"
+import { Navbar as HeroNavbar, NavbarBrand, NavbarContent, NavbarItem } from "@heroui/navbar"
 import NextLink from "next/link"
 import Link from "next/link"
 import Image from "next/image"
-import {usePathname} from "next/navigation";
+import { usePathname } from "next/navigation";
+import { ThemeSwitcher } from "@/components/common/theme-switcher";
 
 const navItems = [
-    {label: "Send", href: "/message-outbound"},
-    {label: "Messages", href: "/admin/messages"},
-    {label: "Transport-Step", href: "/admin/transport-steps"},
-    {label: "Attachments", href: "/admin/attachments"},
-    {label: "Configurations", href: "/admin/configurations"},
-    {label: "Business domain", href: "/admin/business-domains"},
-    {label: "Processing mode", href: "/admin/processing-modes"},
+    { label: "Send", href: "/message-outbound" },
+    { label: "Messages", href: "/admin/messages" },
+    { label: "Transport-Step", href: "/admin/transport-steps" },
+    { label: "Attachments", href: "/admin/attachments" },
+    { label: "Configurations", href: "/admin/configurations" },
+    { label: "Business domain", href: "/admin/business-domains" },
+    { label: "Processing mode", href: "/admin/processing-modes" },
 ]
 export const MainNavbar = () => {
     const pathname = usePathname();
@@ -70,6 +71,9 @@ export const MainNavbar = () => {
                         </NavbarItem>
                     );
                 })}
+                <NavbarItem>
+                    <ThemeSwitcher/>
+                </NavbarItem>
             </NavbarContent>
         </HeroNavbar>
     )

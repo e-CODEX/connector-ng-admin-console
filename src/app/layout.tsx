@@ -16,6 +16,7 @@ import { MainNavbar } from "@/components/common/MainNavbar";
 import { Footer } from "@/components/common/Footer";
 import React from "react";
 import { Toast } from "@heroui/react";
+import { Providers } from "@/app/providers";
 
 export const metadata: Metadata = {
     title: siteConfig.title,
@@ -31,16 +32,19 @@ export default function RootLayout({
         <html
             lang="en"
             className={`${GeistSans.variable} ${GeistMono.variable} h-full antialiased`}
+            suppressHydrationWarning
         >
-        <body className="min-h-full flex flex-col">
-        <div className="relative flex flex-col min-h-screen">
-            <MainNavbar/>
-            <main className="grow pr-3 pl-3 pt-3">
-                {children}
-            </main>
-            <Footer/>
-            <Toast.Provider/>
-        </div>
+        <body className="min-h-full flex flex-col bg-background text-foreground">
+        <Providers>
+            <div className="relative flex flex-col min-h-screen">
+                <MainNavbar/>
+                <main className="grow pr-3 pl-3 pt-3">
+                    {children}
+                </main>
+                <Footer/>
+                <Toast.Provider/>
+            </div>
+        </Providers>
         </body>
         </html>
     );

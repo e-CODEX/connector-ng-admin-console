@@ -31,9 +31,8 @@ export const MainNavbar = () => {
 
     return (
         <HeroNavbar
-            className="bg-slate-800 backdrop-blur-lg text-white border-b border-slate-700 pr-5"
+            className="fixed top-0 left-0 right-0 z-50 bg-slate-800 text-white border-b border-slate-700 backdrop-blur-lg pr-5"
             maxWidth="2xl"
-            position="sticky"
         >
             <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
                 <NavbarBrand className="gap-3 max-w-fit">

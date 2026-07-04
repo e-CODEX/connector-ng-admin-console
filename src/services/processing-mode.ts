@@ -8,7 +8,7 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { ConnectorProcessingMode } from "@/types/processing-mode";
+import { ConnectorProcessingMode, ConnectorProcessingModeDetail } from "@/types/processing-mode";
 import { restApiCall } from "@/lib/rest";
 import { ProcessingModeCreationRequest } from "@/types/request/processing-mode";
 
@@ -34,4 +34,8 @@ export async function createProcessingMode(payload: ProcessingModeCreationReques
             body: formData
         }
     )
+}
+
+export async function getProcessingMode(identifier: string): Promise<ConnectorProcessingModeDetail> {
+    return restApiCall<ConnectorProcessingModeDetail>(`api/v1/admin/processing-modes/${identifier}`);
 }

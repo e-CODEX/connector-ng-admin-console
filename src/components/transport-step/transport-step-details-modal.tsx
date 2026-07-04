@@ -34,7 +34,7 @@ export function TransportStepDetailsModal({
                             <Modal.Icon className="bg-default text-foreground">
                                 <Eye className="size-5"/>
                             </Modal.Icon>
-                            <Modal.Heading className="font-semibold">Message details</Modal.Heading>
+                            <Modal.Heading className="font-semibold">Transport Step Details</Modal.Heading>
                         </Modal.Header>
                         <Modal.Body>
                             {transportStep && <TransportStepDetails transportStep={transportStep}/>}

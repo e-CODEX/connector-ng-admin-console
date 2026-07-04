@@ -35,8 +35,7 @@ export function AttachmentDetailsModal({
                             <Modal.Icon className="bg-default text-foreground">
                                 <Eye className="size-5"/>
                             </Modal.Icon>
-                            <Modal.Heading className="font-semibold">Attachments
-                                details</Modal.Heading>
+                            <Modal.Heading className="font-semibold">Attachments Details</Modal.Heading>
                         </Modal.Header>
                         <Modal.Body>
                             {attachment && (

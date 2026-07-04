@@ -9,6 +9,7 @@
  */
 
 import { ConnectorAttachment } from "@/types/attachments";
+import { ConnectorAction, ConnectorParty, ConnectorService } from "@/types/processing-mode";
 
 export interface ConnectorMessage {
     businessDomainIdentifier: string;
@@ -50,24 +51,6 @@ interface ConnectorAS4Properties {
     toParty: ConnectorParty;
     service: ConnectorService;
     action: ConnectorAction;
-}
-
-export interface ConnectorParty {
-    name: string;
-    identifier: string;
-    identifierType: string;
-    role: string;
-    roleType: string;
-    isHome: boolean;
-}
-
-interface ConnectorService {
-    name: string;
-    type: string;
-}
-
-interface ConnectorAction {
-    name: string;
 }
 
 interface ConnectorMessageEvidence {

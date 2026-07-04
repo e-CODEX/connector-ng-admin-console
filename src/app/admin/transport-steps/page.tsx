@@ -136,9 +136,9 @@ export default function TransportStepsAdminPage() {
                                     <Table.Column>Remote System Identifier</Table.Column>
                                     <Table.Column>Message Type</Table.Column>
                                     <Table.Column>Attempts</Table.Column>
-                                    <Table.Column>status</Table.Column>
+                                    <Table.Column>Status</Table.Column>
                                     <Table.Column>Created at</Table.Column>
-                                    <Table.Column>Action.s</Table.Column>
+                                    <Table.Column>Actions</Table.Column>
                                 </Table.Header>
                                 <Table.Body>
                                     {transportSteps.map((transportStep) => (

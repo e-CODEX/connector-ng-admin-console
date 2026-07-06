@@ -49,8 +49,10 @@ export function formatBytes(bytes: number, decimals = 1): string {
 export const getDeliveryLabel = (isDelivered: boolean): string =>
     isDelivered ? "Delivered" : "Not delivered";
 
-export const getDeliveryColor = (isDelivered: boolean): "success" | "danger" =>
-    isDelivered ? "success" : "danger";
+export const getBooleanColor = (value: boolean): "success" | "danger" =>
+    value ? "success" : "danger";
+
+export const getBooleanLabel = (value: boolean): string => (value ? "Yes" : "No");
 
 export const getTransportDeliveryLabel = (status: string): string => {
     switch (status) {

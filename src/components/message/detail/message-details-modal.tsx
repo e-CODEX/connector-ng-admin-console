@@ -12,7 +12,7 @@
 
 import { Button, Chip, Modal, Spinner, Table, useOverlayState } from "@heroui/react";
 import { ConnectorMessage, ConnectorMessageDetails } from "@/types/message";
-import { formatBytes, formatDate, getDeliveryColor, getDeliveryLabel, toastError, truncate } from "@/utils";
+import { formatBytes, formatDate, getBooleanColor, getDeliveryLabel, toastError, truncate } from "@/utils";
 import React, { useEffect, useState } from "react";
 import { Eye } from "@gravity-ui/icons";
 import { getMessage } from "@/services/message";
@@ -102,7 +102,7 @@ export function MessageDetailsModal({ message, state }: MessageDetailsModalProps
                                         <DetailRow
                                             label="Status"
                                             value={
-                                                <Chip color={getDeliveryColor(message.delivered)}
+                                                <Chip color={getBooleanColor(message.delivered)}
                                                       size="sm" variant="soft">
                                                     <Chip.Label>{getDeliveryLabel(message.delivered)}</Chip.Label>
                                                 </Chip>

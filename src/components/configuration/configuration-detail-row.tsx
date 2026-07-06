@@ -8,3 +8,13 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
+import { ReactNode } from "react";
+
+export function ConfigurationDetailRow({ label, children }: { label: string; children: ReactNode }) {
+    return (
+        <div className="grid grid-cols-[minmax(0,300px)_1fr] items-baseline gap-4 py-1.5">
+            <dt className="text-sm text-neutral-500 dark:text-neutral-400">{label}</dt>
+            <dd className="min-w-0 wrap-break-word font-mono text-sm">{children}</dd>
+        </div>
+    );
+}

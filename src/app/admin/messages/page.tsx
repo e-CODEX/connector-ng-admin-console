@@ -15,7 +15,7 @@ import { ConnectorMessage } from "@/types/message";
 import { listMessages } from "@/services/message";
 import { Button, Chip, Spinner, Table, Tooltip, useOverlayState } from "@heroui/react";
 import { Icon } from "@iconify/react";
-import { formatDate, getDeliveryColor, getDeliveryLabel, toastError, truncate } from "@/utils";
+import { formatDate, getBooleanColor, getDeliveryLabel, toastError, truncate } from "@/utils";
 import { PaginationControls } from "@/components/paging/pagination-controls";
 import { MessageTransportStepsDetailModal } from "@/components/message/detail/message-transport-steps-detail-modal";
 import { PageHeader } from "@/components/common/page-hearder";
@@ -181,7 +181,7 @@ export default function MessagesAdminPage() {
                                             <Table.Cell>{message.direction}</Table.Cell>
                                             <Table.Cell>
                                                 <Chip
-                                                    color={getDeliveryColor(message.delivered)}
+                                                    color={getBooleanColor(message.delivered)}
                                                     size="sm"
                                                     variant="soft"
                                                 >

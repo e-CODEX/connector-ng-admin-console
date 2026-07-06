@@ -13,6 +13,7 @@ export interface ConnectorBusinessDomain {
     description: string;
     enabled: boolean;
     source: string;
+    pmodeFile: string;
     createdAt: string;
     updatedAt: string;
 }

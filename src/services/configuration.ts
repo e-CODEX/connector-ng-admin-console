@@ -36,7 +36,7 @@ export async function getBusinessDocumentConfiguration(): Promise<BusinessDocume
 }
 
 export async function getMessageProcessingConfiguration(): Promise<MessageProcessingConfiguration> {
-    return restApiCall<MessageProcessingConfiguration>("api/v1/admin/configurations/message-procesing");
+    return restApiCall<MessageProcessingConfiguration>("api/v1/admin/configurations/message-processing");
 }
 
 export async function getQueueConfiguration(): Promise<QueueConfiguration> {

@@ -13,6 +13,7 @@ import { ConnectorMessage, ConnectorMessageDetails } from "@/types/message";
 import { ConnectorTransportStep } from "@/types/transport-step";
 import { SendMessageArgs, SendMessageResponse, } from "@/types/send-message-form";
 import { restApiCall } from "@/lib/rest";
+import { ConnectorMessageStats } from "@/types/stats";
 
 
 export async function listMessages(params?: {
@@ -34,6 +35,12 @@ export async function getMessage(identifier: string): Promise<ConnectorMessageDe
 
 export async function getMessageTransportStep(identifier: string): Promise<ConnectorTransportStep> {
     return restApiCall<ConnectorTransportStep>(`api/v1/admin/messages/${identifier}/transport-steps`);
+}
+
+export async function getMessageStats(params: { from?: string; to?: string;  }): Promise<ConnectorMessageStats> {
+    return restApiCall<ConnectorMessageStats>("api/v1/admin/messages/stats", {
+        params
+    });
 }
 
 export async function sendMessage({

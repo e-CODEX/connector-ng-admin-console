@@ -9,6 +9,7 @@
  */
 
 import { toast } from "@heroui/react";
+import { ConnectorMessageStatsItem } from "@/types/stats";
 
 export const formatDate = (date: string) => {
     if (!date) return "";
@@ -112,3 +113,6 @@ const toastMessage = (title: string, description: string, variant: "default" | "
         },
     });
 }
+
+export const deliveryRate = (s: ConnectorMessageStatsItem) =>
+    s.total > 0 ? Math.round((s.delivered / s.total) * 1000) / 10 : 0;

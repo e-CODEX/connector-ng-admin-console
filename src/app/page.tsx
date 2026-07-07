@@ -8,10 +8,41 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-export default function Home() {
+"use client";
+
+import { PageHeader } from "@/components/common/page-hearder";
+import { MessageStatsSection } from "@/components/dashboard/message/message-stats-section";
+import { ArrowsRotateRight } from "@gravity-ui/icons";
+import { PageHeaderButton } from "@/components/common/page-header-button";
+import { useState } from "react";
+import { PeriodFilter } from "@/components/dashboard/period-filter";
+import { DEFAULT_PERIOD, Period } from "@/types/period";
+
+export default function DashboardPage() {
+    const [refreshToken, setRefreshToken] = useState(0);
+    const [period, setPeriod] = useState<Period>(DEFAULT_PERIOD);
+
+    const onRefreshClick = async () => {
+        setRefreshToken((t) => t + 1)
+    }
+
     return (
-        <div className="relative flex flex-1 w-full max-w-3xl flex-col">
-            Welcome to e-CODEX Connector Testor
+        <div className="flex flex-col gap-3">
+            <PageHeader
+                icon="clarity:dashboard-line"
+                title="Dashboard"
+                subtitle="App status and KPIs"
+            >
+                <PageHeaderButton
+                    variant="secondary"
+                    icon={ArrowsRotateRight}
+                    onPress={onRefreshClick}
+                />
+                <PeriodFilter value={period} onChange={setPeriod} />
+            </PageHeader>
+
+            {/* Message KPIs */}
+            <MessageStatsSection refreshToken={refreshToken} period={period}/>
         </div>
     );
 }

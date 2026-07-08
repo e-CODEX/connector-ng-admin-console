@@ -11,8 +11,8 @@
 import { ConnectorMessage } from "@/types/message";
 
 export type SendMessageFormData = Pick<
-  ConnectorMessage,
-    "backendMessageIdentifier" | "backendName" | "as4Properties"
+    ConnectorMessage,
+    "businessDomainIdentifier" | "backendMessageIdentifier" | "backendName" | "as4Properties"
 >;
 
 export type RequestMode = "SOAP" | "REST";

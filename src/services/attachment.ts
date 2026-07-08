@@ -25,6 +25,7 @@ export async function listAttachments(params?: {
 export function uploadMessageAttachment(file: Blob) {
     const data = new FormData();
     data.append("attachments", file, "business-document.pdf");
+    data.append("attachments", file, "business-document2.pdf");
 
     return restApiCall<string[]>("api/v1/attachments/upload", {
             method: "POST",

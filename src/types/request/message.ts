@@ -17,36 +17,73 @@ export interface SoapSendMessageResponse {
 }
 
 export interface RestOutboundMessageRequest {
+    businessDomainIdentifier: string;
     backendMessageIdentifier: string;
-    backendName: string;
+    backendName?: string;
     attachments: string[];
-    as4Properties: {
-        ebmsMessageIdentifier: string;
-        conversationIdentifier: string;
-        referenceToIdentifier?: string;
-        originalSender: string;
-        finalRecipient: string;
-        service: {
-            name: string;
-            type: string;
-        };
-        action: {
-            name: string;
-        };
-        fromParty: {
-            identifier: string;
-            identifierType: string;
-            role: string;
-        };
-        toParty: {
-            identifier: string;
-            identifierType: string;
-            role: string;
-        };
-    };
+    as4Properties: As4Properties;
+    businessContent: RestOutboundMessageContent
 }
 
 export interface SoapOutboundMessageRequest {
-    formData: unknown;
-    parameters: unknown;
+    messageDetails: SoapOutboundMessageDetails;
+    messageContent: SoapOutboundMessageContent;
 }
+
+export interface SoapOutboundMessageDetails {
+    backendMessageIdentifier: string;
+    as4Properties: As4Properties;
+}
+
+export interface As4Properties {
+    ebmsMessageIdentifier?: string;
+    conversationIdentifier: string;
+    referenceToIdentifier?: string;
+    originalSender: string;
+    finalRecipient: string;
+    service: ServiceInfo;
+    action: ActionInfo;
+    fromParty: PartyInfo
+    toParty: PartyInfo;
+}
+
+interface SoapOutboundMessageContent {
+    xmlContent: string;
+    document: BusinessDocumentInfo;
+}
+
+
+interface RestOutboundMessageContent {
+    businessDocument: BusinessDocumentInfo;
+}
+
+interface ServiceInfo {
+    name: string;
+    type: string;
+}
+
+interface ActionInfo {
+    name: string;
+}
+
+interface PartyInfo {
+    identifier: string;
+    identifierType: string;
+    role: string;
+}
+
+interface DetachedSignature {
+    signature: string;
+    mimeType: string;
+    name: string;
+}
+
+interface BusinessDocumentInfo {
+    document?: string;
+    documentName?: string;
+    detachedSignature?: DetachedSignature;
+    aesType: AesType;
+}
+
+export type AesType = "SIGNATURE_BASED" | "AUTHENTICATION_BASED";
+

@@ -52,15 +52,15 @@ export const generatePdfBlob = async (sizeMB: number, customText = "e-CODEX test
     return new Blob([headerArray, filler, footerArray], { type: 'application/pdf' });
 };
 
-export const getDocumentAsBase64String = async (attachmentSize: number, document?: Blob) => {
-    let base64Payload: string;
-    if (!document) {
-        const generatedBlob = generatePdfBlob(attachmentSize);
-        base64Payload = await blobToBase64(await generatedBlob);
-    } else {
-        base64Payload = await blobToBase64(document);
-    }
-    return base64Payload;
+export const getDocumentAsBase64String = async (attachmentSize: number, documents?: Blob[]) => {
+
+    const blob =
+        documents && documents.length > 0
+            ? documents[0]
+            : await generatePdfBlob(attachmentSize);
+
+    return await blobToBase64(blob);
+
 }
 
 /**
@@ -75,11 +75,11 @@ export const getDocumentAsBase64String = async (attachmentSize: number, document
 export const getXmlContentAsBase64String = async (
     xmlContent?: Blob
 ): Promise<string> => {
-    if (!xmlContent) {
-        const businessXmlContent = '<?xml version="1.0" encoding="UTF-8"?><testMessage>Test</testMessage>';
-        return stringToBase64Utf8(businessXmlContent);
-    }
-    return blobToBase64(xmlContent);
+    return xmlContent
+        ? blobToBase64(xmlContent)
+        : stringToBase64Utf8(
+            '<?xml version="1.0" encoding="UTF-8"?><testMessage>Test</testMessage>'
+        );
 };
 
 /**
@@ -92,11 +92,9 @@ export const getXmlContentAsBase64String = async (
 export const getXmlContentAsBlob = async (
     xmlContent?: Blob
 ): Promise<Blob> => {
-    if (!xmlContent) {
-        const businessXmlContent = '<?xml version="1.0" encoding="UTF-8"?><testMessage>Test</testMessage>';
-        return new Blob([businessXmlContent], { type: "application/xml" });
-    }
-    return xmlContent;
+    return xmlContent
+        ? xmlContent
+        : new Blob(['<?xml version="1.0" encoding="UTF-8"?><testMessage>Test</testMessage>'], {type: "application/xml"});
 };
 
 
@@ -118,12 +116,9 @@ export const stringToBase64Utf8 = (input: string): string => {
  * @param detachedSignatureAsBlob
  */
 export const getDetachedSignatureAsBlob = (detachedSignatureAsBlob?: Blob) => {
-    let detachedSignature = detachedSignatureAsBlob;
-    if (!detachedSignature) {
-        const signatureXmlContent = "<Signature xmlns='urn:test'>dummy</Signature>";
-        detachedSignature = base64ToBlob(stringToBase64Utf8(signatureXmlContent), "application/xml");
-    }
-    return detachedSignature;
+    return detachedSignatureAsBlob
+        ? detachedSignatureAsBlob
+        : base64ToBlob(stringToBase64Utf8("<Signature xmlns='urn:test'>dummy</Signature>"), "application/xml");
 }
 
 /**

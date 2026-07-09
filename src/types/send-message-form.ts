@@ -8,32 +8,43 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { ConnectorMessage } from "@/types/response/message";
+import {ConnectorMessage} from "@/types/response/message";
 
 export type SendMessageFormData = Pick<
     ConnectorMessage,
     "businessDomainIdentifier" | "backendMessageIdentifier" | "backendName" | "as4Properties"
 >;
 
-export type RequestMode = "SOAP" | "REST";
+
+export enum FileSourceMode {
+    GENERATED = "GENERATED",
+    UPLOADED = "UPLOADED",
+}
+
+export enum RequestMode {
+    SOAP = "SOAP",
+    REST = "REST"
+}
+
 
 export interface SendParameters {
-  mode: RequestMode;
-  attachmentSizeMB: number;
-  repeatCount: number;
+    mode: RequestMode;
+    attachmentSizeMB: number;
+    repeatCount: number;
+    fileSource: FileSourceMode;
 }
 
 export interface UploadedAttachment {
-  id: string;
+    id: string;
 }
 
 export interface SendMessageResponse {
-  identifier?: string;
-  status?: string;
+    identifier?: string;
+    status?: string;
 }
 
 export interface SendMessageArgs {
-  formData: SendMessageFormData;
-  parameters: SendParameters;
-  document?: Blob;
+    formData: SendMessageFormData;
+    parameters: SendParameters;
+    documents?: Blob[];
 }

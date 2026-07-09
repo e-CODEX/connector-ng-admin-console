@@ -29,16 +29,16 @@ import { SoapOutboundMessageDetails, SoapOutboundMessageRequest } from "@/types/
  *
  * @param formData - Main form data containing business and AS4-related properties.
  * @param parameters - parameters to generate a business document for the outbound message.
- * @param document - Optional binary document to attach to the message.
+ * @param documents - Optional binary documents to attach to the message.
  * @param xmlContent - Optional XML payload of metadata as a Blob.
  */
 export const createSoapOutboundMessagePayload = async (
     formData: SendMessageFormData,
     parameters: SendParameters,
-    document?: Blob,
+    documents?: Blob[],
     xmlContent?: Blob) => {
 
-    const base64Payload = await getDocumentAsBase64String(parameters.attachmentSizeMB, document);
+    const base64Payload = await getDocumentAsBase64String(parameters.attachmentSizeMB, documents);
 
     const businessXmlContent = await getXmlContentAsBase64String(xmlContent);
 

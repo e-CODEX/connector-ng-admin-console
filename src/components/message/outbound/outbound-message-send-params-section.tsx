@@ -10,53 +10,22 @@
 
 "use client";
 
-import { Label, ListBox, Select, } from "@heroui/react";
-import { RequestMode, SendParameters } from "@/types/send-message-form";
-import { FormTextField } from "@/components/form/form-text-field";
+import {FileSourceMode, SendParameters} from "@/types/send-message-form";
+import {FormTextField} from "@/components/form/form-text-field";
+import {FileSourceModeSelect} from "@/components/message/outbound/outbound-message-file-mode-select";
+import {RequestModeSelectField} from "@/components/message/outbound/outbound-message-request-mode-select";
+import {FileUpload} from "@/components/message/outbound/outbound-message-file-upload";
 
 interface OutboundMessageSendParametersSectionProps {
     data: SendParameters;
     onChange: (next: SendParameters) => void;
-}
-
-interface ModeSelectFieldProps {
-    value: RequestMode;
-    onChange: (value: RequestMode) => void;
-}
-
-function ModeSelectField({ value, onChange }: ModeSelectFieldProps) {
-    return (
-        <div className="w-full">
-            <Label className="text-sm font-semibold text-default-700">Mode</Label>
-
-            <Select
-                aria-label="Mode"
-                selectedKey={value}
-                onSelectionChange={(key) => {
-                    if (key) {
-                        onChange(key as RequestMode);
-                    }
-                }}
-            >
-                <Select.Trigger>
-                    <Select.Value/>
-                    <Select.Indicator/>
-                </Select.Trigger>
-
-                <Select.Popover>
-                    <ListBox>
-                        <ListBox.Item id="SOAP">SOAP</ListBox.Item>
-                        <ListBox.Item id="REST">REST</ListBox.Item>
-                    </ListBox>
-                </Select.Popover>
-            </Select>
-        </div>
-    );
+    onFilesSelect: (files: File[]) => void;
 }
 
 export function OutboundMessageSendParametersSection({
                                                          data,
                                                          onChange,
+                                                         onFilesSelect,
                                                      }: OutboundMessageSendParametersSectionProps) {
     const update = (patch: Partial<SendParameters>) => {
         onChange({
@@ -65,33 +34,48 @@ export function OutboundMessageSendParametersSection({
         });
     };
 
+    const isGenerated = data.fileSource === FileSourceMode.GENERATED;
+
     return (
         <section className="rounded-md border bg-content1 p-2">
             <h2 className="mb-2 text-lg font-semibold">Send parameters</h2>
 
-            <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
-                <ModeSelectField
+            <div className="grid grid-cols-1 gap-5 lg:grid-cols-4">
+                <RequestModeSelectField
                     value={data.mode}
-                    onChange={(value) => update({ mode: value })}
+                    onChange={(value) => update({mode: value})}
                 />
 
-                <FormTextField
-                    label="Attachment Size (MB)"
-                    type="number"
-                    value={String(data.attachmentSizeMB)}
-                    onChange={(value) =>
-                        update({ attachmentSizeMB: Number(value) || 0 })
-                    }
+                <FileSourceModeSelect
+                    value={data.fileSource}
+                    onChange={(value) => update({fileSource: value})}
                 />
 
-                <FormTextField
-                    label="Repeat"
-                    type="number"
-                    value={String(data.repeatCount)}
-                    onChange={(value) =>
-                        update({ repeatCount: Number(value) || 0 })
-                    }
-                />
+                {isGenerated ? (
+                        <>
+                            <FormTextField
+                                label="Attachment Size (MB)"
+                                type="number"
+                                value={String(data.attachmentSizeMB)}
+                                onChange={(value) =>
+                                    update({attachmentSizeMB: Number(value) || 0})
+                                }
+                            />
+                            <FormTextField
+                                label="Repeat"
+                                type="number"
+                                value={String(data.repeatCount)}
+                                onChange={(value) =>
+                                    update({repeatCount: Number(value) || 0})
+                                }
+                            />
+                        </>
+                    ) :
+                    <FileUpload
+                        onFilesSelect={onFilesSelect}
+                        text="Upload Business Document(s)"
+                    />
+                }
             </div>
         </section>
     );

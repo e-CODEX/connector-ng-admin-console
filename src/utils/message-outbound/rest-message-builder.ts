@@ -31,22 +31,25 @@ import { uploadMessageAttachment } from "@/services/attachment";
  *
  * @param formData - Main form data containing business and AS4-related properties.
  * @param parameters - parameters to generate a business document for the outbound message.
- * @param document - Optional binary document to attach to the message.
+ * @param documents - Optional binary document to attach to the message.
  * @param xmlContent - Optional XML payload of metadata as a Blob.
  * @param detachedSignature - Optional detached signature as a Blob.
  */
 export const createRestOutboundMessagePayLoad = async (
     formData: SendMessageFormData,
     parameters: SendParameters,
-    document?: Blob,
+    documents?: Blob[],
     xmlContent?: Blob,
     detachedSignature?: Blob) => {
 
-    let generatedBlob = document;
-    if (!generatedBlob) {
-        generatedBlob = await generatePdfBlob(parameters.attachmentSizeMB);
-    }
-    const attachmentIds = await uploadMessageAttachment(generatedBlob)
+
+    const hasDocuments = documents && documents?.length > 0;
+    const documentsToUpload = hasDocuments
+        ? documents
+        : [await generatePdfBlob(parameters.attachmentSizeMB)];
+
+    const attachmentIds = await uploadMessageAttachment(documentsToUpload)
+
     const metadata = createMessageMetadata(formData, attachmentIds);
 
     const dataToSubmit = new FormData();

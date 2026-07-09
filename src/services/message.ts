@@ -74,25 +74,22 @@ export async function exportMessageReports(params: { from?: string; to?: string;
 export async function sendMessage({
                                       formData,
                                       parameters,
-                                      document,
+                                      documents,
                                   }: SendMessageArgs): Promise<SendMessageResponse> {
     if (parameters.mode === "REST") {
-        return sendRestMessage({ formData, parameters, document });
+        return sendRestMessage({formData, parameters, documents});
     }
 
-    return sendSoapMessage({ formData, parameters, document });
+    return sendSoapMessage({formData, parameters, documents});
 }
 
 async function sendRestMessage({
                                    formData,
                                    parameters,
-                                   document,
+                                   documents,
                                }: SendMessageArgs): Promise<SendMessageResponse> {
-    void formData;
-    void parameters;
-    void document;
 
-    const payload = await createRestOutboundMessagePayLoad(formData, parameters, document);
+    const payload = await createRestOutboundMessagePayLoad(formData, parameters, documents);
 
     return restApiCall("api/v1/messages/outbound", {
         method: "POST",
@@ -103,13 +100,10 @@ async function sendRestMessage({
 async function sendSoapMessage({
                                    formData,
                                    parameters,
-                                   document,
+                                   documents,
                                }: SendMessageArgs): Promise<SendMessageResponse> {
-    void formData;
-    void parameters;
-    void document;
 
-    const payload = await createSoapOutboundMessagePayload(formData, parameters, document);
+    const payload = await createSoapOutboundMessagePayload(formData, parameters, documents);
 
     return restApiCall<SendMessageResponse>(
         "bff/api/v1/submit-message",

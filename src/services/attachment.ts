@@ -22,11 +22,11 @@ export async function listAttachments(params?: {
     });
 }
 
-export function uploadMessageAttachment(file: Blob) {
+export function uploadMessageAttachment(file: Blob[]) {
     const data = new FormData();
-    data.append("attachments", file, "business-document.pdf");
-    data.append("attachments", file, "business-document2.pdf");
-
+    for (let i = 0; i < file.length; i++) {
+        data.append("attachments", file[i], `business-document${i}.pdf`);
+    }
     return restApiCall<string[]>("api/v1/attachments/upload", {
             method: "POST",
             body: data,

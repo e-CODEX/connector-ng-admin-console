@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { PageHeader } from "@/components/common/page-header";
-import { OutboundMessageForm } from "@/components/message/outbound/outbound-message-form";
-import { OutboundMessageSendParametersSection } from "@/components/message/outbound/outbound-message-send-params-section";
-import { OutboundMessageActionBar } from "@/components/message/outbound/outbound-message-action-bar";
-import { OutboundMessageConsolePanel } from "@/components/message/outbound/outbound-message-console-panel";
-import { SendMessageFormData, SendParameters, } from "@/types/send-message-form";
-import { sendMessage } from "@/services/message";
-import { toastError } from "@/utils";
+import {useState} from "react";
+import {PageHeader} from "@/components/common/page-header";
+import {OutboundMessageForm} from "@/components/message/outbound/outbound-message-form";
+import {OutboundMessageSendParametersSection} from "@/components/message/outbound/outbound-message-send-params-section";
+import {OutboundMessageActionBar} from "@/components/message/outbound/outbound-message-action-bar";
+import {OutboundMessageConsolePanel} from "@/components/message/outbound/outbound-message-console-panel";
+import {FileSourceMode, RequestMode, SendMessageFormData, SendParameters,} from "@/types/send-message-form";
+import {sendMessage} from "@/services/message";
+import {toastError} from "@/utils";
 
 const initialMessageFormData: SendMessageFormData = {
     businessDomainIdentifier: "",
@@ -47,29 +47,34 @@ const initialMessageFormData: SendMessageFormData = {
 };
 
 const initialSendParameters: SendParameters = {
-    mode: "SOAP",
+    mode: RequestMode.SOAP,
     attachmentSizeMB: 1,
     repeatCount: 1,
+    fileSource: FileSourceMode.UPLOADED
 };
 
 export default function MessageOutboundPage() {
     const [messageFormData, setMessageFormData] =
-              useState<SendMessageFormData>(initialMessageFormData);
+        useState<SendMessageFormData>(initialMessageFormData);
 
     const [sendParameters, setSendParameters] =
-              useState<SendParameters>(initialSendParameters);
+        useState<SendParameters>(initialSendParameters);
 
     const [logs, setLogs] = useState("Ready.");
     const [isSending, setIsSending] = useState(false);
+    const [files, setFiles] = useState<File[]>([]);
+
 
     const handleSend = async () => {
         try {
             setIsSending(true);
             setLogs((prev) => `[${new Date().toLocaleTimeString()}] Sending...\n${prev}`);
 
+            const documentsAsBlobs: Blob[] = [...files];
             await sendMessage({
                 formData: messageFormData,
                 parameters: sendParameters,
+                documents: documentsAsBlobs
             });
 
             setLogs((prev) => `[${new Date().toLocaleTimeString()}] Message sent\n${prev}`);
@@ -108,6 +113,7 @@ export default function MessageOutboundPage() {
                 <OutboundMessageSendParametersSection
                     data={sendParameters}
                     onChange={setSendParameters}
+                    onFilesSelect={setFiles}
                 />
 
                 <OutboundMessageConsolePanel content={logs}/>

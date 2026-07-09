@@ -9,7 +9,7 @@
  */
 
 import { useEffect, useState } from "react";
-import { MessageProcessingConfiguration } from "@/types/configuration";
+import { MessageProcessingConfiguration } from "@/types/response/configuration";
 import { getMessageProcessingConfiguration } from "@/services/configuration";
 import { getBooleanLabel, toastError } from "@/utils";
 import { Spinner } from "@heroui/react";

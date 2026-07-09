@@ -13,11 +13,12 @@ import {
     BusinessDocumentConfiguration,
     BusinessDomainConfiguration,
     ContainerConfiguration,
-    EvidenceConfiguration, LinkPartnerConfiguration,
+    EvidenceConfiguration,
+    LinkPartnerConfiguration,
     MessageProcessingConfiguration,
     QueueConfiguration,
     RoutingConfiguration
-} from "@/types/configuration";
+} from "@/types/response/configuration";
 
 export async function getBusinessDomainsConfig(): Promise<BusinessDomainConfiguration> {
     return restApiCall<BusinessDomainConfiguration>("api/v1/admin/configurations/business-domains");

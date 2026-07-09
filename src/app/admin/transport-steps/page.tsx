@@ -10,17 +10,17 @@
 
 "use client"
 
-import { PageHeader } from "@/components/common/page-hearder";
+import { PageHeader } from "@/components/common/page-header";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { Button, Chip, Spinner, Table, Tooltip, useOverlayState } from "@heroui/react";
 import { listTransportSteps } from "@/services/transport-step";
-import { TransportStepFilters } from "@/components/transport-step/transport-step-filters";
+import { TransportStepFiltersPanel } from "@/components/transport-step/transport-step-filters-panel";
 import { formatDate, getTransportDeliveryColor, getTransportDeliveryLabel, toastError, truncate } from "@/utils";
 import { Icon } from "@iconify/react";
 import { PaginationControls } from "@/components/paging/pagination-controls";
-import { ConnectorTransportStep } from "@/types/transport-step";
-import { TransportStepDetailsModal } from "@/components/transport-step/transport-step-details-modal";
+import { ConnectorTransportStep } from "@/types/response/transport-step";
+import { TransportStepDetailsView } from "@/components/transport-step/transport-step-details-view";
 import { ArrowsRotateRight } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/page-header-button";
 
@@ -114,7 +114,7 @@ export default function TransportStepsAdminPage() {
                     isSpinning={refreshing || loading}
                 />
             </PageHeader>
-            <TransportStepFilters
+            <TransportStepFiltersPanel
                 messageOrRemoteSystemIdentifier={messageOrRemoteSystemIdentifierQuery}
                 linkPartnerName={linkPartnerNameQuery}
                 onMessageOrRemoteSystemIdentifierChange={onMessageOrRemoteSystemIdentifierChange}
@@ -216,8 +216,8 @@ export default function TransportStepsAdminPage() {
                         )
                     }
 
-                    <TransportStepDetailsModal transportStep={selectedTransportStep}
-                                               state={detailsModal}/>
+                    <TransportStepDetailsView transportStep={selectedTransportStep}
+                                              state={detailsModal}/>
                 </>
             )}
         </>

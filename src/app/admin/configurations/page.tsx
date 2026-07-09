@@ -10,7 +10,7 @@
 
 "use client"
 
-import { PageHeader } from "@/components/common/page-hearder";
+import { PageHeader } from "@/components/common/page-header";
 import { Tabs } from "@heroui/react";
 import { ConfigurationEvidenceSection } from "@/components/configuration/section/configuration-evidence-section";
 import { ConfigurationContainerSection } from "@/components/configuration/section/configuration-container-section";

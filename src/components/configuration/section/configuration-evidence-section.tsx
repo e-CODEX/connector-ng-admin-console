@@ -11,9 +11,9 @@
 "use client";
 
 import { ConfigurationDetailRow } from "@/components/configuration/configuration-detail-row";
-import { ConfigurationSignatureView } from "@/components/configuration/configuration-signature-view";
+import { ConfigurationSignatureView } from "@/components/configuration/view/configuration-signature-view";
 import { ConfigurationBlock } from "@/components/configuration/configuration-block";
-import { EvidenceConfiguration } from "@/types/configuration";
+import { EvidenceConfiguration } from "@/types/response/configuration";
 import { useEffect, useState } from "react";
 import { toastError } from "@/utils";
 import { getEvidenceConfiguration } from "@/services/configuration";

@@ -11,7 +11,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { RoutingConfiguration } from "@/types/configuration";
+import { RoutingConfiguration } from "@/types/response/configuration";
 import { getRoutingConfiguration } from "@/services/configuration";
 import { getBooleanLabel, toastError } from "@/utils";
 import { Spinner, Table } from "@heroui/react";

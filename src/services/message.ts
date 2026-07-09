@@ -8,16 +8,16 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import {PaginatedResponse} from "@/types/paginated-response";
-import {ConnectorMessage, ConnectorMessageDetails} from "@/types/message";
-import {ConnectorTransportStep} from "@/types/transport-step";
-import {SendMessageArgs, SendMessageResponse,} from "@/types/send-message-form";
-import {createSoapOutboundMessagePayload} from "@/utils/message-outbound/soap-message-builder";
-import {createRestOutboundMessagePayLoad} from "@/utils/message-outbound/rest-message-builder";
-import { ConnectorMessageStats } from "@/types/stats";
-import { ConnectorMessageReport } from "@/types/reporting";
-import {restApiCall} from "@/lib/rest";
-import {BFF_API_BASE_URL} from "@/lib/config";
+import { PaginatedResponse } from "@/types/response/paginated-response";
+import { ConnectorMessage, ConnectorMessageDetails } from "@/types/response/message";
+import { ConnectorTransportStep } from "@/types/response/transport-step";
+import { SendMessageArgs, SendMessageResponse, } from "@/types/send-message-form";
+import { createSoapOutboundMessagePayload } from "@/utils/message-outbound/soap-message-builder";
+import { createRestOutboundMessagePayLoad } from "@/utils/message-outbound/rest-message-builder";
+import { ConnectorMessageStats } from "@/types/response/stats";
+import { ConnectorMessageReport } from "@/types/response/reporting";
+import { restApiCall } from "@/lib/rest";
+import { BFF_API_BASE_URL } from "@/lib/config";
 
 
 export async function listMessages(params?: {
@@ -59,10 +59,10 @@ export async function sendMessage({
                                       document,
                                   }: SendMessageArgs): Promise<SendMessageResponse> {
     if (parameters.mode === "REST") {
-        return sendRestMessage({formData, parameters, document});
+        return sendRestMessage({ formData, parameters, document });
     }
 
-    return sendSoapMessage({formData, parameters, document});
+    return sendSoapMessage({ formData, parameters, document });
 }
 
 async function sendRestMessage({
@@ -76,11 +76,13 @@ async function sendRestMessage({
 
     const payload = await createRestOutboundMessagePayLoad(formData, parameters, document);
 
-    return restApiCall('api/v1/messages/outbound',
+    return restApiCall(
+        'api/v1/messages/outbound',
         {
             method: "POST",
             body: payload,
-        })
+        }
+    )
 }
 
 async function sendSoapMessage({

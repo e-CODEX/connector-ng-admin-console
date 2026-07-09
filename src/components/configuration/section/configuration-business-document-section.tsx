@@ -11,13 +11,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BusinessDocumentConfiguration } from "@/types/configuration";
+import { BusinessDocumentConfiguration } from "@/types/response/configuration";
 import { getBusinessDocumentConfiguration } from "@/services/configuration";
 import { toastError } from "@/utils";
 import { Spinner } from "@heroui/react";
 import { ConfigurationBlock } from "@/components/configuration/configuration-block";
 import { ConfigurationDetailRow } from "@/components/configuration/configuration-detail-row";
-import { ConfigurationSignatureView } from "@/components/configuration/configuration-signature-view";
+import { ConfigurationSignatureView } from "@/components/configuration/view/configuration-signature-view";
 
 export function ConfigurationBusinessDocumentSection() {
     const [loading, setLoading] = useState(true);

@@ -12,8 +12,8 @@ import type { Metadata } from "next";
 import "../styles/globals.css";
 import { siteConfig } from "@/config/site";
 import { GeistMono, GeistSans } from "@/config/fonts";
-import { MainNavbar } from "@/components/common/MainNavbar";
-import { Footer } from "@/components/common/Footer";
+import { AppMainNavbar } from "@/components/common/app-main-navbar";
+import { AppFooter } from "@/components/common/app-footer";
 import React from "react";
 import { Toast } from "@heroui/react";
 import { Providers } from "@/app/providers";
@@ -37,11 +37,11 @@ export default function RootLayout({
         <body className="min-h-full flex flex-col bg-background text-foreground">
         <Providers>
             <div className="relative flex flex-col min-h-screen">
-                <MainNavbar/>
+                <AppMainNavbar/>
                 <main className="grow px-3 pt-22">
                     {children}
                 </main>
-                <Footer/>
+                <AppFooter/>
                 <Toast.Provider/>
             </div>
         </Providers>

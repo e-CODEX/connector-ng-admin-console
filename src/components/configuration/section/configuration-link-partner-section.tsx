@@ -11,14 +11,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { LinkPartnerConfiguration } from "@/types/configuration";
+import { LinkPartnerConfiguration } from "@/types/response/configuration";
 import { getLinkPartnerConfiguration } from "@/services/configuration";
 import { getBooleanLabel, toastError } from "@/utils";
 import { Spinner, Table } from "@heroui/react";
 import { ConfigurationBlock } from "@/components/configuration/configuration-block";
 import { ConfigurationDetailRow } from "@/components/configuration/configuration-detail-row";
-import { ConfigurationKeystoreView } from "@/components/configuration/configuration-keystore-view";
-import { ConfigurationPrivateKeyView } from "@/components/configuration/configuration-private-key-view";
+import { ConfigurationKeystoreView } from "@/components/configuration/view/configuration-keystore-view";
+import { ConfigurationPrivateKeyView } from "@/components/configuration/view/configuration-private-key-view";
 import { ConfigurationBoolChip } from "@/components/configuration/configuration-bool-chip";
 
 export function ConfigurationLinkPartnerSection() {

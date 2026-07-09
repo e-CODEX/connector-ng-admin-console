@@ -9,6 +9,7 @@
  */
 
 import { Label, SearchField } from "@heroui/react";
+import { SearchCriteriaBox } from "@/components/common/SearchCriteriaBox";
 
 interface MessageFiltersProps {
     identifier: string;
@@ -26,30 +27,23 @@ export function MessageFilters({
                                    className,
                                }: MessageFiltersProps) {
     return (
-        <section
-            className={`mt-6 mb-4 rounded-xl border border-border bg-surface p-4 ${className ?? ""}`}>
-            <h2 className="text-sm font-semibold text-foreground mb-3">Search criteria</h2>
-            <div className="flex flex-col sm:flex-row gap-3">
-                <SearchField className="w-full sm:max-w-xs" value={identifier}
-                             onChange={onIdentifierChange}>
-                    <Label className="text-sm font-medium">Identifier</Label>
-                    <SearchField.Group>
-                        <SearchField.SearchIcon/>
-                        <SearchField.Input placeholder="Search by identifier"/>
-                        <SearchField.ClearButton/>
-                    </SearchField.Group>
-                </SearchField>
-
-                <SearchField className="w-full sm:max-w-xs" value={backendName}
-                             onChange={onBackendNameChange}>
-                    <Label className="text-sm font-medium">Backend name</Label>
-                    <SearchField.Group>
-                        <SearchField.SearchIcon/>
-                        <SearchField.Input placeholder="Search by backend name"/>
-                        <SearchField.ClearButton/>
-                    </SearchField.Group>
-                </SearchField>
-            </div>
-        </section>
+        <SearchCriteriaBox className={className}>
+            <SearchField className="w-full sm:max-w-xs" value={identifier} onChange={onIdentifierChange}>
+                <Label className="text-sm font-medium">Identifier</Label>
+                <SearchField.Group>
+                    <SearchField.SearchIcon/>
+                    <SearchField.Input placeholder="Search by identifier"/>
+                    <SearchField.ClearButton/>
+                </SearchField.Group>
+            </SearchField>
+            <SearchField className="w-full sm:max-w-xs" value={backendName} onChange={onBackendNameChange}>
+                <Label className="text-sm font-medium">Backend name</Label>
+                <SearchField.Group>
+                    <SearchField.SearchIcon/>
+                    <SearchField.Input placeholder="Search by backend name"/>
+                    <SearchField.ClearButton/>
+                </SearchField.Group>
+            </SearchField>
+        </SearchCriteriaBox>
     );
 }

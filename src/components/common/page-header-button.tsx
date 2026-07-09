@@ -8,22 +8,35 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { Button, ButtonProps } from "@heroui/react";
+import { Button, ButtonProps, Tooltip } from "@heroui/react";
 import React, { ComponentType } from "react";
 
 interface PageHeaderButtonProps extends Omit<ButtonProps, "children"> {
     icon: ComponentType<{ className?: string }>;
     isSpinning?: boolean;
+    tooltip?: string;
 }
 
 export function PageHeaderButton({
                                      icon: Icon,
                                      isSpinning = false,
+                                     tooltip,
                                      ...props
                                  }: PageHeaderButtonProps) {
-    return (
-        <Button isIconOnly size="lg" {...props}>
+    const button = (
+        <Button isIconOnly size="lg" aria-label={tooltip} {...props}>
             <Icon className={`size-4 ${isSpinning ? "animate-spin" : ""}`}/>
         </Button>
+    );
+
+    if (!tooltip) {
+        return button;
+    }
+
+    return (
+        <Tooltip delay={0}>
+            {button}
+            <Tooltip.Content>{tooltip}</Tooltip.Content>
+        </Tooltip>
     );
 }

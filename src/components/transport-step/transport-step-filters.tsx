@@ -9,6 +9,7 @@
  */
 
 import { Label, SearchField } from "@heroui/react";
+import { SearchCriteriaBox } from "@/components/common/SearchCriteriaBox";
 
 interface MessageFiltersProps {
     messageOrRemoteSystemIdentifier: string;
@@ -26,32 +27,28 @@ export function TransportStepFilters({
                                          className,
                                      }: MessageFiltersProps) {
     return (
-        <section
-            className={`mt-6 mb-4 rounded-xl border border-border bg-surface p-4 ${className ?? ""}`}>
-            <h2 className="text-sm font-semibold text-foreground mb-3">Search criteria</h2>
-            <div className="flex flex-col sm:flex-row gap-3">
-                <SearchField className="w-full sm:max-w-xs" value={messageOrRemoteSystemIdentifier}
-                             onChange={onMessageOrRemoteSystemIdentifierChange}>
-                    <Label className="text-sm font-medium">Message or remote system
-                        identifier</Label>
-                    <SearchField.Group>
-                        <SearchField.SearchIcon/>
-                        <SearchField.Input
-                            placeholder="Search by message or remote system identifier"/>
-                        <SearchField.ClearButton/>
-                    </SearchField.Group>
-                </SearchField>
+        <SearchCriteriaBox className={className}>
+            <SearchField className="w-full sm:max-w-xs" value={messageOrRemoteSystemIdentifier}
+                         onChange={onMessageOrRemoteSystemIdentifierChange}>
+                <Label className="text-sm font-medium">Message or remote system
+                    identifier</Label>
+                <SearchField.Group>
+                    <SearchField.SearchIcon/>
+                    <SearchField.Input
+                        placeholder="Search by message or remote system identifier"/>
+                    <SearchField.ClearButton/>
+                </SearchField.Group>
+            </SearchField>
 
-                <SearchField className="w-full sm:max-w-xs" value={linkPartnerName}
-                             onChange={onLinkPartnerNameChange}>
-                    <Label className="text-sm font-medium">Link partner name</Label>
-                    <SearchField.Group>
-                        <SearchField.SearchIcon/>
-                        <SearchField.Input placeholder="Search by link partner name"/>
-                        <SearchField.ClearButton/>
-                    </SearchField.Group>
-                </SearchField>
-            </div>
-        </section>
+            <SearchField className="w-full sm:max-w-xs" value={linkPartnerName}
+                         onChange={onLinkPartnerNameChange}>
+                <Label className="text-sm font-medium">Link partner name</Label>
+                <SearchField.Group>
+                    <SearchField.SearchIcon/>
+                    <SearchField.Input placeholder="Search by link partner name"/>
+                    <SearchField.ClearButton/>
+                </SearchField.Group>
+            </SearchField>
+        </SearchCriteriaBox>
     );
 }

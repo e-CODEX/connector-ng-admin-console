@@ -83,11 +83,13 @@ export default function BusinessDomainsAdminPage() {
             >
                 <PageHeaderButton
                     variant="primary"
+                    tooltip="Create a new business domain"
                     icon={Plus}
                     onPress={onAddClick}
                 />
                 <PageHeaderButton
                     variant="secondary"
+                    tooltip="Refresh"
                     icon={ArrowsRotateRight}
                     onPress={onRefreshClick}
                     isDisabled={refreshing}

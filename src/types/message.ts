@@ -11,13 +11,15 @@
 import { ConnectorAttachment } from "@/types/attachments";
 import { ConnectorAction, ConnectorParty, ConnectorService } from "@/types/processing-mode";
 
+export type MessageDirection = "BACKEND_TO_GATEWAY" | "GATEWAY_TO_BACKEND";
+
 export interface ConnectorMessage {
     businessDomainIdentifier: string;
     identifier: string;
     backendMessageIdentifier: string;
     backendName: string;
     gatewayName: string;
-    direction: "BACKEND_TO_GATEWAY" | "GATEWAY_TO_BACKEND";
+    direction: MessageDirection;
     as4Properties: ConnectorAS4Properties;
     delivered: boolean;
     createdAt: string;

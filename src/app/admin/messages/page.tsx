@@ -22,8 +22,9 @@ import { PageHeader } from "@/components/common/page-hearder";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { MessageFilters } from "@/components/message/message-filters";
 import { MessageDetailsModal } from "@/components/message/detail/message-details-modal";
-import { ArrowsRotateRight } from "@gravity-ui/icons";
+import { ArrowsRotateRight, SquareBars } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/page-header-button";
+import { MessageReportingModal } from "@/components/message/report/MessageReportingModal";
 
 const IDENTIFIER_LENGTH = 15;
 
@@ -54,6 +55,7 @@ export default function MessagesAdminPage() {
 
     const detailsModal = useOverlayState();
     const transportModal = useOverlayState();
+    const reportModal = useOverlayState();
 
     const onDetailsClick = (message: ConnectorMessage) => {
         setSelectedMessage(message);
@@ -72,6 +74,10 @@ export default function MessagesAdminPage() {
         } finally {
             setRefreshing(false);
         }
+    }
+
+    const onReportClicked = () => {
+        reportModal.open();
     }
 
     const loadMessages = useCallback(async () => {
@@ -116,7 +122,15 @@ export default function MessagesAdminPage() {
                 subtitle="Connector eDelivery inbox"
             >
                 <PageHeaderButton
+                    variant="primary"
+                    tooltip="See reporting"
+                    icon={SquareBars}
+                    onPress={onReportClicked}
+                />
+
+                <PageHeaderButton
                     variant="secondary"
+                    tooltip="Refresh"
                     icon={ArrowsRotateRight}
                     onPress={onRefreshClick}
                     isDisabled={refreshing}
@@ -263,6 +277,8 @@ export default function MessagesAdminPage() {
                 message={selectedMessage}
                 state={transportModal}
             />
+
+            <MessageReportingModal state={reportModal} />
         </>
     )
 }

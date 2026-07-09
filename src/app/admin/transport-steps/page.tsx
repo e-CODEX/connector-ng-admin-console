@@ -107,6 +107,7 @@ export default function TransportStepsAdminPage() {
             >
                 <PageHeaderButton
                     variant="secondary"
+                    tooltip="Refresh"
                     icon={ArrowsRotateRight}
                     onPress={onRefreshClick}
                     isDisabled={refreshing}

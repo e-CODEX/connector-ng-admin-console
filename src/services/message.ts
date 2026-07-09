@@ -15,6 +15,7 @@ import {SendMessageArgs, SendMessageResponse,} from "@/types/send-message-form";
 import {createSoapOutboundMessagePayload} from "@/utils/message-outbound/soap-message-builder";
 import {createRestOutboundMessagePayLoad} from "@/utils/message-outbound/rest-message-builder";
 import { ConnectorMessageStats } from "@/types/stats";
+import { ConnectorMessageReport } from "@/types/reporting";
 import {restApiCall} from "@/lib/rest";
 import {BFF_API_BASE_URL} from "@/lib/config";
 
@@ -40,8 +41,14 @@ export async function getMessageTransportStep(identifier: string): Promise<Conne
     return restApiCall<ConnectorTransportStep>(`api/v1/admin/messages/${identifier}/transport-steps`);
 }
 
-export async function getMessageStats(params: { from?: string; to?: string;  }): Promise<ConnectorMessageStats> {
+export async function getMessageStats(params: { from?: string; to?: string; }): Promise<ConnectorMessageStats> {
     return restApiCall<ConnectorMessageStats>("api/v1/admin/messages/stats", {
+        params
+    });
+}
+
+export async function getMessageReports(params: { from?: string; to?: string; }): Promise<ConnectorMessageReport> {
+    return restApiCall<ConnectorMessageReport>("api/v1/admin/messages/reports", {
         params
     });
 }

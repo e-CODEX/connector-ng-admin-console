@@ -86,12 +86,14 @@ export default function ProcessingModesAdminPage() {
             >
                 <PageHeaderButton
                     variant="primary"
+                    tooltip="Create a new processing mode"
                     icon={Plus}
                     onPress={onAddClick}
                 />
 
                 <PageHeaderButton
                     variant="secondary"
+                    tooltip="Refresh"
                     icon={ArrowsRotateRight}
                     onPress={onRefreshClick}
                     isDisabled={refreshing}

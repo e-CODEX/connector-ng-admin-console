@@ -17,6 +17,8 @@ import { PageHeaderButton } from "@/components/common/page-header-button";
 import { useState } from "react";
 import { PeriodFilter } from "@/components/dashboard/period-filter";
 import { DEFAULT_PERIOD, Period } from "@/types/period";
+import { DashboardMessageReportingSection } from "@/components/dashboard/message/reporting/DashboardMessageReportingSection";
+import { DashboardSectionBox } from "@/components/dashboard/DashboardSectionBox";
 
 export default function DashboardPage() {
     const [refreshToken, setRefreshToken] = useState(0);
@@ -31,18 +33,29 @@ export default function DashboardPage() {
             <PageHeader
                 icon="clarity:dashboard-line"
                 title="Dashboard"
-                subtitle="App status and KPIs"
+                subtitle="App status, KPIs and Reporting"
             >
                 <PageHeaderButton
                     variant="secondary"
                     icon={ArrowsRotateRight}
                     onPress={onRefreshClick}
                 />
-                <PeriodFilter value={period} onChange={setPeriod} />
+                <PeriodFilter value={period} onChange={setPeriod}/>
             </PageHeader>
 
-            {/* Message KPIs */}
-            <MessageStatsSection refreshToken={refreshToken} period={period}/>
+            <DashboardSectionBox
+                title="Overview"
+                subtitle="Message volume and status at a glance"
+            >
+                <MessageStatsSection refreshToken={refreshToken} period={period}/>
+            </DashboardSectionBox>
+
+            <DashboardSectionBox
+                title="Detailed Report"
+                subtitle="Breakdown by party and service"
+            >
+                <DashboardMessageReportingSection refreshToken={refreshToken} period={period}/>
+            </DashboardSectionBox>
         </div>
     );
 }

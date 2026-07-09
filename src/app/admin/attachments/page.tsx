@@ -90,6 +90,7 @@ export default function AttachmentsAdminPage() {
             >
                 <PageHeaderButton
                     variant="secondary"
+                    tooltip="Refresh"
                     icon={ArrowsRotateRight}
                     onPress={onRefreshClick}
                     isDisabled={refreshing}

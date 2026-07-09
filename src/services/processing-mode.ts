@@ -8,7 +8,7 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { ConnectorProcessingMode, ConnectorProcessingModeDetail } from "@/types/processing-mode";
+import { ConnectorProcessingMode, ConnectorProcessingModeDetail } from "@/types/response/processing-mode";
 import { restApiCall } from "@/lib/rest";
 import { ProcessingModeCreationRequest } from "@/types/request/processing-mode";
 

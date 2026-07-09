@@ -10,15 +10,15 @@
 
 "use client"
 
-import { PageHeader } from "@/components/common/page-hearder";
+import { PageHeader } from "@/components/common/page-header";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ConnectorAttachment } from "@/types/attachments";
+import { ConnectorAttachment } from "@/types/response/attachments";
 import { Button, Spinner, Table, Tooltip, useOverlayState } from "@heroui/react";
 import { listAttachments } from "@/services/attachment";
 import { formatBytes, formatDate, toastError, truncate } from "@/utils";
 import { Icon } from "@iconify/react";
 import { PaginationControls } from "@/components/paging/pagination-controls";
-import { AttachmentDetailsModal } from "@/components/attachment/attachment-details-modal";
+import { AttachmentDetailsView } from "@/components/attachment/attachment-details-view";
 import { ArrowsRotateRight } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/page-header-button";
 
@@ -177,7 +177,7 @@ export default function AttachmentsAdminPage() {
                         )
                     }
 
-                    <AttachmentDetailsModal attachment={selectedAttachment} state={detailsModal}/>
+                    <AttachmentDetailsView attachment={selectedAttachment} state={detailsModal}/>
                 </>
             )}
         </>

@@ -9,7 +9,7 @@
  */
 
 import { toast } from "@heroui/react";
-import { ConnectorMessageStatsItem } from "@/types/stats";
+import { ConnectorMessageStatsItem } from "@/types/response/stats";
 
 export const formatDate = (date: string) => {
     if (!date) return "";

@@ -11,7 +11,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { QueueConfiguration } from "@/types/configuration";
+import { QueueConfiguration } from "@/types/response/configuration";
 import { getQueueConfiguration } from "@/services/configuration";
 import { toastError } from "@/utils";
 import { Spinner } from "@heroui/react";

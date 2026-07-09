@@ -11,12 +11,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ContainerConfiguration } from "@/types/configuration";
+import { ContainerConfiguration } from "@/types/response/configuration";
 import { getContainerConfiguration } from "@/services/configuration";
 import { toastError } from "@/utils";
 import { Spinner } from "@heroui/react";
 import { ConfigurationBlock } from "@/components/configuration/configuration-block";
-import { ConfigurationSignatureView } from "@/components/configuration/configuration-signature-view";
+import { ConfigurationSignatureView } from "@/components/configuration/view/configuration-signature-view";
 
 export function ConfigurationContainerSection() {
     const [loading, setLoading] = useState(true);

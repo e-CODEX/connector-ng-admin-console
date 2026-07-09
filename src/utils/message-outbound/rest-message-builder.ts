@@ -1,8 +1,18 @@
-import {v4 as uuidv4} from 'uuid';
-import {SendMessageFormData, SendParameters} from "@/types/send-message-form";
-import {RestOutboundMessageRequest} from "@/types/request/message";
-import {generatePdfBlob, getDetachedSignatureAsBlob, getXmlContentAsBlob} from "@/utils/fileUtils";
-import {uploadMessageAttachment} from "@/services/attachment";
+/*
+ * Copyright 2026 European Union Agency for the Operational Management of Large-Scale IT Systems
+ * in the Area of Freedom, Security and Justice (eu-LISA)
+ *
+ * Licensed under the EUPL, Version 1.2 or – as soon they will be approved by the
+ * European Commission - subsequent versions of the EUPL (the "Licence");
+ * You may not use this work except in compliance with the Licence.
+ * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
+ */
+
+import { v4 as uuidv4 } from 'uuid';
+import { SendMessageFormData, SendParameters } from "@/types/send-message-form";
+import { RestOutboundMessageRequest } from "@/types/request/message";
+import { generatePdfBlob, getDetachedSignatureAsBlob, getXmlContentAsBlob } from "@/utils/fileUtils";
+import { uploadMessageAttachment } from "@/services/attachment";
 
 
 /**
@@ -48,7 +58,7 @@ export const createRestOutboundMessagePayLoad = async (
 
 async function appendBusinessContentToFormData(data: FormData, metadata: RestOutboundMessageRequest, xmlContent?: Blob, detachedSignatureAsBlob?: Blob) {
     // add metadata content as JSON file
-    data.append("businessContent.contentFile", new Blob([JSON.stringify(metadata.as4Properties)], {type: "application/json"}));
+    data.append("businessContent.contentFile", new Blob([JSON.stringify(metadata.as4Properties)], { type: "application/json" }));
 
     // add metadata content as XML file as
     const businessXml = await getXmlContentAsBlob(xmlContent);

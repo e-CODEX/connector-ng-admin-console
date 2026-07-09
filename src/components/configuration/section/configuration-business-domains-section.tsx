@@ -11,7 +11,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BusinessDomainConfiguration } from "@/types/configuration";
+import { BusinessDomainConfiguration } from "@/types/response/configuration";
 import { getBusinessDomainsConfig } from "@/services/configuration";
 import { getBooleanLabel, toastError } from "@/utils";
 import { Spinner, Table } from "@heroui/react";

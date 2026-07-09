@@ -1,7 +1,12 @@
-/**
- * File generation and conversion utilities
+/*
+ * Copyright 2026 European Union Agency for the Operational Management of Large-Scale IT Systems
+ * in the Area of Freedom, Security and Justice (eu-LISA)
+ *
+ * Licensed under the EUPL, Version 1.2 or – as soon they will be approved by the
+ * European Commission - subsequent versions of the EUPL (the "Licence");
+ * You may not use this work except in compliance with the Licence.
+ * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
-
 
 /**
  * Generates a PDF file as a Blob with an approximate target size.
@@ -21,14 +26,14 @@ export const generatePdfBlob = async (sizeMB: number, customText = "e-CODEX test
     const pdfTextStream = `BT\n/F1 18 Tf\n50 720 Td\n(${customText}) Tj\nET\n`;
 
     const header =
-        "%PDF-1.4\n" +
-        "%âãÏÓ\n" +
-        "1 0 obj\n<</Type/Catalog/Pages 2 0 R>>\nendobj\n" +
-        "2 0 obj\n<</Type/Pages/Count 1/Kids[3 0 R]>>\nendobj\n" +
-        "3 0 obj\n<</Type/Page/Parent 2 0 R/MediaBox[0 0 612 792]/Contents 4 0 R/Resources 5 0 R>>\nendobj\n" +
-        fontDefinition +
-        "4 0 obj\n<</Length " + (totalBytes - 600) + ">>\nstream\n" +
-        pdfTextStream;
+              "%PDF-1.4\n" +
+              "%âãÏÓ\n" +
+              "1 0 obj\n<</Type/Catalog/Pages 2 0 R>>\nendobj\n" +
+              "2 0 obj\n<</Type/Pages/Count 1/Kids[3 0 R]>>\nendobj\n" +
+              "3 0 obj\n<</Type/Page/Parent 2 0 R/MediaBox[0 0 612 792]/Contents 4 0 R/Resources 5 0 R>>\nendobj\n" +
+              fontDefinition +
+              "4 0 obj\n<</Length " + (totalBytes - 600) + ">>\nstream\n" +
+              pdfTextStream;
 
     const footer = "\nendstream\nendobj\nxref\n0 6\n0000000000 65535 f\n0000000018 00000 n\n0000000077 00000 n\n0000000124 00000 n\n0000000227 00000 n\n0000000318 00000 n\ntrailer\n<</Size 6/Root 1 0 R>>\nstartxref\n400\n%%EOF";
 
@@ -44,7 +49,7 @@ export const generatePdfBlob = async (sizeMB: number, customText = "e-CODEX test
         window.crypto.getRandomValues(filler.subarray(offset, offset + currentChunkSize));
     }
 
-    return new Blob([headerArray, filler, footerArray], {type: 'application/pdf'});
+    return new Blob([headerArray, filler, footerArray], { type: 'application/pdf' });
 };
 
 export const getDocumentAsBase64String = async (attachmentSize: number, document?: Blob) => {
@@ -57,7 +62,6 @@ export const getDocumentAsBase64String = async (attachmentSize: number, document
     }
     return base64Payload;
 }
-
 
 /**
  * Generates XML content as a Blob or uses the provided XML Blob
@@ -90,7 +94,7 @@ export const getXmlContentAsBlob = async (
 ): Promise<Blob> => {
     if (!xmlContent) {
         const businessXmlContent = '<?xml version="1.0" encoding="UTF-8"?><testMessage>Test</testMessage>';
-        return new Blob([businessXmlContent], {type: "application/xml"});
+        return new Blob([businessXmlContent], { type: "application/xml" });
     }
     return xmlContent;
 };
@@ -131,7 +135,6 @@ export const getDetachedSignatureAsBlob = (detachedSignatureAsBlob?: Blob) => {
  * @throws {Error} If the Blob cannot be read or the conversion fails.
  */
 export const blobToBase64 = (blob: Blob): Promise<string> => {
-
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
 
@@ -147,7 +150,6 @@ export const blobToBase64 = (blob: Blob): Promise<string> => {
         reader.onerror = () => reject(reader.error);
         reader.readAsDataURL(blob);
     });
-
 };
 
 /**
@@ -166,5 +168,5 @@ export const base64ToBlob = (base64: string, mimeType = "application/octet-strea
     for (let i = 0; i < binary.length; i++) {
         bytes[i] = binary.charCodeAt(i);
     }
-    return new Blob([bytes], {type: mimeType});
+    return new Blob([bytes], { type: mimeType });
 }

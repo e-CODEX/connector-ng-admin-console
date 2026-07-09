@@ -1,16 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { PageHeader } from "@/components/common/page-hearder";
-import { MessageOutboundForm } from "@/components/message/outbound/message-outbound-form";
-import { SendParametersSection } from "@/components/message/outbound/message-send-params-section";
-import { MessageActionBar } from "@/components/message/outbound/message-action-bar";
-import { MessageConsolePanel } from "@/components/message/outbound/message-console-panel";
-import {
-    SendMessageFormData,
-    SendParameters,
-} from "@/types/send-message-form";
+import { PageHeader } from "@/components/common/page-header";
+import { OutboundMessageForm } from "@/components/message/outbound/outbound-message-form";
+import { OutboundMessageSendParametersSection } from "@/components/message/outbound/outbound-message-send-params-section";
+import { OutboundMessageActionBar } from "@/components/message/outbound/outbound-message-action-bar";
+import { OutboundMessageConsolePanel } from "@/components/message/outbound/outbound-message-console-panel";
+import { SendMessageFormData, SendParameters, } from "@/types/send-message-form";
 import { sendMessage } from "@/services/message";
+import { toastError } from "@/utils";
 
 const initialMessageFormData: SendMessageFormData = {
     businessDomainIdentifier: "",
@@ -56,16 +54,17 @@ const initialSendParameters: SendParameters = {
 
 export default function MessageOutboundPage() {
     const [messageFormData, setMessageFormData] =
-        useState<SendMessageFormData>(initialMessageFormData);
+              useState<SendMessageFormData>(initialMessageFormData);
 
     const [sendParameters, setSendParameters] =
-        useState<SendParameters>(initialSendParameters);
+              useState<SendParameters>(initialSendParameters);
 
     const [logs, setLogs] = useState("Ready.");
-    const [isLoading, setIsLoading] = useState(false);
+    const [isSending, setIsSending] = useState(false);
 
     const handleSend = async () => {
         try {
+            setIsSending(true);
             setLogs((prev) => `[${new Date().toLocaleTimeString()}] Sending...\n${prev}`);
 
             await sendMessage({
@@ -76,6 +75,9 @@ export default function MessageOutboundPage() {
             setLogs((prev) => `[${new Date().toLocaleTimeString()}] Message sent\n${prev}`);
         } catch (error) {
             setLogs((prev) => `[${new Date().toLocaleTimeString()}] Send failed\n${prev}`);
+            toastError(error)
+        } finally {
+            setIsSending(false);
         }
     };
 
@@ -90,24 +92,25 @@ export default function MessageOutboundPage() {
                 title="Send Bussiness Message"
                 subtitle="Send a business message to a party"
             >
-                <MessageActionBar
+                <OutboundMessageActionBar
                     onSend={handleSend}
+                    isSending={isSending}
                     onSaveAsXml={handleSaveAsXml}
                 />
             </PageHeader>
 
             <div className="space-y-3">
-                <MessageOutboundForm
+                <OutboundMessageForm
                     data={messageFormData}
                     onChange={setMessageFormData}
                 />
 
-                <SendParametersSection
+                <OutboundMessageSendParametersSection
                     data={sendParameters}
                     onChange={setSendParameters}
                 />
 
-                <MessageConsolePanel content={logs} />
+                <OutboundMessageConsolePanel content={logs}/>
             </div>
         </>
     );

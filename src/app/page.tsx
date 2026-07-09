@@ -10,15 +10,15 @@
 
 "use client";
 
-import { PageHeader } from "@/components/common/page-hearder";
-import { MessageStatsSection } from "@/components/dashboard/message/message-stats-section";
+import { PageHeader } from "@/components/common/page-header";
+import { MessageStatsSection } from "@/components/dashboard/message/stats/message-stats-section";
 import { ArrowsRotateRight } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/page-header-button";
 import { useState } from "react";
-import { PeriodFilter } from "@/components/dashboard/period-filter";
+import { PeriodFilterSelector } from "@/components/form/period-filter-selector";
 import { DEFAULT_PERIOD, Period } from "@/types/period";
-import { DashboardMessageReportingSection } from "@/components/dashboard/message/reporting/DashboardMessageReportingSection";
-import { DashboardSectionBox } from "@/components/dashboard/DashboardSectionBox";
+import { MessageReportingSection } from "@/components/dashboard/message/reporting/message-reporting-section";
+import { DashboardSectionBox } from "@/components/dashboard/dashboard-section-box";
 
 export default function DashboardPage() {
     const [refreshToken, setRefreshToken] = useState(0);
@@ -40,7 +40,7 @@ export default function DashboardPage() {
                     icon={ArrowsRotateRight}
                     onPress={onRefreshClick}
                 />
-                <PeriodFilter value={period} onChange={setPeriod}/>
+                <PeriodFilterSelector value={period} onChange={setPeriod}/>
             </PageHeader>
 
             <DashboardSectionBox
@@ -54,7 +54,7 @@ export default function DashboardPage() {
                 title="Detailed Report"
                 subtitle="Breakdown by party and service"
             >
-                <DashboardMessageReportingSection refreshToken={refreshToken} period={period}/>
+                <MessageReportingSection refreshToken={refreshToken} period={period}/>
             </DashboardSectionBox>
         </div>
     );

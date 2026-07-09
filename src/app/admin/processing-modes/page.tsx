@@ -10,17 +10,17 @@
 
 "use client";
 
-import { PageHeader } from "@/components/common/page-hearder";
+import { PageHeader } from "@/components/common/page-header";
 import { useEffect, useRef, useState } from "react";
 import { Button, Spinner, Table, Tooltip, useOverlayState } from "@heroui/react";
-import { ConnectorProcessingMode } from "@/types/processing-mode";
+import { ConnectorProcessingMode } from "@/types/response/processing-mode";
 import { createProcessingMode, listProcessingModes } from "@/services/processing-mode";
 import { formatDate, toastError, toastSuccess, truncate } from "@/utils";
 import { Icon } from "@iconify/react";
-import { ProcessingModeDetailsModal } from "@/components/processing-mode/processing-mode-detail-modal";
+import { ProcessingModeDetailsView } from "@/components/processing-mode/processing-mode-detail-view";
 import { ArrowsRotateRight, Plus } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/page-header-button";
-import { ProcessingModeCreationModal } from "@/components/processing-mode/processing-mode-creation-modal";
+import { ProcessingModeCreationView } from "@/components/processing-mode/processing-mode-creation-view";
 
 export default function ProcessingModesAdminPage() {
     const [loading, setLoading] = useState(true)
@@ -159,7 +159,7 @@ export default function ProcessingModesAdminPage() {
                         </Table.ScrollContainer>
                     </Table>
 
-                    <ProcessingModeCreationModal
+                    <ProcessingModeCreationView
                         state={addModal}
                         onSubmit={async (payload) => {
                             try {
@@ -173,7 +173,7 @@ export default function ProcessingModesAdminPage() {
                         }}
                     />
 
-                    <ProcessingModeDetailsModal
+                    <ProcessingModeDetailsView
                         processingMode={selectedProcessingMode}
                         state={detailsModal}
                     />

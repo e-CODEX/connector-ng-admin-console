@@ -11,20 +11,20 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ConnectorMessage } from "@/types/message";
+import { ConnectorMessage } from "@/types/response/message";
 import { listMessages } from "@/services/message";
 import { Button, Chip, Spinner, Table, Tooltip, useOverlayState } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { formatDate, getBooleanColor, getDeliveryLabel, toastError, truncate } from "@/utils";
 import { PaginationControls } from "@/components/paging/pagination-controls";
-import { MessageTransportStepsDetailModal } from "@/components/message/detail/message-transport-steps-detail-modal";
-import { PageHeader } from "@/components/common/page-hearder";
+import { MessageTransportStepsDetailView } from "@/components/message/detail/message-transport-steps-detail-view";
+import { PageHeader } from "@/components/common/page-header";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
-import { MessageFilters } from "@/components/message/message-filters";
-import { MessageDetailsModal } from "@/components/message/detail/message-details-modal";
+import { MessageFiltersPanel } from "@/components/message/message-filters-panel";
+import { MessageDetailsView } from "@/components/message/detail/message-details-view";
 import { ArrowsRotateRight, SquareBars } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/page-header-button";
-import { MessageReportingModal } from "@/components/message/report/MessageReportingModal";
+import { MessageReportingView } from "@/components/message/report/message-reporting-view";
 
 const IDENTIFIER_LENGTH = 15;
 
@@ -137,7 +137,7 @@ export default function MessagesAdminPage() {
                     isSpinning={refreshing || loading}
                 />
             </PageHeader>
-            <MessageFilters
+            <MessageFiltersPanel
                 identifier={identifierQuery}
                 backendName={backendNameQuery}
                 onIdentifierChange={onIdentifierChange}
@@ -268,17 +268,17 @@ export default function MessagesAdminPage() {
                 </>
             )}
 
-            <MessageDetailsModal
+            <MessageDetailsView
                 message={selectedMessage}
                 state={detailsModal}
             />
 
-            <MessageTransportStepsDetailModal
+            <MessageTransportStepsDetailView
                 message={selectedMessage}
                 state={transportModal}
             />
 
-            <MessageReportingModal state={reportModal} />
+            <MessageReportingView state={reportModal}/>
         </>
     )
 }

@@ -21,6 +21,12 @@ export enum FileSourceMode {
     UPLOADED = "UPLOADED",
 }
 
+export enum PayloadGenerationMode {
+    SEQUENTIAL = "SEQUENTIAL",
+    PREGENERATE_SYNC_DELIVERY = "PREGENERATE WITH SYNC DELIVERY",
+    PREGENERATE_ASYNC_DELIVERY = "PREGENERATE WITH ASYNC DELIVERY",
+}
+
 export enum RequestMode {
     SOAP = "SOAP",
     REST = "REST"
@@ -32,6 +38,7 @@ export interface SendParameters {
     attachmentSizeMB: number;
     repeatCount: number;
     fileSource: FileSourceMode;
+    payloadGenerationMode: PayloadGenerationMode;
 }
 
 export interface UploadedAttachment {

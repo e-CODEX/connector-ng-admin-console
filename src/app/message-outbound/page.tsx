@@ -6,7 +6,13 @@ import {OutboundMessageForm} from "@/components/message/outbound/outbound-messag
 import {OutboundMessageSendParametersSection} from "@/components/message/outbound/outbound-message-send-params-section";
 import {OutboundMessageActionBar} from "@/components/message/outbound/outbound-message-action-bar";
 import {OutboundMessageConsolePanel} from "@/components/message/outbound/outbound-message-console-panel";
-import {FileSourceMode, RequestMode, SendMessageFormData, SendParameters,} from "@/types/send-message-form";
+import {
+    FileSourceMode,
+    PayloadGenerationMode,
+    RequestMode,
+    SendMessageFormData,
+    SendParameters,
+} from "@/types/send-message-form";
 import {sendMessage} from "@/services/message";
 import {toastError} from "@/utils";
 
@@ -50,7 +56,8 @@ const initialSendParameters: SendParameters = {
     mode: RequestMode.SOAP,
     attachmentSizeMB: 1,
     repeatCount: 1,
-    fileSource: FileSourceMode.UPLOADED
+    fileSource: FileSourceMode.GENERATED,
+    payloadGenerationMode: PayloadGenerationMode.SEQUENTIAL
 };
 
 export default function MessageOutboundPage() {

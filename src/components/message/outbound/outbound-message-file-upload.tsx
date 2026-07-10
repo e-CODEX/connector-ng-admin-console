@@ -11,8 +11,8 @@
 "use client";
 
 
-import {Button} from "@heroui/react";
-import {useRef} from "react";
+import {Button, Label, toast} from "@heroui/react";
+import {useRef, useState} from "react";
 
 
 interface FileUploadProps {
@@ -22,34 +22,48 @@ interface FileUploadProps {
 }
 
 export function FileUpload({
-                                         onFilesSelect,
-                                         text = "Upload Document",
-                                         acceptedTypes = ".pdf,.xml",
-                                     }: FileUploadProps) {
+                               onFilesSelect,
+                               text = "Upload Document",
+                               acceptedTypes = ".pdf,.xml",
+                           }: FileUploadProps) {
 
+    const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(e.target.files || []);
+
+        if (files.length > 0) {
+            toast.success(
+                `${files.length} file${files.length > 1 ? "s" : ""} selected`
+                //    `Selected: ${files.map(f => f.name).join(", ")}`
+            );
+        }
+        setSelectedFiles(files.map(f => f.name));
+        onFilesSelect(files);
+    };
+
     return (
         <>
-            <div className="flex flex-col gap-4 p-6">
+            <div className="w-full">
+                <Label className="text-sm font-semibold text-default-700">Upload documents</Label>
                 <input
                     ref={fileInputRef}
                     type="file"
                     accept={acceptedTypes}
-                    onChange={
-                        (e) => {
-                            const files = Array.from(e.target.files || []);
-                            onFilesSelect(files);
-                        }
-                    }
+                    onChange={handleFileSelect}
                     className="hidden"
                 />
-
                 <Button onPress={() => fileInputRef.current?.click()}>
                     {text}
                 </Button>
             </div>
+            {selectedFiles.length > 0 && (
+                <p className="text-sm text-success">
+                    {selectedFiles.length} file(s) selected
+                </p>
+            )}
         </>
     );
-
 
 }

@@ -26,14 +26,14 @@ export const generatePdfBlob = async (sizeMB: number, customText = "e-CODEX test
     const pdfTextStream = `BT\n/F1 18 Tf\n50 720 Td\n(${customText}) Tj\nET\n`;
 
     const header =
-              "%PDF-1.4\n" +
-              "%âãÏÓ\n" +
-              "1 0 obj\n<</Type/Catalog/Pages 2 0 R>>\nendobj\n" +
-              "2 0 obj\n<</Type/Pages/Count 1/Kids[3 0 R]>>\nendobj\n" +
-              "3 0 obj\n<</Type/Page/Parent 2 0 R/MediaBox[0 0 612 792]/Contents 4 0 R/Resources 5 0 R>>\nendobj\n" +
-              fontDefinition +
-              "4 0 obj\n<</Length " + (totalBytes - 600) + ">>\nstream\n" +
-              pdfTextStream;
+        "%PDF-1.4\n" +
+        "%âãÏÓ\n" +
+        "1 0 obj\n<</Type/Catalog/Pages 2 0 R>>\nendobj\n" +
+        "2 0 obj\n<</Type/Pages/Count 1/Kids[3 0 R]>>\nendobj\n" +
+        "3 0 obj\n<</Type/Page/Parent 2 0 R/MediaBox[0 0 612 792]/Contents 4 0 R/Resources 5 0 R>>\nendobj\n" +
+        fontDefinition +
+        "4 0 obj\n<</Length " + (totalBytes - 600) + ">>\nstream\n" +
+        pdfTextStream;
 
     const footer = "\nendstream\nendobj\nxref\n0 6\n0000000000 65535 f\n0000000018 00000 n\n0000000077 00000 n\n0000000124 00000 n\n0000000227 00000 n\n0000000318 00000 n\ntrailer\n<</Size 6/Root 1 0 R>>\nstartxref\n400\n%%EOF";
 
@@ -49,14 +49,14 @@ export const generatePdfBlob = async (sizeMB: number, customText = "e-CODEX test
         window.crypto.getRandomValues(filler.subarray(offset, offset + currentChunkSize));
     }
 
-    return new Blob([headerArray, filler, footerArray], { type: 'application/pdf' });
+    return new Blob([headerArray, filler, footerArray], {type: 'application/pdf'});
 };
 
-export const getDocumentAsBase64String = async (attachmentSize: number, documents?: Blob[]) => {
+export const getDocumentAsBase64String = async (attachmentSize: number, document?: Blob) => {
 
     const blob =
-        documents && documents.length > 0
-            ? documents[0]
+        document
+            ? document
             : await generatePdfBlob(attachmentSize);
 
     return await blobToBase64(blob);
@@ -163,5 +163,5 @@ export const base64ToBlob = (base64: string, mimeType = "application/octet-strea
     for (let i = 0; i < binary.length; i++) {
         bytes[i] = binary.charCodeAt(i);
     }
-    return new Blob([bytes], { type: mimeType });
+    return new Blob([bytes], {type: mimeType});
 }

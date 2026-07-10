@@ -11,13 +11,13 @@
 import { PaginatedResponse } from "@/types/response/paginated-response";
 import { ConnectorMessage, ConnectorMessageDetails } from "@/types/response/message";
 import { ConnectorTransportStep } from "@/types/response/transport-step";
-import { SendMessageArgs, SendMessageResponse, } from "@/types/send-message-form";
 import { createSoapOutboundMessagePayload } from "@/utils/message-outbound/soap-message-builder";
 import { createRestOutboundMessagePayLoad } from "@/utils/message-outbound/rest-message-builder";
 import { ConnectorMessageStats } from "@/types/response/stats";
 import { ConnectorMessageReport } from "@/types/response/reporting";
 import { DownloadedFile, restApiCall, restApiDownload } from "@/lib/rest";
 import { BFF_API_BASE_URL } from "@/lib/config";
+import { PayloadGenerationMode, RequestMode, SendMessageArgs, SendMessageResponse, SendParameters, } from "@/types/send-message-form";
 
 
 export async function listMessages(params?: {
@@ -75,45 +75,106 @@ export async function sendMessage({
                                       formData,
                                       parameters,
                                       documents,
-                                  }: SendMessageArgs): Promise<SendMessageResponse> {
-    if (parameters.mode === "REST") {
+                                  }: SendMessageArgs): Promise<SendMessageResponse[]> {
+    if (parameters.mode === RequestMode.REST) {
         return sendRestMessage({formData, parameters, documents});
     }
-
     return sendSoapMessage({formData, parameters, documents});
+
 }
 
 async function sendRestMessage({
                                    formData,
                                    parameters,
                                    documents,
-                               }: SendMessageArgs): Promise<SendMessageResponse> {
+                               }: SendMessageArgs): Promise<SendMessageResponse[]> {
 
     const payload = await createRestOutboundMessagePayLoad(formData, parameters, documents);
 
-    return restApiCall("api/v1/messages/outbound", {
-        method: "POST",
-        body: payload,
-    })
+    const createRequest = async () => {
+        const payload = await createRestOutboundMessagePayLoad(
+            formData,
+            parameters,
+            documents
+        );
+        return restApiCall<SendMessageResponse>(
+            "api/v1/messages/outbound",
+            {
+                method: "POST",
+                body: payload,
+            }
+        );
+    };
+
+    return await executeRepeatedRestRequest(parameters, createRequest);
 }
+
 
 async function sendSoapMessage({
                                    formData,
                                    parameters,
                                    documents,
-                               }: SendMessageArgs): Promise<SendMessageResponse> {
+                               }: SendMessageArgs): Promise<SendMessageResponse[]> {
 
-    const payload = await createSoapOutboundMessagePayload(formData, parameters, documents);
+    // pregenerate payloads
+    const docs = documents?.length ? documents : [undefined];
+    const payloads = await Promise.all(
+        docs.map((document) =>
+            createSoapOutboundMessagePayload(
+                formData,
+                parameters,
+                document
+            )
+        )
+    );
 
-    return restApiCall<SendMessageResponse>(
-        "bff/api/v1/submit-message",
-        {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(payload),
-        },
-        BFF_API_BASE_URL
-    )
+    const createRequests = () =>
+        payloads.map((payload) =>
+            restApiCall<SendMessageResponse>(
+                "bff/api/v1/submit-message",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(payload),
+                },
+                BFF_API_BASE_URL
+            )
+        );
+    return await executeRepeatedSoapRequest(parameters, createRequests);
+
+}
+
+async function executeRepeatedSoapRequest(parameters: SendParameters, createRequests: () => Promise<SendMessageResponse>[]) {
+    if (parameters.payloadGenerationMode === PayloadGenerationMode.SEQUENTIAL) {
+        const results: PromiseSettledResult<SendMessageResponse>[] = [];
+
+        for (let i = 0; i < parameters.repeatCount; i++) {
+            results.push(...(await Promise.allSettled(createRequests())));
+        }
+        return results;
+    }
+
+    return Promise.allSettled(
+        Array.from({length: parameters.repeatCount}).flatMap(createRequests)
+    );
+}
+
+async function executeRepeatedRestRequest(parameters: SendParameters, createRequest: () => Promise<SendMessageResponse>) {
+    if (parameters.payloadGenerationMode === PayloadGenerationMode.SEQUENTIAL) {
+        const results: PromiseSettledResult<SendMessageResponse>[] = [];
+
+        for (let i = 0; i < parameters.repeatCount; i++) {
+            results.push(await createRequest().then(
+                value => ({status: "fulfilled", value} as const),
+                reason => ({status: "rejected", reason} as const)
+            ));
+        }
+        return results;
+    }
+
+    return Promise.allSettled(
+        Array.from({length: parameters.repeatCount}, createRequest)
+    );
 }

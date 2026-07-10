@@ -15,6 +15,7 @@ import {FormTextField} from "@/components/form/form-text-field";
 import {FileSourceModeSelect} from "@/components/message/outbound/outbound-message-file-mode-select";
 import {RequestModeSelectField} from "@/components/message/outbound/outbound-message-request-mode-select";
 import {FileUpload} from "@/components/message/outbound/outbound-message-file-upload";
+import {PayloadGenerationSelectField} from "@/components/message/outbound/outbound-message-payload-generation-select";
 
 interface OutboundMessageSendParametersSectionProps {
     data: SendParameters;
@@ -40,10 +41,24 @@ export function OutboundMessageSendParametersSection({
         <section className="rounded-md border bg-content1 p-2">
             <h2 className="mb-2 text-lg font-semibold">Send parameters</h2>
 
-            <div className="grid grid-cols-1 gap-5 lg:grid-cols-4">
+            <div className="grid grid-cols-1 gap-5 lg:grid-cols-5">
                 <RequestModeSelectField
                     value={data.mode}
                     onChange={(value) => update({mode: value})}
+                />
+
+                <PayloadGenerationSelectField
+                    value={data.payloadGenerationMode}
+                    onChange={(value) => update({payloadGenerationMode: value})}
+                />
+
+                <FormTextField
+                    label="Repeat"
+                    type="number"
+                    value={String(data.repeatCount)}
+                    onChange={(value) =>
+                        update({repeatCount: Number(value) || 0})
+                    }
                 />
 
                 <FileSourceModeSelect
@@ -51,31 +66,22 @@ export function OutboundMessageSendParametersSection({
                     onChange={(value) => update({fileSource: value})}
                 />
 
-                {isGenerated ? (
-                        <>
-                            <FormTextField
-                                label="Attachment Size (MB)"
-                                type="number"
-                                value={String(data.attachmentSizeMB)}
-                                onChange={(value) =>
-                                    update({attachmentSizeMB: Number(value) || 0})
-                                }
-                            />
-                            <FormTextField
-                                label="Repeat"
-                                type="number"
-                                value={String(data.repeatCount)}
-                                onChange={(value) =>
-                                    update({repeatCount: Number(value) || 0})
-                                }
-                            />
-                        </>
-                    ) :
+                {isGenerated ?
+                    <FormTextField
+                        label="Attachment Size (MB)"
+                        type="number"
+                        value={String(data.attachmentSizeMB)}
+                        onChange={(value) =>
+                            update({attachmentSizeMB: Number(value) || 0})
+                        }
+                    />
+                    :
                     <FileUpload
                         onFilesSelect={onFilesSelect}
                         text="Upload Business Document(s)"
                     />
                 }
+
             </div>
         </section>
     );

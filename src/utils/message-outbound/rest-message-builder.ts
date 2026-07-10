@@ -8,11 +8,11 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { v4 as uuidv4 } from 'uuid';
-import { SendMessageFormData, SendParameters } from "@/types/send-message-form";
-import { RestOutboundMessageRequest } from "@/types/request/message";
-import { generatePdfBlob, getDetachedSignatureAsBlob, getXmlContentAsBlob } from "@/utils/fileUtils";
-import { uploadMessageAttachment } from "@/services/attachment";
+import {v4 as uuidv4} from 'uuid';
+import {SendMessageFormData, SendParameters} from "@/types/send-message-form";
+import {RestOutboundMessageRequest} from "@/types/request/message";
+import {generatePdfBlob, getDetachedSignatureAsBlob, getXmlContentAsBlob} from "@/utils/fileUtils";
+import {uploadMessageAttachment} from "@/services/attachment";
 
 
 /**
@@ -42,13 +42,13 @@ export const createRestOutboundMessagePayLoad = async (
     xmlContent?: Blob,
     detachedSignature?: Blob) => {
 
-
+    // TODO
     const hasDocuments = documents && documents?.length > 0;
     const documentsToUpload = hasDocuments
         ? documents
         : [await generatePdfBlob(parameters.attachmentSizeMB)];
 
-    const attachmentIds = await uploadMessageAttachment(documentsToUpload)
+    const attachmentIds = await uploadMessageAttachment(documentsToUpload);
 
     const metadata = createMessageMetadata(formData, attachmentIds);
 
@@ -61,7 +61,7 @@ export const createRestOutboundMessagePayLoad = async (
 
 async function appendBusinessContentToFormData(data: FormData, metadata: RestOutboundMessageRequest, xmlContent?: Blob, detachedSignatureAsBlob?: Blob) {
     // add metadata content as JSON file
-    data.append("businessContent.contentFile", new Blob([JSON.stringify(metadata.as4Properties)], { type: "application/json" }));
+    data.append("businessContent.contentFile", new Blob([JSON.stringify(metadata.as4Properties)], {type: "application/json"}));
 
     // add metadata content as XML file as
     const businessXml = await getXmlContentAsBlob(xmlContent);

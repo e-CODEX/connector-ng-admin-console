@@ -8,21 +8,55 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import {API_BASE_URL} from "@/lib/config";
+import { API_BASE_URL } from "@/lib/config";
+import { RestApiError } from "@/lib/rest/rest-api-error";
 
 interface ApiError {
     status: number;
     message: string;
 }
 
-export class RestApiError extends Error {
-    readonly status: number;
+type RestApiOptions = RequestInit & {
+    params?: Record<string, string | number | boolean>;
+};
 
-    constructor(status: number, message: string) {
-        super(message);
-        this.name = "RestApiError";
-        this.status = status;
+function toQuery(params: Record<string, string | number | boolean | undefined | null>) {
+    const sp = new URLSearchParams();
+
+    for (const [key, value] of Object.entries(params)) {
+        if (value !== undefined && value !== null) {
+            sp.append(key, String(value));
+        }
     }
+
+    return sp.toString();
+}
+
+/** Performs the call and throws RestApiError on a non-2xx response. */
+async function restApiFetch(
+    path: string,
+    options: RestApiOptions,
+    baseUrl: string,
+): Promise<Response> {
+    const { params, ...init } = options;
+    const qs = params ? `?${toQuery(params)}` : "";
+    const response = await fetch(`${baseUrl}/${path}${qs}`, init);
+    if (!response.ok) {
+        throw new RestApiError(response.status, await extractErrorMessage(response));
+    }
+    return response;
+}
+
+async function extractErrorMessage(response: Response): Promise<string> {
+    try {
+        const body = await response.json() as Partial<ApiError>;
+        if (body && typeof body.message === "string") {
+            return body.message;
+        }
+    } catch {
+        // Body was empty or not JSON — fall through to the default message
+    }
+    return `HTTP error! ${response.status} ${response.statusText}`;
 }
 
 /**
@@ -42,8 +76,7 @@ export class RestApiError extends Error {
  *
  * @example
  * ```ts
- * const user = await restApiCall<User>(
- *   '/users/1',
+ * const user = await restApiCall<User>('/users/1',
  *   {
  *     method: 'GET',
  *     params: { includeDetails: true }
@@ -52,38 +85,58 @@ export class RestApiError extends Error {
  * );
  * ```
  */
-export async function restApiCall<T>(path: string, options: RequestInit & {
-    params?: Record<string, string | number | boolean>
-} = {}, baseUrl: string = API_BASE_URL): Promise<T> {
+export async function restApiCall<T>(
+    path: string,
+    options: RestApiOptions = {},
+    baseUrl: string         = API_BASE_URL,
+): Promise<T> {
+    const response = await restApiFetch(path, options, baseUrl);
 
-    const {params, ...init} = options;
-    const qs = params ? `?${toQuery(params)}` : "";
-    const response = await fetch(`${baseUrl}/${path}${qs}`, init);
-
-    if (!response.ok) {
-        let message = `HTTP error! ${response.status} ${response.statusText}`;
-        try {
-            const body = await response.json() as Partial<ApiError>;
-            if (body && typeof body.message === "string") {
-                message = body.message;
-            }
-        } catch {
-            // Body was empty or not JSON — keep the default message
-        }
-        throw new RestApiError(response.status, message);
+    if (response.status === 204) {
+        return undefined as T;   // no content
     }
 
     return response.json() as Promise<T>;
 }
 
-function toQuery(params: Record<string, string | number | boolean | undefined | null>) {
-    const sp = new URLSearchParams();
+export interface DownloadedFile {
+    blob: Blob;
+    filename: string;
+    contentType: string;
+}
 
-    for (const [key, value] of Object.entries(params)) {
-        if (value !== undefined && value !== null) {
-            sp.append(key, String(value));
+export async function restApiDownload(
+    path: string,
+    options: RestApiOptions & { defaultFilename?: string } = {},
+    baseUrl: string                                        = API_BASE_URL,
+): Promise<DownloadedFile> {
+    const { defaultFilename = "download", ...rest } = options;
+    const response = await restApiFetch(path, {
+        ...rest,
+        headers: { Accept: "application/octet-stream, */*", ...rest.headers },
+    }, baseUrl);
+
+    const blob = await response.blob();
+    return {
+        blob,
+        filename: parseFilename(response.headers.get("Content-Disposition")) ?? defaultFilename,
+        contentType: response.headers.get("Content-Type") ?? blob.type ?? "application/octet-stream",
+    };
+}
+
+/** Handles both `filename="x.xlsx"` and RFC 5987 `filename*=UTF-8''x%20y.xlsx`. */
+function parseFilename(header: string | null): string | undefined {
+    if (!header) return undefined;
+
+    const encoded = /filename\*=\s*([^']*)'[^']*'([^;]+)/i.exec(header);
+    if (encoded) {
+        try {
+            return decodeURIComponent(encoded[2].trim());
+        } catch {
+            // Malformed percent-encoding — fall back to the plain parameter
         }
     }
 
-    return sp.toString();
+    const plain = /filename=\s*"?([^";]+)"?/i.exec(header);
+    return plain?.[1].trim();
 }

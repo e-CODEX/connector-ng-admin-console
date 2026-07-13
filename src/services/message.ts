@@ -16,7 +16,7 @@ import { createSoapOutboundMessagePayload } from "@/utils/message-outbound/soap-
 import { createRestOutboundMessagePayLoad } from "@/utils/message-outbound/rest-message-builder";
 import { ConnectorMessageStats } from "@/types/response/stats";
 import { ConnectorMessageReport } from "@/types/response/reporting";
-import { restApiCall } from "@/lib/rest";
+import { DownloadedFile, restApiCall, restApiDownload } from "@/lib/rest";
 import { BFF_API_BASE_URL } from "@/lib/config";
 
 
@@ -53,6 +53,24 @@ export async function getMessageReports(params: { from?: string; to?: string; })
     });
 }
 
+const MESSAGE_REPORT_EXPORT_FORMATS = {
+    CSV: "csv",
+    JSON: "json",
+    XLSX: "xlsx",
+} as const;
+
+function getExportExtension(format: MessageReportExportFormat,): string {
+    return MESSAGE_REPORT_EXPORT_FORMATS[format];
+}
+
+export type MessageReportExportFormat = keyof typeof MESSAGE_REPORT_EXPORT_FORMATS;
+
+export async function exportMessageReports(params: { from?: string; to?: string; format: MessageReportExportFormat }): Promise<DownloadedFile> {
+    return restApiDownload("api/v1/admin/messages/reports/export", {
+        params, defaultFilename: `message-report.${getExportExtension(params.format)}`,
+    });
+}
+
 export async function sendMessage({
                                       formData,
                                       parameters,
@@ -76,13 +94,10 @@ async function sendRestMessage({
 
     const payload = await createRestOutboundMessagePayLoad(formData, parameters, document);
 
-    return restApiCall(
-        'api/v1/messages/outbound',
-        {
-            method: "POST",
-            body: payload,
-        }
-    )
+    return restApiCall("api/v1/messages/outbound", {
+        method: "POST",
+        body: payload,
+    })
 }
 
 async function sendSoapMessage({

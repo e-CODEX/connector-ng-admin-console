@@ -10,6 +10,7 @@
 
 import { toast } from "@heroui/react";
 import { ConnectorMessageStatsItem } from "@/types/response/stats";
+import { DownloadedFile } from "@/lib/rest";
 
 export const formatDate = (date: string) => {
     if (!date) return "";
@@ -116,3 +117,16 @@ const toastMessage = (title: string, description: string, variant: "default" | "
 
 export const deliveryRate = (s: ConnectorMessageStatsItem) =>
     s.total > 0 ? Math.round((s.delivered / s.total) * 1000) / 10 : 0;
+
+export function saveFile({blob, filename}: DownloadedFile): void {
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = filename;
+    anchor.rel = "noopener";
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    // Defer revocation: some browsers cancel the download if the URL dies too early.
+    setTimeout(() => URL.revokeObjectURL(url), 1_000);
+}

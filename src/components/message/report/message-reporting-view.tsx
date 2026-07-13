@@ -8,13 +8,13 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { Button, Modal, Spinner, Table, useOverlayState } from "@heroui/react";
+import { Button, Description, Dropdown, Kbd, Key, Label, Modal, Spinner, Table, useOverlayState } from "@heroui/react";
 import { type RangeValue } from "react-aria-components";
 import React, { Fragment, useEffect, useRef, useState } from "react";
-import { getMessageReports } from "@/services/message";
+import { exportMessageReports, getMessageReports, MessageReportExportFormat } from "@/services/message";
 import { getLocalTimeZone, now, ZonedDateTime } from "@internationalized/date";
-import { toastError } from "@/utils";
-import { SquareBars } from "@gravity-ui/icons";
+import { saveFile, toastError } from "@/utils";
+import { ArrowUpFromSquare, Magnifier, SquareBars } from "@gravity-ui/icons";
 import { ConnectorMessageReport } from "@/types/response/reporting";
 import { DateTimeRangeGranularity, DateTimeRangeSelector } from "@/components/form/date-time-range-selector";
 import { EmptyState } from "@/components/common/empty-state";
@@ -36,7 +36,7 @@ const defaultRange: RangeValue<ZonedDateTime> = {
 export function MessageReportingView({ state }: MessageReportingViewProps) {
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
-    const [messageReports, setMessageReports] = useState<ConnectorMessageReport>();
+    const [messageReports, setMessageReports] = useState<ConnectorMessageReport | undefined>(undefined);
     const [range, setRange] = useState<RangeValue<ZonedDateTime> | null>(defaultRange);
     const [hasLoaded, setHasLoaded] = useState(false);
     const requestId = useRef(0);
@@ -61,6 +61,38 @@ export function MessageReportingView({ state }: MessageReportingViewProps) {
             from: from.toDate().toISOString(),
             to: to.toDate().toISOString(),
         };
+    }
+
+    const onExportClick = async (formatKey: Key) => {
+        let format: MessageReportExportFormat;
+
+        switch (formatKey) {
+            case "export-csv": {
+                format = "CSV";
+                break;
+            }
+            case "export-json": {
+                format = "JSON";
+                break;
+            }
+            case "export-excel": {
+                format = "XLSX";
+                break;
+            }
+            default: {
+                format = "XLSX";
+            }
+        }
+
+        const date = toReportRange(range, granularity)
+        const params = { ...date, format: format }
+
+        try {
+            const file = await exportMessageReports(params)
+            saveFile(file);
+        } catch (error) {
+            toastError(error);
+        }
     }
 
     const loadReports = async (
@@ -95,6 +127,8 @@ export function MessageReportingView({ state }: MessageReportingViewProps) {
             }
         }
     };
+
+    const hasReports = !!messageReports && messageReports.years.length > 0;
 
     useEffect(() => {
         if (state.isOpen) {
@@ -139,6 +173,7 @@ export function MessageReportingView({ state }: MessageReportingViewProps) {
                                         isDisabled={!range}
                                         onPress={() => void loadReports(range, "refresh")}
                                     >
+                                        <Magnifier />
                                         Apply
                                     </Button>
                                 </div>
@@ -223,6 +258,58 @@ export function MessageReportingView({ state }: MessageReportingViewProps) {
                             )}
                         </Modal.Body>
                         <Modal.Footer>
+                            <Dropdown>
+                                <Button
+                                    variant="secondary"
+                                    aria-label="Export report menu"
+                                    isDisabled={!hasReports || loading || refreshing}>
+                                    <ArrowUpFromSquare/>
+                                    Export
+                                </Button>
+                                <Dropdown.Popover>
+                                    <Dropdown.Menu onAction={onExportClick}>
+                                        <Dropdown.Item id="export-excel" textValue="Excel">
+                                            <div className="flex h-8 items-start justify-center pt-px">
+                                                <ArrowUpFromSquare className="size-4 shrink-0 text-muted"/>
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <Label>Excel</Label>
+                                                <Description>Export to Excel</Description>
+                                            </div>
+                                            <Kbd className="ms-auto" slot="keyboard" variant="light">
+                                                <Kbd.Abbr keyValue="command"/>
+                                                <Kbd.Content>E</Kbd.Content>
+                                            </Kbd>
+                                        </Dropdown.Item>
+                                        <Dropdown.Item id="export-json" textValue="JSON">
+                                            <div className="flex h-8 items-start justify-center pt-px">
+                                                <ArrowUpFromSquare className="size-4 shrink-0 text-muted"/>
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <Label>JSON</Label>
+                                                <Description>Export to JSON format</Description>
+                                            </div>
+                                            <Kbd className="ms-auto" slot="keyboard" variant="light">
+                                                <Kbd.Abbr keyValue="command"/>
+                                                <Kbd.Content>J</Kbd.Content>
+                                            </Kbd>
+                                        </Dropdown.Item>
+                                        <Dropdown.Item id="export-csv" textValue="CSV">
+                                            <div className="flex h-8 items-start justify-center pt-px">
+                                                <ArrowUpFromSquare className="size-4 shrink-0 text-muted"/>
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <Label>CSV</Label>
+                                                <Description>Export to CSV</Description>
+                                            </div>
+                                            <Kbd className="ms-auto" slot="keyboard" variant="light">
+                                                <Kbd.Abbr keyValue="command"/>
+                                                <Kbd.Content>C</Kbd.Content>
+                                            </Kbd>
+                                        </Dropdown.Item>
+                                    </Dropdown.Menu>
+                                </Dropdown.Popover>
+                            </Dropdown>
                             <Button slot="close" variant="tertiary">Close</Button>
                         </Modal.Footer>
                     </Modal.Dialog>

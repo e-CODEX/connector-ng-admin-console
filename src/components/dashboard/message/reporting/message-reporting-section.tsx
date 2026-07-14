@@ -16,9 +16,13 @@ import { getMessageReports } from "@/services/message";
 import { Spinner } from "@heroui/react";
 import { MessageReportingStats } from "@/components/dashboard/message/reporting/message-reporting-stats";
 
-export function MessageReportingSection({ period, refreshToken }: { period: Period; refreshToken?: number; }) {
+export function MessageReportingSection({ period, refreshToken, refreshInterval }: {
+    period: Period;
+    refreshToken?: number;
+    refreshInterval: number;
+}) {
     const { data, loading, error } = usePolledFetch(() =>
-        getMessageReports(periodToParams(period)), 45_000, [period, refreshToken]);
+        getMessageReports(periodToParams(period)), refreshInterval, [period, refreshToken]);
 
     if (!data) {
         return (

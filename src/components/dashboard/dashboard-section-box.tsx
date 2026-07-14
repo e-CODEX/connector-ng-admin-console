@@ -21,8 +21,8 @@ interface DashboardSectionBoxProps {
 
 export function DashboardSectionBox({ title, subtitle, icon, children }: DashboardSectionBoxProps) {
     return (
-        <section className="flex flex-col rounded-lg border border-default-200 bg-default-50 mb-5">
-            <div className="flex items-center gap-3 px-4 py-3">
+        <section className="flex flex-col rounded-lg border border-default-200 bg-default-50 mb-1">
+            <div className="flex items-center gap-3 px-4 py-1">
                 {icon && (
                     <span className="flex size-9 shrink-0 items-center justify-center rounded-medium bg-default-100 text-foreground">
                         <Icon icon={icon} className="size-5"/>
@@ -39,7 +39,7 @@ export function DashboardSectionBox({ title, subtitle, icon, children }: Dashboa
                     )}
                 </div>
             </div>
-            <div className="p-4">
+            <div className="p-3">
                 {children}
             </div>
         </section>

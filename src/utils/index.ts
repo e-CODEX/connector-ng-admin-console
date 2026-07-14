@@ -48,6 +48,10 @@ export function formatBytes(bytes: number, decimals = 1): string {
     return `${parseFloat(formatted)} ${units[i]}`;
 }
 
+export function asNumber(value: unknown): number {
+    return typeof value === "number" ? value : 0;
+}
+
 export const getDeliveryLabel = (isDelivered: boolean): string =>
     isDelivered ? "Delivered" : "Not delivered";
 
@@ -118,7 +122,7 @@ const toastMessage = (title: string, description: string, variant: "default" | "
 export const deliveryRate = (s: ConnectorMessageStatsItem) =>
     s.total > 0 ? Math.round((s.delivered / s.total) * 1000) / 10 : 0;
 
-export function saveFile({blob, filename}: DownloadedFile): void {
+export function saveFile({ blob, filename }: DownloadedFile): void {
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
     anchor.href = url;
@@ -129,4 +133,9 @@ export function saveFile({blob, filename}: DownloadedFile): void {
     anchor.remove();
     // Defer revocation: some browsers cancel the download if the URL dies too early.
     setTimeout(() => URL.revokeObjectURL(url), 1_000);
+}
+
+export function capitalize(str: string): string {
+    if (!str) return str;
+    return str.charAt(0).toUpperCase() + str.slice(1);
 }

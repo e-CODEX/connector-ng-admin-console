@@ -19,6 +19,9 @@ import { PeriodFilterSelector } from "@/components/form/period-filter-selector";
 import { DEFAULT_PERIOD, Period } from "@/types/period";
 import { MessageReportingSection } from "@/components/dashboard/message/reporting/message-reporting-section";
 import { DashboardSectionBox } from "@/components/dashboard/dashboard-section-box";
+import { BackendHealthSection } from "@/components/dashboard/health/backend-health-section";
+
+const REFRESH_INTERVAL = 60_000;
 
 export default function DashboardPage() {
     const [refreshToken, setRefreshToken] = useState(0);
@@ -44,17 +47,24 @@ export default function DashboardPage() {
             </PageHeader>
 
             <DashboardSectionBox
+                title="Connector Health"
+                subtitle="Api, Db, JMS, Disk Space ..."
+            >
+                <BackendHealthSection refreshToken={refreshToken} refreshInterval={REFRESH_INTERVAL}/>
+            </DashboardSectionBox>
+
+            <DashboardSectionBox
                 title="Overview"
                 subtitle="Message volume and status at a glance"
             >
-                <MessageStatsSection refreshToken={refreshToken} period={period}/>
+                <MessageStatsSection refreshToken={refreshToken} period={period} refreshInterval={REFRESH_INTERVAL}/>
             </DashboardSectionBox>
 
             <DashboardSectionBox
                 title="Detailed Report"
                 subtitle="Breakdown by party and service"
             >
-                <MessageReportingSection refreshToken={refreshToken} period={period}/>
+                <MessageReportingSection refreshToken={refreshToken} period={period} refreshInterval={REFRESH_INTERVAL}/>
             </DashboardSectionBox>
         </div>
     );

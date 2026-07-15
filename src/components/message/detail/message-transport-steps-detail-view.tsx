@@ -10,7 +10,7 @@
 
 "use client";
 
-import { Button, Modal, Spinner, useOverlayState } from "@heroui/react";
+import { Modal, Spinner, useOverlayState } from "@heroui/react";
 import { ConnectorMessage } from "@/types/response/message";
 import { Eye } from "@gravity-ui/icons";
 import React, { useEffect, useState } from "react";
@@ -62,6 +62,7 @@ export function MessageTransportStepsDetailView({ message, state }: MessageTrans
             <Modal.Backdrop>
                 <Modal.Container>
                     <Modal.Dialog className="sm:max-w-200">
+                        <Modal.CloseTrigger/>
                         <Modal.Header>
                             <Modal.Icon className="bg-default text-foreground">
                                 <Eye className="size-5"/>
@@ -84,9 +85,6 @@ export function MessageTransportStepsDetailView({ message, state }: MessageTrans
                                 </div>
                             )}
                         </Modal.Body>
-                        <Modal.Footer>
-                            <Button slot="close" variant="tertiary">Close</Button>
-                        </Modal.Footer>
                     </Modal.Dialog>
                 </Modal.Container>
             </Modal.Backdrop>

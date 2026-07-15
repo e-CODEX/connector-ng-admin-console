@@ -89,6 +89,7 @@ export function MessageDetailsView({ message, state }: MessageDetailsViewProps) 
             <Modal.Backdrop>
                 <Modal.Container>
                     <Modal.Dialog className="sm:max-w-300">
+                        <Modal.CloseTrigger/>
                         <Modal.Header>
                             <Modal.Icon className="bg-default text-foreground">
                                 <Eye className="size-5"/>
@@ -288,9 +289,6 @@ export function MessageDetailsView({ message, state }: MessageDetailsViewProps) 
                                 </div>
                             )}
                         </Modal.Body>
-                        <Modal.Footer>
-                            <Button slot="close" variant="tertiary">Close</Button>
-                        </Modal.Footer>
                     </Modal.Dialog>
                 </Modal.Container>
             </Modal.Backdrop>

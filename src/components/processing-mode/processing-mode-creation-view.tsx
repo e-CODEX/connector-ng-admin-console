@@ -12,7 +12,7 @@
 
 import { Button, FieldError, Form, Input, Label, ListBox, Modal, Select, Spinner, TextField, useOverlayState } from "@heroui/react";
 import React, { useEffect, useState } from "react";
-import { ArrowShapeUp, Plus } from "@gravity-ui/icons";
+import { ArrowUpToLine, Plus } from "@gravity-ui/icons";
 import { ProcessingModeCreationRequest } from "@/types/request/processing-mode";
 import { listBusinessDomains } from "@/services/business-domain";
 import { FileTrigger } from "react-aria-components";
@@ -91,6 +91,7 @@ export function ProcessingModeCreationView({ state, onSubmit }: ProcessingModeCr
             <Modal.Backdrop isDismissable={false} isKeyboardDismissDisabled>
                 <Modal.Container size="lg">
                     <Modal.Dialog className="sm:max-w-150">
+                        <Modal.CloseTrigger/>
                         <Modal.Header>
                             <Modal.Icon className="bg-default text-foreground">
                                 <Plus className="size-5"/>
@@ -157,15 +158,15 @@ export function ProcessingModeCreationView({ state, onSubmit }: ProcessingModeCr
                         <Modal.Footer>
                             <Button
                                 type="submit"
+                                className="w-full"
                                 form="add-processing-mode-form"
                                 variant="primary"
                                 isPending={submitting}
                                 isDisabled={!file || !description.trim() || !businessDomainIdentifier}
                             >
-                                {submitting ? <Spinner color="current" size="sm"/> : <ArrowShapeUp className="mr-2 size-4"/>}
+                                {submitting ? <Spinner color="current" size="sm"/> : <ArrowUpToLine className="mr-2 size-4"/>}
                                 Load
                             </Button>
-                            <Button slot="close" variant="tertiary">Close</Button>
                         </Modal.Footer>
                     </Modal.Dialog>
                 </Modal.Container>

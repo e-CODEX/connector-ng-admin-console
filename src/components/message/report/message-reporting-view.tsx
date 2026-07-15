@@ -148,6 +148,7 @@ export function MessageReportingView({ state }: MessageReportingViewProps) {
             <Modal.Backdrop isDismissable={false} isKeyboardDismissDisabled>
                 <Modal.Container>
                     <Modal.Dialog className="sm:max-w-350 sm:min-h-200">
+                        <Modal.CloseTrigger/>
                         <Modal.Header>
                             <Modal.Icon className="bg-default text-foreground">
                                 <SquareBars className="size-5"/>
@@ -173,7 +174,7 @@ export function MessageReportingView({ state }: MessageReportingViewProps) {
                                         isDisabled={!range}
                                         onPress={() => void loadReports(range, "refresh")}
                                     >
-                                        <Magnifier />
+                                        <Magnifier/>
                                         Apply
                                     </Button>
                                 </div>
@@ -310,7 +311,6 @@ export function MessageReportingView({ state }: MessageReportingViewProps) {
                                     </Dropdown.Menu>
                                 </Dropdown.Popover>
                             </Dropdown>
-                            <Button slot="close" variant="tertiary">Close</Button>
                         </Modal.Footer>
                     </Modal.Dialog>
                 </Modal.Container>

@@ -10,7 +10,7 @@
 
 "use client";
 
-import { Button, Modal, useOverlayState } from "@heroui/react";
+import { Modal, useOverlayState } from "@heroui/react";
 import { formatBytes, formatDate } from "@/utils";
 import React from "react";
 import { ConnectorAttachment } from "@/types/response/attachments";
@@ -31,6 +31,7 @@ export function AttachmentDetailsView({
             <Modal.Backdrop>
                 <Modal.Container size="lg">
                     <Modal.Dialog className="sm:max-w-200">
+                        <Modal.CloseTrigger/>
                         <Modal.Header>
                             <Modal.Icon className="bg-default text-foreground">
                                 <Eye className="size-5"/>
@@ -52,9 +53,6 @@ export function AttachmentDetailsView({
                                 </div>
                             )}
                         </Modal.Body>
-                        <Modal.Footer>
-                            <Button slot="close" variant="tertiary">Close</Button>
-                        </Modal.Footer>
                     </Modal.Dialog>
                 </Modal.Container>
             </Modal.Backdrop>

@@ -24,10 +24,7 @@ interface ProcessingModeDetailsViewProps {
     state: ReturnType<typeof useOverlayState>;
 }
 
-export function ProcessingModeDetailsView({
-                                              processingMode,
-                                              state
-                                          }: ProcessingModeDetailsViewProps) {
+export function ProcessingModeDetailsView({ processingMode, state }: ProcessingModeDetailsViewProps) {
     const [details, setDetails] = useState<ConnectorProcessingModeDetail | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -90,6 +87,7 @@ export function ProcessingModeDetailsView({
             <Modal.Backdrop>
                 <Modal.Container size="lg">
                     <Modal.Dialog className="sm:max-w-300">
+                        <Modal.CloseTrigger/>
                         <Modal.Header>
                             <Modal.Icon className="bg-default text-foreground">
                                 <Eye className="size-5"/>

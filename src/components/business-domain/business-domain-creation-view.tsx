@@ -88,11 +88,12 @@ export function BusinessDomainCreationView({ state, onSubmit }: BusinessDomainCr
             <Modal.Backdrop isDismissable={false} isKeyboardDismissDisabled>
                 <Modal.Container size="lg">
                     <Modal.Dialog className="sm:max-w-150">
+                        <Modal.CloseTrigger/>
                         <Modal.Header>
                             <Modal.Icon className="bg-default text-foreground">
                                 <Plus className="size-5"/>
                             </Modal.Icon>
-                            <Modal.Heading className="font-semibold">Create  A Business Domain</Modal.Heading>
+                            <Modal.Heading className="font-semibold">Create A Business Domain</Modal.Heading>
                         </Modal.Header>
                         <Modal.Body>
                             <Form id="add-business-domain-form" onSubmit={handleSubmit} className="space-y-6">
@@ -154,6 +155,7 @@ export function BusinessDomainCreationView({ state, onSubmit }: BusinessDomainCr
                         <Modal.Footer>
                             <Button
                                 type="submit"
+                                className="w-full"
                                 form="add-business-domain-form"
                                 variant="primary"
                                 isPending={submitting}
@@ -162,7 +164,6 @@ export function BusinessDomainCreationView({ state, onSubmit }: BusinessDomainCr
                                 {submitting ? <Spinner color="current" size="sm"/> : <Plus className="mr-2 size-4"/>}
                                 Add
                             </Button>
-                            <Button slot="close" variant="tertiary">Close</Button>
                         </Modal.Footer>
                     </Modal.Dialog>
                 </Modal.Container>

@@ -10,7 +10,7 @@
 
 "use client";
 
-import { Button, Modal, useOverlayState } from "@heroui/react";
+import { Modal, useOverlayState } from "@heroui/react";
 import React from "react";
 import { ConnectorTransportStep } from "@/types/response/transport-step";
 import { Eye } from "@gravity-ui/icons";
@@ -21,15 +21,13 @@ interface TransportStepDetailsViewProps {
     state: ReturnType<typeof useOverlayState>;
 }
 
-export function TransportStepDetailsView({
-                                             transportStep,
-                                             state
-                                         }: TransportStepDetailsViewProps) {
+export function TransportStepDetailsView({ transportStep, state }: TransportStepDetailsViewProps) {
     return (
         <Modal state={state}>
             <Modal.Backdrop>
                 <Modal.Container size="lg">
                     <Modal.Dialog className="sm:max-w-200">
+                        <Modal.CloseTrigger/>
                         <Modal.Header>
                             <Modal.Icon className="bg-default text-foreground">
                                 <Eye className="size-5"/>
@@ -39,9 +37,6 @@ export function TransportStepDetailsView({
                         <Modal.Body>
                             {transportStep && <TransportStepDetails transportStep={transportStep}/>}
                         </Modal.Body>
-                        <Modal.Footer>
-                            <Button slot="close" variant="tertiary">Close</Button>
-                        </Modal.Footer>
                     </Modal.Dialog>
                 </Modal.Container>
             </Modal.Backdrop>

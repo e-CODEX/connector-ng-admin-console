@@ -10,15 +10,17 @@
 
 "use client";
 
-import { Button, Chip, Modal, Spinner, Table, useOverlayState } from "@heroui/react";
-import { ConnectorMessage, ConnectorMessageDetails } from "@/types/response/message";
-import { formatBytes, formatDate, getBooleanColor, getDeliveryLabel, toastError, truncate } from "@/utils";
+import { Button, Chip, Modal, Spinner, Table, Tooltip, useOverlayState } from "@heroui/react";
+import { ConnectorMessage, ConnectorMessageDetails, ConnectorMessageEvidence } from "@/types/response/message";
+import { formatBytes, formatDate, getBooleanColor, getDeliveryLabel, saveFile, toastError, truncate } from "@/utils";
 import React, { useEffect, useState } from "react";
 import { Eye } from "@gravity-ui/icons";
 import { getMessage } from "@/services/message";
 import { DetailRow } from "@/components/common/detail-row";
 import { DetailSection } from "@/components/common/detail-section";
 import { ConnectorParty } from "@/types/response/processing-mode";
+import { ArrowDownToLine } from "lucide-react";
+import { downloadEvidence } from "@/services/evidence";
 
 interface MessageDetailsViewProps {
     message: ConnectorMessage | null;
@@ -29,6 +31,15 @@ export function MessageDetailsView({ message, state }: MessageDetailsViewProps) 
     const [details, setDetails] = useState<ConnectorMessageDetails | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    const onDownloadEvidenceClicked = async (evidence: ConnectorMessageEvidence) => {
+        try {
+            const file = await downloadEvidence(evidence.uuid, evidence.type)
+            saveFile(file);
+        } catch (error) {
+            toastError(error);
+        }
+    }
 
     const detailParty = (party: ConnectorParty) => {
         return `${party.identifier}(${party.identifierType})`
@@ -196,6 +207,7 @@ export function MessageDetailsView({ message, state }: MessageDetailsViewProps) 
                                                                         <Table.Column>Delivered to link partner at</Table.Column>
                                                                         <Table.Column>Created at</Table.Column>
                                                                         <Table.Column>Updated at</Table.Column>
+                                                                        <Table.Column>Action</Table.Column>
                                                                     </Table.Header>
                                                                     <Table.Body>
                                                                         {details.evidences.map((evidence) => (
@@ -209,6 +221,24 @@ export function MessageDetailsView({ message, state }: MessageDetailsViewProps) 
                                                                                 <Table.Cell>{formatDate(evidence.deliveredToLinkPartnerAt)}</Table.Cell>
                                                                                 <Table.Cell>{formatDate(evidence.createdAt)}</Table.Cell>
                                                                                 <Table.Cell>{formatDate(evidence.updatedAt)}</Table.Cell>
+                                                                                <Table.Cell>
+                                                                                    <div className="flex items-center gap-1">
+                                                                                        <Tooltip delay={0}>
+                                                                                            <Button
+                                                                                                isIconOnly
+                                                                                                size="sm"
+                                                                                                variant="secondary"
+                                                                                                onPress={() => onDownloadEvidenceClicked(evidence)}
+                                                                                            >
+                                                                                                <ArrowDownToLine/>
+                                                                                            </Button>
+                                                                                            <Tooltip.Content showArrow>
+                                                                                                <Tooltip.Arrow/>
+                                                                                                <p>Download</p>
+                                                                                            </Tooltip.Content>
+                                                                                        </Tooltip>
+                                                                                    </div>
+                                                                                </Table.Cell>
                                                                             </Table.Row>
                                                                         ))}
                                                                     </Table.Body>

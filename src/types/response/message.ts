@@ -55,7 +55,7 @@ interface ConnectorAS4Properties {
     action: ConnectorAction;
 }
 
-interface ConnectorMessageEvidence {
+export interface ConnectorMessageEvidence {
     uuid: string;
     type: string;
     createdAt: string;

@@ -8,10 +8,12 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-export const AppFooter = () => {
+import { AppInfoView } from "@/components/common/app-info-view";
+
+export function AppFooter() {
     return (
-        <footer className="flex items-center justify-center w-full h-10 border-t">
-            Footer
+        <footer className="border-divider bg-surface fixed inset-x-0 bottom-0 z-40 flex h-12 w-full flex-wrap justify-between gap-4 border-t px-4">
+            <AppInfoView variant="footer"/>
         </footer>
-    )
+    );
 }

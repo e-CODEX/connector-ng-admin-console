@@ -38,7 +38,7 @@ export default function RootLayout({
         <Providers>
             <div className="relative flex flex-col min-h-screen">
                 <AppMainNavbar/>
-                <main className="grow px-3 pt-22">
+                <main className="grow px-3 pt-22 pb-12">
                     {children}
                 </main>
                 <AppFooter/>

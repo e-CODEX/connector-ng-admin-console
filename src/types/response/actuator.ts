@@ -25,3 +25,15 @@ export interface HealthComponent {
     details?: Record<string, unknown>;
     components?: Record<string, HealthComponent>;
 }
+
+export interface AppBuildInfo {
+    readonly artifact: string;
+    readonly name: string;
+    readonly group: string;
+    readonly version: string;
+    readonly time: string;
+}
+
+export interface AppInfoResponse {
+    readonly build?: AppBuildInfo;
+}

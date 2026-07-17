@@ -59,7 +59,9 @@ export function PaginationControls({
             pages.push("ellipsis");
         }
 
-        pages.push(totalPages);
+        if (totalPages > 1) {
+            pages.push(totalPages);
+        }
 
         return pages;
     };

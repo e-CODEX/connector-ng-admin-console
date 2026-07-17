@@ -22,6 +22,7 @@ const navItems = [
     { label: "Messages", href: "/admin/messages" },
     { label: "Transport-Step", href: "/admin/transport-steps" },
     { label: "Attachments", href: "/admin/attachments" },
+    { label: "Queues", href: "/admin/queues" },
     { label: "Configurations", href: "/admin/configurations" },
     { label: "Business domain", href: "/admin/business-domains" },
     { label: "Processing mode", href: "/admin/processing-modes" },

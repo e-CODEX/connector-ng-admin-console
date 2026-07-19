@@ -8,7 +8,8 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { ConnectorBusinessDomain } from "@/types/response/business-domain";
+import { ConnectorBusinessDomainResponse } from "@/types/response/business-domain";
+import { BusinessDocumentAesType, KeystoreType } from "@/types/global";
 
 export interface LinkPartnerConfiguration {
     backend: BackendPartner[];
@@ -56,7 +57,7 @@ export interface LinkPartnerProperties {
 // business domain config
 
 export interface BusinessDomainConfiguration {
-    defaults: ConnectorBusinessDomain[]
+    defaults: ConnectorBusinessDomainResponse[]
 }
 
 // message verification
@@ -134,12 +135,10 @@ export interface AuthenticationValidation {
     identityProvider: string;
 }
 
-export type AdvancedSystemType = "AUTHENTICATION_BASED" | "SIGNATURE_BASED";
-
 export interface BusinessDocumentConfiguration {
     country: string;
     serviceProvider: string;
-    defaultAdvancedSystemType: AdvancedSystemType;
+    defaultAdvancedSystemType: BusinessDocumentAesType;
     authenticationValidation: AuthenticationValidation;
     signature: Signature;
 }
@@ -153,8 +152,6 @@ export interface Signature {
     privateKey: PrivateKey;
     validation: Validation;
 }
-
-export type KeystoreType = "JKS" | "PKCS12";
 
 export interface Keystore {
     path: string;

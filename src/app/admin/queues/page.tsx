@@ -11,7 +11,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ConnectorQueueStats } from "@/types/response/queue";
+import { ConnectorQueueStatsResponse } from "@/types/response/queue";
 import { toastError } from "@/utils";
 import { loadQueueStats } from "@/services/queue";
 import { PageHeaderButton } from "@/components/common/page-header-button";
@@ -23,7 +23,7 @@ import { QueueCard } from "@/components/queue/QueueCard";
 export default function QueueAdminPage() {
     const [loading, setLoading] = useState(true)
     const [refreshing, setRefreshing] = useState(false)
-    const [queues, setQueues] = useState<ConnectorQueueStats[]>([])
+    const [queues, setQueues] = useState<ConnectorQueueStatsResponse[]>([])
     const [selectedQueue, setSelectedQueue] = useState<string | null>(null)
     const requestId = useRef(0);
 

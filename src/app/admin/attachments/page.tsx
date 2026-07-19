@@ -12,7 +12,7 @@
 
 import { PageHeader } from "@/components/common/page-header";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ConnectorAttachment } from "@/types/response/attachments";
+import { ConnectorAttachmentResponse } from "@/types/response/attachments";
 import { Button, Spinner, Table, Tooltip, useOverlayState } from "@heroui/react";
 import { listAttachments } from "@/services/attachment";
 import { formatBytes, formatDate, toastError, truncate } from "@/utils";
@@ -28,13 +28,13 @@ export default function AttachmentsAdminPage() {
     const [page, setPage] = useState(1);
     const [totalElements, setTotalElements] = useState(0);
     const [pageSize, setPageSize] = useState(20);
-    const [attachments, setAttachments] = useState<ConnectorAttachment[]>([]);
-    const [selectedAttachment, setSelectedAttachment] = useState<ConnectorAttachment | null>(null);
+    const [attachments, setAttachments] = useState<ConnectorAttachmentResponse[]>([]);
+    const [selectedAttachment, setSelectedAttachment] = useState<ConnectorAttachmentResponse | null>(null);
     const requestId = useRef(0);
 
     const detailsModal = useOverlayState();
 
-    const onDetailsClick = (attachment: ConnectorAttachment) => {
+    const onDetailsClick = (attachment: ConnectorAttachmentResponse) => {
         setSelectedAttachment(attachment);
         detailsModal.open();
     };

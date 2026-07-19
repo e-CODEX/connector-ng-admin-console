@@ -14,18 +14,18 @@ import { Button, Chip, Modal, Spinner, Table, useOverlayState } from "@heroui/re
 import { formatDate, toastError } from "@/utils";
 import React, { useEffect, useState } from "react";
 import { Eye } from "@gravity-ui/icons";
-import { ConnectorProcessingMode, ConnectorProcessingModeDetail } from "@/types/response/processing-mode";
+import { ConnectorProcessingModeResponse, ConnectorProcessingModeDetailResponse } from "@/types/response/processing-mode";
 import { DetailRow } from "@/components/common/detail-row";
 import { getProcessingMode } from "@/services/processing-mode";
 import { DetailSection } from "@/components/common/detail-section";
 
 interface ProcessingModeDetailsViewProps {
-    processingMode: ConnectorProcessingMode | null;
+    processingMode: ConnectorProcessingModeResponse | null;
     state: ReturnType<typeof useOverlayState>;
 }
 
 export function ProcessingModeDetailsView({ processingMode, state }: ProcessingModeDetailsViewProps) {
-    const [details, setDetails] = useState<ConnectorProcessingModeDetail | null>(null);
+    const [details, setDetails] = useState<ConnectorProcessingModeDetailResponse | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 

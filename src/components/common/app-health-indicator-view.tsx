@@ -12,10 +12,8 @@
 
 import { useEffect, useState } from "react";
 import { getHealthInfo } from "@/services/actuator";
-import { HealthResponse } from "@/types/response/actuator";
 import { Chip } from "@heroui/react";
-
-export type HealthStatus = HealthResponse["status"];
+import { HealthStatus } from "@/types/global";
 
 type ChipColor = "success" | "danger" | "warning" | "default";
 
@@ -34,7 +32,6 @@ const PRESENTATION: Record<HealthStatus, { label: string; color: ChipColor; dot:
     },
     UNKNOWN: { label: "Unknown", color: "default", dot: "bg-default-400" },
 };
-
 
 export function AppHealthIndicatorView({ pollIntervalMs = 60_000, size = "sm", }: AppHealthIndicatorProps) {
     const [status, setStatus] = useState<HealthStatus>("UNKNOWN");

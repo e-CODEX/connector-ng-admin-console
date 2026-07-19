@@ -8,7 +8,7 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-export interface ConnectorProcessingMode {
+export interface ConnectorProcessingModeResponse {
     uuid: string;
     description: string;
     filename: string;
@@ -17,13 +17,13 @@ export interface ConnectorProcessingMode {
     updatedAt: string;
 }
 
-export interface ConnectorProcessingModeDetail extends ConnectorProcessingMode {
-    parties: ConnectorParty[];
-    services: ConnectorService[];
-    actions: ConnectorAction[];
+export interface ConnectorProcessingModeDetailResponse extends ConnectorProcessingModeResponse {
+    parties: ConnectorProcessingModeParty[];
+    services: ConnectorProcessingModeService[];
+    actions: ConnectorProcessingModeAction[];
 }
 
-export interface ConnectorParty {
+export interface ConnectorProcessingModeParty {
     name: string;
     identifier: string;
     identifierType: string;
@@ -32,11 +32,11 @@ export interface ConnectorParty {
     isHome: boolean;
 }
 
-export interface ConnectorService {
+export interface ConnectorProcessingModeService {
     name: string;
     type: string;
 }
 
-export interface ConnectorAction {
+export interface ConnectorProcessingModeAction {
     name: string;
 }

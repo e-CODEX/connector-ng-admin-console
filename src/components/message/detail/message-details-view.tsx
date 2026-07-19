@@ -11,14 +11,14 @@
 "use client";
 
 import { Button, Chip, Modal, Spinner, Table, Tooltip, useOverlayState } from "@heroui/react";
-import { ConnectorMessage, ConnectorMessageDetails, ConnectorMessageEvidence } from "@/types/response/message";
+import { ConnectorMessage, ConnectorMessageDetailsResponse, ConnectorMessageEvidence } from "@/types/response/message";
 import { formatBytes, formatDate, getBooleanColor, getDeliveryLabel, saveFile, toastError, truncate } from "@/utils";
 import React, { useEffect, useState } from "react";
 import { Eye } from "@gravity-ui/icons";
 import { getMessage } from "@/services/message";
 import { DetailRow } from "@/components/common/detail-row";
 import { DetailSection } from "@/components/common/detail-section";
-import { ConnectorParty } from "@/types/response/processing-mode";
+import { ConnectorProcessingModeParty } from "@/types/response/processing-mode";
 import { ArrowDownToLine } from "lucide-react";
 import { downloadEvidence } from "@/services/evidence";
 import { MessageDirectionChip } from "@/components/message/message-direction";
@@ -29,7 +29,7 @@ interface MessageDetailsViewProps {
 }
 
 export function MessageDetailsView({ message, state }: MessageDetailsViewProps) {
-    const [details, setDetails] = useState<ConnectorMessageDetails | null>(null);
+    const [details, setDetails] = useState<ConnectorMessageDetailsResponse | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -42,7 +42,7 @@ export function MessageDetailsView({ message, state }: MessageDetailsViewProps) 
         }
     }
 
-    const detailParty = (party: ConnectorParty) => {
+    const detailParty = (party: ConnectorProcessingModeParty) => {
         return `${party.identifier}(${party.identifierType})`
     }
 

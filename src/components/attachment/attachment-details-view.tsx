@@ -13,12 +13,12 @@
 import { Modal, useOverlayState } from "@heroui/react";
 import { formatBytes, formatDate } from "@/utils";
 import React from "react";
-import { ConnectorAttachment } from "@/types/response/attachments";
+import { ConnectorAttachmentResponse } from "@/types/response/attachments";
 import { Eye } from "@gravity-ui/icons";
 import { DetailRow } from "@/components/common/detail-row";
 
 interface AttachmentDetailsViewProps {
-    attachment: ConnectorAttachment | null;
+    attachment: ConnectorAttachmentResponse | null;
     state: ReturnType<typeof useOverlayState>;
 }
 

@@ -8,16 +8,16 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { ConnectorProcessingMode, ConnectorProcessingModeDetail } from "@/types/response/processing-mode";
+import { ConnectorProcessingModeResponse, ConnectorProcessingModeDetailResponse } from "@/types/response/processing-mode";
 import { restApiCall } from "@/lib/rest";
 import { ProcessingModeCreationRequest } from "@/types/request/processing-mode";
 
 export async function listProcessingModes():
-    Promise<ConnectorProcessingMode[]> {
-    return restApiCall<ConnectorProcessingMode[]>("api/v1/admin/processing-modes");
+    Promise<ConnectorProcessingModeResponse[]> {
+    return restApiCall<ConnectorProcessingModeResponse[]>("api/v1/admin/processing-modes");
 }
 
-export async function createProcessingMode(payload: ProcessingModeCreationRequest): Promise<ConnectorProcessingMode> {
+export async function createProcessingMode(payload: ProcessingModeCreationRequest): Promise<ConnectorProcessingModeResponse> {
     const formData = new FormData();
     const { description, businessDomainIdentifier, processingModeXmlFile } = payload;
     formData.append("processingModeXmlFile", processingModeXmlFile);
@@ -29,13 +29,13 @@ export async function createProcessingMode(payload: ProcessingModeCreationReques
         )
     );
 
-    return restApiCall<ConnectorProcessingMode>("api/v1/admin/processing-modes", {
+    return restApiCall<ConnectorProcessingModeResponse>("api/v1/admin/processing-modes", {
             method: "POST",
             body: formData
         }
     )
 }
 
-export async function getProcessingMode(identifier: string): Promise<ConnectorProcessingModeDetail> {
-    return restApiCall<ConnectorProcessingModeDetail>(`api/v1/admin/processing-modes/${identifier}`);
+export async function getProcessingMode(identifier: string): Promise<ConnectorProcessingModeDetailResponse> {
+    return restApiCall<ConnectorProcessingModeDetailResponse>(`api/v1/admin/processing-modes/${identifier}`);
 }

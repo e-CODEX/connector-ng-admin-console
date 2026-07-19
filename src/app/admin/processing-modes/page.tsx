@@ -13,7 +13,7 @@
 import { PageHeader } from "@/components/common/page-header";
 import { useEffect, useRef, useState } from "react";
 import { Button, Spinner, Table, Tooltip, useOverlayState } from "@heroui/react";
-import { ConnectorProcessingMode } from "@/types/response/processing-mode";
+import { ConnectorProcessingModeResponse } from "@/types/response/processing-mode";
 import { createProcessingMode, listProcessingModes } from "@/services/processing-mode";
 import { formatDate, toastError, toastSuccess, truncate } from "@/utils";
 import { Icon } from "@iconify/react";
@@ -25,8 +25,8 @@ import { ProcessingModeCreationView } from "@/components/processing-mode/process
 export default function ProcessingModesAdminPage() {
     const [loading, setLoading] = useState(true)
     const [refreshing, setRefreshing] = useState(false)
-    const [processingModes, setProcessingModes] = useState<ConnectorProcessingMode[]>([])
-    const [selectedProcessingMode, setSelectedProcessingMode] = useState<ConnectorProcessingMode | null>(null);
+    const [processingModes, setProcessingModes] = useState<ConnectorProcessingModeResponse[]>([])
+    const [selectedProcessingMode, setSelectedProcessingMode] = useState<ConnectorProcessingModeResponse | null>(null);
     const requestId = useRef(0);
     const detailsModal = useOverlayState();
     const addModal = useOverlayState();
@@ -44,7 +44,7 @@ export default function ProcessingModesAdminPage() {
         }
     }
 
-    const onDetailsClick = (processingMode: ConnectorProcessingMode) => {
+    const onDetailsClick = (processingMode: ConnectorProcessingModeResponse) => {
         setSelectedProcessingMode(processingMode);
         detailsModal.open();
     };

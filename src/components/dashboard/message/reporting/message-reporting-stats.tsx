@@ -8,7 +8,7 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { ConnectorMessageReport } from "@/types/response/reporting";
+import { ConnectorMessageReportResponse } from "@/types/response/reporting";
 import { useEffect, useMemo, useState } from "react";
 import { MessageReportingKpi } from "@/components/dashboard/message/reporting/message-reporting-kpi";
 import { MessageReportingTh } from "@/components/dashboard/message/reporting/message-reporting-th";
@@ -20,7 +20,7 @@ const AXIS = "#94a3b8";
 const GRID = "rgba(148,163,184,0.25)";
 
 interface MessageReportingStatsProps {
-    payload: ConnectorMessageReport;
+    payload: ConnectorMessageReportResponse;
     refreshing?: boolean;
 }
 
@@ -35,7 +35,7 @@ const monthName = (m: number) => MONTH_ABBR[m - 1] ?? String(m);
 const keyOf = (year: number, month: number) => `${year}-${String(month).padStart(2, "0")}`;
 
 
-function normalize(payload: ConnectorMessageReport) {
+function normalize(payload: ConnectorMessageReportResponse) {
     const flat: FlatRow[] = [];
     for (const y of payload.years ?? [])
         for (const m of y.months ?? [])

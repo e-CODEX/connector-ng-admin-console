@@ -8,14 +8,16 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-export interface ConnectorAttachment {
+import { AttachmentType } from "@/types/global";
+
+export interface ConnectorAttachmentResponse {
     identifier: string;
     name: string;
     contentType: string;
     size: number;
     description: string;
     storage: string;
-    type: "S3_BUCKET" | "LOCAL_FILE_SYSTEM";
+    type: AttachmentType;
     createdAt: string;
     updatedAt: string;
 }

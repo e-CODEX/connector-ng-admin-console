@@ -12,12 +12,12 @@
 
 import { Modal, useOverlayState } from "@heroui/react";
 import React from "react";
-import { ConnectorTransportStep } from "@/types/response/transport-step";
+import { ConnectorTransportStepResponse } from "@/types/response/transport-step";
 import { Eye } from "@gravity-ui/icons";
 import { TransportStepDetails } from "@/components/transport-step/transport-step-details";
 
 interface TransportStepDetailsViewProps {
-    transportStep: ConnectorTransportStep | null;
+    transportStep: ConnectorTransportStepResponse | null;
     state: ReturnType<typeof useOverlayState>;
 }
 

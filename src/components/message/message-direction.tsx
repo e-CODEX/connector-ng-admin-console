@@ -11,7 +11,7 @@
 import { ArrowDownLeft, ArrowUpRight } from "lucide-react";
 import { Chip } from "@heroui/react";
 import type { ComponentType } from "react";
-import { MessageDirection } from "@/types/response/message";
+import { MessageDirection } from "@/types/global";
 
 interface DirectionPresentation {
     label: string;

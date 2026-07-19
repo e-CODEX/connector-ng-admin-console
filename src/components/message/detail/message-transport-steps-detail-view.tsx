@@ -14,7 +14,7 @@ import { Modal, Spinner, useOverlayState } from "@heroui/react";
 import { ConnectorMessage } from "@/types/response/message";
 import { Eye } from "@gravity-ui/icons";
 import React, { useEffect, useState } from "react";
-import { ConnectorTransportStep } from "@/types/response/transport-step";
+import { ConnectorTransportStepResponse } from "@/types/response/transport-step";
 import { getMessageTransportStep } from "@/services/message";
 import { TransportStepDetails } from "@/components/transport-step/transport-step-details";
 import { toastError } from "@/utils";
@@ -25,7 +25,7 @@ interface MessageTransportStepsDetailViewProps {
 }
 
 export function MessageTransportStepsDetailView({ message, state }: MessageTransportStepsDetailViewProps) {
-    const [transportStep, setTransportStep] = useState<ConnectorTransportStep | null>(null);
+    const [transportStep, setTransportStep] = useState<ConnectorTransportStepResponse | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 

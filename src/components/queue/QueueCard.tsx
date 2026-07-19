@@ -8,11 +8,11 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { ConnectorQueueStats } from "@/types/response/queue";
+import { ConnectorQueueStatsResponse } from "@/types/response/queue";
 import { Card } from "@heroui/react";
 
 interface QueueCardProps {
-    stats: ConnectorQueueStats;
+    stats: ConnectorQueueStatsResponse;
     selected: boolean;
     onSelect: () => void;
 }

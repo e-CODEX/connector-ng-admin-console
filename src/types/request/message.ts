@@ -8,6 +8,8 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
+import { BusinessDocumentAesType } from "@/types/global";
+
 export interface SendMessageResponse {
     identifier: string;
 }
@@ -82,8 +84,5 @@ interface BusinessDocumentInfo {
     document?: string;
     documentName?: string;
     detachedSignature?: DetachedSignature;
-    aesType: AesType;
+    aesType: BusinessDocumentAesType;
 }
-
-export type AesType = "SIGNATURE_BASED" | "AUTHENTICATION_BASED";
-

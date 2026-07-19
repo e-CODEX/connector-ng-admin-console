@@ -33,23 +33,10 @@ export const PERIOD_OPTIONS: readonly PeriodOption[] = [
 export const DEFAULT_PERIOD: Period = "TODAY";
 
 export interface PeriodRange {
-    /** Inclusive lower bound, or null for no lower bound ("ALL"). */
     from: Date | null;
-    /** Upper bound; null means "up to now". */
     to: Date | null;
 }
 
-/**
- * Resolves a Period into a concrete date range.
- *
- * Boundaries are computed in the browser's local timezone (Paris), then
- * `.toISOString()` converts them to UTC for the backend.
- *
- * Call this at request time (inside your fetcher), NOT once into state:
- * rolling windows like "LAST_HOUR" must be recomputed on each poll, and
- * keeping it out of state avoids a new object every render thrashing your
- * usePolledFetch dependencies.
- */
 export function getPeriodRange(period: Period, now: Date = new Date()): PeriodRange {
     const from = new Date(now);
     const to = new Date(now);
@@ -87,7 +74,6 @@ export function getPeriodRange(period: Period, now: Date = new Date()): PeriodRa
     }
 }
 
-/** Range as query params ready for the BFF / stats endpoint. */
 export function periodToParams(period: Period,):
     { from?: string; to?: string } {
     const { from, to } = getPeriodRange(period);

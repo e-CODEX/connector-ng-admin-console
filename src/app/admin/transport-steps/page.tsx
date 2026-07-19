@@ -19,7 +19,7 @@ import { TransportStepFiltersPanel } from "@/components/transport-step/transport
 import { formatDate, getTransportDeliveryColor, getTransportDeliveryLabel, toastError, truncate } from "@/utils";
 import { Icon } from "@iconify/react";
 import { PaginationControls } from "@/components/paging/pagination-controls";
-import { ConnectorTransportStep } from "@/types/response/transport-step";
+import { ConnectorTransportStepResponse } from "@/types/response/transport-step";
 import { TransportStepDetailsView } from "@/components/transport-step/transport-step-details-view";
 import { ArrowsRotateRight } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/page-header-button";
@@ -30,8 +30,8 @@ export default function TransportStepsAdminPage() {
     const [page, setPage] = useState(1)
     const [totalElements, setTotalElements] = useState(0)
     const [pageSize, setPageSize] = useState(20);
-    const [selectedTransportStep, setSelectedTransportStep] = useState<ConnectorTransportStep | null>(null);
-    const [transportSteps, setTransportSteps] = useState<ConnectorTransportStep[]>([])
+    const [selectedTransportStep, setSelectedTransportStep] = useState<ConnectorTransportStepResponse | null>(null);
+    const [transportSteps, setTransportSteps] = useState<ConnectorTransportStepResponse[]>([])
     const [messageOrRemoteSystemIdentifierQuery, setMessageOrRemoteSystemIdentifierQuery] = useState("")
     const [linkPartnerNameQuery, setLinkPartnerNameQuery] = useState("")
     const debouncedMessageOrRemoteSystemIdentifier = useDebouncedValue(messageOrRemoteSystemIdentifierQuery)
@@ -50,7 +50,7 @@ export default function TransportStepsAdminPage() {
 
     const detailsModal = useOverlayState();
 
-    const onDetailsClick = (step: ConnectorTransportStep) => {
+    const onDetailsClick = (step: ConnectorTransportStepResponse) => {
         setSelectedTransportStep(step);
         detailsModal.open();
     };

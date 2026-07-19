@@ -9,7 +9,7 @@
  */
 
 import { PaginatedResponse } from "@/types/response/paginated-response";
-import { ConnectorTransportStep } from "@/types/response/transport-step";
+import { ConnectorTransportStepResponse } from "@/types/response/transport-step";
 import { restApiCall } from "@/lib/rest";
 
 export async function listTransportSteps(params?: {
@@ -18,8 +18,8 @@ export async function listTransportSteps(params?: {
     messageOrRemoteSystemIdentifier?: string,
     linkPartnerName?: string
 }):
-    Promise<PaginatedResponse<ConnectorTransportStep>> {
-    return restApiCall<PaginatedResponse<ConnectorTransportStep>>("api/v1/admin/transport-steps", {
+    Promise<PaginatedResponse<ConnectorTransportStepResponse>> {
+    return restApiCall<PaginatedResponse<ConnectorTransportStepResponse>>("api/v1/admin/transport-steps", {
             params
         }
     );

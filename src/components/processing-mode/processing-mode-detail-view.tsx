@@ -205,9 +205,6 @@ export function ProcessingModeDetailsView({ processingMode, state }: ProcessingM
                                 </div>
                             )}
                         </Modal.Body>
-                        <Modal.Footer>
-                            <Button slot="close" variant="tertiary">Close</Button>
-                        </Modal.Footer>
                     </Modal.Dialog>
                 </Modal.Container>
             </Modal.Backdrop>

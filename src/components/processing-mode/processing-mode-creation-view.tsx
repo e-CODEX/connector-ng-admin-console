@@ -10,12 +10,13 @@
 
 "use client";
 
-import { Button, FieldError, Form, Input, Label, ListBox, Modal, Select, Spinner, TextField, useOverlayState } from "@heroui/react";
+import { Button, Form, Input, Label, Modal, Spinner, TextField, useOverlayState } from "@heroui/react";
 import React, { useEffect, useState } from "react";
 import { ArrowUpToLine, Plus } from "@gravity-ui/icons";
 import { ProcessingModeCreationRequest } from "@/types/request/processing-mode";
 import { listBusinessDomains } from "@/services/business-domain";
 import { FileTrigger } from "react-aria-components";
+import { BusinessDomainSelector } from "@/components/form/business-domain-selector";
 
 interface ProcessingModeCreationViewProps {
     state: ReturnType<typeof useOverlayState>;
@@ -119,31 +120,16 @@ export function ProcessingModeCreationView({ state, onSubmit }: ProcessingModeCr
                                     )}
                                 </div>
 
-                                <Select
+                                <BusinessDomainSelector
+                                    identifiers={businessDomainIdentifiers}
                                     value={businessDomainIdentifier}
-                                    onChange={(key) => {
+                                    isRequired={true}
+                                    error={domainError}
+                                    onValueChange={(key) => {
                                         setBusinessDomainIdentifier(key as string);
                                         setDomainError("");
                                     }}
-                                    isInvalid={!!domainError}
-                                >
-                                    <Label className="font-semibold">Business domain</Label>
-                                    <Select.Trigger>
-                                        <Select.Value/>
-                                        <Select.Indicator/>
-                                    </Select.Trigger>
-                                    <Select.Popover>
-                                        <ListBox>
-                                            {businessDomainIdentifiers.map((identifier) => (
-                                                <ListBox.Item key={identifier} id={identifier} textValue={identifier}>
-                                                    {identifier}
-                                                    <ListBox.ItemIndicator/>
-                                                </ListBox.Item>
-                                            ))}
-                                        </ListBox>
-                                    </Select.Popover>
-                                    <FieldError>{domainError}</FieldError>
-                                </Select>
+                                />
 
                                 {/* metadata.description */}
                                 <TextField

@@ -10,16 +10,29 @@
 
 import { Label, SearchField } from "@heroui/react";
 import { SearchCriteriaBox } from "@/components/form/search-criteria-box";
+import { BusinessDomainSelector } from "@/components/form/business-domain-selector";
 
 interface MessageFiltersPanelProps {
     identifier: string;
     backendName: string;
+    businessDomainIdentifier: string;
+    businessDomainIdentifiers: string[];
     onIdentifierChange: (value: string) => void;
     onBackendNameChange: (value: string) => void;
+    onBusinessDomainIdentifierChange: (value: string) => void;
     className?: string;
 }
 
-export function MessageFiltersPanel({ identifier, backendName, onIdentifierChange, onBackendNameChange, className }: MessageFiltersPanelProps) {
+export function MessageFiltersPanel({
+                                        identifier,
+                                        backendName,
+                                        businessDomainIdentifier,
+                                        businessDomainIdentifiers,
+                                        onIdentifierChange,
+                                        onBackendNameChange,
+                                        onBusinessDomainIdentifierChange,
+                                        className
+                                    }: MessageFiltersPanelProps) {
     return (
         <SearchCriteriaBox className={className}>
             <SearchField className="w-full sm:max-w-xs" value={identifier} onChange={onIdentifierChange}>
@@ -38,6 +51,11 @@ export function MessageFiltersPanel({ identifier, backendName, onIdentifierChang
                     <SearchField.ClearButton/>
                 </SearchField.Group>
             </SearchField>
+            <BusinessDomainSelector
+                identifiers={businessDomainIdentifiers}
+                value={businessDomainIdentifier}
+                onValueChange={onBusinessDomainIdentifierChange}
+            />
         </SearchCriteriaBox>
     );
 }

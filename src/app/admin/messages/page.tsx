@@ -29,6 +29,7 @@ import { MessageDeliveryStatusChip } from "@/components/message/chip/message-del
 import { Mail, Route } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
+import { listBusinessDomains } from "@/services/business-domain";
 
 const IDENTIFIER_LENGTH = 15;
 
@@ -40,8 +41,10 @@ export default function MessagesAdminPage() {
     const [totalElements, setTotalElements] = useState(0);
     const [pageSize, setPageSize] = useState(20);
     const [selectedMessage, setSelectedMessage] = useState<ConnectorMessage | null>(null);
+    const [businessDomainIdentifiers, setBusinessDomainIdentifiers] = useState<string[]>([]);
     const [identifierQuery, setIdentifierQuery] = useState("");
     const [backendNameQuery, setBackendNameQuery] = useState("");
+    const [businessDomainIdentifierQuery, setBusinessDomainIdentifierQuery] = useState<string>("");
     const requestId = useRef(0);
 
     const debouncedIdentifier = useDebouncedValue(identifierQuery);
@@ -54,6 +57,16 @@ export default function MessagesAdminPage() {
 
     const onBackendNameChange = (value: string) => {
         setBackendNameQuery(value)
+        setPage(1)
+    }
+
+    const onBusinessDomainIdentifierChange = (value: string) => {
+        if (value === "All") {
+            setBusinessDomainIdentifierQuery("")
+            return
+        }
+
+        setBusinessDomainIdentifierQuery(value)
         setPage(1)
     }
 
@@ -74,7 +87,7 @@ export default function MessagesAdminPage() {
     const onRefreshClick = async () => {
         setRefreshing(true)
         try {
-            await loadMessages();
+            await loadMessages(true);
         } finally {
             setRefreshing(false);
         }
@@ -84,15 +97,20 @@ export default function MessagesAdminPage() {
         reportModal.open();
     }
 
-    const loadMessages = useCallback(async () => {
+    const loadMessages = useCallback(async (silent = false) => {
         const id = ++requestId.current;
-        setLoading(true);
+
+        if (!silent) {
+            setLoading(true);
+        }
+
         try {
             const data = await listMessages({
                 page: page - 1,
                 size: pageSize,
                 identifier: debouncedIdentifier || undefined,
                 backendName: debouncedBackendName || undefined,
+                businessDomain: businessDomainIdentifierQuery || undefined,
             });
 
             if (id !== requestId.current) {
@@ -108,11 +126,31 @@ export default function MessagesAdminPage() {
 
             toastError(error);
         } finally {
-            if (id === requestId.current) {
+            if (id === requestId.current && !silent) {
                 setLoading(false);
             }
         }
-    }, [page, pageSize, debouncedIdentifier, debouncedBackendName]);
+    }, [page, pageSize, debouncedIdentifier, debouncedBackendName, businessDomainIdentifierQuery]);
+
+    useEffect(() => {
+        let cancelled = false;
+
+        (async () => {
+            try {
+                const businessDomains = await listBusinessDomains().then((domains) =>
+                    ["All", ...domains.map(d => d.identifier)]);
+                if (cancelled) return;
+                setBusinessDomainIdentifiers(businessDomains);
+            } catch (error) {
+                if (cancelled) return;
+                toastError(error);
+            }
+        })();
+
+        return () => {
+            cancelled = true;
+        };
+    }, []);
 
     useEffect(() => {
         void loadMessages();
@@ -144,8 +182,11 @@ export default function MessagesAdminPage() {
             <MessageFiltersPanel
                 identifier={identifierQuery}
                 backendName={backendNameQuery}
+                businessDomainIdentifier={businessDomainIdentifierQuery}
+                businessDomainIdentifiers={businessDomainIdentifiers}
                 onIdentifierChange={onIdentifierChange}
                 onBackendNameChange={onBackendNameChange}
+                onBusinessDomainIdentifierChange={onBusinessDomainIdentifierChange}
             />
 
             {loading ? (

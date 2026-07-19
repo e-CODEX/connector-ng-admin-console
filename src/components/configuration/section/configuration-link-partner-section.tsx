@@ -85,7 +85,7 @@ export function ConfigurationLinkPartnerSection() {
                                                 <Table.ScrollContainer>
                                                     <Table.Content aria-label="Link partners">
                                                         <Table.Header>
-                                                            <Table.Column>Name</Table.Column>
+                                                            <Table.Column isRowHeader>Name</Table.Column>
                                                             <Table.Column>Description</Table.Column>
                                                             <Table.Column>Modes (sender / receiver)</Table.Column>
                                                             <Table.Column>Status</Table.Column>

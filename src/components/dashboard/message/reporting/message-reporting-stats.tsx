@@ -19,6 +19,11 @@ const OUT = "#f59e0b";  // outbound
 const AXIS = "#94a3b8";
 const GRID = "rgba(148,163,184,0.25)";
 
+interface MessageReportingStatsProps {
+    payload: ConnectorMessageReport;
+    refreshing?: boolean;
+}
+
 type FlatRow = {
     party: string; service: string;
     inbound: number; outbound: number; total: number;
@@ -58,7 +63,7 @@ function normalize(payload: ConnectorMessageReport) {
     return { flat, axis, services: payload.services ?? [] };
 }
 
-export function MessageReportingStats({ payload, refreshing }: { payload: ConnectorMessageReport; refreshing?: boolean }) {
+export function MessageReportingStats({ payload, refreshing }: MessageReportingStatsProps) {
     const { flat, axis, services } = useMemo(() => normalize(payload), [payload]);
     const options = useMemo(() => ["All", ...services], [services]);
     const [service, setService] = useState<string>(options[0]);

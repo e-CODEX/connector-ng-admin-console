@@ -22,10 +22,7 @@ interface AttachmentDetailsViewProps {
     state: ReturnType<typeof useOverlayState>;
 }
 
-export function AttachmentDetailsView({
-                                          attachment,
-                                          state
-                                      }: AttachmentDetailsViewProps) {
+export function AttachmentDetailsView({ attachment, state }: AttachmentDetailsViewProps) {
     return (
         <Modal state={state}>
             <Modal.Backdrop>

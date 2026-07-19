@@ -45,7 +45,7 @@ export function ConfigurationContainerSection() {
     }
 
     return (
-        <>
+        <div>
             {
                 loading ? (
                     <div className="flex justify-center items-center min-h-400]">
@@ -59,6 +59,6 @@ export function ConfigurationContainerSection() {
                     </div>
                 )
             }
-        </>
+        </div>
     )
 }

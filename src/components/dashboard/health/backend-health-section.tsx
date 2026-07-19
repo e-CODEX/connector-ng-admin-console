@@ -16,7 +16,12 @@ import { Database, MessagesSquare } from "lucide-react";
 import { CardHeart, HardDrive } from "@gravity-ui/icons";
 import { asNumber, formatBytes } from "@/utils";
 
-export function BackendHealthSection({ refreshToken, refreshInterval }: { refreshToken?: number; refreshInterval: number; }) {
+interface BackendHealthSectionProps {
+    refreshToken?: number;
+    refreshInterval: number;
+}
+
+export function BackendHealthSection({ refreshToken, refreshInterval }: BackendHealthSectionProps) {
     const { data, loading, error } = usePolledFetch(() => getHealthInfo(), refreshInterval, [refreshToken]);
 
     if (!data) {

@@ -16,11 +16,7 @@ interface SearchCriteriaProps {
     className?: string;
 }
 
-export function SearchCriteriaBox({
-                                      children,
-                                      title = "Search criteria",
-                                      className,
-                                  }: SearchCriteriaProps) {
+export function SearchCriteriaBox({ children, title = "Search criteria", className }: SearchCriteriaProps) {
     return (
         <section className={`mt-6 mb-4 rounded-xl border border-border bg-surface p-4 ${className ?? ""}`}>
             <h2 className="text-sm font-semibold text-foreground mb-3">{title}</h2>

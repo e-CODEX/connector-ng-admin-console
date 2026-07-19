@@ -216,6 +216,11 @@ export function ProcessingModeDetailsView({ processingMode, state }: ProcessingM
                                     )}
                                 </div>
                             )}
+                            {error && (
+                                <div className="flex justify-center py-6">
+                                    <div className="text-destructive">{error}</div>
+                                </div>
+                            )}
                         </Modal.Body>
                         <Modal.Footer>
                             <Button slot="close" variant="tertiary">Close</Button>

@@ -75,7 +75,7 @@ export default function BusinessDomainsAdminPage() {
     }, [])
 
     return (
-        <>
+        <div>
             <PageHeader
                 icon="grommet-icons:domain"
                 title="Business Domains"
@@ -158,6 +158,6 @@ export default function BusinessDomainsAdminPage() {
                     />
                 </>
             )}
-        </>
+        </div>
     )
 }

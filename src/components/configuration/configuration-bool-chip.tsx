@@ -11,7 +11,12 @@
 import { Check, Minus } from "lucide-react";
 import { Chip } from "@heroui/react";
 
-export function ConfigurationBoolChip({ value, label }: { value: boolean; label: string }) {
+interface ConfigurationBoolChipProps {
+    value: boolean;
+    label: string;
+}
+
+export function ConfigurationBoolChip({ value, label }: ConfigurationBoolChipProps) {
     return (
         <Chip variant="soft" size="sm" color={value ? "success" : "default"}>
             {value ? <Check className="size-3"/> : <Minus className="size-3"/>}

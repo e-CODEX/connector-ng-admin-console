@@ -34,11 +34,13 @@ export function PaginationControls({
     const totalPages = Math.max(1, Math.ceil(totalElements / pageSize));
     const start = totalElements === 0 ? 0 : (page - 1) * pageSize + 1;
     const end = Math.min(page * pageSize, totalElements);
+
     const handlePageSizeChange = (key: React.Key | null) => {
         if (key == null) return;
         onPageSizeChange(Number(key));
         onPageChange(1);
     };
+
     const getPageNumbers = () => {
         const pages: (number | "ellipsis")[] = [];
 
@@ -71,9 +73,9 @@ export function PaginationControls({
         <Pagination className={className}>
             <Pagination.Summary>
                 <div className="flex items-center gap-4 pb-3">
-          <span>
-            Showing {start}-{end} of {totalElements} results
-          </span>
+                    <span>
+                        Showing {start}-{end} of {totalElements} results
+                    </span>
 
                     <Select
                         aria-label="Rows per page"

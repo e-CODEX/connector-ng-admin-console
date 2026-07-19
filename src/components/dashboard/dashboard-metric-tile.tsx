@@ -12,6 +12,12 @@
 
 type Tone = "default" | "success" | "warning" | "danger";
 
+interface DashboardMetricTileProps {
+    label: string;
+    value: number | undefined;
+    tone?: Tone;
+}
+
 const TONE_TEXT: Record<Tone, string> = {
     default: "text-foreground",
     success: "text-green-800 ",
@@ -19,11 +25,7 @@ const TONE_TEXT: Record<Tone, string> = {
     danger: "text-red-800 ",
 };
 
-export function DashboardMetricTile({ label, value, tone = "default" }: {
-    label: string;
-    value: number | undefined;
-    tone?: Tone;
-}) {
+export function DashboardMetricTile({ label, value, tone = "default" }: DashboardMetricTileProps) {
     return (
         <div className="rounded-large bg-default-100 px-4 py-3">
             <p className="text-xs opacity-80">{label}</p>

@@ -15,7 +15,11 @@ import { ConfigurationKeystoreView } from "@/components/configuration/view/confi
 import { ConfigurationPrivateKeyView } from "@/components/configuration/view/configuration-private-key-view";
 import { ConfigurationValidationView } from "@/components/configuration/view/configuration-validation-view";
 
-export function ConfigurationSignatureView({ signature }: { signature: Signature }) {
+interface ConfigurationSignatureViewProps {
+    signature: Signature;
+}
+
+export function ConfigurationSignatureView({ signature }: ConfigurationSignatureViewProps) {
     return (
         <div className="flex flex-col gap-3">
             <div className="flex flex-wrap gap-2">

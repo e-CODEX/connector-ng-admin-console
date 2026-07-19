@@ -15,6 +15,12 @@ import { Circle } from "@gravity-ui/icons";
 import { HealthStatus } from "@/types/response/actuator";
 import { capitalize } from "@/utils";
 
+export interface HealthCardProps {
+    title: string;
+    icon?: ReactNode;
+    status: HealthStatus;
+    details?: Array<{ label: string; value: string }>;
+}
 
 const HEALTH_COLOR: Record<HealthStatus, "success" | "warning" | "danger" | "default"> = {
     UP: "success",
@@ -22,13 +28,6 @@ const HEALTH_COLOR: Record<HealthStatus, "success" | "warning" | "danger" | "def
     DOWN: "danger",
     UNKNOWN: "default",
 };
-
-export interface HealthCardProps {
-    title: string;
-    icon?: ReactNode;
-    status: HealthStatus;
-    details?: Array<{ label: string; value: string }>;
-}
 
 export function HealthCard({ title, icon, status, details = [] }: HealthCardProps) {
     return (

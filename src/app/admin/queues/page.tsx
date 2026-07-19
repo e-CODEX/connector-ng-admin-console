@@ -66,7 +66,7 @@ export default function QueueAdminPage() {
 
 
     return (
-        <div className="">
+        <div>
             <PageHeader
                 icon="fluent-mdl2:processing"
                 title="JMS Queues Statuses"

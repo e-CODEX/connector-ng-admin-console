@@ -82,7 +82,7 @@ export default function AttachmentsAdminPage() {
     }, [loadAttachments]);
 
     return (
-        <>
+        <div>
             <PageHeader
                 icon="lsicon:attachments-filled"
                 title="Message attachments"
@@ -180,6 +180,6 @@ export default function AttachmentsAdminPage() {
                     <AttachmentDetailsView attachment={selectedAttachment} state={detailsModal}/>
                 </>
             )}
-        </>
+        </div>
     )
 }

@@ -19,13 +19,7 @@ interface MessageFiltersPanelProps {
     className?: string;
 }
 
-export function MessageFiltersPanel({
-                                   identifier,
-                                   backendName,
-                                   onIdentifierChange,
-                                   onBackendNameChange,
-                                   className,
-                               }: MessageFiltersPanelProps) {
+export function MessageFiltersPanel({ identifier, backendName, onIdentifierChange, onBackendNameChange, className }: MessageFiltersPanelProps) {
     return (
         <SearchCriteriaBox className={className}>
             <SearchField className="w-full sm:max-w-xs" value={identifier} onChange={onIdentifierChange}>

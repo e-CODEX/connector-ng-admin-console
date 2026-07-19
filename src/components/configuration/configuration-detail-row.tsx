@@ -10,7 +10,12 @@
 
 import { ReactNode } from "react";
 
-export function ConfigurationDetailRow({ label, children }: { label: string; children: ReactNode }) {
+interface ConfigurationDetailRowProps {
+    label: string;
+    children: ReactNode;
+}
+
+export function ConfigurationDetailRow({ label, children }: ConfigurationDetailRowProps) {
     return (
         <div className="grid grid-cols-[minmax(0,300px)_1fr] items-baseline gap-4 py-1.5">
             <dt className="text-sm text-neutral-500 dark:text-neutral-400">{label}</dt>

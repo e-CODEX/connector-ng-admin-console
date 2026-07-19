@@ -12,14 +12,12 @@ interface OutboundMessageConsolePanelProps {
     content?: string;
 }
 
-export function OutboundMessageConsolePanel({
-                                                content = "Ready.",
-                                            }: OutboundMessageConsolePanelProps) {
+export function OutboundMessageConsolePanel({ content = "Ready.", }: OutboundMessageConsolePanelProps) {
     return (
-        <>
+        <div>
             <pre className="h-56 overflow-y-auto bg-black px-4 py-4 font-mono text-xs text-green-400 font-semibold">
                     {content}
             </pre>
-        </>
+        </div>
     );
 }

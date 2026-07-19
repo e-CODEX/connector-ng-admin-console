@@ -10,11 +10,13 @@
 
 import React from "react";
 
-export function MessageReportingTh({ children, onClick, align = "left" }: {
+interface MessageReportingThProps {
     children: React.ReactNode;
     onClick: () => void;
     align?: "left" | "right"
-}) {
+}
+
+export function MessageReportingTh({ children, onClick, align = "left" }: MessageReportingThProps) {
     return (
         <th onClick={onClick}
             className={`px-4 py-2 font-medium cursor-pointer select-none hover:text-default-600 ${align === "right" ? "text-right" : "text-left"}`}>

@@ -22,11 +22,7 @@ interface PeriodFilterProps {
     className?: string;
 }
 
-export function PeriodFilterSelector({
-                                 value,
-                                 onChange,
-                                 className = "w-44",
-                             }: PeriodFilterProps) {
+export function PeriodFilterSelector({ value, onChange, className = "w-44", }: PeriodFilterProps) {
     return (
         <Select
             aria-label="Period"

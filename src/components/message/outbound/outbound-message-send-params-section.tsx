@@ -54,10 +54,7 @@ function ModeSelectField({ value, onChange }: ModeSelectFieldProps) {
     );
 }
 
-export function OutboundMessageSendParametersSection({
-                                                         data,
-                                                         onChange,
-                                                     }: OutboundMessageSendParametersSectionProps) {
+export function OutboundMessageSendParametersSection({ data, onChange, }: OutboundMessageSendParametersSectionProps) {
     const update = (patch: Partial<SendParameters>) => {
         onChange({
             ...data,

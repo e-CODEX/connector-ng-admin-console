@@ -13,19 +13,23 @@ import { Button } from "@heroui/react";
 import { EyeOff } from "lucide-react";
 import { Eye } from "@gravity-ui/icons";
 
-export function ConfigurationSecretValue({ value }: { value: string }) {
+interface ConfigurationSecretValueProps {
+    value: string;
+}
+
+export function ConfigurationSecretValue({ value }: ConfigurationSecretValueProps) {
     const [shown, setShown] = useState(false);
     return (
         <span className="inline-flex items-center gap-2">
-      <span className={shown ? undefined : "text-neutral-400"}>{shown ? value : "••••••••••"}</span>
-      <Button
-          size="sm"
-          variant="tertiary"
-          aria-label={shown ? "Hide value" : "Reveal value"}
-          onPress={() => setShown((s) => !s)}
-      >
-        {shown ? <EyeOff className="size-4"/> : <Eye className="size-4"/>}
-      </Button>
-    </span>
+            <span className={shown ? undefined : "text-neutral-400"}>{shown ? value : "••••••••••"}</span>
+            <Button
+                size="sm"
+                variant="tertiary"
+                aria-label={shown ? "Hide value" : "Reveal value"}
+                onPress={() => setShown((s) => !s)}
+            >
+                {shown ? <EyeOff className="size-4"/> : <Eye className="size-4"/>}
+            </Button>
+        </span>
     );
 }

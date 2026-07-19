@@ -45,7 +45,7 @@ export function ConfigurationBusinessDomainsSection() {
     }
 
     return (
-        <>
+        <div>
             {
                 loading ? (
                     <div className="flex justify-center items-center min-h-400]">
@@ -84,6 +84,6 @@ export function ConfigurationBusinessDomainsSection() {
                     </div>
                 )
             }
-        </>
+        </div>
     );
 }

@@ -23,7 +23,7 @@ import { ConfigurationBusinessDocumentSection } from "@/components/configuration
 
 export default function ConfigurationsAdminPage() {
     return (
-        <>
+        <div>
             <PageHeader
                 icon="icon-park-outline:config"
                 title="Configurations"
@@ -93,6 +93,6 @@ export default function ConfigurationsAdminPage() {
                     </Tabs.Panel>
                 </Tabs>
             </div>
-        </>
+        </div>
     )
 }

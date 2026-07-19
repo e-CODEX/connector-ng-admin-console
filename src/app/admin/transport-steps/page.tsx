@@ -99,7 +99,7 @@ export default function TransportStepsAdminPage() {
     }, [loadTransportSteps]);
 
     return (
-        <>
+        <div>
             <PageHeader
                 icon="streamline-pixel:transportation-truck"
                 title="Message Transport Steps"
@@ -220,6 +220,6 @@ export default function TransportStepsAdminPage() {
                                               state={detailsModal}/>
                 </>
             )}
-        </>
+        </div>
     )
 }

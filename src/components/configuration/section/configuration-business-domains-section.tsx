@@ -55,7 +55,7 @@ export function ConfigurationBusinessDomainsSection() {
                         <ConfigurationBlock title="Business domains" note="Configured default business domains">
                             <Table aria-label="Configured busniess domains">
                                 <Table.ScrollContainer>
-                                    <Table.Content>
+                                    <Table.Content aria-label="Configured busniess domains">
                                         <Table.Header>
                                             <Table.Column isRowHeader>Identifier</Table.Column>
                                             <Table.Column>Description</Table.Column>

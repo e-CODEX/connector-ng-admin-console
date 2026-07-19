@@ -15,7 +15,7 @@ import { exportMessageReports, getMessageReports, MessageReportExportFormat } fr
 import { getLocalTimeZone, now, ZonedDateTime } from "@internationalized/date";
 import { saveFile, toastError } from "@/utils";
 import { ArrowUpFromSquare, Magnifier, SquareBars } from "@gravity-ui/icons";
-import { ConnectorMessageReport } from "@/types/response/reporting";
+import { ConnectorMessageReportResponse } from "@/types/response/reporting";
 import { DateTimeRangeGranularity, DateTimeRangeSelector } from "@/components/form/date-time-range-selector";
 import { EmptyState } from "@/components/common/empty-state";
 import { SearchCriteriaBox } from "@/components/form/search-criteria-box";
@@ -36,7 +36,7 @@ const defaultRange: RangeValue<ZonedDateTime> = {
 export function MessageReportingView({ state }: MessageReportingViewProps) {
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
-    const [messageReports, setMessageReports] = useState<ConnectorMessageReport | undefined>(undefined);
+    const [messageReports, setMessageReports] = useState<ConnectorMessageReportResponse | undefined>(undefined);
     const [range, setRange] = useState<RangeValue<ZonedDateTime> | null>(defaultRange);
     const [hasLoaded, setHasLoaded] = useState(false);
     const requestId = useRef(0);

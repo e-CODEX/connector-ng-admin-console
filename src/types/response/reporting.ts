@@ -8,7 +8,7 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-export interface ConnectorMessageReport {
+export interface ConnectorMessageReportResponse {
     services: string[];
     parties: string[];
     months: ReportMonthKey[];

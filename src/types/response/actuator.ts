@@ -8,13 +8,9 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-export type HealthStatus =
-    | "UP"
-    | "DOWN"
-    | "DEGRADED"
-    | "UNKNOWN";
+import { HealthStatus } from "@/types/global";
 
-export interface HealthResponse {
+export interface ActuatorHealthResponse {
     status: HealthStatus;
     groups: string[];
     components: Record<string, HealthComponent>;

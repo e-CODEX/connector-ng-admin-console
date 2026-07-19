@@ -9,11 +9,11 @@
  */
 
 import { restApiCall } from "@/lib/rest";
-import { AppInfoResponse, HealthResponse } from "@/types/response/actuator";
+import { AppInfoResponse, ActuatorHealthResponse } from "@/types/response/actuator";
 
 export async function getHealthInfo():
-    Promise<HealthResponse> {
-    return restApiCall<HealthResponse>("actuator/health");
+    Promise<ActuatorHealthResponse> {
+    return restApiCall<ActuatorHealthResponse>("actuator/health");
 }
 
 export async function getAppInfo():

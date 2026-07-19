@@ -23,10 +23,6 @@ export interface SendParameters {
   repeatCount: number;
 }
 
-export interface UploadedAttachment {
-  id: string;
-}
-
 export interface SendMessageResponse {
   identifier?: string;
   status?: string;

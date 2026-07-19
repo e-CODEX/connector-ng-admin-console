@@ -8,7 +8,7 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-export interface ConnectorQueueStats {
+export interface ConnectorQueueStatsResponse {
     queueName: string;
     queueDescription: string;
     pendingCount: number;

@@ -8,24 +8,22 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-type MessageType = "BUSINESS" | "EVIDENCE";
+import { TransportStepMessageType, TransportStepStatus } from "@/types/global";
 
-type Status = "DELIVERED" | "FAILED" | "SUBMITTED" | "DOWNLOADED" | "READY_FOR_DOWNLOAD";
-
-export interface ConnectorTransportStep {
+export interface ConnectorTransportStepResponse {
     identifier: string;
     remoteSystemIdentifier: string;
     transportedMessageIdentifier: string;
     numberOfAttempts: number;
     linkPartnerName: string;
-    status: Status;
+    status: TransportStepStatus;
     statuses: Statuses[];
-    messageType: MessageType;
+    messageType: TransportStepMessageType;
     createdAt: string;
     updatedAt: string;
 }
 
 interface Statuses {
-    status: Status
+    status: TransportStepStatus
     createdAt: string;
 }

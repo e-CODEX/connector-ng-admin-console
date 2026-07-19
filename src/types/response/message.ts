@@ -8,10 +8,10 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { ConnectorAttachment } from "@/types/response/attachments";
-import { ConnectorAction, ConnectorParty, ConnectorService } from "@/types/response/processing-mode";
+import { ConnectorAttachmentResponse } from "@/types/response/attachments";
+import { ConnectorProcessingModeAction, ConnectorProcessingModeParty, ConnectorProcessingModeService } from "@/types/response/processing-mode";
+import { MessageDirection } from "@/types/global";
 
-export type MessageDirection = "BACKEND_TO_GATEWAY" | "GATEWAY_TO_BACKEND";
 
 export interface ConnectorMessage {
     businessDomainIdentifier: string;
@@ -31,9 +31,9 @@ export interface ConnectorMessage {
     deliveredToBackendAt: string;
 }
 
-export interface ConnectorMessageDetails extends ConnectorMessage {
+export interface ConnectorMessageDetailsResponse extends ConnectorMessage {
     businessContent: ConnectorMessageBusinessContent;
-    attachments: ConnectorAttachment[];
+    attachments: ConnectorAttachmentResponse[];
     evidences: ConnectorMessageEvidence[];
     errors: ConnectorMessageError[];
 }
@@ -49,10 +49,10 @@ interface ConnectorAS4Properties {
     conversationIdentifier: string;
     originalSender: string;
     finalRecipient: string;
-    fromParty: ConnectorParty;
-    toParty: ConnectorParty;
-    service: ConnectorService;
-    action: ConnectorAction;
+    fromParty: ConnectorProcessingModeParty;
+    toParty: ConnectorProcessingModeParty;
+    service: ConnectorProcessingModeService;
+    action: ConnectorProcessingModeAction;
 }
 
 export interface ConnectorMessageEvidence {

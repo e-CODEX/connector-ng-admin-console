@@ -9,8 +9,8 @@
  */
 
 import { restApiCall } from "@/lib/rest";
-import { ConnectorQueueStats } from "@/types/response/queue";
+import { ConnectorQueueStatsResponse } from "@/types/response/queue";
 
-export async function loadQueueStats(): Promise<ConnectorQueueStats[]> {
-    return restApiCall<ConnectorQueueStats[]>("api/v1/admin/jms/queues/stats");
+export async function loadQueueStats(): Promise<ConnectorQueueStatsResponse[]> {
+    return restApiCall<ConnectorQueueStatsResponse[]>("api/v1/admin/jms/queues/stats");
 }

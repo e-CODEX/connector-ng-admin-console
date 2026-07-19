@@ -8,7 +8,7 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-export interface ConnectorMessageStats {
+export interface ConnectorMessageStatsResponse {
     all: ConnectorMessageStatsItem;
     outbound: ConnectorMessageStatsItem;
     inbound: ConnectorMessageStatsItem;

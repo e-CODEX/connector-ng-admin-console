@@ -9,15 +9,15 @@
  */
 
 import { PaginatedResponse } from "@/types/response/paginated-response";
-import { ConnectorAttachment } from "@/types/response/attachments";
+import { ConnectorAttachmentResponse } from "@/types/response/attachments";
 import { restApiCall } from "@/lib/rest";
 
 export async function listAttachments(params?: {
     page?: number,
     size?: number
 }):
-    Promise<PaginatedResponse<ConnectorAttachment>> {
-    return restApiCall<PaginatedResponse<ConnectorAttachment>>("api/v1/admin/attachments", {
+    Promise<PaginatedResponse<ConnectorAttachmentResponse>> {
+    return restApiCall<PaginatedResponse<ConnectorAttachmentResponse>>("api/v1/admin/attachments", {
         params
     });
 }

@@ -12,7 +12,7 @@
 
 import { PageHeader } from "@/components/common/page-header";
 import { useEffect, useState } from "react";
-import { ConnectorBusinessDomain } from "@/types/response/business-domain";
+import { ConnectorBusinessDomainResponse } from "@/types/response/business-domain";
 import { Chip, Spinner, Table, useOverlayState } from "@heroui/react";
 import { createBusinessDomain, listBusinessDomains } from "@/services/business-domain";
 import { formatDate, toastError, toastSuccess, truncate } from "@/utils";
@@ -23,7 +23,7 @@ import { PageHeaderButton } from "@/components/common/page-header-button";
 export default function BusinessDomainsAdminPage() {
     const [loading, setLoading] = useState(true)
     const [refreshing, setRefreshing] = useState(false)
-    const [businessDomains, setBusinessDomain] = useState<ConnectorBusinessDomain[]>([])
+    const [businessDomains, setBusinessDomain] = useState<ConnectorBusinessDomainResponse[]>([])
 
     const addModal = useOverlayState();
 

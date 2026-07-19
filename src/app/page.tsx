@@ -20,6 +20,7 @@ import { DEFAULT_PERIOD, Period } from "@/types/period";
 import { MessageReportingSection } from "@/components/dashboard/message/reporting/message-reporting-section";
 import { DashboardSectionBox } from "@/components/dashboard/dashboard-section-box";
 import { BackendHealthSection } from "@/components/dashboard/health/backend-health-section";
+import { Gauge } from "lucide-react";
 
 const REFRESH_INTERVAL = 60_000;
 
@@ -34,7 +35,7 @@ export default function DashboardPage() {
     return (
         <div className="flex flex-col gap-3">
             <PageHeader
-                icon="clarity:dashboard-line"
+                icon={Gauge}
                 title="Dashboard"
                 subtitle="App status, KPIs and Reporting"
             >

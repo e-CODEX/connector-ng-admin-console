@@ -11,7 +11,7 @@
 "use client"
 
 import { PageHeader } from "@/components/common/page-header";
-import { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { Button, Spinner, Table, Tooltip, useOverlayState } from "@heroui/react";
 import { listTransportSteps } from "@/services/transport-step";
@@ -25,6 +25,8 @@ import { PageHeaderButton } from "@/components/common/page-header-button";
 import { TransportStepMessageTypeChip } from "@/components/message/chip/message-type-chip";
 import { TransportDeliveryStatusChip } from "@/components/transport-step/transport-step-status-chip";
 import { Route } from "lucide-react";
+import { EmptyState } from "@/components/common/empty-state";
+import { SpinnerView } from "@/components/common/spinner-view";
 
 export default function TransportStepsAdminPage() {
     const [loading, setLoading] = useState(true)
@@ -124,9 +126,7 @@ export default function TransportStepsAdminPage() {
             />
 
             {loading ? (
-                <div className="flex justify-center items-center min-h-400]">
-                    <Spinner size="lg"/>
-                </div>
+                <SpinnerView className="mt-60"/>
             ) : (
                 <>
                     <Table variant="secondary">
@@ -194,6 +194,10 @@ export default function TransportStepsAdminPage() {
                             </Table.Content>
                         </Table.ScrollContainer>
                     </Table>
+
+                    {!loading && !refreshing && transportSteps && transportSteps.length === 0 && (
+                        <EmptyState text="No transport step available" className="mt-70"/>
+                    )}
 
                     {
                         totalElements > 0 && (

@@ -11,8 +11,8 @@
 "use client";
 
 import { PageHeader } from "@/components/common/page-header";
-import { useEffect, useRef, useState } from "react";
-import { Button, Spinner, Table, Tooltip, useOverlayState } from "@heroui/react";
+import React, { useEffect, useRef, useState } from "react";
+import { Button, Table, Tooltip, useOverlayState } from "@heroui/react";
 import { ConnectorProcessingModeResponse } from "@/types/response/processing-mode";
 import { createProcessingMode, listProcessingModes } from "@/services/processing-mode";
 import { formatDate, toastError, toastSuccess, truncate } from "@/utils";
@@ -21,6 +21,8 @@ import { ArrowsRotateRight, Eye, Plus } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/page-header-button";
 import { ProcessingModeCreationView } from "@/components/processing-mode/processing-mode-creation-view";
 import { Workflow } from "lucide-react";
+import { EmptyState } from "@/components/common/empty-state";
+import { SpinnerView } from "@/components/common/spinner-view";
 
 export default function ProcessingModesAdminPage() {
     const [loading, setLoading] = useState(true)
@@ -102,9 +104,7 @@ export default function ProcessingModesAdminPage() {
             </PageHeader>
 
             {loading ? (
-                <div className="flex justify-center items-center min-h-400]">
-                    <Spinner size="lg"/>
-                </div>
+                <SpinnerView className="mt-80"/>
             ) : (
                 <>
                     <Table variant="secondary">
@@ -155,6 +155,10 @@ export default function ProcessingModesAdminPage() {
                             </Table.Content>
                         </Table.ScrollContainer>
                     </Table>
+
+                    {!loading && !refreshing && processingModes && processingModes.length === 0 && (
+                        <EmptyState text="No processing mode available" className="mt-70"/>
+                    )}
 
                     <ProcessingModeCreationView
                         state={addModal}

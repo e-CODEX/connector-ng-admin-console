@@ -11,9 +11,9 @@
 "use client"
 
 import { PageHeader } from "@/components/common/page-header";
-import { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ConnectorAttachmentResponse } from "@/types/response/attachments";
-import { Button, Spinner, Table, Tooltip, useOverlayState } from "@heroui/react";
+import { Button, Table, Tooltip, useOverlayState } from "@heroui/react";
 import { listAttachments } from "@/services/attachment";
 import { formatBytes, formatDate, toastError, truncate } from "@/utils";
 import { PaginationControls } from "@/components/paging/pagination-controls";
@@ -22,6 +22,8 @@ import { ArrowsRotateRight, Eye } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/page-header-button";
 import { AttachmentStorageChip } from "@/components/attachment/attachment-storage-chip";
 import { Paperclip } from "lucide-react";
+import { EmptyState } from "@/components/common/empty-state";
+import { SpinnerView } from "@/components/common/spinner-view";
 
 export default function AttachmentsAdminPage() {
     const [loading, setLoading] = useState(true);
@@ -100,9 +102,7 @@ export default function AttachmentsAdminPage() {
             </PageHeader>
 
             {loading ? (
-                <div className="flex justify-center items-center min-h-400]">
-                    <Spinner size="lg"/>
-                </div>
+                <SpinnerView className="mt-60"/>
             ) : (
                 <>
                     <Table variant="secondary">
@@ -161,6 +161,10 @@ export default function AttachmentsAdminPage() {
                             </Table.Content>
                         </Table.ScrollContainer>
                     </Table>
+
+                    {!loading && !refreshing && attachments && attachments.length === 0 && (
+                        <EmptyState text="No attachment available" className="mt-70"/>
+                    )}
 
                     {
                         totalElements > 0 && (

@@ -10,7 +10,7 @@
 
 "use client";
 
-import { Button, Modal, Spinner, Table, Tooltip, useOverlayState } from "@heroui/react";
+import { Button, Modal, Table, Tooltip, useOverlayState } from "@heroui/react";
 import { ConnectorMessage, ConnectorMessageDetailsResponse, ConnectorMessageEvidence } from "@/types/response/message";
 import { formatBytes, formatDate, saveFile, toastError, truncate } from "@/utils";
 import React, { useEffect, useState } from "react";
@@ -23,6 +23,7 @@ import { ArrowDownToLine } from "lucide-react";
 import { downloadEvidence } from "@/services/evidence";
 import { MessageDirectionChip } from "@/components/message/chip/message-direction-chip";
 import { MessageDeliveryStatusChip } from "@/components/message/chip/message-delivery-status-chip";
+import { SpinnerView } from "@/components/common/spinner-view";
 
 interface MessageDetailsViewProps {
     message: ConnectorMessage | null;
@@ -140,9 +141,7 @@ export function MessageDetailsView({ message, state }: MessageDetailsViewProps) 
                                     </div>
 
                                     {loading ? (
-                                        <div className="flex justify-center py-6">
-                                            <Spinner size="sm"/>
-                                        </div>
+                                        <SpinnerView className="mt-60"/>
                                     ) : (
                                         <>
                                             {details && !loading && (

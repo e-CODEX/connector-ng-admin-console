@@ -10,10 +10,10 @@
 
 "use client"
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ConnectorMessage } from "@/types/response/message";
 import { listMessages } from "@/services/message";
-import { Button, Spinner, Table, Tooltip, useOverlayState } from "@heroui/react";
+import { Button, Table, Tooltip, useOverlayState } from "@heroui/react";
 import { formatDate, toastError, truncate } from "@/utils";
 import { PaginationControls } from "@/components/paging/pagination-controls";
 import { MessageTransportStepsDetailView } from "@/components/message/detail/message-transport-steps-detail-view";
@@ -27,6 +27,8 @@ import { MessageReportingView } from "@/components/message/report/message-report
 import { MessageDirectionChip } from "@/components/message/chip/message-direction-chip";
 import { MessageDeliveryStatusChip } from "@/components/message/chip/message-delivery-status-chip";
 import { Mail, Route } from "lucide-react";
+import { EmptyState } from "@/components/common/empty-state";
+import { SpinnerView } from "@/components/common/spinner-view";
 
 const IDENTIFIER_LENGTH = 15;
 
@@ -145,10 +147,9 @@ export default function MessagesAdminPage() {
                 onIdentifierChange={onIdentifierChange}
                 onBackendNameChange={onBackendNameChange}
             />
+
             {loading ? (
-                <div className="flex justify-center items-center min-h-400]">
-                    <Spinner size="lg"/>
-                </div>
+                <SpinnerView className="mt-60"/>
             ) : (
                 <>
                     <Table variant="secondary">
@@ -244,6 +245,10 @@ export default function MessagesAdminPage() {
                             </Table.Content>
                         </Table.ScrollContainer>
                     </Table>
+
+                    {!loading && !refreshing && messages && messages.length === 0 && (
+                        <EmptyState text="No message available" className="mt-50"/>
+                    )}
 
                     {
                         totalElements > 0 && (

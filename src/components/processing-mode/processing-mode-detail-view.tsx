@@ -10,7 +10,7 @@
 
 "use client";
 
-import { Button, Modal, Spinner, Table, useOverlayState } from "@heroui/react";
+import { Modal, Table, useOverlayState } from "@heroui/react";
 import { formatDate, toastError } from "@/utils";
 import React, { useEffect, useState } from "react";
 import { Eye } from "@gravity-ui/icons";
@@ -19,6 +19,7 @@ import { DetailRow } from "@/components/common/detail-row";
 import { getProcessingMode } from "@/services/processing-mode";
 import { DetailSection } from "@/components/common/detail-section";
 import { BooleanChip } from "@/components/common/boolean-chip";
+import { SpinnerView } from "@/components/common/spinner-view";
 
 interface ProcessingModeDetailsViewProps {
     processingMode: ConnectorProcessingModeResponse | null;
@@ -92,9 +93,7 @@ export function ProcessingModeDetailsView({ processingMode, state }: ProcessingM
                                         <DetailRow label="Updated at" value={formatDate(processingMode.updatedAt)}/>
                                     </div>
                                     {loading ? (
-                                        <div className="flex justify-center py-6">
-                                            <Spinner size="sm"/>
-                                        </div>
+                                        <SpinnerView className="mt-60"/>
                                     ) : (
                                         <>
                                             {details && !loading && (

@@ -10,16 +10,17 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { LinkPartnerConfiguration } from "@/types/response/configuration";
 import { getLinkPartnerConfiguration } from "@/services/configuration";
 import { toastError } from "@/utils";
-import { Spinner, Table } from "@heroui/react";
+import { Table } from "@heroui/react";
 import { ConfigurationBlock } from "@/components/configuration/configuration-block";
 import { ConfigurationDetailRow } from "@/components/configuration/configuration-detail-row";
 import { ConfigurationKeystoreView } from "@/components/configuration/view/configuration-keystore-view";
 import { ConfigurationPrivateKeyView } from "@/components/configuration/view/configuration-private-key-view";
 import { BooleanChip } from "@/components/common/boolean-chip";
+import { SpinnerView } from "@/components/common/spinner-view";
 
 export function ConfigurationLinkPartnerSection() {
     const [loading, setLoading] = useState(true);
@@ -51,9 +52,7 @@ export function ConfigurationLinkPartnerSection() {
         <div>
             {
                 loading ? (
-                    <div className="flex justify-center items-center min-h-400]">
-                        <Spinner size="lg"/>
-                    </div>
+                    <SpinnerView className="mt-60"/>
                 ) : (
                     <div className="flex flex-col gap-4">
                         <ConfigurationBlock title="Backend Link Partners" note="">

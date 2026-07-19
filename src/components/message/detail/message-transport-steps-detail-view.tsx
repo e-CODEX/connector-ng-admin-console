@@ -10,7 +10,7 @@
 
 "use client";
 
-import { Modal, Spinner, useOverlayState } from "@heroui/react";
+import { Modal, useOverlayState } from "@heroui/react";
 import { ConnectorMessage } from "@/types/response/message";
 import { Eye } from "@gravity-ui/icons";
 import React, { useEffect, useState } from "react";
@@ -18,6 +18,7 @@ import { ConnectorTransportStepResponse } from "@/types/response/transport-step"
 import { getMessageTransportStep } from "@/services/message";
 import { TransportStepDetails } from "@/components/transport-step/transport-step-details";
 import { toastError } from "@/utils";
+import { SpinnerView } from "@/components/common/spinner-view";
 
 interface MessageTransportStepsDetailViewProps {
     message: ConnectorMessage | null;
@@ -71,9 +72,7 @@ export function MessageTransportStepsDetailView({ message, state }: MessageTrans
                         </Modal.Header>
                         <Modal.Body>
                             {loading ? (
-                                <div className="flex justify-center py-6">
-                                    <Spinner size="sm"/>
-                                </div>
+                                <SpinnerView className="mt-60"/>
                             ) : (
                                 <>
                                     {transportStep && <TransportStepDetails transportStep={transportStep}/>}

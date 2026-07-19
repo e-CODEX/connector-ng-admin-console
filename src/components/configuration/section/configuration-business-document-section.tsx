@@ -10,14 +10,14 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BusinessDocumentConfiguration } from "@/types/response/configuration";
 import { getBusinessDocumentConfiguration } from "@/services/configuration";
 import { toastError } from "@/utils";
-import { Spinner } from "@heroui/react";
 import { ConfigurationBlock } from "@/components/configuration/configuration-block";
 import { ConfigurationDetailRow } from "@/components/configuration/configuration-detail-row";
 import { ConfigurationSignatureView } from "@/components/configuration/view/configuration-signature-view";
+import { SpinnerView } from "@/components/common/spinner-view";
 
 export function ConfigurationBusinessDocumentSection() {
     const [loading, setLoading] = useState(true);
@@ -49,9 +49,7 @@ export function ConfigurationBusinessDocumentSection() {
         <div>
             {
                 loading ? (
-                    <div className="flex justify-center items-center min-h-400]">
-                        <Spinner size="lg"/>
-                    </div>
+                    <SpinnerView className="mt-60"/>
                 ) : (
                     <div className="flex flex-col gap-4">
                         <ConfigurationBlock title="Business document" note="Configured business document">

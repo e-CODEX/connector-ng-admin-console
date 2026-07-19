@@ -8,7 +8,7 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { Button, Description, Dropdown, Kbd, Key, Label, Modal, Spinner, Table, useOverlayState } from "@heroui/react";
+import { Button, Description, Dropdown, Kbd, Key, Label, Modal, Table, useOverlayState } from "@heroui/react";
 import { type RangeValue } from "react-aria-components";
 import React, { Fragment, useEffect, useRef, useState } from "react";
 import { exportMessageReports, getMessageReports, MessageReportExportFormat } from "@/services/message";
@@ -19,6 +19,7 @@ import { ConnectorMessageReportResponse } from "@/types/response/reporting";
 import { DateTimeRangeGranularity, DateTimeRangeSelector } from "@/components/form/date-time-range-selector";
 import { EmptyState } from "@/components/common/empty-state";
 import { SearchCriteriaBox } from "@/components/form/search-criteria-box";
+import { SpinnerView } from "@/components/common/spinner-view";
 
 interface MessageReportingViewProps {
     state: ReturnType<typeof useOverlayState>;
@@ -181,9 +182,7 @@ export function MessageReportingView({ state }: MessageReportingViewProps) {
                             </SearchCriteriaBox>
 
                             {loading && !messageReports && (
-                                <div className="flex justify-center items-center min-h-400]">
-                                    <Spinner size="lg"/>
-                                </div>
+                                <SpinnerView className="mt-60"/>
                             )}
 
                             {hasLoaded && !loading && !refreshing && messageReports && messageReports.years.length === 0 && (

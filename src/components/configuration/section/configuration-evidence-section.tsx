@@ -14,10 +14,11 @@ import { ConfigurationDetailRow } from "@/components/configuration/configuration
 import { ConfigurationSignatureView } from "@/components/configuration/view/configuration-signature-view";
 import { ConfigurationBlock } from "@/components/configuration/configuration-block";
 import { EvidenceConfiguration } from "@/types/response/configuration";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toastError } from "@/utils";
 import { getEvidenceConfiguration } from "@/services/configuration";
 import { Spinner } from "@heroui/react";
+import { SpinnerView } from "@/components/common/spinner-view";
 
 export function ConfigurationEvidenceSection() {
     const [loading, setLoading] = useState(true);
@@ -52,9 +53,7 @@ export function ConfigurationEvidenceSection() {
         <div>
             {
                 loading ? (
-                    <div className="flex justify-center items-center min-h-400]">
-                        <Spinner size="lg"/>
-                    </div>
+                    <SpinnerView className="mt-60"/>
                 ) : (
                     <div className="flex flex-col gap-4">
                         <ConfigurationBlock title="Signature" note="reused view">

@@ -11,7 +11,7 @@
 "use client";
 
 import { PageHeader } from "@/components/common/page-header";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ConnectorBusinessDomainResponse } from "@/types/response/business-domain";
 import { Spinner, Table, useOverlayState } from "@heroui/react";
 import { createBusinessDomain, listBusinessDomains } from "@/services/business-domain";
@@ -21,6 +21,8 @@ import { BusinessDomainCreationView } from "@/components/business-domain/busines
 import { PageHeaderButton } from "@/components/common/page-header-button";
 import { BooleanChip } from "@/components/common/boolean-chip";
 import { Building2 } from "lucide-react";
+import { EmptyState } from "@/components/common/empty-state";
+import { SpinnerView } from "@/components/common/spinner-view";
 
 export default function BusinessDomainsAdminPage() {
     const [loading, setLoading] = useState(true)
@@ -39,22 +41,6 @@ export default function BusinessDomainsAdminPage() {
             await loadBusinessDomains();
         } finally {
             setRefreshing(false);
-        }
-    }
-
-    const getStatusLabel = (enabled: boolean): string => {
-        if (enabled) {
-            return "Enabled"
-        } else {
-            return "Disabled"
-        }
-    }
-
-    const getStatusColor = (enabled: boolean): "success" | "danger" => {
-        if (enabled) {
-            return "success"
-        } else {
-            return "danger"
         }
     }
 
@@ -100,9 +86,7 @@ export default function BusinessDomainsAdminPage() {
             </PageHeader>
 
             {loading ? (
-                <div className="flex justify-center items-center min-h-400]">
-                    <Spinner size="lg"/>
-                </div>
+                <SpinnerView className="mt-80"/>
             ) : (
                 <>
                     <Table variant="secondary">
@@ -138,6 +122,10 @@ export default function BusinessDomainsAdminPage() {
                             </Table.Content>
                         </Table.ScrollContainer>
                     </Table>
+
+                    {!loading && !refreshing && businessDomains && businessDomains.length === 0 && (
+                        <EmptyState text="No business domain available" className="mt-70"/>
+                    )}
 
                     <BusinessDomainCreationView
                         state={addModal}

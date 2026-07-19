@@ -10,7 +10,7 @@
 
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ConnectorQueueStatsResponse } from "@/types/response/queue";
 import { toastError } from "@/utils";
 import { loadQueueStats } from "@/services/queue";
@@ -20,6 +20,8 @@ import { PageHeader } from "@/components/common/page-header";
 import { Spinner } from "@heroui/react";
 import { QueueCard } from "@/components/queue/QueueCard";
 import { Layers } from "lucide-react";
+import { EmptyState } from "@/components/common/empty-state";
+import { SpinnerView } from "@/components/common/spinner-view";
 
 export default function QueueAdminPage() {
     const [loading, setLoading] = useState(true)
@@ -85,9 +87,7 @@ export default function QueueAdminPage() {
             </PageHeader>
 
             {loading ? (
-                <div className="flex justify-center items-center min-h-400]">
-                    <Spinner size="lg"/>
-                </div>
+                <SpinnerView className="mt-80"/>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-4 gap-x-5 gap-y-2">
                     {queues.map((queueStats) => (
@@ -99,6 +99,10 @@ export default function QueueAdminPage() {
                         />
                     ))}
                 </div>
+            )}
+
+            {!loading && !refreshing && queues && queues.length === 0 && (
+                <EmptyState text="No queue stats available" className="mt-70"/>
             )}
         </div>
     )

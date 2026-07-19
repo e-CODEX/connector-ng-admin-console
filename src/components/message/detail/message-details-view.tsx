@@ -21,7 +21,7 @@ import { DetailSection } from "@/components/common/detail-section";
 import { ConnectorProcessingModeParty } from "@/types/response/processing-mode";
 import { ArrowDownToLine } from "lucide-react";
 import { downloadEvidence } from "@/services/evidence";
-import { MessageDirectionChip } from "@/components/message/message-direction";
+import { MessageDirectionChip } from "@/components/message/message-direction-chip";
 
 interface MessageDetailsViewProps {
     message: ConnectorMessage | null;

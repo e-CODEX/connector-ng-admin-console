@@ -23,6 +23,7 @@ import { ConnectorTransportStepResponse } from "@/types/response/transport-step"
 import { TransportStepDetailsView } from "@/components/transport-step/transport-step-details-view";
 import { ArrowsRotateRight } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/page-header-button";
+import { TransportStepMessageTypeChip } from "@/components/message/message-type-chip";
 
 export default function TransportStepsAdminPage() {
     const [loading, setLoading] = useState(true)
@@ -159,10 +160,13 @@ export default function TransportStepsAdminPage() {
                                             <Table.Cell>{truncate(transportStep.transportedMessageIdentifier)}</Table.Cell>
                                             <Table.Cell>{transportStep.linkPartnerName}</Table.Cell>
                                             <Table.Cell>{truncate(transportStep.remoteSystemIdentifier)}</Table.Cell>
-                                            <Table.Cell>{transportStep.messageType}</Table.Cell>
+                                            <Table.Cell>{
+                                                <TransportStepMessageTypeChip messageType={transportStep.messageType}/>
+                                            }</Table.Cell>
                                             <Table.Cell>{transportStep.numberOfAttempts}</Table.Cell>
                                             <Table.Cell>
                                                 <Chip
+                                                    className="px-2"
                                                     color={getTransportDeliveryColor(transportStep.status)}
                                                     size="sm"
                                                     variant="soft"

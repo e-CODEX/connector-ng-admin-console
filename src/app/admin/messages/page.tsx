@@ -25,7 +25,7 @@ import { MessageDetailsView } from "@/components/message/detail/message-details-
 import { ArrowsRotateRight, SquareBars } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/page-header-button";
 import { MessageReportingView } from "@/components/message/report/message-reporting-view";
-import { MessageDirectionChip } from "@/components/message/message-direction";
+import { MessageDirectionChip } from "@/components/message/message-direction-chip";
 
 const IDENTIFIER_LENGTH = 15;
 

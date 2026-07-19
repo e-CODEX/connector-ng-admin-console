@@ -13,6 +13,7 @@ import { DetailRow } from "@/components/common/detail-row";
 import { formatDate, getTransportDeliveryColor, getTransportDeliveryLabel } from "@/utils";
 import { Chip, Table } from "@heroui/react";
 import { DetailSection } from "@/components/common/detail-section";
+import { TransportStepMessageTypeChip } from "@/components/message/message-type-chip";
 
 interface TransportStepDetailsProps {
     transportStep: ConnectorTransportStepResponse;
@@ -26,7 +27,9 @@ export function TransportStepDetails({ transportStep }: TransportStepDetailsProp
                 <DetailRow label="Transported Message ID" value={transportStep.transportedMessageIdentifier}/>
                 <DetailRow label="Link Partner Name" value={transportStep.linkPartnerName}/>
                 <DetailRow label="Remote System Identifier" value={transportStep.remoteSystemIdentifier}/>
-                <DetailRow label="Message Type" value={transportStep.messageType}/>
+                <DetailRow label="Message Type" value={
+                    <TransportStepMessageTypeChip messageType={transportStep.messageType}/>
+                }/>
                 <DetailRow label="Attempts" value={transportStep.numberOfAttempts}/>
                 <DetailRow
                     label="Status"

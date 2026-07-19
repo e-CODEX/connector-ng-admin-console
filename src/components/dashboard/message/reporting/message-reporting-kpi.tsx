@@ -8,6 +8,8 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
+import { Card } from "@heroui/react";
+
 interface MessageReportingKpiProps {
     label: string;
     value: number;
@@ -17,13 +19,17 @@ interface MessageReportingKpiProps {
 
 export function MessageReportingKpi({ label, value, dot, sub }: MessageReportingKpiProps) {
     return (
-        <div className="bg-content1 rounded-xl border border-default-200 p-4">
-            <div className="flex items-center gap-1.5 text-xs text-default-500 mb-1">
-                {dot && <span className="w-2 h-2 rounded-full" style={{ background: dot }}/>}
-                {label}
-            </div>
-            <div className="text-2xl font-semibold text-foreground tabular-nums">{value.toLocaleString()}</div>
-            {sub && <div className="text-[11px] text-default-400 mt-0.5">{sub}</div>}
-        </div>
+        <Card variant="default" className="gap-0 p-4">
+            <Card.Header className="p-0">
+                <Card.Description className="flex items-center gap-1.5 text-md font-semibold">
+                    {dot && <span className="size-2 rounded-full" style={{ background: dot }}/>}
+                    {label}
+                </Card.Description>
+            </Card.Header>
+            <Card.Content className="p-0">
+                <div className="text-xl font-semibold tabular-nums">{value.toLocaleString()}</div>
+                {sub && <div className="text-[11px] text-muted mt-0.5">{sub}</div>}
+            </Card.Content>
+        </Card>
     );
 }

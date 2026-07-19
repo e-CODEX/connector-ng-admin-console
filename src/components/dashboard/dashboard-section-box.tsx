@@ -29,7 +29,7 @@ export function DashboardSectionBox({ title, subtitle, icon, children }: Dashboa
                     </span>
                 )}
                 <div className="flex flex-col">
-                    <Typography.Heading level={4} weight="semibold" className="text-slate-700">
+                    <Typography.Heading level={4} weight="semibold">
                         {title}
                     </Typography.Heading>
                     {subtitle && (

@@ -13,6 +13,7 @@ import { useEffect, useMemo, useState } from "react";
 import { MessageReportingKpi } from "@/components/dashboard/message/reporting/message-reporting-kpi";
 import { MessageReportingTh } from "@/components/dashboard/message/reporting/message-reporting-th";
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Card } from "@heroui/react";
 
 const IN = "#2563eb";   // inbound
 const OUT = "#f59e0b";  // outbound
@@ -34,6 +35,13 @@ const MONTH_ABBR = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep
 const monthName = (m: number) => MONTH_ABBR[m - 1] ?? String(m);
 const keyOf = (year: number, month: number) => `${year}-${String(month).padStart(2, "0")}`;
 
+const TOOLTIP_STYLE = {
+    borderRadius: 8,
+    border: "1px solid var(--heroui-border, #e2e8f0)",
+    background: "var(--heroui-surface, #ffffff)",
+    color: "var(--heroui-foreground, #1e293b)",
+    fontSize: 13,
+};
 
 function normalize(payload: ConnectorMessageReportResponse) {
     const flat: FlatRow[] = [];
@@ -148,75 +156,72 @@ export function MessageReportingStats({ payload, refreshing }: MessageReportingS
                 <MessageReportingKpi label="Parties" value={parties.length}/>
             </div>
 
-            <div className="bg-content1 rounded-xl border border-default-200 p-4">
-                <h2 className="text-sm font-semibold text-default-700 mb-3">Monthly volume</h2>
-                <ResponsiveContainer width="100%" height={260}>
-                    <BarChart data={monthly} margin={{ top: 4, right: 4, left: -16, bottom: 0 }}>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={GRID}/>
-                        <XAxis dataKey="label" tick={{ fontSize: 12, fill: AXIS }} axisLine={false} tickLine={false}/>
-                        <YAxis tick={{ fontSize: 12, fill: AXIS }} axisLine={false} tickLine={false}/>
-                        <Tooltip
-                            contentStyle={{
-                                borderRadius: 8,
-                                border: "1px solid #e2e8f0",
-                                background: "#ffffff",
-                                color: "#1e293b",
-                                fontSize: 13
-                            }}
-                            cursor={{ fill: "rgba(148,163,184,0.15)" }}
-                        />
-                        <Legend wrapperStyle={{ fontSize: 12 }}/>
-                        <Bar dataKey="inbound" name="Inbound" fill={IN} radius={[3, 3, 0, 0]} maxBarSize={28}/>
-                        <Bar dataKey="outbound" name="Outbound" fill={OUT} radius={[3, 3, 0, 0]} maxBarSize={28}/>
-                    </BarChart>
-                </ResponsiveContainer>
-            </div>
+            <Card variant="default" className="p-4 gap-0">
+                <Card.Header className="p-0 pb-3">
+                    <Card.Title className="text-sm font-semibold">Monthly volume</Card.Title>
+                </Card.Header>
+                <Card.Content className="p-0">
+                    <ResponsiveContainer width="100%" height={260}>
+                        <BarChart data={monthly} margin={{ top: 4, right: 4, left: -16, bottom: 0 }}>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={GRID} />
+                            <XAxis dataKey="label" tick={{ fontSize: 12, fill: AXIS }} axisLine={false} tickLine={false} />
+                            <YAxis tick={{ fontSize: 12, fill: AXIS }} axisLine={false} tickLine={false} />
+                            <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ fill: "rgba(148,163,184,0.15)" }} />
+                            <Legend wrapperStyle={{ fontSize: 12 }} />
+                            <Bar dataKey="inbound" name="Inbound" fill={IN} radius={[3, 3, 0, 0]} maxBarSize={28} />
+                            <Bar dataKey="outbound" name="Outbound" fill={OUT} radius={[3, 3, 0, 0]} maxBarSize={28} />
+                        </BarChart>
+                    </ResponsiveContainer>
+                </Card.Content>
+            </Card>
 
-            <div className="bg-content1 rounded-xl border border-default-200 overflow-hidden">
-                <div className="px-4 py-3 border-b border-default-100">
-                    <h2 className="text-sm font-semibold text-default-700">By Party</h2>
-                </div>
-                <table className="w-full text-sm">
-                    <thead>
-                    <tr className="text-left text-xs text-default-400 border-b border-default-100">
-                        <MessageReportingTh onClick={() => setSort("id")}>
-                            Party{arrow("id")}
-                        </MessageReportingTh>
-                        <MessageReportingTh onClick={() => setSort("inbound")} align="right">
-                            Inbound{arrow("inbound")}
-                        </MessageReportingTh>
-                        <MessageReportingTh onClick={() => setSort("outbound")} align="right">
-                            Outbound{arrow("outbound")}
-                        </MessageReportingTh>
-                        <th className="px-4 py-2 font-medium w-2/5">Split</th>
-                        <MessageReportingTh onClick={() => setSort("total")} align="right">
-                            Total{arrow("total")}
-                        </MessageReportingTh>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {parties.map((p) => (
-                        <tr key={p.id} className="border-b border-default-50 hover:bg-default-50">
-                            <td className="px-4 py-2.5 font-mono text-xs text-default-700">{p.id}</td>
-                            <td className="px-4 py-2.5 text-right tabular-nums">{p.inbound}</td>
-                            <td className="px-4 py-2.5 text-right tabular-nums">{p.outbound}</td>
-                            <td className="px-4 py-2.5">
-                                <div className="flex items-center gap-1 h-4">
-                                    <div className="h-2 rounded-sm" style={{ width: `${(p.inbound / maxParty) * 50}%`, background: IN }}/>
-                                    <div className="h-2 rounded-sm" style={{ width: `${(p.outbound / maxParty) * 50}%`, background: OUT }}/>
-                                </div>
-                            </td>
-                            <td className="px-4 py-2.5 text-right font-medium tabular-nums">{p.total}</td>
+            <Card variant="default" className="p-0 gap-0 overflow-hidden">
+                <Card.Header className="px-4 py-3 border-b border-default-100">
+                    <Card.Title className="text-sm font-semibold">By Party</Card.Title>
+                </Card.Header>
+                <Card.Content className="p-0">
+                    <table className="w-full text-sm">
+                        <thead>
+                        <tr className="text-left text-xs text-default-400 border-b border-default-100">
+                            <MessageReportingTh onClick={() => setSort("id")}>
+                                Party{arrow("id")}
+                            </MessageReportingTh>
+                            <MessageReportingTh onClick={() => setSort("inbound")} align="right">
+                                Inbound{arrow("inbound")}
+                            </MessageReportingTh>
+                            <MessageReportingTh onClick={() => setSort("outbound")} align="right">
+                                Outbound{arrow("outbound")}
+                            </MessageReportingTh>
+                            <th className="px-4 py-2 font-medium w-2/5">Split</th>
+                            <MessageReportingTh onClick={() => setSort("total")} align="right">
+                                Total{arrow("total")}
+                            </MessageReportingTh>
                         </tr>
-                    ))}
-                    {parties.length === 0 && (
-                        <tr>
-                            <td colSpan={5} className="px-4 py-8 text-center text-sm text-default-400">No messages in this range.</td>
-                        </tr>
-                    )}
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                        {parties.map((p) => (
+                            <tr key={p.id} className="border-b border-default-50 hover:bg-default-50">
+                                <td className="px-4 py-2.5 font-mono text-xs text-default-700">{p.id}</td>
+                                <td className="px-4 py-2.5 text-right tabular-nums">{p.inbound}</td>
+                                <td className="px-4 py-2.5 text-right tabular-nums">{p.outbound}</td>
+                                <td className="px-4 py-2.5">
+                                    <div className="flex items-center gap-1 h-4">
+                                        <div className="h-2 rounded-sm" style={{ width: `${(p.inbound / maxParty) * 50}%`, background: IN }}/>
+                                        <div className="h-2 rounded-sm" style={{ width: `${(p.outbound / maxParty) * 50}%`, background: OUT }}/>
+                                    </div>
+                                </td>
+                                <td className="px-4 py-2.5 text-right font-medium tabular-nums">{p.total}</td>
+                            </tr>
+                        ))}
+                        {parties.length === 0 && (
+                            <tr>
+                                <td colSpan={5} className="px-4 py-8 text-center text-sm text-default-400">No messages in this range.</td>
+                            </tr>
+                        )}
+                        </tbody>
+                    </table>
+                </Card.Content>
+            </Card>
         </div>
     );
 }

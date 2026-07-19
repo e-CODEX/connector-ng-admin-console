@@ -21,6 +21,7 @@ import { DetailSection } from "@/components/common/detail-section";
 import { ConnectorParty } from "@/types/response/processing-mode";
 import { ArrowDownToLine } from "lucide-react";
 import { downloadEvidence } from "@/services/evidence";
+import { MessageDirectionChip } from "@/components/message/message-direction";
 
 interface MessageDetailsViewProps {
     message: ConnectorMessage | null;
@@ -110,7 +111,11 @@ export function MessageDetailsView({ message, state }: MessageDetailsViewProps) 
                                         <DetailRow label="Gateway" value={message.gatewayName}/>
                                         <DetailRow label="Service" value={message.as4Properties.service.name}/>
                                         <DetailRow label="Action" value={message.as4Properties.action.name}/>
-                                        <DetailRow label="Direction" value={message.direction}/>
+                                        <DetailRow label="Direction" value={
+                                            <MessageDirectionChip
+                                                direction={message.direction}
+                                            />
+                                        }/>
                                         <DetailRow
                                             label="Status"
                                             value={

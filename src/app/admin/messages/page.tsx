@@ -25,6 +25,7 @@ import { MessageDetailsView } from "@/components/message/detail/message-details-
 import { ArrowsRotateRight, SquareBars } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/page-header-button";
 import { MessageReportingView } from "@/components/message/report/message-reporting-view";
+import { MessageDirectionChip } from "@/components/message/message-direction";
 
 const IDENTIFIER_LENGTH = 15;
 
@@ -192,7 +193,11 @@ export default function MessagesAdminPage() {
                                             <Table.Cell>{message.gatewayName}</Table.Cell>
                                             <Table.Cell>{message.as4Properties.service.name}</Table.Cell>
                                             <Table.Cell>{message.as4Properties.action.name}</Table.Cell>
-                                            <Table.Cell>{message.direction}</Table.Cell>
+                                            <Table.Cell>
+                                                <MessageDirectionChip
+                                                    direction={message.direction}
+                                                />
+                                            </Table.Cell>
                                             <Table.Cell>
                                                 <Chip
                                                     color={getBooleanColor(message.delivered)}

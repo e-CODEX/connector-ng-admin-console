@@ -21,6 +21,7 @@ import { PaginationControls } from "@/components/paging/pagination-controls";
 import { AttachmentDetailsView } from "@/components/attachment/attachment-details-view";
 import { ArrowsRotateRight } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/page-header-button";
+import { AttachmentStorageChip } from "@/components/attachment/attachment-storage-chip";
 
 export default function AttachmentsAdminPage() {
     const [loading, setLoading] = useState(true);
@@ -131,7 +132,9 @@ export default function AttachmentsAdminPage() {
                                             <Table.Cell>{attachment.contentType}</Table.Cell>
                                             <Table.Cell>{truncate(attachment.description)}</Table.Cell>
                                             <Table.Cell>{formatBytes(attachment.size)}</Table.Cell>
-                                            <Table.Cell>{attachment.storage}</Table.Cell>
+                                            <Table.Cell>
+                                                <AttachmentStorageChip type={attachment.storage}/>
+                                            </Table.Cell>
                                             <Table.Cell>{attachment.type}</Table.Cell>
                                             <Table.Cell>{formatDate(attachment.createdAt)}</Table.Cell>
                                             <Table.Cell>

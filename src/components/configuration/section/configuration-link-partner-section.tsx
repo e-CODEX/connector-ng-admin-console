@@ -13,13 +13,13 @@
 import { useEffect, useState } from "react";
 import { LinkPartnerConfiguration } from "@/types/response/configuration";
 import { getLinkPartnerConfiguration } from "@/services/configuration";
-import { getBooleanLabel, toastError } from "@/utils";
+import { toastError } from "@/utils";
 import { Spinner, Table } from "@heroui/react";
 import { ConfigurationBlock } from "@/components/configuration/configuration-block";
 import { ConfigurationDetailRow } from "@/components/configuration/configuration-detail-row";
 import { ConfigurationKeystoreView } from "@/components/configuration/view/configuration-keystore-view";
 import { ConfigurationPrivateKeyView } from "@/components/configuration/view/configuration-private-key-view";
-import { ConfigurationBoolChip } from "@/components/configuration/configuration-bool-chip";
+import { BooleanChip } from "@/components/common/boolean-chip";
 
 export function ConfigurationLinkPartnerSection() {
     const [loading, setLoading] = useState(true);
@@ -66,9 +66,7 @@ export function ConfigurationLinkPartnerSection() {
                                         {backend.linkConfig.properties.wsPolicy}
                                     </ConfigurationDetailRow>
                                     <ConfigurationDetailRow label="Loggind enabled">
-                                        <ConfigurationBoolChip
-                                            value={backend.linkConfig.properties.loggingEnabled}
-                                            label={getBooleanLabel(backend.linkConfig.properties.loggingEnabled)}/>
+                                        <BooleanChip value={backend.linkConfig.properties.loggingEnabled}/>
                                     </ConfigurationDetailRow>
                                     <ConfigurationBlock title="Keystore">
                                         <ConfigurationKeystoreView keystore={backend.linkConfig.properties.endpoint.keystore}/>
@@ -88,7 +86,7 @@ export function ConfigurationLinkPartnerSection() {
                                                             <Table.Column isRowHeader>Name</Table.Column>
                                                             <Table.Column>Description</Table.Column>
                                                             <Table.Column>Modes (sender / receiver)</Table.Column>
-                                                            <Table.Column>Status</Table.Column>
+                                                            <Table.Column>Enabled</Table.Column>
                                                             <Table.Column>Encrypt Alias</Table.Column>
                                                             <Table.Column>Certificate DN</Table.Column>
                                                             <Table.Column>Push Address</Table.Column>
@@ -103,8 +101,7 @@ export function ConfigurationLinkPartnerSection() {
                                                                     {partner.senderMode} / {partner.receiverMode}
                                                                 </Table.Cell>
                                                                 <Table.Cell>
-                                                                    <ConfigurationBoolChip value={partner.enabled}
-                                                                                           label={partner.enabled ? "enabled" : "disabled"}/>
+                                                                    <BooleanChip value={partner.enabled}/>
                                                                 </Table.Cell>
                                                                 <Table.Cell>{partner.properties.encryptionAlias}</Table.Cell>
                                                                 <Table.Cell>{partner.properties.certificateDn}</Table.Cell>

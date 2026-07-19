@@ -10,10 +10,11 @@
 
 import { ConnectorTransportStepResponse } from "@/types/response/transport-step";
 import { DetailRow } from "@/components/common/detail-row";
-import { formatDate, getTransportDeliveryColor, getTransportDeliveryLabel } from "@/utils";
-import { Chip, Table } from "@heroui/react";
+import { formatDate } from "@/utils";
+import { Table } from "@heroui/react";
 import { DetailSection } from "@/components/common/detail-section";
-import { TransportStepMessageTypeChip } from "@/components/message/message-type-chip";
+import { TransportStepMessageTypeChip } from "@/components/message/chip/message-type-chip";
+import { TransportDeliveryStatusChip } from "@/components/transport-step/transport-step-status-chip";
 
 interface TransportStepDetailsProps {
     transportStep: ConnectorTransportStepResponse;
@@ -34,9 +35,7 @@ export function TransportStepDetails({ transportStep }: TransportStepDetailsProp
                 <DetailRow
                     label="Status"
                     value={
-                        <Chip color={getTransportDeliveryColor(transportStep.status)} size="sm" variant="soft">
-                            <Chip.Label>{getTransportDeliveryLabel(transportStep.status)}</Chip.Label>
-                        </Chip>
+                        <TransportDeliveryStatusChip status={transportStep.status}/>
                     }
                 />
                 <DetailRow label="Created at" value={formatDate(transportStep.createdAt)}/>
@@ -59,9 +58,7 @@ export function TransportStepDetails({ transportStep }: TransportStepDetailsProp
                                 {transportStep.statuses.map((status, i) => (
                                     <Table.Row key={`${status.status}-${i}`}>
                                         <Table.Cell>
-                                            <Chip color={getTransportDeliveryColor(status.status)} size="sm" variant="soft">
-                                                <Chip.Label>{getTransportDeliveryLabel(status.status)}</Chip.Label>
-                                            </Chip>
+                                            <TransportDeliveryStatusChip status={status.status}/>
                                         </Table.Cell>
                                         <Table.Cell>{formatDate(status.createdAt)}</Table.Cell>
                                     </Table.Row>

@@ -13,12 +13,13 @@
 import { PageHeader } from "@/components/common/page-header";
 import { useEffect, useState } from "react";
 import { ConnectorBusinessDomainResponse } from "@/types/response/business-domain";
-import { Chip, Spinner, Table, useOverlayState } from "@heroui/react";
+import { Spinner, Table, useOverlayState } from "@heroui/react";
 import { createBusinessDomain, listBusinessDomains } from "@/services/business-domain";
 import { formatDate, toastError, toastSuccess, truncate } from "@/utils";
 import { ArrowsRotateRight, Plus } from "@gravity-ui/icons";
 import { BusinessDomainCreationView } from "@/components/business-domain/business-domain-creation-view";
 import { PageHeaderButton } from "@/components/common/page-header-button";
+import { BooleanChip } from "@/components/common/boolean-chip";
 
 export default function BusinessDomainsAdminPage() {
     const [loading, setLoading] = useState(true)
@@ -110,7 +111,7 @@ export default function BusinessDomainsAdminPage() {
                                     <Table.Column isRowHeader>Identifier</Table.Column>
                                     <Table.Column>Description</Table.Column>
                                     <Table.Column>Source</Table.Column>
-                                    <Table.Column>Status</Table.Column>
+                                    <Table.Column>Enabled</Table.Column>
                                     <Table.Column>Created at</Table.Column>
                                     <Table.Column>Updated at</Table.Column>
                                 </Table.Header>
@@ -126,13 +127,7 @@ export default function BusinessDomainsAdminPage() {
                                             <Table.Cell>{businessDomain.description}</Table.Cell>
                                             <Table.Cell>{businessDomain.source}</Table.Cell>
                                             <Table.Cell>
-                                                <Chip
-                                                    color={getStatusColor(businessDomain.enabled)}
-                                                    size="sm"
-                                                    variant="soft"
-                                                >
-                                                    <Chip.Label>{getStatusLabel(businessDomain.enabled)}</Chip.Label>
-                                                </Chip>
+                                                <BooleanChip value={businessDomain.enabled}/>
                                             </Table.Cell>
                                             <Table.Cell>{formatDate(businessDomain.createdAt)}</Table.Cell>
                                             <Table.Cell>{formatDate(businessDomain.updatedAt)}</Table.Cell>

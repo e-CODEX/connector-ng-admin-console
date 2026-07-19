@@ -52,49 +52,6 @@ export function asNumber(value: unknown): number {
     return typeof value === "number" ? value : 0;
 }
 
-export const getDeliveryLabel = (isDelivered: boolean): string =>
-    isDelivered ? "Delivered" : "Not delivered";
-
-export const getBooleanColor = (value: boolean): "success" | "danger" =>
-    value ? "success" : "danger";
-
-export const getBooleanLabel = (value: boolean): string => (value ? "Yes" : "No");
-
-export const getTransportDeliveryLabel = (status: string): string => {
-    switch (status) {
-        case "DELIVERED":
-            return "Delivered";
-        case "SUBMITTED":
-            return "Submitted";
-        case "DOWNLOADED":
-            return "Downloaded";
-        case "READY_FOR_DOWNLOAD":
-            return "Ready for download";
-        case "FAILED":
-            return "Failed";
-        default:
-            return "Unknown";
-    }
-}
-
-export const getTransportDeliveryColor = (status: string):
-    "success" | "danger" | "warning" | "accent" | "default" => {
-    switch (status) {
-        case "DELIVERED":
-            return "success";
-        case "SUBMITTED":
-            return "warning";
-        case "DOWNLOADED":
-            return "success";
-        case "READY_FOR_DOWNLOAD":
-            return "accent";
-        case "FAILED":
-            return "danger";
-        default:
-            return "default";
-    }
-}
-
 export const toastSuccess = (message: string) => {
     toastMessage("Success", message, "success");
 }

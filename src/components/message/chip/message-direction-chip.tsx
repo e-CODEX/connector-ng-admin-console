@@ -44,9 +44,9 @@ export function MessageDirectionChip({ direction, showLabel = true, }: MessageDi
     const { label, description, icon: Icon, color } = MESSAGE_DIRECTION[direction];
 
     return (
-        <Chip className="px-2" color={color} variant="primary" size="md" aria-label={description}>
+        <Chip className="px-2 text-white [&_svg]:text-inherit" color={color} variant="primary" size="md" aria-label={description}>
             <Icon className="size-3.5 shrink-0" aria-hidden="true"/>
-            {showLabel && <span>{label}</span>}
+            {showLabel && <Chip.Label className="text-inherit">{label}</Chip.Label>}
         </Chip>
     );
 }

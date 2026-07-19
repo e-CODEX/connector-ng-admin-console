@@ -13,10 +13,10 @@
 import { useEffect, useState } from "react";
 import { BusinessDomainConfiguration } from "@/types/response/configuration";
 import { getBusinessDomainsConfig } from "@/services/configuration";
-import { getBooleanLabel, toastError } from "@/utils";
+import { toastError } from "@/utils";
 import { Spinner, Table } from "@heroui/react";
 import { ConfigurationBlock } from "@/components/configuration/configuration-block";
-import { ConfigurationBoolChip } from "@/components/configuration/configuration-bool-chip";
+import { BooleanChip } from "@/components/common/boolean-chip";
 
 export function ConfigurationBusinessDomainsSection() {
     const [loading, setLoading] = useState(true);
@@ -71,7 +71,7 @@ export function ConfigurationBusinessDomainsSection() {
                                                     </Table.Cell>
                                                     <Table.Cell>{domain.description}</Table.Cell>
                                                     <Table.Cell>
-                                                        <ConfigurationBoolChip value={domain.enabled} label={getBooleanLabel(domain.enabled)}/>
+                                                        <BooleanChip value={domain.enabled}/>
                                                     </Table.Cell>
                                                     <Table.Cell>{domain.pmodeFile}</Table.Cell>
                                                 </Table.Row>

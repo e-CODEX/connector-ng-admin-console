@@ -10,9 +10,9 @@
 
 "use client";
 
-import { Button, Chip, Modal, Spinner, Table, Tooltip, useOverlayState } from "@heroui/react";
+import { Button, Modal, Spinner, Table, Tooltip, useOverlayState } from "@heroui/react";
 import { ConnectorMessage, ConnectorMessageDetailsResponse, ConnectorMessageEvidence } from "@/types/response/message";
-import { formatBytes, formatDate, getBooleanColor, getDeliveryLabel, saveFile, toastError, truncate } from "@/utils";
+import { formatBytes, formatDate, saveFile, toastError, truncate } from "@/utils";
 import React, { useEffect, useState } from "react";
 import { Eye } from "@gravity-ui/icons";
 import { getMessage } from "@/services/message";
@@ -21,7 +21,8 @@ import { DetailSection } from "@/components/common/detail-section";
 import { ConnectorProcessingModeParty } from "@/types/response/processing-mode";
 import { ArrowDownToLine } from "lucide-react";
 import { downloadEvidence } from "@/services/evidence";
-import { MessageDirectionChip } from "@/components/message/message-direction-chip";
+import { MessageDirectionChip } from "@/components/message/chip/message-direction-chip";
+import { MessageDeliveryStatusChip } from "@/components/message/chip/message-delivery-status-chip";
 
 interface MessageDetailsViewProps {
     message: ConnectorMessage | null;
@@ -119,10 +120,7 @@ export function MessageDetailsView({ message, state }: MessageDetailsViewProps) 
                                         <DetailRow
                                             label="Status"
                                             value={
-                                                <Chip color={getBooleanColor(message.delivered)}
-                                                      size="sm" variant="soft">
-                                                    <Chip.Label>{getDeliveryLabel(message.delivered)}</Chip.Label>
-                                                </Chip>
+                                                <MessageDeliveryStatusChip isDelivered={message.delivered}/>
                                             }
                                         />
                                         <DetailRow label="Created at"

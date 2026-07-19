@@ -13,11 +13,11 @@
 import { useEffect, useState } from "react";
 import { RoutingConfiguration } from "@/types/response/configuration";
 import { getRoutingConfiguration } from "@/services/configuration";
-import { getBooleanLabel, toastError } from "@/utils";
+import { toastError } from "@/utils";
 import { Spinner, Table } from "@heroui/react";
 import { ConfigurationBlock } from "@/components/configuration/configuration-block";
 import { ConfigurationDetailRow } from "@/components/configuration/configuration-detail-row";
-import { ConfigurationBoolChip } from "@/components/configuration/configuration-bool-chip";
+import { BooleanChip } from "@/components/common/boolean-chip";
 
 export function ConfigurationBackendRulesSection() {
     const [loading, setLoading] = useState(true);
@@ -56,7 +56,7 @@ export function ConfigurationBackendRulesSection() {
                     <div className="flex flex-col gap-4">
                         <ConfigurationBlock title="Global Configuration" note="">
                             <ConfigurationDetailRow label="Enabled">
-                                <ConfigurationBoolChip value={config.enabled} label={getBooleanLabel(config.enabled)}/>
+                                <BooleanChip value={config.enabled}/>
                             </ConfigurationDetailRow>
                             <ConfigurationDetailRow label="Deafult backend name">
                                 {config.defaultBackendName}

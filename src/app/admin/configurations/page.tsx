@@ -20,12 +20,13 @@ import { ConfigurationMessageProcessingSection } from "@/components/configuratio
 import { ConfigurationLinkPartnerSection } from "@/components/configuration/section/configuration-link-partner-section";
 import { ConfigurationBusinessDomainsSection } from "@/components/configuration/section/configuration-business-domains-section";
 import { ConfigurationBusinessDocumentSection } from "@/components/configuration/section/configuration-business-document-section";
+import { Settings } from "lucide-react";
 
 export default function ConfigurationsAdminPage() {
     return (
         <div>
             <PageHeader
-                icon="icon-park-outline:config"
+                icon={Settings}
                 title="Configurations"
                 subtitle="List of configurations"
             />

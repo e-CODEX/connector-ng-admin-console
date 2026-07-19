@@ -19,6 +19,7 @@ import { ArrowsRotateRight } from "@gravity-ui/icons";
 import { PageHeader } from "@/components/common/page-header";
 import { Spinner } from "@heroui/react";
 import { QueueCard } from "@/components/queue/QueueCard";
+import { Layers } from "lucide-react";
 
 export default function QueueAdminPage() {
     const [loading, setLoading] = useState(true)
@@ -68,7 +69,7 @@ export default function QueueAdminPage() {
     return (
         <div>
             <PageHeader
-                icon="fluent-mdl2:processing"
+                icon={Layers}
                 title="JMS Queues Statuses"
                 subtitle="Manage JMS Queues"
             >

@@ -9,22 +9,21 @@
  */
 
 import { Typography } from "@heroui/react";
-import { Icon } from "@iconify/react";
-import React from "react";
+import React, { type ComponentType } from "react";
 
 interface PageHeaderProps {
     title: string;
-    icon: string;
+    icon: ComponentType<{ className?: string }>;
     subtitle?: string;
     className?: string;
     children?: React.ReactNode;
 }
 
-export function PageHeader({ title, icon, subtitle, className, children }: PageHeaderProps) {
+export function PageHeader({ title, icon: Icon, subtitle, className, children }: PageHeaderProps) {
     return (
         <div className={`flex items-center gap-3.5 ${className ?? "mb-6"}`}>
             <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-accent-soft">
-                <Icon icon={icon} className="size-6 text-accent"/>
+                <Icon className="size-6 text-accent"/>
             </div>
             <div>
                 <Typography.Heading level={1}

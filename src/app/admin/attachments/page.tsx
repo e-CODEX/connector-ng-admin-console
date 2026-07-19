@@ -16,12 +16,12 @@ import { ConnectorAttachmentResponse } from "@/types/response/attachments";
 import { Button, Spinner, Table, Tooltip, useOverlayState } from "@heroui/react";
 import { listAttachments } from "@/services/attachment";
 import { formatBytes, formatDate, toastError, truncate } from "@/utils";
-import { Icon } from "@iconify/react";
 import { PaginationControls } from "@/components/paging/pagination-controls";
 import { AttachmentDetailsView } from "@/components/attachment/attachment-details-view";
-import { ArrowsRotateRight } from "@gravity-ui/icons";
+import { ArrowsRotateRight, Eye } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/page-header-button";
 import { AttachmentStorageChip } from "@/components/attachment/attachment-storage-chip";
+import { Paperclip } from "lucide-react";
 
 export default function AttachmentsAdminPage() {
     const [loading, setLoading] = useState(true);
@@ -85,7 +85,7 @@ export default function AttachmentsAdminPage() {
     return (
         <div>
             <PageHeader
-                icon="lsicon:attachments-filled"
+                icon={Paperclip}
                 title="Message attachments"
                 subtitle="Attachments associated to messages"
             >
@@ -146,10 +146,7 @@ export default function AttachmentsAdminPage() {
                                                             variant="tertiary"
                                                             onPress={() => onDetailsClick(attachment)}
                                                         >
-                                                            <Icon
-                                                                className="size-4"
-                                                                icon="gravity-ui:eye"
-                                                            />
+                                                            <Eye/>
                                                         </Button>
                                                         <Tooltip.Content showArrow>
                                                             <Tooltip.Arrow/>

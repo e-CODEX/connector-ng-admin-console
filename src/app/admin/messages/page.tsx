@@ -14,7 +14,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ConnectorMessage } from "@/types/response/message";
 import { listMessages } from "@/services/message";
 import { Button, Spinner, Table, Tooltip, useOverlayState } from "@heroui/react";
-import { Icon } from "@iconify/react";
 import { formatDate, toastError, truncate } from "@/utils";
 import { PaginationControls } from "@/components/paging/pagination-controls";
 import { MessageTransportStepsDetailView } from "@/components/message/detail/message-transport-steps-detail-view";
@@ -22,11 +21,12 @@ import { PageHeader } from "@/components/common/page-header";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { MessageFiltersPanel } from "@/components/message/message-filters-panel";
 import { MessageDetailsView } from "@/components/message/detail/message-details-view";
-import { ArrowsRotateRight, SquareBars } from "@gravity-ui/icons";
+import { ArrowsRotateRight, Eye, SquareBars } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/page-header-button";
 import { MessageReportingView } from "@/components/message/report/message-reporting-view";
 import { MessageDirectionChip } from "@/components/message/chip/message-direction-chip";
 import { MessageDeliveryStatusChip } from "@/components/message/chip/message-delivery-status-chip";
+import { Mail, Route } from "lucide-react";
 
 const IDENTIFIER_LENGTH = 15;
 
@@ -119,7 +119,7 @@ export default function MessagesAdminPage() {
     return (
         <div>
             <PageHeader
-                icon="gravity-ui:envelope"
+                icon={Mail}
                 title="Business Messages"
                 subtitle="Connector eDelivery inbox"
             >
@@ -213,10 +213,7 @@ export default function MessagesAdminPage() {
                                                             onPress={() => onDetailsClick(
                                                                 message)}
                                                         >
-                                                            <Icon
-                                                                className="size-4"
-                                                                icon="gravity-ui:eye"
-                                                            />
+                                                            <Eye/>
                                                         </Button>
                                                         <Tooltip.Content showArrow>
                                                             <Tooltip.Arrow/>
@@ -232,10 +229,7 @@ export default function MessagesAdminPage() {
                                                             onPress={() => onTransportStepsClick(
                                                                 message)}
                                                         >
-                                                            <Icon
-                                                                className="size-4"
-                                                                icon="boxicons:path"
-                                                            />
+                                                            <Route/>
                                                         </Button>
                                                         <Tooltip.Content showArrow>
                                                             <Tooltip.Arrow/>

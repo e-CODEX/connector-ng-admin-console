@@ -9,6 +9,7 @@ import { OutboundMessageConsolePanel } from "@/components/message/outbound/outbo
 import { SendMessageFormData, SendParameters, } from "@/types/send-message-form";
 import { sendMessage } from "@/services/message";
 import { toastError } from "@/utils";
+import { Send } from "lucide-react";
 
 const initialMessageFormData: SendMessageFormData = {
     businessDomainIdentifier: "",
@@ -88,7 +89,7 @@ export default function MessageOutboundPage() {
     return (
         <div>
             <PageHeader
-                icon="boxicons:send"
+                icon={Send}
                 title="Send Bussiness Message"
                 subtitle="Send a business message to a party"
             >

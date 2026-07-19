@@ -17,14 +17,14 @@ import { Button, Spinner, Table, Tooltip, useOverlayState } from "@heroui/react"
 import { listTransportSteps } from "@/services/transport-step";
 import { TransportStepFiltersPanel } from "@/components/transport-step/transport-step-filters-panel";
 import { formatDate, toastError, truncate } from "@/utils";
-import { Icon } from "@iconify/react";
 import { PaginationControls } from "@/components/paging/pagination-controls";
 import { ConnectorTransportStepResponse } from "@/types/response/transport-step";
 import { TransportStepDetailsView } from "@/components/transport-step/transport-step-details-view";
-import { ArrowsRotateRight } from "@gravity-ui/icons";
+import { ArrowsRotateRight, Eye } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/page-header-button";
 import { TransportStepMessageTypeChip } from "@/components/message/chip/message-type-chip";
 import { TransportDeliveryStatusChip } from "@/components/transport-step/transport-step-status-chip";
+import { Route } from "lucide-react";
 
 export default function TransportStepsAdminPage() {
     const [loading, setLoading] = useState(true)
@@ -103,7 +103,7 @@ export default function TransportStepsAdminPage() {
     return (
         <div>
             <PageHeader
-                icon="streamline-pixel:transportation-truck"
+                icon={Route}
                 title="Message Transport Steps"
                 subtitle="Track message transport steps"
             >
@@ -179,10 +179,7 @@ export default function TransportStepsAdminPage() {
                                                             onPress={() => onDetailsClick(
                                                                 transportStep)}
                                                         >
-                                                            <Icon
-                                                                className="size-4"
-                                                                icon="gravity-ui:eye"
-                                                            />
+                                                            <Eye/>
                                                         </Button>
                                                         <Tooltip.Content showArrow>
                                                             <Tooltip.Arrow/>

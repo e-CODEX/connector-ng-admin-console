@@ -13,9 +13,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ConnectorMessage } from "@/types/response/message";
 import { listMessages } from "@/services/message";
-import { Button, Chip, Spinner, Table, Tooltip, useOverlayState } from "@heroui/react";
+import { Button, Spinner, Table, Tooltip, useOverlayState } from "@heroui/react";
 import { Icon } from "@iconify/react";
-import { formatDate, getBooleanColor, getDeliveryLabel, toastError, truncate } from "@/utils";
+import { formatDate, toastError, truncate } from "@/utils";
 import { PaginationControls } from "@/components/paging/pagination-controls";
 import { MessageTransportStepsDetailView } from "@/components/message/detail/message-transport-steps-detail-view";
 import { PageHeader } from "@/components/common/page-header";
@@ -25,7 +25,8 @@ import { MessageDetailsView } from "@/components/message/detail/message-details-
 import { ArrowsRotateRight, SquareBars } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/page-header-button";
 import { MessageReportingView } from "@/components/message/report/message-reporting-view";
-import { MessageDirectionChip } from "@/components/message/message-direction-chip";
+import { MessageDirectionChip } from "@/components/message/chip/message-direction-chip";
+import { MessageDeliveryStatusChip } from "@/components/message/chip/message-delivery-status-chip";
 
 const IDENTIFIER_LENGTH = 15;
 
@@ -199,13 +200,7 @@ export default function MessagesAdminPage() {
                                                 />
                                             </Table.Cell>
                                             <Table.Cell>
-                                                <Chip
-                                                    color={getBooleanColor(message.delivered)}
-                                                    size="sm"
-                                                    variant="soft"
-                                                >
-                                                    <Chip.Label>{getDeliveryLabel(message.delivered)}</Chip.Label>
-                                                </Chip>
+                                                <MessageDeliveryStatusChip isDelivered={message.delivered}/>
                                             </Table.Cell>
                                             <Table.Cell>{formatDate(message.createdAt)}</Table.Cell>
                                             <Table.Cell>

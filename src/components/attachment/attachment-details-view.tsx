@@ -16,6 +16,7 @@ import React from "react";
 import { ConnectorAttachmentResponse } from "@/types/response/attachments";
 import { Eye } from "@gravity-ui/icons";
 import { DetailRow } from "@/components/common/detail-row";
+import { AttachmentStorageChip } from "@/components/attachment/attachment-storage-chip";
 
 interface AttachmentDetailsViewProps {
     attachment: ConnectorAttachmentResponse | null;
@@ -43,7 +44,9 @@ export function AttachmentDetailsView({ attachment, state }: AttachmentDetailsVi
                                     <DetailRow label="Content type" value={attachment.contentType}/>
                                     <DetailRow label="Description" value={attachment.description}/>
                                     <DetailRow label="Size" value={formatBytes(attachment.size)}/>
-                                    <DetailRow label="Storage" value={attachment.storage}/>
+                                    <DetailRow label="Storage" value={
+                                        <AttachmentStorageChip type={attachment.storage}/>
+                                    }/>
                                     <DetailRow label="Type" value={attachment.type}/>
                                     <DetailRow label="Created at" value={formatDate(attachment.createdAt)}/>
                                     <DetailRow label="Updated at" value={formatDate(attachment.updatedAt)}/>

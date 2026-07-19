@@ -10,14 +10,15 @@
 
 "use client";
 
-import { Button, Chip, Modal, Spinner, Table, useOverlayState } from "@heroui/react";
+import { Button, Modal, Spinner, Table, useOverlayState } from "@heroui/react";
 import { formatDate, toastError } from "@/utils";
 import React, { useEffect, useState } from "react";
 import { Eye } from "@gravity-ui/icons";
-import { ConnectorProcessingModeResponse, ConnectorProcessingModeDetailResponse } from "@/types/response/processing-mode";
+import { ConnectorProcessingModeDetailResponse, ConnectorProcessingModeResponse } from "@/types/response/processing-mode";
 import { DetailRow } from "@/components/common/detail-row";
 import { getProcessingMode } from "@/services/processing-mode";
 import { DetailSection } from "@/components/common/detail-section";
+import { BooleanChip } from "@/components/common/boolean-chip";
 
 interface ProcessingModeDetailsViewProps {
     processingMode: ConnectorProcessingModeResponse | null;
@@ -29,21 +30,6 @@ export function ProcessingModeDetailsView({ processingMode, state }: ProcessingM
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const isHomeLabel = (isHome: boolean) => {
-        if (isHome) {
-            return "Yes";
-        } else {
-            return "No";
-        }
-    }
-
-    const isHomeColor = (isHome: boolean) => {
-        if (isHome) {
-            return "success";
-        } else {
-            return "danger";
-        }
-    }
     const identifier = processingMode?.uuid;
 
     useEffect(() => {
@@ -142,10 +128,7 @@ export function ProcessingModeDetailsView({ processingMode, state }: ProcessingM
                                                                                 <Table.Cell>{party.role}</Table.Cell>
                                                                                 <Table.Cell>{party.roleType}</Table.Cell>
                                                                                 <Table.Cell>
-                                                                                    <Chip color={isHomeColor(party.isHome)}
-                                                                                          size="sm" variant="soft">
-                                                                                        <Chip.Label>{isHomeLabel(party.isHome)}</Chip.Label>
-                                                                                    </Chip>
+                                                                                    <BooleanChip value={party.isHome}/>
                                                                                 </Table.Cell>
                                                                             </Table.Row>
                                                                         ))}

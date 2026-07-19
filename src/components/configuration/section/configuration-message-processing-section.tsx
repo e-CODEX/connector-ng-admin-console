@@ -11,11 +11,11 @@
 import { useEffect, useState } from "react";
 import { MessageProcessingConfiguration } from "@/types/response/configuration";
 import { getMessageProcessingConfiguration } from "@/services/configuration";
-import { getBooleanLabel, toastError } from "@/utils";
+import { toastError } from "@/utils";
 import { Spinner } from "@heroui/react";
 import { ConfigurationBlock } from "@/components/configuration/configuration-block";
 import { ConfigurationDetailRow } from "@/components/configuration/configuration-detail-row";
-import { ConfigurationBoolChip } from "@/components/configuration/configuration-bool-chip";
+import { BooleanChip } from "@/components/common/boolean-chip";
 
 export function ConfigurationMessageProcessingSection() {
     const [loading, setLoading] = useState(true);
@@ -57,14 +57,13 @@ export function ConfigurationMessageProcessingSection() {
                                 {config.identifierSuffix}
                             </ConfigurationDetailRow>
                             <ConfigurationDetailRow label="Ebms identifier generation enabled">
-                                <ConfigurationBoolChip value={config.ebmsIdGeneratorEnabled} label={getBooleanLabel(config.ebmsIdGeneratorEnabled)}/>
+                                <BooleanChip value={config.ebmsIdGeneratorEnabled}/>
                             </ConfigurationDetailRow>
                             <ConfigurationDetailRow label="Ebms identifier suffix">
                                 {config.ebmsIdSuffix}
                             </ConfigurationDetailRow>
                             <ConfigurationDetailRow label="Send generated evidences to backend">
-                                <ConfigurationBoolChip value={config.sendGeneratedEvidencesToBackend}
-                                                       label={getBooleanLabel(config.sendGeneratedEvidencesToBackend)}/>
+                                <BooleanChip value={config.sendGeneratedEvidencesToBackend}/>
                             </ConfigurationDetailRow>
                             <ConfigurationDetailRow label="Transport step identifier suffix">
                                 {config.transportIdSuffix}

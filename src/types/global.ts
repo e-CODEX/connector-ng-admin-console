@@ -12,7 +12,7 @@ export type MessageDirection = "BACKEND_TO_GATEWAY" | "GATEWAY_TO_BACKEND";
 
 export type HealthStatus = | "UP" | "DOWN" | "DEGRADED" | "UNKNOWN";
 
-export type AttachmentType = "S3_BUCKET" | "LOCAL_FILE_SYSTEM";
+export type AttachmentStorageType = "S3_BUCKET" | "LOCAL_FILE_SYSTEM";
 
 export type KeystoreType = "JKS" | "PKCS12";
 

@@ -14,11 +14,65 @@
 @custom-variant dark (&:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *));
 
 @theme {
-  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-mono), ui-monospace, monospace;
+    --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+    --font-mono: var(--font-mono), ui-monospace, monospace;
 }
 
 .dark, [data-theme="dark"] {
-  --field-border: oklch(0.44 0.01 285);
-  --field-border-width: 1px;
+    --field-border: oklch(0.44 0.01 285);
+    --field-border-width: 1px;
+}
+
+@layer components {
+    .chip--transport {
+        @apply gap-1.5;
+    }
+
+    .chip--submitted {
+        @apply border-zinc-300/60 bg-zinc-300 text-zinc-700
+        dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300;
+    }
+    .chip--submitted .chip__label {
+        @apply text-inherit;
+    }
+
+    .chip--ready-for-download {
+        @apply border-amber-400/40 bg-amber-200 text-amber-800
+        dark:border-amber-500/30 dark:bg-amber-950 dark:text-amber-300;
+    }
+    .chip--ready-for-download .chip__label {
+        @apply text-inherit;
+    }
+
+    .chip--downloaded {
+        @apply border-sky-400/40 bg-sky-200 text-sky-800
+        dark:border-sky-500/30 dark:bg-sky-950 dark:text-sky-300;
+    }
+    .chip--downloaded .chip__label {
+        @apply text-inherit;
+    }
+
+    .chip--delivered {
+        @apply border-emerald-400/40 bg-emerald-100 text-emerald-800
+        dark:border-emerald-500/30 dark:bg-emerald-950 dark:text-emerald-300;
+    }
+    .chip--delivered .chip__label {
+        @apply text-inherit;
+    }
+
+    .chip--failed {
+        @apply border-red-400/40 bg-red-100 text-red-800
+        dark:border-red-500/30 dark:bg-red-800 dark:text-red-300;
+    }
+    .chip--failed .chip__label {
+        @apply text-inherit;
+    }
+
+    .chip--unknown {
+        @apply border border-dashed border-zinc-400/50 bg-transparent text-zinc-500
+        dark:border-zinc-600 dark:text-zinc-400;
+    }
+    .chip--unknown .chip__label {
+        @apply text-inherit italic;
+    }
 }

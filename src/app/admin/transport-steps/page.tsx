@@ -13,17 +13,18 @@
 import { PageHeader } from "@/components/common/page-header";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
-import { Button, Chip, Spinner, Table, Tooltip, useOverlayState } from "@heroui/react";
+import { Button, Spinner, Table, Tooltip, useOverlayState } from "@heroui/react";
 import { listTransportSteps } from "@/services/transport-step";
 import { TransportStepFiltersPanel } from "@/components/transport-step/transport-step-filters-panel";
-import { formatDate, getTransportDeliveryColor, getTransportDeliveryLabel, toastError, truncate } from "@/utils";
+import { formatDate, toastError, truncate } from "@/utils";
 import { Icon } from "@iconify/react";
 import { PaginationControls } from "@/components/paging/pagination-controls";
 import { ConnectorTransportStepResponse } from "@/types/response/transport-step";
 import { TransportStepDetailsView } from "@/components/transport-step/transport-step-details-view";
 import { ArrowsRotateRight } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/page-header-button";
-import { TransportStepMessageTypeChip } from "@/components/message/message-type-chip";
+import { TransportStepMessageTypeChip } from "@/components/message/chip/message-type-chip";
+import { TransportDeliveryStatusChip } from "@/components/transport-step/transport-step-status-chip";
 
 export default function TransportStepsAdminPage() {
     const [loading, setLoading] = useState(true)
@@ -165,15 +166,7 @@ export default function TransportStepsAdminPage() {
                                             }</Table.Cell>
                                             <Table.Cell>{transportStep.numberOfAttempts}</Table.Cell>
                                             <Table.Cell>
-                                                <Chip
-                                                    className="px-2"
-                                                    color={getTransportDeliveryColor(transportStep.status)}
-                                                    size="sm"
-                                                    variant="soft"
-                                                >
-                                                    <Chip.Label>{getTransportDeliveryLabel(
-                                                        transportStep.status)}</Chip.Label>
-                                                </Chip>
+                                                <TransportDeliveryStatusChip status={transportStep.status}/>
                                             </Table.Cell>
                                             <Table.Cell>{formatDate(transportStep.createdAt)}</Table.Cell>
                                             <Table.Cell>

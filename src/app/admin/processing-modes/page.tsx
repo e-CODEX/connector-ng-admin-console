@@ -78,7 +78,7 @@ export default function ProcessingModesAdminPage() {
     }, [])
 
     return (
-        <>
+        <div>
             <PageHeader
                 icon="fluent-mdl2:processing"
                 title="Processing Modes"
@@ -179,6 +179,6 @@ export default function ProcessingModesAdminPage() {
                     />
                 </>
             )}
-        </>
+        </div>
     )
 }

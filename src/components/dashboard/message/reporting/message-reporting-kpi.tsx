@@ -8,7 +8,14 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-export function MessageReportingKpi({ label, value, dot, sub }: { label: string; value: number; dot?: string; sub?: string }) {
+interface MessageReportingKpiProps {
+    label: string;
+    value: number;
+    dot?: string;
+    sub?: string;
+}
+
+export function MessageReportingKpi({ label, value, dot, sub }: MessageReportingKpiProps) {
     return (
         <div className="bg-content1 rounded-xl border border-default-200 p-4">
             <div className="flex items-center gap-1.5 text-xs text-default-500 mb-1">

@@ -13,9 +13,13 @@ import { Keystore } from "@/types/response/configuration";
 import { ConfigurationSecretValue } from "@/components/configuration/configuration-secret-value";
 import { ConfigurationDetailRow } from "@/components/configuration/configuration-detail-row";
 
-export function ConfigurationKeystoreView({ keystore }: { keystore: Keystore }) {
+interface ConfigurationKeystoreViewProps {
+    keystore: Keystore;
+}
+
+export function ConfigurationKeystoreView({ keystore }: ConfigurationKeystoreViewProps) {
     return (
-        <>
+        <div>
             {keystore ? (
                 <dl>
                     <ConfigurationDetailRow label="Path">{keystore.path}</ConfigurationDetailRow>
@@ -29,6 +33,6 @@ export function ConfigurationKeystoreView({ keystore }: { keystore: Keystore }) 
             ) : (
                 <div className="flex flex-col gap-3">No keystore configuration available</div>
             )}
-        </>
+        </div>
     );
 }

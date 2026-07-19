@@ -115,7 +115,7 @@ export default function MessagesAdminPage() {
     }, [loadMessages]);
 
     return (
-        <>
+        <div>
             <PageHeader
                 icon="gravity-ui:envelope"
                 title="Business Messages"
@@ -279,6 +279,6 @@ export default function MessagesAdminPage() {
             />
 
             <MessageReportingView state={reportModal}/>
-        </>
+        </div>
     )
 }

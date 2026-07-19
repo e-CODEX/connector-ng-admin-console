@@ -17,12 +17,7 @@ interface PageHeaderButtonProps extends Omit<ButtonProps, "children"> {
     tooltip?: string;
 }
 
-export function PageHeaderButton({
-                                     icon: Icon,
-                                     isSpinning = false,
-                                     tooltip,
-                                     ...props
-                                 }: PageHeaderButtonProps) {
+export function PageHeaderButton({ icon: Icon, isSpinning = false, tooltip, ...props }: PageHeaderButtonProps) {
     const button = (
         <Button isIconOnly size="lg" aria-label={tooltip} {...props}>
             <Icon className={`size-4 ${isSpinning ? "animate-spin" : ""}`}/>

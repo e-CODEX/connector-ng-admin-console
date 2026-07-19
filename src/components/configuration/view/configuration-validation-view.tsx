@@ -14,9 +14,13 @@ import { ConfigurationBlock } from "@/components/configuration/configuration-blo
 import { ConfigurationDetailRow } from "@/components/configuration/configuration-detail-row";
 import { ConfigurationBoolChip } from "@/components/configuration/configuration-bool-chip";
 
-export function ConfigurationValidationView({ validation }: { validation: Validation }) {
+interface ConfigurationValidationViewProps {
+    validation: Validation;
+}
+
+export function ConfigurationValidationView({ validation }: ConfigurationValidationViewProps) {
     return (
-        <>
+        <div>
             {validation ? (
                 <div className="flex flex-col gap-3">
                     <div className="flex flex-wrap gap-2">
@@ -39,6 +43,6 @@ export function ConfigurationValidationView({ validation }: { validation: Valida
             ) : (
                 <div className="flex flex-col gap-3">No validation configuration available</div>
             )}
-        </>
+        </div>
     );
 }

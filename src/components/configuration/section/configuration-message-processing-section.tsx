@@ -44,7 +44,7 @@ export function ConfigurationMessageProcessingSection() {
     }
 
     return (
-        <>
+        <div>
             {
                 loading ? (
                     <div className="flex justify-center items-center min-h-400]">
@@ -79,6 +79,6 @@ export function ConfigurationMessageProcessingSection() {
                     </div>
                 )
             }
-        </>
+        </div>
     );
 }

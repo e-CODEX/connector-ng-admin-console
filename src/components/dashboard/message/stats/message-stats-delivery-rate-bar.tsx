@@ -13,7 +13,11 @@
 import { ConnectorMessageStatsItem } from "@/types/response/stats";
 import { deliveryRate } from "@/utils";
 
-export function MessageStatsDeliveryRateBar({ stats }: { stats: ConnectorMessageStatsItem }) {
+interface MessageStatsDeliveryRateBarProps {
+    stats: ConnectorMessageStatsItem;
+}
+
+export function MessageStatsDeliveryRateBar({ stats }: MessageStatsDeliveryRateBarProps) {
     const calculatePercentage = (n: number) => (stats.total > 0 ? (n / stats.total) * 100 : 0);
     const label = `Delivered ${deliveryRate(stats)}%, pending ${stats.pending}, rejected ${stats.rejected}`;
     return (

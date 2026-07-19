@@ -12,7 +12,7 @@ import { AppInfoView } from "@/components/common/app-info-view";
 
 export function AppFooter() {
     return (
-        <footer className="border-divider bg-surface fixed inset-x-0 bottom-0 z-40 flex h-12 w-full flex-wrap justify-between gap-4 border-t px-4">
+        <footer className="border-divider bg-surface fixed inset-x-0 bottom-0 z-40 flex h-12 w-full items-center justify-center gap-4 border-t px-4">
             <AppInfoView variant="footer"/>
         </footer>
     );

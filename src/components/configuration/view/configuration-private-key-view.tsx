@@ -12,7 +12,11 @@ import { ConfigurationSecretValue } from "@/components/configuration/configurati
 import { PrivateKey } from "@/types/response/configuration";
 import { ConfigurationDetailRow } from "@/components/configuration/configuration-detail-row";
 
-export function ConfigurationPrivateKeyView({ privateKey }: { privateKey: PrivateKey }) {
+interface ConfigurationPrivateKeyViewProps {
+    privateKey: PrivateKey;
+}
+
+export function ConfigurationPrivateKeyView({ privateKey }: ConfigurationPrivateKeyViewProps) {
     return (
         <dl>
             <ConfigurationDetailRow label="Alias">{privateKey.alias}</ConfigurationDetailRow>

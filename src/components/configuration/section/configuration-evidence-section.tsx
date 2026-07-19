@@ -49,7 +49,7 @@ export function ConfigurationEvidenceSection() {
     const address = [a.street, a.locality, a.zipCode, a.country].filter(Boolean).join(", ");
 
     return (
-        <>
+        <div>
             {
                 loading ? (
                     <div className="flex justify-center items-center min-h-400]">
@@ -70,6 +70,6 @@ export function ConfigurationEvidenceSection() {
                     </div>
                 )
             }
-        </>
+        </div>
     );
 }

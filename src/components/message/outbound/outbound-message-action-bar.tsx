@@ -19,11 +19,7 @@ interface OutboundMessageActionBarProps {
     onSaveAsXml?: () => void;
 }
 
-export function OutboundMessageActionBar({
-                                     isSending = false,
-                                     onSend,
-                                     onSaveAsXml,
-                                 }: OutboundMessageActionBarProps) {
+export function OutboundMessageActionBar({ isSending = false, onSend, onSaveAsXml }: OutboundMessageActionBarProps) {
     return (
         <div className="flex flex-wrap gap-3 justify-end">
             <Button

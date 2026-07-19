@@ -86,7 +86,7 @@ export default function MessageOutboundPage() {
     };
 
     return (
-        <>
+        <div>
             <PageHeader
                 icon="boxicons:send"
                 title="Send Bussiness Message"
@@ -112,6 +112,6 @@ export default function MessageOutboundPage() {
 
                 <OutboundMessageConsolePanel content={logs}/>
             </div>
-        </>
+        </div>
     );
 }

@@ -48,7 +48,7 @@ export function ConfigurationLinkPartnerSection() {
     }
 
     return (
-        <>
+        <div>
             {
                 loading ? (
                     <div className="flex justify-center items-center min-h-400]">
@@ -122,6 +122,6 @@ export function ConfigurationLinkPartnerSection() {
                     </div>
                 )
             }
-        </>
+        </div>
     );
 }

@@ -11,16 +11,18 @@
 import { Typography } from "@heroui/react";
 import React from "react";
 
-export function DetailSection({ title, isEmpty, emptyLabel, children }: {
+interface DetailSectionProps {
     title: string;
     isEmpty: boolean;
     emptyLabel: string;
     children: React.ReactNode;
-}) {
+}
+
+export function DetailSection({ title, isEmpty, emptyLabel, children }: DetailSectionProps) {
     return (
-        <>
+        <div>
             <Typography.Heading level={6} className="mt-5 mb-3">{title}</Typography.Heading>
             {isEmpty ? <p className="text-muted text-sm">{emptyLabel}</p> : children}
-        </>
+        </div>
     );
 }

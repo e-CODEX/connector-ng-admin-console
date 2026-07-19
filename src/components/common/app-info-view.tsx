@@ -50,10 +50,7 @@ async function resolveInfo(): Promise<AppInfoResponse | undefined> {
     }
 }
 
-export async function AppInfoView({
-                                      variant = "footer",
-                                      className = "",
-                                  }: AppInfoProps) {
+export async function AppInfoView({ variant = "footer", className = "", }: AppInfoProps) {
     const resolved = await resolveInfo();
     const build = resolved?.build;
 
@@ -102,9 +99,7 @@ export async function AppInfoView({
     }
 
     return (
-        <div
-            className={`text-default-500 flex flex-wrap items-center gap-x-10 gap-y-1 text-xs ${className}`}
-        >
+        <div className={`text-default-500 flex flex-wrap items-center gap-x-10 gap-y-1 text-xs ${className}`}>
             <span className="text-default-700 truncate text-sm font-semibold">
                 e-CODEX Connector
             </span>
@@ -121,4 +116,3 @@ export async function AppInfoView({
         </div>
     );
 }
-

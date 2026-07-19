@@ -18,10 +18,7 @@ interface OutboundMessageFormProps {
     onChange: (next: SendMessageFormData) => void;
 }
 
-export function OutboundMessageForm({
-                                        data,
-                                        onChange,
-                                    }: OutboundMessageFormProps) {
+export function OutboundMessageForm({ data, onChange, }: OutboundMessageFormProps) {
     const { as4Properties } = data;
 
     const update = (patch: Partial<SendMessageFormData>) => {

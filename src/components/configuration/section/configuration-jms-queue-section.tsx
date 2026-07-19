@@ -45,7 +45,7 @@ export function ConfigurationJmsQueueSection() {
     }
 
     return (
-        <>
+        <div>
             {
                 loading ? (
                     <div className="flex justify-center items-center min-h-400]">
@@ -91,6 +91,6 @@ export function ConfigurationJmsQueueSection() {
                     </div>
                 )
             }
-        </>
+        </div>
     );
 }

@@ -11,7 +11,13 @@
 import { Surface } from "@heroui/react";
 import { ReactNode } from "react";
 
-export function ConfigurationBlock({ title, note, children }: { title: string; note?: string; children: ReactNode }) {
+interface ConfigurationBlockProps {
+    title: string;
+    note?: string;
+    children: ReactNode;
+}
+
+export function ConfigurationBlock({ title, note, children }: ConfigurationBlockProps) {
     return (
         <Surface className="rounded-xl p-4">
             <div className="mb-2 flex items-baseline gap-2">

@@ -18,13 +18,7 @@ interface FormTextFieldProps {
     onChange: (value: string) => void;
 }
 
-export function FormTextField({
-                                  label,
-                                  value = "",
-                                  type = "text",
-                                  required = false,
-                                  onChange,
-                              }: FormTextFieldProps) {
+export function FormTextField({ label, value = "", type = "text", required = false, onChange }: FormTextFieldProps) {
     return (
         <TextField
             value={value}

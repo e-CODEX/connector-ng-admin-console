@@ -16,11 +16,11 @@ import { Button, Spinner, Table, Tooltip, useOverlayState } from "@heroui/react"
 import { ConnectorProcessingModeResponse } from "@/types/response/processing-mode";
 import { createProcessingMode, listProcessingModes } from "@/services/processing-mode";
 import { formatDate, toastError, toastSuccess, truncate } from "@/utils";
-import { Icon } from "@iconify/react";
 import { ProcessingModeDetailsView } from "@/components/processing-mode/processing-mode-detail-view";
-import { ArrowsRotateRight, Plus } from "@gravity-ui/icons";
+import { ArrowsRotateRight, Eye, Plus } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/page-header-button";
 import { ProcessingModeCreationView } from "@/components/processing-mode/processing-mode-creation-view";
+import { Workflow } from "lucide-react";
 
 export default function ProcessingModesAdminPage() {
     const [loading, setLoading] = useState(true)
@@ -80,7 +80,7 @@ export default function ProcessingModesAdminPage() {
     return (
         <div>
             <PageHeader
-                icon="fluent-mdl2:processing"
+                icon={Workflow}
                 title="Processing Modes"
                 subtitle="Stored processing modes"
             >
@@ -140,10 +140,7 @@ export default function ProcessingModesAdminPage() {
                                                             variant="tertiary"
                                                             onPress={() => onDetailsClick(pMode)}
                                                         >
-                                                            <Icon
-                                                                className="size-4"
-                                                                icon="gravity-ui:eye"
-                                                            />
+                                                            <Eye/>
                                                         </Button>
                                                         <Tooltip.Content showArrow>
                                                             <Tooltip.Arrow/>

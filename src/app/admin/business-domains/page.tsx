@@ -20,6 +20,7 @@ import { ArrowsRotateRight, Plus } from "@gravity-ui/icons";
 import { BusinessDomainCreationView } from "@/components/business-domain/business-domain-creation-view";
 import { PageHeaderButton } from "@/components/common/page-header-button";
 import { BooleanChip } from "@/components/common/boolean-chip";
+import { Building2 } from "lucide-react";
 
 export default function BusinessDomainsAdminPage() {
     const [loading, setLoading] = useState(true)
@@ -78,7 +79,7 @@ export default function BusinessDomainsAdminPage() {
     return (
         <div>
             <PageHeader
-                icon="grommet-icons:domain"
+                icon={Building2}
                 title="Business Domains"
                 subtitle="Used for multi-tenancy"
             >

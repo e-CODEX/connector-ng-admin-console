@@ -16,17 +16,19 @@ import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation";
 import { ThemeSwitcher } from "@/components/common/theme-switcher";
+import { Building2, Layers, Mail, Paperclip, Route, Send, Settings, Workflow } from "lucide-react";
 
-const navItems = [
-    { label: "Send", href: "/message-outbound" },
-    { label: "Messages", href: "/admin/messages" },
-    { label: "Transport-Step", href: "/admin/transport-steps" },
-    { label: "Attachments", href: "/admin/attachments" },
-    { label: "Queues", href: "/admin/queues" },
-    { label: "Configurations", href: "/admin/configurations" },
-    { label: "Business domain", href: "/admin/business-domains" },
-    { label: "Processing mode", href: "/admin/processing-modes" },
-]
+const navItems= [
+    { label: "Send", href: "/message-outbound", icon: Send },
+    { label: "Messages", href: "/admin/messages", icon: Mail },
+    { label: "Transport-Step", href: "/admin/transport-steps", icon: Route },
+    { label: "Attachments", href: "/admin/attachments", icon: Paperclip },
+    { label: "Queues", href: "/admin/queues", icon: Layers },
+    { label: "Configurations", href: "/admin/configurations", icon: Settings },
+    { label: "Business domain", href: "/admin/business-domains", icon: Building2 },
+    { label: "Processing mode", href: "/admin/processing-modes", icon: Workflow },
+];
+
 export const AppMainNavbar = () => {
     const pathname = usePathname();
 
@@ -51,22 +53,22 @@ export const AppMainNavbar = () => {
             </NavbarContent>
 
             <NavbarContent className="hidden lg:flex gap-5" justify="end">
-                {navItems.map((item) => {
-                    const isActive = item.href === "/"
+                {navItems.map(({ label, href, icon: Icon }) => {
+                    const isActive = href === "/"
                         ? pathname === "/"
-                        : pathname === item.href || pathname.startsWith(item.href + "/")
-
+                        : pathname === href || pathname.startsWith(href + "/");
                     return (
-                        <NavbarItem key={item.href} isActive={isActive}>
+                        <NavbarItem key={href} isActive={isActive}>
                             <Link
-                                className={`whitespace-nowrap transition-colors text-base font-medium pb-0.5 ${
+                                className={`flex items-center gap-1.5 whitespace-nowrap transition-colors text-base font-medium pb-0.5 ${
                                     isActive
                                         ? "text-white font-semibold border-b-2 border-white"
                                         : "text-white/80 hover:text-white"
                                 }`}
-                                href={item.href}
+                                href={href}
                             >
-                                {item.label}
+                                <Icon className="size-4 shrink-0" aria-hidden="true" />
+                                {label}
                             </Link>
                         </NavbarItem>
                     );

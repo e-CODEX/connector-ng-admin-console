@@ -44,7 +44,7 @@ export function MessageDirectionChip({ direction, showLabel = true, }: MessageDi
     const { label, description, icon: Icon, color } = MESSAGE_DIRECTION[direction];
 
     return (
-        <Chip className="pe-2" color={color} variant="soft" size="sm" aria-label={description}>
+        <Chip className="px-2" color={color} variant="primary" size="md" aria-label={description}>
             <Icon className="size-3.5 shrink-0" aria-hidden="true"/>
             {showLabel && <span>{label}</span>}
         </Chip>

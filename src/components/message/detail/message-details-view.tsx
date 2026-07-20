@@ -134,10 +134,8 @@ export function MessageDetailsView({ message, state }: MessageDetailsViewProps) 
                                                    value={formatDate(message.rejectedAt)}/>
                                         <DetailRow label="Confirmed at"
                                                    value={formatDate(message.confirmedAt)}/>
-                                        <DetailRow label="Delivered to Gateway at"
-                                                   value={formatDate(message.deliveredToGatewayAt)}/>
-                                        <DetailRow label="Delivered to Backend at"
-                                                   value={formatDate(message.deliveredToBackendAt)}/>
+                                        <DetailRow label="Delivered to Link Partner at"
+                                                   value={formatDate(message.deliveredToLinkPartnerAt)}/>
                                     </div>
 
                                     {loading ? (

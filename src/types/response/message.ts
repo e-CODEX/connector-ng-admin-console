@@ -27,8 +27,7 @@ export interface ConnectorMessage {
     deletedAt: string;
     rejectedAt: string;
     confirmedAt: string;
-    deliveredToGatewayAt: string;
-    deliveredToBackendAt: string;
+    deliveredToLinkPartnerAt: string;
 }
 
 export interface ConnectorMessageDetailsResponse extends ConnectorMessage {

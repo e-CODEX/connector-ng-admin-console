@@ -8,12 +8,43 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
+import {PayloadGenerationMode, RequestMode} from "@/types/send-message-form";
+
 export interface SendMessageResponse {
     identifier: string;
 }
 
 export interface SoapSendMessageResponse {
     messageId: string;
+}
+
+export enum ExecutionMode {
+    SEQUENTIAL = "SEQUENTIAL",
+    PARALLEL = "PARALLEL",
+}
+
+export interface PayloadDefinition {
+    source: PayloadGenerationMode;
+    generatorThreads: number;
+}
+
+export interface TestConfiguration {
+    iterations: number;
+    generateFiles: boolean;
+    fileSizeMb: number;
+    reuseFiles?: boolean;
+    submitterThreads?: number;
+    executionMode: ExecutionMode;
+    payloadDefinition: PayloadDefinition;
+    requestMode: RequestMode
+}
+
+export interface TestExecution {
+    identifier?: string;
+    name?: string;
+    description?: string;
+    configData: TestConfiguration;
+    requestData: RestOutboundMessageRequest | SoapOutboundMessageRequest;
 }
 
 export interface RestOutboundMessageRequest {
@@ -26,8 +57,9 @@ export interface RestOutboundMessageRequest {
 }
 
 export interface SoapOutboundMessageRequest {
-    messageDetails: SoapOutboundMessageDetails;
-    messageContent: SoapOutboundMessageContent;
+    backendMessageIdentifier: string;
+    as4Properties: As4Properties;
+    businessContent: SoapOutboundMessageContent;
 }
 
 export interface SoapOutboundMessageDetails {
@@ -48,8 +80,8 @@ export interface As4Properties {
 }
 
 interface SoapOutboundMessageContent {
-    xmlContent: string;
-    document: BusinessDocumentInfo;
+    xmlContent?: string | null;
+    businessDocument: BusinessDocumentInfo;
 }
 
 
@@ -79,7 +111,7 @@ interface DetachedSignature {
 }
 
 interface BusinessDocumentInfo {
-    document?: string;
+    document?: string | null;
     documentName?: string;
     detachedSignature?: DetachedSignature;
     aesType: AesType;

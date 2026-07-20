@@ -56,6 +56,9 @@ const initialSendParameters: SendParameters = {
     mode: RequestMode.SOAP,
     attachmentSizeMB: 1,
     repeatCount: 1,
+    submitterThreads: 5,
+    generatorThreads: 3,
+    reuseFiles: true,
     fileSource: FileSourceMode.GENERATED,
     payloadGenerationMode: PayloadGenerationMode.SEQUENTIAL
 };

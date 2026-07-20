@@ -23,8 +23,8 @@ export enum FileSourceMode {
 
 export enum PayloadGenerationMode {
     SEQUENTIAL = "SEQUENTIAL",
-    PREGENERATE_SYNC_DELIVERY = "PREGENERATE WITH SYNC DELIVERY",
-    PREGENERATE_ASYNC_DELIVERY = "PREGENERATE WITH ASYNC DELIVERY",
+    PREGENERATE = "PREGENERATE",
+    PREGENERATE_WITH_THREADS = "PREGENERATE_WITH_THREADS"
 }
 
 export enum RequestMode {
@@ -38,6 +38,9 @@ export interface SendParameters {
     attachmentSizeMB: number;
     repeatCount: number;
     fileSource: FileSourceMode;
+    submitterThreads: number;
+    generatorThreads: number;
+    reuseFiles: boolean;
     payloadGenerationMode: PayloadGenerationMode;
 }
 

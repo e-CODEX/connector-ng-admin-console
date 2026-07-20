@@ -1,7 +1,7 @@
 import {Label, ListBox, Select} from "@heroui/react";
 import {PayloadGenerationMode} from "@/types/send-message-form";
 
-interface PayloadGenerationSelectFieldProps {
+interface ExecutionModeSelectFieldProps {
     value: PayloadGenerationMode;
     onChange: (value: PayloadGenerationMode) => void;
 }
@@ -9,19 +9,19 @@ interface PayloadGenerationSelectFieldProps {
 const requestOptions = [
     {
         id: PayloadGenerationMode.SEQUENTIAL,
-        label: "Sequential",
+        label: "Sequential generation",
     },
     {
-        id: PayloadGenerationMode.PREGENERATE_SYNC_DELIVERY,
-        label: "Pregenerate - synchronous delivery",
+        id: PayloadGenerationMode.PREGENERATE,
+        label: "Pregenerate with sync delivery",
     },
     {
-        id: PayloadGenerationMode.PREGENERATE_ASYNC_DELIVERY,
-        label: "Pregenerate - asynchronous delivery",
+        id: PayloadGenerationMode.PREGENERATE_WITH_THREADS,
+        label: "Pregenerate with async delivery",
     },
 ];
 
-export function PayloadGenerationSelectField({value, onChange}: PayloadGenerationSelectFieldProps) {
+export function ExecutionModeSelectField({value, onChange}: ExecutionModeSelectFieldProps) {
     return (
         <div className="w-full">
             <Label className="text-sm font-semibold text-default-700">Payload generation</Label>

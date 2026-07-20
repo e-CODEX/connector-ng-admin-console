@@ -8,16 +8,16 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { PaginatedResponse } from "@/types/response/paginated-response";
-import { ConnectorMessage, ConnectorMessageDetails } from "@/types/response/message";
-import { ConnectorTransportStep } from "@/types/response/transport-step";
-import { createSoapOutboundMessagePayload } from "@/utils/message-outbound/soap-message-builder";
-import { createRestOutboundMessagePayLoad } from "@/utils/message-outbound/rest-message-builder";
-import { ConnectorMessageStats } from "@/types/response/stats";
-import { ConnectorMessageReport } from "@/types/response/reporting";
-import { DownloadedFile, restApiCall, restApiDownload } from "@/lib/rest";
-import { BFF_API_BASE_URL } from "@/lib/config";
-import { PayloadGenerationMode, RequestMode, SendMessageArgs, SendMessageResponse, SendParameters, } from "@/types/send-message-form";
+import {PaginatedResponse} from "@/types/response/paginated-response";
+import {ConnectorMessage, ConnectorMessageDetails} from "@/types/response/message";
+import {ConnectorTransportStep} from "@/types/response/transport-step";
+import {createSoapOutboundMessagePayload} from "@/utils/message-outbound/soap-message-builder";
+import {createBffRestOutboundMessagePayLoad} from "@/utils/message-outbound/rest-message-builder";
+import {ConnectorMessageStats} from "@/types/response/stats";
+import {ConnectorMessageReport} from "@/types/response/reporting";
+import {DownloadedFile, restApiCall, restApiDownload} from "@/lib/rest";
+import {BFF_API_BASE_URL} from "@/lib/config";
+import {RequestMode, SendMessageArgs, SendMessageResponse,} from "@/types/send-message-form";
 
 
 export async function listMessages(params?: {
@@ -65,7 +65,11 @@ function getExportExtension(format: MessageReportExportFormat,): string {
 
 export type MessageReportExportFormat = keyof typeof MESSAGE_REPORT_EXPORT_FORMATS;
 
-export async function exportMessageReports(params: { from?: string; to?: string; format: MessageReportExportFormat }): Promise<DownloadedFile> {
+export async function exportMessageReports(params: {
+    from?: string;
+    to?: string;
+    format: MessageReportExportFormat
+}): Promise<DownloadedFile> {
     return restApiDownload("api/v1/admin/messages/reports/export", {
         params, defaultFilename: `message-report.${getExportExtension(params.format)}`,
     });
@@ -89,24 +93,39 @@ async function sendRestMessage({
                                    documents,
                                }: SendMessageArgs): Promise<SendMessageResponse[]> {
 
-    const payload = await createRestOutboundMessagePayLoad(formData, parameters, documents);
+    //TODO remove old generation mechanism
 
-    const createRequest = async () => {
-        const payload = await createRestOutboundMessagePayLoad(
-            formData,
-            parameters,
-            documents
-        );
-        return restApiCall<SendMessageResponse>(
-            "api/v1/messages/outbound",
-            {
-                method: "POST",
-                body: payload,
-            }
-        );
-    };
+    const docs = documents?.length ? documents : [undefined];
+    const payloads = await Promise.all(
+        docs.map((document) =>
+            createBffRestOutboundMessagePayLoad(
+                formData,
+                parameters,
+                document
+            )
+        )
+    );
 
-    return await executeRepeatedRestRequest(parameters, createRequest);
+    const createRequests = () =>
+        payloads.map((payload) =>
+            restApiCall<SendMessageResponse>(
+                "bff/api/v2/submit-message",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(payload),
+                },
+                BFF_API_BASE_URL
+            )
+        );
+
+    const results: PromiseSettledResult<SendMessageResponse>[] = [];
+    results.push(...(await Promise.allSettled(createRequests())));
+
+    return results;
+
 }
 
 
@@ -115,6 +134,8 @@ async function sendSoapMessage({
                                    parameters,
                                    documents,
                                }: SendMessageArgs): Promise<SendMessageResponse[]> {
+
+    //TODO remove old generation mechanism
 
     // pregenerate payloads
     const docs = documents?.length ? documents : [undefined];
@@ -131,7 +152,7 @@ async function sendSoapMessage({
     const createRequests = () =>
         payloads.map((payload) =>
             restApiCall<SendMessageResponse>(
-                "bff/api/v1/submit-message",
+                "bff/api/v2/submit-message",
                 {
                     method: "POST",
                     headers: {
@@ -142,39 +163,10 @@ async function sendSoapMessage({
                 BFF_API_BASE_URL
             )
         );
-    return await executeRepeatedSoapRequest(parameters, createRequests);
 
-}
+    const results: PromiseSettledResult<SendMessageResponse>[] = [];
+    results.push(...(await Promise.allSettled(createRequests())));
 
-async function executeRepeatedSoapRequest(parameters: SendParameters, createRequests: () => Promise<SendMessageResponse>[]) {
-    if (parameters.payloadGenerationMode === PayloadGenerationMode.SEQUENTIAL) {
-        const results: PromiseSettledResult<SendMessageResponse>[] = [];
+    return results;
 
-        for (let i = 0; i < parameters.repeatCount; i++) {
-            results.push(...(await Promise.allSettled(createRequests())));
-        }
-        return results;
-    }
-
-    return Promise.allSettled(
-        Array.from({length: parameters.repeatCount}).flatMap(createRequests)
-    );
-}
-
-async function executeRepeatedRestRequest(parameters: SendParameters, createRequest: () => Promise<SendMessageResponse>) {
-    if (parameters.payloadGenerationMode === PayloadGenerationMode.SEQUENTIAL) {
-        const results: PromiseSettledResult<SendMessageResponse>[] = [];
-
-        for (let i = 0; i < parameters.repeatCount; i++) {
-            results.push(await createRequest().then(
-                value => ({status: "fulfilled", value} as const),
-                reason => ({status: "rejected", reason} as const)
-            ));
-        }
-        return results;
-    }
-
-    return Promise.allSettled(
-        Array.from({length: parameters.repeatCount}, createRequest)
-    );
 }

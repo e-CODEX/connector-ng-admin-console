@@ -9,9 +9,9 @@
  */
 
 import {v4 as uuidv4} from 'uuid';
-import {SendMessageFormData, SendParameters} from "@/types/send-message-form";
+import {FileSourceMode, PayloadGenerationMode, SendMessageFormData, SendParameters} from "@/types/send-message-form";
 import {getDocumentAsBase64String, getXmlContentAsBase64String} from "@/utils/fileUtils";
-import {SoapOutboundMessageDetails, SoapOutboundMessageRequest} from "@/types/request/message";
+import {ExecutionMode, SoapOutboundMessageRequest, TestExecution} from "@/types/request/message";
 
 
 /**
@@ -38,30 +38,13 @@ export const createSoapOutboundMessagePayload = async (
     document?: Blob,
     xmlContent?: Blob) => {
 
-    document ? console.log("Document is present") : console.log("Document will be generated");
+    document ? console.log("Business document is loaded") : console.log("Business document will be generated");
 
-    const base64Payload = await getDocumentAsBase64String(parameters.attachmentSizeMB, document);
+    const base64Payload = await getDocumentAsBase64String(document);
 
     const businessXmlContent = await getXmlContentAsBase64String(xmlContent);
 
     const submitMessageRequest: SoapOutboundMessageRequest = {
-        messageDetails: createMessageDetails(formData),
-        messageContent: {
-            xmlContent: businessXmlContent,
-            document: {
-                document: base64Payload,
-                documentName: 'test-attachment.pdf',
-                aesType: 'SIGNATURE_BASED'
-            }
-        }
-    };
-
-    return submitMessageRequest;
-};
-
-
-function createMessageDetails(formData: SendMessageFormData) {
-    return {
         backendMessageIdentifier: formData.backendMessageIdentifier || uuidv4(),
         as4Properties: {
             conversationIdentifier: formData.as4Properties?.conversationIdentifier || uuidv4(),
@@ -84,6 +67,34 @@ function createMessageDetails(formData: SendMessageFormData) {
                 identifierType: formData.as4Properties?.toParty?.identifierType,
                 role: formData.as4Properties?.toParty?.role
             }
+        },
+        businessContent: {
+            xmlContent: businessXmlContent,
+            businessDocument: {
+                document: base64Payload,
+                documentName: 'test-attachment.pdf',
+                aesType: 'SIGNATURE_BASED'
+            }
         }
-    } as SoapOutboundMessageDetails;
-}
+    };
+
+    const testDefinitionMessage: TestExecution = {
+        configData: {
+            iterations: parameters.repeatCount,
+            generateFiles: parameters.fileSource === FileSourceMode.GENERATED,
+            fileSizeMb: parameters.attachmentSizeMB,
+            executionMode: parameters.payloadGenerationMode === PayloadGenerationMode.SEQUENTIAL ?
+                ExecutionMode.SEQUENTIAL
+                : ExecutionMode.PARALLEL,
+            payloadDefinition: {
+                source: parameters.payloadGenerationMode,
+                generatorThreads: parameters.generatorThreads,
+            },
+            submitterThreads: parameters.submitterThreads,
+            reuseFiles: true,
+            requestMode: parameters.mode,
+        },
+        requestData: submitMessageRequest
+    }
+    return testDefinitionMessage;
+};

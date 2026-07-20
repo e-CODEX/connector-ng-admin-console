@@ -10,12 +10,13 @@
 
 "use client";
 
-import {FileSourceMode, SendParameters} from "@/types/send-message-form";
+import {FileSourceMode, PayloadGenerationMode, SendParameters} from "@/types/send-message-form";
 import {FormTextField} from "@/components/form/form-text-field";
 import {FileSourceModeSelect} from "@/components/message/outbound/outbound-message-file-mode-select";
 import {RequestModeSelectField} from "@/components/message/outbound/outbound-message-request-mode-select";
 import {FileUpload} from "@/components/message/outbound/outbound-message-file-upload";
-import {PayloadGenerationSelectField} from "@/components/message/outbound/outbound-message-payload-generation-select";
+import {ExecutionModeSelectField} from "@/components/message/outbound/outbound-message-execution-mode-select";
+import {ReuseFieldSelectField} from "@/components/message/outbound/outbound-message-reuse-files-select";
 
 interface OutboundMessageSendParametersSectionProps {
     data: SendParameters;
@@ -36,21 +37,47 @@ export function OutboundMessageSendParametersSection({
     };
 
     const isGenerated = data.fileSource === FileSourceMode.GENERATED;
+    const isSequential = data.payloadGenerationMode === PayloadGenerationMode.SEQUENTIAL;
+
+    const normalizeThreads = (value: string) =>
+        Math.min(Math.max(Number(value) || 1, 1), 10);
 
     return (
         <section className="rounded-md border bg-content1 p-2">
             <h2 className="mb-2 text-lg font-semibold">Send parameters</h2>
 
-            <div className="grid grid-cols-1 gap-5 lg:grid-cols-5">
+            <div className="grid grid-cols-1 gap-5 lg:grid-cols-4">
                 <RequestModeSelectField
                     value={data.mode}
                     onChange={(value) => update({mode: value})}
                 />
 
-                <PayloadGenerationSelectField
+                <ExecutionModeSelectField
                     value={data.payloadGenerationMode}
                     onChange={(value) => update({payloadGenerationMode: value})}
                 />
+
+                {!isSequential && (
+                    <>
+                        <FormTextField
+                            label="Gnerator threads"
+                            type="number"
+                            value={String(data.generatorThreads)}
+                            onChange={(value) =>
+                                update({generatorThreads: normalizeThreads(value)})
+                            }
+                        />
+
+                        <FormTextField
+                            label="Submission threads"
+                            type="number"
+                            value={String(data.submitterThreads)}
+                            onChange={(value) =>
+                                update({submitterThreads: normalizeThreads(value)})
+                            }
+                        />
+                    </>
+                )}
 
                 <FormTextField
                     label="Repeat"
@@ -81,6 +108,10 @@ export function OutboundMessageSendParametersSection({
                         text="Upload Business Document(s)"
                     />
                 }
+
+                <ReuseFieldSelectField
+                    value={data.reuseFiles}
+                    onChange={(value) => update({reuseFiles: value})}/>
 
             </div>
         </section>

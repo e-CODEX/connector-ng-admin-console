@@ -52,15 +52,8 @@ export const generatePdfBlob = async (sizeMB: number, customText = "e-CODEX test
     return new Blob([headerArray, filler, footerArray], {type: 'application/pdf'});
 };
 
-export const getDocumentAsBase64String = async (attachmentSize: number, document?: Blob) => {
-
-    const blob =
-        document
-            ? document
-            : await generatePdfBlob(attachmentSize);
-
-    return await blobToBase64(blob);
-
+export const getDocumentAsBase64String = async (document?: Blob) => {
+    return document ? await blobToBase64(document) : null
 }
 
 /**
@@ -74,12 +67,8 @@ export const getDocumentAsBase64String = async (attachmentSize: number, document
  */
 export const getXmlContentAsBase64String = async (
     xmlContent?: Blob
-): Promise<string> => {
-    return xmlContent
-        ? blobToBase64(xmlContent)
-        : stringToBase64Utf8(
-            '<?xml version="1.0" encoding="UTF-8"?><testMessage>Test</testMessage>'
-        );
+): Promise<string|null> => {
+    return xmlContent ? blobToBase64(xmlContent) : null;
 };
 
 /**

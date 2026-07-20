@@ -9,8 +9,8 @@
  */
 
 import {v4 as uuidv4} from 'uuid';
-import {SendMessageFormData, SendParameters} from "@/types/send-message-form";
-import {RestOutboundMessageRequest} from "@/types/request/message";
+import {FileSourceMode, PayloadGenerationMode, SendMessageFormData, SendParameters} from "@/types/send-message-form";
+import {ExecutionMode, RestOutboundMessageRequest, TestExecution} from "@/types/request/message";
 import {generatePdfBlob, getDetachedSignatureAsBlob, getXmlContentAsBlob} from "@/utils/fileUtils";
 import {uploadMessageAttachment} from "@/services/attachment";
 
@@ -42,7 +42,7 @@ export const createRestOutboundMessagePayLoad = async (
     xmlContent?: Blob,
     detachedSignature?: Blob) => {
 
-    // TODO
+    // TODO multiple documents uploads ?
     const hasDocuments = documents && documents?.length > 0;
     const documentsToUpload = hasDocuments
         ? documents
@@ -57,6 +57,31 @@ export const createRestOutboundMessagePayLoad = async (
     appendBusinessContentToFormData(dataToSubmit, metadata, xmlContent, detachedSignature);
     return dataToSubmit;
 };
+
+
+export const createBffRestOutboundMessagePayLoad = async (
+    formData: SendMessageFormData, parameters: SendParameters, documents?: Blob) => {
+
+    const testDefinitionMessage: TestExecution = {
+        configData: {
+            iterations: parameters.repeatCount,
+            generateFiles: parameters.fileSource === FileSourceMode.GENERATED,
+            fileSizeMb: parameters.attachmentSizeMB,
+            executionMode: parameters.payloadGenerationMode === PayloadGenerationMode.SEQUENTIAL ?
+                ExecutionMode.SEQUENTIAL
+                : ExecutionMode.PARALLEL,
+            payloadDefinition: {
+                source: parameters.payloadGenerationMode,
+                generatorThreads: parameters.generatorThreads,
+            },
+            submitterThreads: 5,
+            reuseFiles: parameters.reuseFiles,
+            requestMode: parameters.mode,
+        },
+        requestData: createMessageMetadata(formData, [])
+    }
+    return testDefinitionMessage;
+}
 
 
 async function appendBusinessContentToFormData(data: FormData, metadata: RestOutboundMessageRequest, xmlContent?: Blob, detachedSignatureAsBlob?: Blob) {
@@ -110,7 +135,6 @@ function createMessageMetadata(formData: SendMessageFormData, attachmentIds: str
             }
         }
     } as RestOutboundMessageRequest;
-
 }
 
 

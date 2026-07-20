@@ -10,7 +10,7 @@
 
 import { FieldError, Label, ListBox, Select } from "@heroui/react";
 
-export interface BusinessDomainSelectProps {
+export interface BusinessDomainSelectorProps {
     identifiers: string[];
     value: string;
     onValueChange: (identifier: string) => void;
@@ -28,7 +28,7 @@ export function BusinessDomainSelector({
                                            label = "Business domain",
                                            isRequired = false,
                                            isDisabled,
-                                       }: BusinessDomainSelectProps) {
+                                       }: BusinessDomainSelectorProps) {
     const showError = isRequired && !!error;
 
     return (

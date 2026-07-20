@@ -11,15 +11,19 @@
 import { Label, SearchField } from "@heroui/react";
 import { SearchCriteriaBox } from "@/components/form/search-criteria-box";
 import { BusinessDomainSelector } from "@/components/form/business-domain-selector";
+import { ProcessingModeServiceSelector } from "@/components/form/pmode-service-selector";
 
 interface MessageFiltersPanelProps {
     identifier: string;
     backendName: string;
     businessDomainIdentifier: string;
+    processingModeService: string;
     businessDomainIdentifiers: string[];
+    processingModesServices: string[];
     onIdentifierChange: (value: string) => void;
     onBackendNameChange: (value: string) => void;
     onBusinessDomainIdentifierChange: (value: string) => void;
+    onProcessingModesServiceChange: (value: string) => void;
     className?: string;
 }
 
@@ -27,10 +31,13 @@ export function MessageFiltersPanel({
                                         identifier,
                                         backendName,
                                         businessDomainIdentifier,
+                                        processingModeService,
                                         businessDomainIdentifiers,
+                                        processingModesServices,
                                         onIdentifierChange,
                                         onBackendNameChange,
                                         onBusinessDomainIdentifierChange,
+                                        onProcessingModesServiceChange,
                                         className
                                     }: MessageFiltersPanelProps) {
     return (
@@ -55,6 +62,11 @@ export function MessageFiltersPanel({
                 identifiers={businessDomainIdentifiers}
                 value={businessDomainIdentifier}
                 onValueChange={onBusinessDomainIdentifierChange}
+            />
+            <ProcessingModeServiceSelector
+                services={processingModesServices}
+                value={processingModeService}
+                onValueChange={onProcessingModesServiceChange}
             />
         </SearchCriteriaBox>
     );

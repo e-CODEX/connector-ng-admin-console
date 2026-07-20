@@ -29,8 +29,8 @@ import { MessageDeliveryStatusChip } from "@/components/message/chip/message-del
 import { Mail, Route } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
-import { listBusinessDomains } from "@/services/business-domain";
 import { listProcessingModeServices } from "@/services/processing-mode";
+import { useBusinessDomainIdentifiers } from "@/hooks/use-business-domain-identifiers";
 
 const IDENTIFIER_LENGTH = 15;
 const ALL_SELECTOR = "All";
@@ -43,7 +43,6 @@ export default function MessagesAdminPage() {
     const [totalElements, setTotalElements] = useState(0);
     const [pageSize, setPageSize] = useState(20);
     const [selectedMessage, setSelectedMessage] = useState<ConnectorMessage | null>(null);
-    const [businessDomainIdentifiers, setBusinessDomainIdentifiers] = useState<string[]>([]);
     const [processingModeServices, setProcessingModeServices] = useState<string[]>([]);
     const [identifierQuery, setIdentifierQuery] = useState("");
     const [backendNameQuery, setBackendNameQuery] = useState("");
@@ -55,6 +54,8 @@ export default function MessagesAdminPage() {
     const debouncedBackendName = useDebouncedValue(backendNameQuery);
 
     const asFilter = (value: string) => (value === ALL_SELECTOR || value === "" ? undefined : value);
+
+    const businessDomainIdentifiers = useBusinessDomainIdentifiers(ALL_SELECTOR);
 
     const onIdentifierChange = (value: string) => {
         setIdentifierQuery(value)
@@ -143,26 +144,6 @@ export default function MessagesAdminPage() {
     useEffect(() => {
         void loadMessages();
     }, [loadMessages]);
-
-    useEffect(() => {
-        let cancelled = false;
-
-        (async () => {
-            try {
-                const businessDomains = await listBusinessDomains().then((domains) =>
-                    [ALL_SELECTOR, ...domains.map(d => d.identifier)]);
-                if (cancelled) return;
-                setBusinessDomainIdentifiers(businessDomains);
-            } catch (error) {
-                if (cancelled) return;
-                toastError(error);
-            }
-        })();
-
-        return () => {
-            cancelled = true;
-        };
-    }, []);
 
     useEffect(() => {
         let cancelled = false;

@@ -19,13 +19,14 @@ import { MessageReportingStats } from "@/components/dashboard/message/reporting/
 
 interface MessageReportingSectionProps {
     period: Period;
+    businessDomain?: string;
     refreshToken?: number;
     refreshInterval: number;
 }
 
-export function MessageReportingSection({ period, refreshToken, refreshInterval }: MessageReportingSectionProps) {
+export function MessageReportingSection({ period, businessDomain, refreshToken, refreshInterval }: MessageReportingSectionProps) {
     const { data, loading, error } = usePolledFetch(() =>
-        getMessageReports(periodToParams(period)), refreshInterval, [period, refreshToken]);
+        getMessageReports({ ...periodToParams(period), businessDomain }), refreshInterval, [period, businessDomain, refreshToken]);
 
     if (!data) {
         return (

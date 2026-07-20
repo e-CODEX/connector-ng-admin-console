@@ -10,7 +10,7 @@
 
 import { FieldError, Label, ListBox, Select } from "@heroui/react";
 
-export interface BusinessDomainSelectorProps {
+interface BusinessDomainSelectorProps {
     identifiers: string[];
     value: string;
     onValueChange: (identifier: string) => void;
@@ -21,6 +21,8 @@ export interface BusinessDomainSelectorProps {
     showLabel?: boolean;
     className?: string;
 }
+
+export const asBusinessDomainSelectorFilter = (value: string, selector: string) => (value === selector ? undefined : value);
 
 export function BusinessDomainSelector({
                                            identifiers,

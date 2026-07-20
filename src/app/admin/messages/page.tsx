@@ -31,6 +31,7 @@ import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { listProcessingModeServices } from "@/services/processing-mode";
 import { useBusinessDomainIdentifiers } from "@/hooks/use-business-domain-identifiers";
+import { asBusinessDomainSelectorFilter } from "@/components/form/business-domain-selector";
 
 const IDENTIFIER_LENGTH = 15;
 const ALL_SELECTOR = "All";
@@ -118,7 +119,7 @@ export default function MessagesAdminPage() {
                 size: pageSize,
                 identifier: asFilter(debouncedIdentifier),
                 backendName: asFilter(debouncedBackendName),
-                businessDomain: asFilter(businessDomainIdentifierQuery),
+                businessDomain: asBusinessDomainSelectorFilter(businessDomainIdentifierQuery, ALL_SELECTOR),
                 service: asFilter(processingModeServiceQuery),
             });
 

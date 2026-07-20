@@ -17,13 +17,14 @@ import { Period, periodToParams } from "@/types/period";
 
 interface MessageStatsSectionProps {
     period: Period;
+    businessDomain?: string;
     refreshToken?: number;
     refreshInterval: number;
 }
 
-export function MessageStatsSection({ period, refreshToken, refreshInterval }: MessageStatsSectionProps) {
+export function MessageStatsSection({ period, businessDomain, refreshToken, refreshInterval }: MessageStatsSectionProps) {
     const { data, loading, error } = usePolledFetch(() =>
-        getMessageStats(periodToParams(period)), refreshInterval, [period, refreshToken]);
+        getMessageStats({ ...periodToParams(period), businessDomain }), refreshInterval, [period, businessDomain, refreshToken]);
 
     if (!data) {
         return (

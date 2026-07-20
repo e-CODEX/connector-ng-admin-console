@@ -21,15 +21,27 @@ import { MessageReportingSection } from "@/components/dashboard/message/reportin
 import { DashboardSectionBox } from "@/components/dashboard/dashboard-section-box";
 import { BackendHealthSection } from "@/components/dashboard/health/backend-health-section";
 import { Gauge } from "lucide-react";
+import { BusinessDomainSelector } from "@/components/form/business-domain-selector";
+import { useBusinessDomainIdentifiers } from "@/hooks/use-business-domain-identifiers";
 
 const REFRESH_INTERVAL = 60_000;
+const ALL_SELECTOR = "All Business domains";
 
 export default function DashboardPage() {
     const [refreshToken, setRefreshToken] = useState(0);
     const [period, setPeriod] = useState<Period>(DEFAULT_PERIOD);
+    const [businessDomainIdentifierQuery, setBusinessDomainIdentifierQuery] = useState<string>(ALL_SELECTOR);
+
+    const businessDomainIdentifiers = useBusinessDomainIdentifiers(ALL_SELECTOR);
+
+    const asFilter = (value: string) => (value === ALL_SELECTOR ? undefined : value);
 
     const onRefreshClick = async () => {
         setRefreshToken((t) => t + 1)
+    }
+
+    const onBusinessDomainIdentifierChange = (value: string) => {
+        setBusinessDomainIdentifierQuery(value)
     }
 
     return (
@@ -39,12 +51,20 @@ export default function DashboardPage() {
                 title="Dashboard"
                 subtitle="App status, KPIs and Reporting"
             >
+                <PeriodFilterSelector value={period} onChange={setPeriod}/>
+
+                <BusinessDomainSelector
+                    label="Filter by business domain"
+                    identifiers={businessDomainIdentifiers}
+                    value={businessDomainIdentifierQuery}
+                    onValueChange={onBusinessDomainIdentifierChange}
+                    showLabel={false}
+                />
                 <PageHeaderButton
                     variant="secondary"
                     icon={ArrowsRotateRight}
                     onPress={onRefreshClick}
                 />
-                <PeriodFilterSelector value={period} onChange={setPeriod}/>
             </PageHeader>
 
             <DashboardSectionBox
@@ -58,14 +78,22 @@ export default function DashboardPage() {
                 title="Overview"
                 subtitle="Message volume and status at a glance"
             >
-                <MessageStatsSection refreshToken={refreshToken} period={period} refreshInterval={REFRESH_INTERVAL}/>
+                <MessageStatsSection
+                    refreshToken={refreshToken}
+                    period={period}
+                    businessDomain={asFilter(businessDomainIdentifierQuery)}
+                    refreshInterval={REFRESH_INTERVAL}/>
             </DashboardSectionBox>
 
             <DashboardSectionBox
                 title="Detailed Report"
                 subtitle="Breakdown by party and service"
             >
-                <MessageReportingSection refreshToken={refreshToken} period={period} refreshInterval={REFRESH_INTERVAL}/>
+                <MessageReportingSection
+                    refreshToken={refreshToken}
+                    period={period}
+                    businessDomain={asFilter(businessDomainIdentifierQuery)}
+                    refreshInterval={REFRESH_INTERVAL}/>
             </DashboardSectionBox>
         </div>
     );

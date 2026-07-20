@@ -43,13 +43,13 @@ export async function getMessageTransportStep(identifier: string): Promise<Conne
     return restApiCall<ConnectorTransportStepResponse>(`api/v1/admin/messages/${identifier}/transport-steps`);
 }
 
-export async function getMessageStats(params: { from?: string; to?: string; }): Promise<ConnectorMessageStatsResponse> {
+export async function getMessageStats(params: { from?: string; to?: string; businessDomain?: string; }): Promise<ConnectorMessageStatsResponse> {
     return restApiCall<ConnectorMessageStatsResponse>("api/v1/admin/messages/stats", {
         params
     });
 }
 
-export async function getMessageReports(params: { from?: string; to?: string; }): Promise<ConnectorMessageReportResponse> {
+export async function getMessageReports(params: { from?: string; to?: string; businessDomain?: string; }): Promise<ConnectorMessageReportResponse> {
     return restApiCall<ConnectorMessageReportResponse>("api/v1/admin/messages/reports", {
         params
     });

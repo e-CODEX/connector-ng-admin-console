@@ -18,6 +18,7 @@ export interface ProcessingModeServiceSelectorProps {
     label?: string;
     isRequired?: boolean;
     isDisabled?: boolean;
+    className?: string;
 }
 
 export function ProcessingModeServiceSelector({
@@ -28,6 +29,7 @@ export function ProcessingModeServiceSelector({
                                                   label = "Service",
                                                   isRequired = false,
                                                   isDisabled,
+                                                  className = "min-w-70",
                                               }: ProcessingModeServiceSelectorProps) {
     const showError = isRequired && !!error;
 
@@ -38,6 +40,7 @@ export function ProcessingModeServiceSelector({
             isInvalid={showError}
             isRequired={isRequired}
             isDisabled={isDisabled}
+            className={className}
         >
             <Label className="font-semibold">{label}</Label>
             <Select.Trigger>

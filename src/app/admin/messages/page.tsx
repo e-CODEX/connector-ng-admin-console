@@ -30,8 +30,10 @@ import { Mail, Route } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { listBusinessDomains } from "@/services/business-domain";
+import { listProcessingModeServices } from "@/services/processing-mode";
 
 const IDENTIFIER_LENGTH = 15;
+const ALL_SELECTOR = "All";
 
 export default function MessagesAdminPage() {
     const [loading, setLoading] = useState(true);
@@ -42,13 +44,17 @@ export default function MessagesAdminPage() {
     const [pageSize, setPageSize] = useState(20);
     const [selectedMessage, setSelectedMessage] = useState<ConnectorMessage | null>(null);
     const [businessDomainIdentifiers, setBusinessDomainIdentifiers] = useState<string[]>([]);
+    const [processingModeServices, setProcessingModeServices] = useState<string[]>([]);
     const [identifierQuery, setIdentifierQuery] = useState("");
     const [backendNameQuery, setBackendNameQuery] = useState("");
-    const [businessDomainIdentifierQuery, setBusinessDomainIdentifierQuery] = useState<string>("");
+    const [businessDomainIdentifierQuery, setBusinessDomainIdentifierQuery] = useState<string>(ALL_SELECTOR);
+    const [processingModeServiceQuery, setProcessingModeServiceQuery] = useState<string>(ALL_SELECTOR);
     const requestId = useRef(0);
 
     const debouncedIdentifier = useDebouncedValue(identifierQuery);
     const debouncedBackendName = useDebouncedValue(backendNameQuery);
+
+    const asFilter = (value: string) => (value === ALL_SELECTOR || value === "" ? undefined : value);
 
     const onIdentifierChange = (value: string) => {
         setIdentifierQuery(value)
@@ -61,12 +67,13 @@ export default function MessagesAdminPage() {
     }
 
     const onBusinessDomainIdentifierChange = (value: string) => {
-        if (value === "All") {
-            setBusinessDomainIdentifierQuery("")
-            return
-        }
-
+        setProcessingModeServiceQuery(ALL_SELECTOR);
         setBusinessDomainIdentifierQuery(value)
+        setPage(1)
+    }
+
+    const onProcessingModeServiceChange = (value: string) => {
+        setProcessingModeServiceQuery(value)
         setPage(1)
     }
 
@@ -108,9 +115,10 @@ export default function MessagesAdminPage() {
             const data = await listMessages({
                 page: page - 1,
                 size: pageSize,
-                identifier: debouncedIdentifier || undefined,
-                backendName: debouncedBackendName || undefined,
-                businessDomain: businessDomainIdentifierQuery || undefined,
+                identifier: asFilter(debouncedIdentifier),
+                backendName: asFilter(debouncedBackendName),
+                businessDomain: asFilter(businessDomainIdentifierQuery),
+                service: asFilter(processingModeServiceQuery),
             });
 
             if (id !== requestId.current) {
@@ -130,7 +138,11 @@ export default function MessagesAdminPage() {
                 setLoading(false);
             }
         }
-    }, [page, pageSize, debouncedIdentifier, debouncedBackendName, businessDomainIdentifierQuery]);
+    }, [page, pageSize, debouncedIdentifier, debouncedBackendName, businessDomainIdentifierQuery, processingModeServiceQuery]);
+
+    useEffect(() => {
+        void loadMessages();
+    }, [loadMessages]);
 
     useEffect(() => {
         let cancelled = false;
@@ -138,7 +150,7 @@ export default function MessagesAdminPage() {
         (async () => {
             try {
                 const businessDomains = await listBusinessDomains().then((domains) =>
-                    ["All", ...domains.map(d => d.identifier)]);
+                    [ALL_SELECTOR, ...domains.map(d => d.identifier)]);
                 if (cancelled) return;
                 setBusinessDomainIdentifiers(businessDomains);
             } catch (error) {
@@ -153,8 +165,33 @@ export default function MessagesAdminPage() {
     }, []);
 
     useEffect(() => {
-        void loadMessages();
-    }, [loadMessages]);
+        let cancelled = false;
+
+        const load = async (): Promise<string[]> => {
+            if (businessDomainIdentifierQuery === ALL_SELECTOR || businessDomainIdentifierQuery === "") {
+                return [];
+            }
+            const services = await listProcessingModeServices({
+                businessDomain: businessDomainIdentifierQuery,
+            });
+            return [ALL_SELECTOR, ...services.map(service => service.name)];
+        };
+
+        load()
+            .then(services => {
+                if (cancelled) return;
+                setProcessingModeServices(services);
+            })
+            .catch(error => {
+                if (cancelled) return;
+                setProcessingModeServices([]);
+                toastError(error);
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [businessDomainIdentifierQuery]);
 
     return (
         <div>
@@ -183,10 +220,13 @@ export default function MessagesAdminPage() {
                 identifier={identifierQuery}
                 backendName={backendNameQuery}
                 businessDomainIdentifier={businessDomainIdentifierQuery}
+                processingModeService={processingModeServiceQuery}
                 businessDomainIdentifiers={businessDomainIdentifiers}
+                processingModesServices={processingModeServices}
                 onIdentifierChange={onIdentifierChange}
                 onBackendNameChange={onBackendNameChange}
                 onBusinessDomainIdentifierChange={onBusinessDomainIdentifierChange}
+                onProcessingModesServiceChange={onProcessingModeServiceChange}
             />
 
             {loading ? (

@@ -25,7 +25,8 @@ export async function listMessages(params?: {
     size?: number,
     identifier?: string,
     backendName?: string,
-    businessDomain? : string
+    businessDomain? : string,
+    service?: string,
 }):
     Promise<PaginatedResponse<ConnectorMessage>> {
     return restApiCall<PaginatedResponse<ConnectorMessage>>("api/v1/admin/messages", {

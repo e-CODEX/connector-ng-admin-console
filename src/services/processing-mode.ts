@@ -8,7 +8,11 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { ConnectorProcessingModeResponse, ConnectorProcessingModeDetailResponse } from "@/types/response/processing-mode";
+import {
+    ConnectorProcessingModeDetailResponse,
+    ConnectorProcessingModeResponse,
+    ConnectorProcessingModeService
+} from "@/types/response/processing-mode";
 import { restApiCall } from "@/lib/rest";
 import { ProcessingModeCreationRequest } from "@/types/request/processing-mode";
 
@@ -38,4 +42,10 @@ export async function createProcessingMode(payload: ProcessingModeCreationReques
 
 export async function getProcessingMode(identifier: string): Promise<ConnectorProcessingModeDetailResponse> {
     return restApiCall<ConnectorProcessingModeDetailResponse>(`api/v1/admin/processing-modes/${identifier}`);
+}
+
+export async function listProcessingModeServices(params?: { businessDomain: string }): Promise<ConnectorProcessingModeService[]> {
+    return restApiCall<ConnectorProcessingModeService[]>("api/v1/services", {
+        params
+    });
 }

@@ -11,9 +11,9 @@
 "use client";
 
 import { PageHeader } from "@/components/common/page-header";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { ConnectorBusinessDomainResponse } from "@/types/response/business-domain";
-import { Spinner, Table, useOverlayState } from "@heroui/react";
+import { Table, useOverlayState } from "@heroui/react";
 import { createBusinessDomain, listBusinessDomains } from "@/services/business-domain";
 import { formatDate, toastError, toastSuccess, truncate } from "@/utils";
 import { ArrowsRotateRight, Plus } from "@gravity-ui/icons";
@@ -23,44 +23,12 @@ import { BooleanChip } from "@/components/common/boolean-chip";
 import { Building2 } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
+import { useList } from "@/hooks/use-list";
 
 export default function BusinessDomainsAdminPage() {
-    const [loading, setLoading] = useState(true)
-    const [refreshing, setRefreshing] = useState(false)
-    const [businessDomains, setBusinessDomain] = useState<ConnectorBusinessDomainResponse[]>([])
+    const list = useList<ConnectorBusinessDomainResponse>(listBusinessDomains);
 
     const addModal = useOverlayState();
-
-    const onAddClick = () => {
-        addModal.open();
-    }
-
-    const onRefreshClick = async () => {
-        setRefreshing(true)
-        try {
-            await loadBusinessDomains();
-        } finally {
-            setRefreshing(false);
-        }
-    }
-
-    const loadBusinessDomains = async () => {
-        setLoading(true)
-        try {
-            const data = await listBusinessDomains()
-            setBusinessDomain(data || [])
-        } catch (error) {
-            toastError(error)
-        } finally {
-            setLoading(false)
-        }
-    }
-
-    useEffect(() => {
-        (async () => {
-            await loadBusinessDomains()
-        })()
-    }, [])
 
     return (
         <div>
@@ -73,19 +41,19 @@ export default function BusinessDomainsAdminPage() {
                     variant="primary"
                     tooltip="Create a new business domain"
                     icon={Plus}
-                    onPress={onAddClick}
+                    onPress={addModal.open}
                 />
                 <PageHeaderButton
                     variant="secondary"
                     tooltip="Refresh"
                     icon={ArrowsRotateRight}
-                    onPress={onRefreshClick}
-                    isDisabled={refreshing}
-                    isSpinning={refreshing || loading}
+                    onPress={list.refresh}
+                    isDisabled={list.refreshing}
+                    isSpinning={list.refreshing || list.loading}
                 />
             </PageHeader>
 
-            {loading ? (
+            {list.loading ? (
                 <SpinnerView className="mt-80"/>
             ) : (
                 <>
@@ -101,11 +69,10 @@ export default function BusinessDomainsAdminPage() {
                                     <Table.Column>Updated at</Table.Column>
                                 </Table.Header>
                                 <Table.Body>
-                                    {businessDomains.map((businessDomain) => (
+                                    {list.items.map((businessDomain) => (
                                         <Table.Row key={businessDomain.identifier}>
                                             <Table.Cell>
-                                                <span
-                                                    className="font-semibold truncate inline-block">
+                                                <span className="font-semibold truncate inline-block">
                                                     {truncate(businessDomain.identifier)}
                                                 </span>
                                             </Table.Cell>
@@ -123,25 +90,25 @@ export default function BusinessDomainsAdminPage() {
                         </Table.ScrollContainer>
                     </Table>
 
-                    {!loading && !refreshing && businessDomains && businessDomains.length === 0 && (
+                    {list.items.length === 0 && !list.refreshing && (
                         <EmptyState text="No business domain available" className="mt-70"/>
                     )}
-
-                    <BusinessDomainCreationView
-                        state={addModal}
-                        onSubmit={async (payload) => {
-                            try {
-                                await createBusinessDomain(payload);
-                                await onRefreshClick();
-                                toastSuccess("Business domain created successfully");
-                                addModal.close();
-                            } catch (error) {
-                                toastError(error)
-                            }
-                        }}
-                    />
                 </>
             )}
+
+            <BusinessDomainCreationView
+                state={addModal}
+                onSubmit={async (payload) => {
+                    try {
+                        await createBusinessDomain(payload);
+                        await list.refresh();
+                        toastSuccess("Business domain created successfully");
+                        addModal.close();
+                    } catch (error) {
+                        toastError(error);
+                    }
+                }}
+            />
         </div>
-    )
+    );
 }

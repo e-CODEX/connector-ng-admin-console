@@ -10,14 +10,12 @@
 
 "use client";
 
-import { DependencyList, useCallback, useEffect, useRef, useState } from "react";
+import { DependencyList, useEffect, useRef, useState } from "react";
 
 export interface PolledFetchResult<T> {
     data: T | null;
     error: Error | null;
-    /** true only until the first result (or first error) arrives. */
     loading: boolean;
-    /** true while a manual refresh() is in flight — for spin/disable on a button. */
     refreshing: boolean;
     refresh: () => void;
 }
@@ -38,45 +36,51 @@ export function usePolledFetch<T>(
         fetcherRef.current = fetcher;
     });
 
-    const mounted = useRef(true);
-    const reqId = useRef(0);
+    // Bridges the event handler to the effect-scoped loader.
+    const refreshRef = useRef<() => void>(() => {
+    });
 
-    const load = useCallback(async (manual = false) => {
-        const id = ++reqId.current; // any newer call invalidates this one
-        if (manual) setRefreshing(true);
-        try {
-            const result = await fetcherRef.current();
-            if (mounted.current && id === reqId.current) {
-                setData(result);
-                setError(null);
-            }
-        } catch (e) {
-            if (mounted.current && id === reqId.current) {
-                setError(e as Error);
-            }
-        } finally {
-            if (mounted.current && id === reqId.current) {
-                setLoading(false);
-                if (manual) setRefreshing(false);
-            }
-        }
-    }, []);
-
-    const refresh = useCallback(() => void load(true), [load]);
-
-    // Serialize deps into a stable key so filter changes retrigger without a
-    // spread element in the dependency array (keeps exhaustive-deps quiet).
     const depsKey = JSON.stringify(deps);
 
     useEffect(() => {
-        mounted.current = true;
+        let cancelled = false;
+        let reqId = 0;
+
+        const load = async (manual: boolean) => {
+            const id = ++reqId;
+            try {
+                const result = await fetcherRef.current();
+                if (cancelled || id !== reqId) return;
+                setData(result);
+                setError(null);
+            } catch (e) {
+                if (cancelled || id !== reqId) return;
+                setError(e as Error);
+            } finally {
+                if (!cancelled && id === reqId) {
+                    setLoading(false);
+                    if (manual) setRefreshing(false);
+                }
+            }
+        };
+
+        refreshRef.current = () => {
+            setRefreshing(true);
+            void load(true);
+        };
+
         void load(false);
         const timer = setInterval(() => void load(false), intervalMs);
+
         return () => {
-            mounted.current = false;
+            cancelled = true;
             clearInterval(timer);
+            refreshRef.current = () => {
+            };
         };
-    }, [intervalMs, depsKey, load]);
+    }, [intervalMs, depsKey]);
+
+    const refresh = () => refreshRef.current();
 
     return { data, error, loading, refreshing, refresh };
 }

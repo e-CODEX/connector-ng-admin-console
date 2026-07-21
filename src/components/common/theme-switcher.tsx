@@ -12,17 +12,14 @@
 
 import { useTheme } from "next-themes";
 import { Button } from "@heroui/react";
-import { useEffect, useState } from "react";
 import { Moon, Sun } from "@gravity-ui/icons";
+import { useIsHydrated } from "@/hooks/use-is-hydrated";
 
 export function ThemeSwitcher() {
-    const [mounted, setMounted] = useState(false);
+    const hydrated = useIsHydrated();
     const { resolvedTheme, setTheme } = useTheme();
 
-    useEffect(() => setMounted(true), []);
-
-    // Render a stable placeholder until mounted to avoid hydration mismatch
-    if (!mounted) {
+    if (!hydrated) {
         return <Button isIconOnly variant="ghost" aria-label="Toggle theme"/>;
     }
 

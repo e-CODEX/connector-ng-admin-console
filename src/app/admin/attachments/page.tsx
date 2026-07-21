@@ -11,11 +11,11 @@
 "use client"
 
 import { PageHeader } from "@/components/common/page-header";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import { ConnectorAttachmentResponse } from "@/types/response/attachments";
 import { Button, Table, Tooltip, useOverlayState } from "@heroui/react";
 import { listAttachments } from "@/services/attachment";
-import { formatBytes, formatDate, toastError, truncate } from "@/utils";
+import { formatBytes, formatDate, truncate } from "@/utils";
 import { PaginationControls } from "@/components/paging/pagination-controls";
 import { AttachmentDetailsView } from "@/components/attachment/attachment-details-view";
 import { ArrowsRotateRight, Eye } from "@gravity-ui/icons";
@@ -24,16 +24,12 @@ import { AttachmentStorageChip } from "@/components/attachment/attachment-storag
 import { Paperclip } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
+import { usePagedList } from "@/hooks/use-paged-list";
 
 export default function AttachmentsAdminPage() {
-    const [loading, setLoading] = useState(true);
-    const [refreshing, setRefreshing] = useState(false);
-    const [page, setPage] = useState(1);
-    const [totalElements, setTotalElements] = useState(0);
-    const [pageSize, setPageSize] = useState(20);
-    const [attachments, setAttachments] = useState<ConnectorAttachmentResponse[]>([]);
     const [selectedAttachment, setSelectedAttachment] = useState<ConnectorAttachmentResponse | null>(null);
-    const requestId = useRef(0);
+
+    const pagedList = usePagedList<ConnectorAttachmentResponse>(listAttachments);
 
     const detailsModal = useOverlayState();
 
@@ -41,48 +37,6 @@ export default function AttachmentsAdminPage() {
         setSelectedAttachment(attachment);
         detailsModal.open();
     };
-
-    const onRefreshClick = async () => {
-        setRefreshing(true)
-        try {
-            await loadAttachments();
-        } finally {
-            setRefreshing(false);
-        }
-    }
-
-    const loadAttachments = useCallback(async () => {
-        const id = ++requestId.current;
-        setLoading(true);
-        try {
-            const data = await listAttachments({
-                page: page - 1,
-                size: pageSize,
-            });
-
-            if (id !== requestId.current) {
-                return;
-            }
-
-            setAttachments(data.content || []);
-            setTotalElements(data.totalElements || 0);
-        } catch (error) {
-
-            if (id !== requestId.current) {
-                return;
-            }
-
-            toastError(error);
-        } finally {
-            if (id === requestId.current) {
-                setLoading(false);
-            }
-        }
-    }, [page, pageSize]);
-
-    useEffect(() => {
-        void loadAttachments();
-    }, [loadAttachments]);
 
     return (
         <div>
@@ -95,13 +49,13 @@ export default function AttachmentsAdminPage() {
                     variant="secondary"
                     tooltip="Refresh"
                     icon={ArrowsRotateRight}
-                    onPress={onRefreshClick}
-                    isDisabled={refreshing}
-                    isSpinning={refreshing || loading}
+                    onPress={pagedList.refresh}
+                    isDisabled={pagedList.refreshing}
+                    isSpinning={pagedList.refreshing || pagedList.loading}
                 />
             </PageHeader>
 
-            {loading ? (
+            {pagedList.loading ? (
                 <SpinnerView className="mt-60"/>
             ) : (
                 <>
@@ -120,7 +74,7 @@ export default function AttachmentsAdminPage() {
                                     <Table.Column>Action.s</Table.Column>
                                 </Table.Header>
                                 <Table.Body>
-                                    {attachments.map((attachment) => (
+                                    {pagedList.items.map((attachment) => (
                                         <Table.Row key={attachment.identifier}>
                                             <Table.Cell>
                                                 <span
@@ -162,20 +116,19 @@ export default function AttachmentsAdminPage() {
                         </Table.ScrollContainer>
                     </Table>
 
-                    {!loading && !refreshing && attachments && attachments.length === 0 && (
+                    {pagedList.items.length === 0 && !pagedList.refreshing && (
                         <EmptyState text="No attachment available" className="mt-70"/>
                     )}
 
                     {
-                        totalElements > 0 && (
-
+                        pagedList.totalElements > 0 && (
                             <div className="flex justify-center mt-4">
                                 <PaginationControls
-                                    page={page}
-                                    pageSize={pageSize}
-                                    totalElements={totalElements}
-                                    onPageChange={setPage}
-                                    onPageSizeChange={setPageSize}
+                                    page={pagedList.page}
+                                    pageSize={pagedList.pageSize}
+                                    totalElements={pagedList.totalElements}
+                                    onPageChange={pagedList.setPage}
+                                    onPageSizeChange={pagedList.setPageSize}
                                 />
                             </div>
                         )

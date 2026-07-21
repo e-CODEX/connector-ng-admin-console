@@ -17,7 +17,6 @@ import { EvidenceConfiguration } from "@/types/response/configuration";
 import React, { useEffect, useState } from "react";
 import { toastError } from "@/utils";
 import { getEvidenceConfiguration } from "@/services/configuration";
-import { Spinner } from "@heroui/react";
 import { SpinnerView } from "@/components/common/spinner-view";
 
 export function ConfigurationEvidenceSection() {

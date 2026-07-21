@@ -10,63 +10,22 @@
 
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import { ConnectorQueueStatsResponse } from "@/types/response/queue";
-import { toastError } from "@/utils";
 import { loadQueueStats } from "@/services/queue";
 import { PageHeaderButton } from "@/components/common/page-header-button";
 import { ArrowsRotateRight } from "@gravity-ui/icons";
 import { PageHeader } from "@/components/common/page-header";
-import { Spinner } from "@heroui/react";
 import { QueueCard } from "@/components/queue/QueueCard";
 import { Layers } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
+import { useList } from "@/hooks/use-list";
 
 export default function QueueAdminPage() {
-    const [loading, setLoading] = useState(true)
-    const [refreshing, setRefreshing] = useState(false)
-    const [queues, setQueues] = useState<ConnectorQueueStatsResponse[]>([])
     const [selectedQueue, setSelectedQueue] = useState<string | null>(null)
-    const requestId = useRef(0);
 
-    const onRefreshClick = async () => {
-        setRefreshing(true)
-        try {
-            await loadQueues();
-        } finally {
-            setRefreshing(false);
-        }
-    }
-
-    const loadQueues = async () => {
-        const id = ++requestId.current;
-        setLoading(true)
-        try {
-            const data = await loadQueueStats()
-
-            if (id !== requestId.current) {
-                return;
-            }
-
-            setQueues(data || [])
-        } catch (error) {
-            if (id !== requestId.current) {
-                return;
-            }
-
-            toastError(error)
-        } finally {
-            if (id === requestId.current) {
-                setLoading(false);
-            }
-        }
-    }
-
-    useEffect(() => {
-        void loadQueues()
-    }, [])
-
+    const list = useList<ConnectorQueueStatsResponse>(loadQueueStats);
 
     return (
         <div>
@@ -80,17 +39,17 @@ export default function QueueAdminPage() {
                     variant="secondary"
                     tooltip="Refresh"
                     icon={ArrowsRotateRight}
-                    onPress={onRefreshClick}
-                    isDisabled={refreshing}
-                    isSpinning={refreshing || loading}
+                    onPress={list.refresh}
+                    isDisabled={list.refreshing}
+                    isSpinning={list.refreshing || list.loading}
                 />
             </PageHeader>
 
-            {loading ? (
+            {list.loading ? (
                 <SpinnerView className="mt-80"/>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-4 gap-x-5 gap-y-2">
-                    {queues.map((queueStats) => (
+                    {list.items.map((queueStats) => (
                         <QueueCard
                             key={queueStats.queueName}
                             stats={queueStats}
@@ -101,7 +60,7 @@ export default function QueueAdminPage() {
                 </div>
             )}
 
-            {!loading && !refreshing && queues && queues.length === 0 && (
+            {list.items.length === 0 && !list.refreshing && (
                 <EmptyState text="No queue stats available" className="mt-70"/>
             )}
         </div>

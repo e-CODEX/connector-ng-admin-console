@@ -5,4 +5,4 @@ on:
 name: ES Code Linting
 jobs:
     checkstyle:
-        uses: e-CODEX/workflows/.github/workflows/js/es-linting.yaml@42e87735cab5e9db2b557d64b4cd0a8719dcaa10
+        uses: e-CODEX/workflows/.github/workflows/es-linting.yaml@f25a9778299fa1fce5d3ec64124ffa8630244775

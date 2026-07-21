@@ -12,6 +12,7 @@ import { Label, SearchField } from "@heroui/react";
 import { SearchCriteriaBox } from "@/components/form/search-criteria-box";
 import { BusinessDomainSelector } from "@/components/form/business-domain-selector";
 import { ProcessingModeServiceSelector } from "@/components/form/pmode-service-selector";
+import { ConnectorProcessingModeService } from "@/types/response/processing-mode";
 
 interface MessageFiltersPanelProps {
     identifier: string;
@@ -19,11 +20,11 @@ interface MessageFiltersPanelProps {
     businessDomainIdentifier: string;
     processingModeService: string;
     businessDomainIdentifiers: string[];
-    processingModesServices: string[];
+    processingModesServices: ConnectorProcessingModeService[];
     onIdentifierChange: (value: string) => void;
     onBackendNameChange: (value: string) => void;
     onBusinessDomainIdentifierChange: (value: string) => void;
-    onProcessingModesServiceChange: (value: string) => void;
+    onProcessingModesServiceChange: (service: ConnectorProcessingModeService | null) => void;
     className?: string;
 }
 

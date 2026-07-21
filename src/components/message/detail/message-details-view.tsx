@@ -121,7 +121,7 @@ export function MessageDetailsView({ message, state }: MessageDetailsViewProps) 
                                         <DetailRow
                                             label="Status"
                                             value={
-                                                <MessageDeliveryStatusChip isDelivered={message.delivered}/>
+                                                <MessageDeliveryStatusChip message={message}/>
                                             }
                                         />
                                         <DetailRow label="Created at"

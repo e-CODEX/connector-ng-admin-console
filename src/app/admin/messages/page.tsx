@@ -264,7 +264,7 @@ export default function MessagesAdminPage() {
                                                 />
                                             </Table.Cell>
                                             <Table.Cell>
-                                                <MessageDeliveryStatusChip isDelivered={message.delivered}/>
+                                                <MessageDeliveryStatusChip message={message}/>
                                             </Table.Cell>
                                             <Table.Cell>{formatDate(message.createdAt)}</Table.Cell>
                                             <Table.Cell>

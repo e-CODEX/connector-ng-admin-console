@@ -10,11 +10,11 @@
 
 "use client"
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { ConnectorMessage } from "@/types/response/message";
 import { listMessages } from "@/services/message";
 import { Button, Table, Tooltip, useOverlayState } from "@heroui/react";
-import { formatDate, toastError, truncate } from "@/utils";
+import { formatDate, truncate } from "@/utils";
 import { PaginationControls } from "@/components/paging/pagination-controls";
 import { MessageTransportStepsDetailView } from "@/components/message/detail/message-transport-steps-detail-view";
 import { PageHeader } from "@/components/common/page-header";
@@ -29,10 +29,11 @@ import { MessageDeliveryStatusChip } from "@/components/message/chip/message-del
 import { Mail, Route } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
-import { listProcessingModeServices } from "@/services/processing-mode";
 import { useBusinessDomainIdentifiers } from "@/hooks/use-business-domain-identifiers";
 import { asBusinessDomainSelectorFilter } from "@/components/form/business-domain-selector";
 import { usePagedList } from "@/hooks/use-paged-list";
+import { useProcessingModeServices } from "@/hooks/use-processing-mode-services";
+import { ConnectorProcessingModeService } from "@/types/response/processing-mode";
 
 const IDENTIFIER_LENGTH = 15;
 const ALL_SELECTOR = "All";
@@ -41,7 +42,6 @@ const asFilter = (value: string) => value === ALL_SELECTOR || value === "" ? und
 
 export default function MessagesAdminPage() {
     const [selectedMessage, setSelectedMessage] = useState<ConnectorMessage | null>(null);
-    const [processingModeServices, setProcessingModeServices] = useState<string[]>([]);
     const [identifierQuery, setIdentifierQuery] = useState("");
     const [backendNameQuery, setBackendNameQuery] = useState("");
     const [businessDomainIdentifierQuery, setBusinessDomainIdentifierQuery] = useState(ALL_SELECTOR);
@@ -50,6 +50,7 @@ export default function MessagesAdminPage() {
     const debouncedBackendName = useDebouncedValue(backendNameQuery);
 
     const businessDomainIdentifiers = useBusinessDomainIdentifiers(ALL_SELECTOR);
+    const processingModeServices = useProcessingModeServices(businessDomainIdentifierQuery, ALL_SELECTOR);
 
     const pagedList = usePagedList<ConnectorMessage>(
         ({ page, size }) =>
@@ -85,8 +86,8 @@ export default function MessagesAdminPage() {
         pagedList.setPage(1);
     };
 
-    const onProcessingModeServiceChange = (value: string) => {
-        setProcessingModeServiceQuery(value);
+    const onProcessingModeServiceChange = (service: ConnectorProcessingModeService | null) => {
+        setProcessingModeServiceQuery(service!.name);
         pagedList.setPage(1);
     };
 
@@ -107,33 +108,6 @@ export default function MessagesAdminPage() {
     const onReportClicked = () => {
         reportModal.open();
     }
-
-    useEffect(() => {
-        let cancelled = false;
-
-        const load = async (): Promise<string[]> => {
-            if (businessDomainIdentifierQuery === ALL_SELECTOR || businessDomainIdentifierQuery === "") {
-                return [];
-            }
-            const services = await listProcessingModeServices(businessDomainIdentifierQuery);
-            return [ALL_SELECTOR, ...services.map(service => service.name)];
-        };
-
-        load()
-            .then(services => {
-                if (cancelled) return;
-                setProcessingModeServices(services);
-            })
-            .catch(error => {
-                if (cancelled) return;
-                setProcessingModeServices([]);
-                toastError(error);
-            });
-
-        return () => {
-            cancelled = true;
-        };
-    }, [businessDomainIdentifierQuery]);
 
     return (
         <div>
@@ -164,7 +138,7 @@ export default function MessagesAdminPage() {
                 businessDomainIdentifier={businessDomainIdentifierQuery}
                 processingModeService={processingModeServiceQuery}
                 businessDomainIdentifiers={businessDomainIdentifiers}
-                processingModesServices={processingModeServices}
+                processingModesServices={processingModeServices.items}
                 onIdentifierChange={onIdentifierChange}
                 onBackendNameChange={onBackendNameChange}
                 onBusinessDomainIdentifierChange={onBusinessDomainIdentifierChange}

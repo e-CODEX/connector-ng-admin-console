@@ -115,9 +115,7 @@ export default function MessagesAdminPage() {
             if (businessDomainIdentifierQuery === ALL_SELECTOR || businessDomainIdentifierQuery === "") {
                 return [];
             }
-            const services = await listProcessingModeServices({
-                businessDomain: businessDomainIdentifierQuery,
-            });
+            const services = await listProcessingModeServices(businessDomainIdentifierQuery);
             return [ALL_SELECTOR, ...services.map(service => service.name)];
         };
 

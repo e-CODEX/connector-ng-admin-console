@@ -9,7 +9,7 @@
  */
 
 import { ConnectorMessageReportResponse } from "@/types/response/reporting";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { MessageReportingKpi } from "@/components/dashboard/message/reporting/message-reporting-kpi";
 import { MessageReportingTh } from "@/components/dashboard/message/reporting/message-reporting-th";
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
@@ -19,6 +19,8 @@ const IN = "#2563eb";   // inbound
 const OUT = "#f59e0b";  // outbound
 const AXIS = "#94a3b8";
 const GRID = "rgba(148,163,184,0.25)";
+
+const ALL = "All";
 
 interface MessageReportingStatsProps {
     payload: ConnectorMessageReportResponse;
@@ -73,19 +75,20 @@ function normalize(payload: ConnectorMessageReportResponse) {
 
 export function MessageReportingStats({ payload, refreshing }: MessageReportingStatsProps) {
     const { flat, axis, services } = useMemo(() => normalize(payload), [payload]);
-    const options = useMemo(() => ["All", ...services], [services]);
-    const [service, setService] = useState<string>(options[0]);
+    const options = useMemo(() => [ALL, ...services], [services]);
+
+    const [service, setService] = useState<string>(ALL);
     const [sortKey, setSortKey] = useState<"id" | "inbound" | "outbound" | "total">("total");
     const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
-    // keep selection valid if the service set changes on a later poll
-    useEffect(() => {
-        if (!options.includes(service)) setService(options[0]);
-    }, [options, service]);
+    // Clamp instead of correcting after the fact — a later poll may drop the
+    // selected service from the payload. The user's choice is preserved in
+    // `service` and comes back if the service reappears.
+    const effectiveService = options.includes(service) ? service : options[0];
 
     const rows = useMemo(
-        () => (service === "All" ? flat : flat.filter((r) => r.service === service)),
-        [flat, service]
+        () => (effectiveService === ALL ? flat : flat.filter((r) => r.service === effectiveService)),
+        [flat, effectiveService]
     );
 
     const monthly = useMemo(() => {
@@ -136,9 +139,9 @@ export function MessageReportingStats({ payload, refreshing }: MessageReportingS
                 <div className="inline-flex rounded-lg border border-default-200 bg-content1 p-1">
                     {options.map((s) => (
                         <button key={s} onClick={() => setService(s)}
-                                aria-pressed={service === s}
+                                aria-pressed={effectiveService === s}
                                 className={`px-3 py-1.5 text-sm rounded-md transition ${
-                                    service === s
+                                    effectiveService === s
                                         ? "bg-slate-800 text-white font-medium shadow-sm"
                                         : "text-default-600 hover:bg-default-100"
                                 }`}>
@@ -163,13 +166,13 @@ export function MessageReportingStats({ payload, refreshing }: MessageReportingS
                 <Card.Content className="p-0">
                     <ResponsiveContainer width="100%" height={260}>
                         <BarChart data={monthly} margin={{ top: 4, right: 4, left: -16, bottom: 0 }}>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={GRID} />
-                            <XAxis dataKey="label" tick={{ fontSize: 12, fill: AXIS }} axisLine={false} tickLine={false} />
-                            <YAxis tick={{ fontSize: 12, fill: AXIS }} axisLine={false} tickLine={false} />
-                            <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ fill: "rgba(148,163,184,0.15)" }} />
-                            <Legend wrapperStyle={{ fontSize: 12 }} />
-                            <Bar dataKey="inbound" name="Inbound" fill={IN} radius={[3, 3, 0, 0]} maxBarSize={28} />
-                            <Bar dataKey="outbound" name="Outbound" fill={OUT} radius={[3, 3, 0, 0]} maxBarSize={28} />
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={GRID}/>
+                            <XAxis dataKey="label" tick={{ fontSize: 12, fill: AXIS }} axisLine={false} tickLine={false}/>
+                            <YAxis tick={{ fontSize: 12, fill: AXIS }} axisLine={false} tickLine={false}/>
+                            <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ fill: "rgba(148,163,184,0.15)" }}/>
+                            <Legend wrapperStyle={{ fontSize: 12 }}/>
+                            <Bar dataKey="inbound" name="Inbound" fill={IN} radius={[3, 3, 0, 0]} maxBarSize={28}/>
+                            <Bar dataKey="outbound" name="Outbound" fill={OUT} radius={[3, 3, 0, 0]} maxBarSize={28}/>
                         </BarChart>
                     </ResponsiveContainer>
                 </Card.Content>

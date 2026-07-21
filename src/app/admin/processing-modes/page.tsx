@@ -11,7 +11,7 @@
 "use client";
 
 import { PageHeader } from "@/components/common/page-header";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import { Button, Table, Tooltip, useOverlayState } from "@heroui/react";
 import { ConnectorProcessingModeResponse } from "@/types/response/processing-mode";
 import { createProcessingMode, listProcessingModes } from "@/services/processing-mode";
@@ -23,61 +23,24 @@ import { ProcessingModeCreationView } from "@/components/processing-mode/process
 import { Workflow } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
+import { useList } from "@/hooks/use-list";
 
 export default function ProcessingModesAdminPage() {
-    const [loading, setLoading] = useState(true)
-    const [refreshing, setRefreshing] = useState(false)
-    const [processingModes, setProcessingModes] = useState<ConnectorProcessingModeResponse[]>([])
     const [selectedProcessingMode, setSelectedProcessingMode] = useState<ConnectorProcessingModeResponse | null>(null);
-    const requestId = useRef(0);
+
     const detailsModal = useOverlayState();
     const addModal = useOverlayState();
 
+    const list = useList<ConnectorProcessingModeResponse>(listProcessingModes);
+
     const onAddClick = () => {
         addModal.open();
-    }
-
-    const onRefreshClick = async () => {
-        setRefreshing(true)
-        try {
-            await loadProcessingModes();
-        } finally {
-            setRefreshing(false);
-        }
     }
 
     const onDetailsClick = (processingMode: ConnectorProcessingModeResponse) => {
         setSelectedProcessingMode(processingMode);
         detailsModal.open();
     };
-
-    const loadProcessingModes = async () => {
-        const id = ++requestId.current;
-        setLoading(true)
-        try {
-            const data = await listProcessingModes()
-
-            if (id !== requestId.current) {
-                return;
-            }
-
-            setProcessingModes(data || [])
-        } catch (error) {
-            if (id !== requestId.current) {
-                return;
-            }
-
-            toastError(error)
-        } finally {
-            if (id === requestId.current) {
-                setLoading(false);
-            }
-        }
-    }
-
-    useEffect(() => {
-        void loadProcessingModes()
-    }, [])
 
     return (
         <div>
@@ -97,13 +60,13 @@ export default function ProcessingModesAdminPage() {
                     variant="secondary"
                     tooltip="Refresh"
                     icon={ArrowsRotateRight}
-                    onPress={onRefreshClick}
-                    isDisabled={refreshing}
-                    isSpinning={refreshing || loading}
+                    onPress={list.refresh}
+                    isDisabled={list.refreshing}
+                    isSpinning={list.refreshing || list.loading}
                 />
             </PageHeader>
 
-            {loading ? (
+            {list.loading ? (
                 <SpinnerView className="mt-80"/>
             ) : (
                 <>
@@ -119,7 +82,7 @@ export default function ProcessingModesAdminPage() {
                                     <Table.Column>Action.s</Table.Column>
                                 </Table.Header>
                                 <Table.Body>
-                                    {processingModes.map((pMode) => (
+                                    {list.items.map((pMode) => (
                                         <Table.Row key={pMode.uuid}>
                                             <Table.Cell>
                                                 <span
@@ -156,7 +119,7 @@ export default function ProcessingModesAdminPage() {
                         </Table.ScrollContainer>
                     </Table>
 
-                    {!loading && !refreshing && processingModes && processingModes.length === 0 && (
+                    {list.items.length === 0 && !list.refreshing && (
                         <EmptyState text="No processing mode available" className="mt-70"/>
                     )}
 
@@ -165,11 +128,11 @@ export default function ProcessingModesAdminPage() {
                         onSubmit={async (payload) => {
                             try {
                                 await createProcessingMode(payload);
-                                await onRefreshClick();
+                                await list.refresh();
                                 toastSuccess("Processing mode created successfully");
                                 addModal.close();
                             } catch (error) {
-                                toastError(error)
+                                toastError(error);
                             }
                         }}
                     />

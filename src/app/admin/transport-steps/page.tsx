@@ -11,12 +11,12 @@
 "use client"
 
 import { PageHeader } from "@/components/common/page-header";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
-import { Button, Spinner, Table, Tooltip, useOverlayState } from "@heroui/react";
+import { Button, Table, Tooltip, useOverlayState } from "@heroui/react";
 import { listTransportSteps } from "@/services/transport-step";
 import { TransportStepFiltersPanel } from "@/components/transport-step/transport-step-filters-panel";
-import { formatDate, toastError, truncate } from "@/utils";
+import { formatDate, truncate } from "@/utils";
 import { PaginationControls } from "@/components/paging/pagination-controls";
 import { ConnectorTransportStepResponse } from "@/types/response/transport-step";
 import { TransportStepDetailsView } from "@/components/transport-step/transport-step-details-view";
@@ -27,30 +27,35 @@ import { TransportDeliveryStatusChip } from "@/components/transport-step/transpo
 import { Route } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
+import { usePagedList } from "@/hooks/use-paged-list";
 
 export default function TransportStepsAdminPage() {
-    const [loading, setLoading] = useState(true)
-    const [refreshing, setRefreshing] = useState(false);
-    const [page, setPage] = useState(1)
-    const [totalElements, setTotalElements] = useState(0)
-    const [pageSize, setPageSize] = useState(20);
     const [selectedTransportStep, setSelectedTransportStep] = useState<ConnectorTransportStepResponse | null>(null);
-    const [transportSteps, setTransportSteps] = useState<ConnectorTransportStepResponse[]>([])
-    const [messageOrRemoteSystemIdentifierQuery, setMessageOrRemoteSystemIdentifierQuery] = useState("")
-    const [linkPartnerNameQuery, setLinkPartnerNameQuery] = useState("")
-    const debouncedMessageOrRemoteSystemIdentifier = useDebouncedValue(messageOrRemoteSystemIdentifierQuery)
-    const debouncedLinkPartnerName = useDebouncedValue(linkPartnerNameQuery)
-    const requestId = useRef(0);
+    const [messageOrRemoteSystemIdentifierQuery, setMessageOrRemoteSystemIdentifierQuery] = useState("");
+    const [linkPartnerNameQuery, setLinkPartnerNameQuery] = useState("");
+    const debouncedMessageOrRemoteSystemIdentifier = useDebouncedValue(messageOrRemoteSystemIdentifierQuery);
+    const debouncedLinkPartnerName = useDebouncedValue(linkPartnerNameQuery);
+
+    const pagedList = usePagedList<ConnectorTransportStepResponse>(
+        ({ page, size }) =>
+            listTransportSteps({
+                page,
+                size,
+                messageOrRemoteSystemIdentifier: debouncedMessageOrRemoteSystemIdentifier || undefined,
+                linkPartnerName: debouncedLinkPartnerName || undefined,
+            }),
+        [debouncedMessageOrRemoteSystemIdentifier, debouncedLinkPartnerName],
+    );
 
     const onMessageOrRemoteSystemIdentifierChange = (value: string) => {
-        setMessageOrRemoteSystemIdentifierQuery(value)
-        setPage(1)
-    }
+        setMessageOrRemoteSystemIdentifierQuery(value);
+        pagedList.setPage(1);
+    };
 
     const onLinkPartnerNameChange = (value: string) => {
-        setLinkPartnerNameQuery(value)
-        setPage(1)
-    }
+        setLinkPartnerNameQuery(value);
+        pagedList.setPage(1);
+    };
 
     const detailsModal = useOverlayState();
 
@@ -58,49 +63,6 @@ export default function TransportStepsAdminPage() {
         setSelectedTransportStep(step);
         detailsModal.open();
     };
-
-    const onRefreshClick = async () => {
-        setRefreshing(true)
-        try {
-            await loadTransportSteps();
-        } finally {
-            setRefreshing(false);
-        }
-    }
-
-    const loadTransportSteps = useCallback(async () => {
-        const id = ++requestId.current;
-        setLoading(true)
-        try {
-            const data = await listTransportSteps({
-                page: page - 1,
-                size: pageSize,
-                messageOrRemoteSystemIdentifier: debouncedMessageOrRemoteSystemIdentifier || undefined,
-                linkPartnerName: debouncedLinkPartnerName || undefined,
-            })
-
-            if (id !== requestId.current) {
-                return;
-            }
-
-            setTransportSteps(data.content || [])
-            setTotalElements(data.totalElements || 0)
-        } catch (error) {
-            if (id !== requestId.current) {
-                return;
-            }
-
-            toastError(error)
-        } finally {
-            if (id === requestId.current) {
-                setLoading(false);
-            }
-        }
-    }, [page, pageSize, debouncedMessageOrRemoteSystemIdentifier, debouncedLinkPartnerName]);
-
-    useEffect(() => {
-        void loadTransportSteps();
-    }, [loadTransportSteps]);
 
     return (
         <div>
@@ -113,9 +75,9 @@ export default function TransportStepsAdminPage() {
                     variant="secondary"
                     tooltip="Refresh"
                     icon={ArrowsRotateRight}
-                    onPress={onRefreshClick}
-                    isDisabled={refreshing}
-                    isSpinning={refreshing || loading}
+                    onPress={pagedList.refresh}
+                    isDisabled={pagedList.refreshing}
+                    isSpinning={pagedList.refreshing || pagedList.loading}
                 />
             </PageHeader>
             <TransportStepFiltersPanel
@@ -125,7 +87,7 @@ export default function TransportStepsAdminPage() {
                 onLinkPartnerNameChange={onLinkPartnerNameChange}
             />
 
-            {loading ? (
+            {pagedList.loading ? (
                 <SpinnerView className="mt-60"/>
             ) : (
                 <>
@@ -144,7 +106,7 @@ export default function TransportStepsAdminPage() {
                                     <Table.Column>Actions</Table.Column>
                                 </Table.Header>
                                 <Table.Body>
-                                    {transportSteps.map((transportStep) => (
+                                    {pagedList.items.map((transportStep) => (
                                         <Table.Row key={transportStep.identifier}>
                                             <Table.Cell>
                                                 <Tooltip delay={0}>
@@ -195,27 +157,25 @@ export default function TransportStepsAdminPage() {
                         </Table.ScrollContainer>
                     </Table>
 
-                    {!loading && !refreshing && transportSteps && transportSteps.length === 0 && (
+                    {pagedList.items.length === 0 && !pagedList.refreshing && (
                         <EmptyState text="No transport step available" className="mt-70"/>
                     )}
 
                     {
-                        totalElements > 0 && (
-
+                        pagedList.totalElements > 0 && (
                             <div className="flex justify-center mt-4">
                                 <PaginationControls
-                                    page={page}
-                                    pageSize={pageSize}
-                                    totalElements={totalElements}
-                                    onPageChange={setPage}
-                                    onPageSizeChange={setPageSize}
+                                    page={pagedList.page}
+                                    pageSize={pagedList.pageSize}
+                                    totalElements={pagedList.totalElements}
+                                    onPageChange={pagedList.setPage}
+                                    onPageSizeChange={pagedList.setPageSize}
                                 />
                             </div>
                         )
                     }
 
-                    <TransportStepDetailsView transportStep={selectedTransportStep}
-                                              state={detailsModal}/>
+                    <TransportStepDetailsView transportStep={selectedTransportStep} state={detailsModal}/>
                 </>
             )}
         </div>

@@ -10,7 +10,7 @@
 
 "use client"
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ConnectorMessage } from "@/types/response/message";
 import { listMessages } from "@/services/message";
 import { Button, Table, Tooltip, useOverlayState } from "@heroui/react";
@@ -32,52 +32,63 @@ import { SpinnerView } from "@/components/common/spinner-view";
 import { listProcessingModeServices } from "@/services/processing-mode";
 import { useBusinessDomainIdentifiers } from "@/hooks/use-business-domain-identifiers";
 import { asBusinessDomainSelectorFilter } from "@/components/form/business-domain-selector";
+import { usePagedList } from "@/hooks/use-paged-list";
 
 const IDENTIFIER_LENGTH = 15;
 const ALL_SELECTOR = "All";
 
+const asFilter = (value: string) => value === ALL_SELECTOR || value === "" ? undefined : value;
+
 export default function MessagesAdminPage() {
-    const [loading, setLoading] = useState(true);
-    const [refreshing, setRefreshing] = useState(false);
-    const [messages, setMessages] = useState<ConnectorMessage[]>([]);
-    const [page, setPage] = useState(1);
-    const [totalElements, setTotalElements] = useState(0);
-    const [pageSize, setPageSize] = useState(20);
     const [selectedMessage, setSelectedMessage] = useState<ConnectorMessage | null>(null);
     const [processingModeServices, setProcessingModeServices] = useState<string[]>([]);
     const [identifierQuery, setIdentifierQuery] = useState("");
     const [backendNameQuery, setBackendNameQuery] = useState("");
-    const [businessDomainIdentifierQuery, setBusinessDomainIdentifierQuery] = useState<string>(ALL_SELECTOR);
-    const [processingModeServiceQuery, setProcessingModeServiceQuery] = useState<string>(ALL_SELECTOR);
-    const requestId = useRef(0);
-
+    const [businessDomainIdentifierQuery, setBusinessDomainIdentifierQuery] = useState(ALL_SELECTOR);
+    const [processingModeServiceQuery, setProcessingModeServiceQuery] = useState(ALL_SELECTOR);
     const debouncedIdentifier = useDebouncedValue(identifierQuery);
     const debouncedBackendName = useDebouncedValue(backendNameQuery);
 
-    const asFilter = (value: string) => (value === ALL_SELECTOR || value === "" ? undefined : value);
-
     const businessDomainIdentifiers = useBusinessDomainIdentifiers(ALL_SELECTOR);
 
+    const pagedList = usePagedList<ConnectorMessage>(
+        ({ page, size }) =>
+            listMessages({
+                page,
+                size,
+                identifier: asFilter(debouncedIdentifier),
+                backendName: asFilter(debouncedBackendName),
+                businessDomain: asBusinessDomainSelectorFilter(businessDomainIdentifierQuery, ALL_SELECTOR),
+                service: asFilter(processingModeServiceQuery),
+            }),
+        [
+            debouncedIdentifier,
+            debouncedBackendName,
+            businessDomainIdentifierQuery,
+            processingModeServiceQuery,
+        ],
+    );
+
     const onIdentifierChange = (value: string) => {
-        setIdentifierQuery(value)
-        setPage(1)
-    }
+        setIdentifierQuery(value);
+        pagedList.setPage(1);
+    };
 
     const onBackendNameChange = (value: string) => {
-        setBackendNameQuery(value)
-        setPage(1)
-    }
+        setBackendNameQuery(value);
+        pagedList.setPage(1);
+    };
 
     const onBusinessDomainIdentifierChange = (value: string) => {
         setProcessingModeServiceQuery(ALL_SELECTOR);
-        setBusinessDomainIdentifierQuery(value)
-        setPage(1)
-    }
+        setBusinessDomainIdentifierQuery(value);
+        pagedList.setPage(1);
+    };
 
     const onProcessingModeServiceChange = (value: string) => {
-        setProcessingModeServiceQuery(value)
-        setPage(1)
-    }
+        setProcessingModeServiceQuery(value);
+        pagedList.setPage(1);
+    };
 
     const detailsModal = useOverlayState();
     const transportModal = useOverlayState();
@@ -93,58 +104,9 @@ export default function MessagesAdminPage() {
         transportModal.open();
     };
 
-    const onRefreshClick = async () => {
-        setRefreshing(true)
-        try {
-            await loadMessages(true);
-        } finally {
-            setRefreshing(false);
-        }
-    }
-
     const onReportClicked = () => {
         reportModal.open();
     }
-
-    const loadMessages = useCallback(async (silent = false) => {
-        const id = ++requestId.current;
-
-        if (!silent) {
-            setLoading(true);
-        }
-
-        try {
-            const data = await listMessages({
-                page: page - 1,
-                size: pageSize,
-                identifier: asFilter(debouncedIdentifier),
-                backendName: asFilter(debouncedBackendName),
-                businessDomain: asBusinessDomainSelectorFilter(businessDomainIdentifierQuery, ALL_SELECTOR),
-                service: asFilter(processingModeServiceQuery),
-            });
-
-            if (id !== requestId.current) {
-                return;
-            }
-
-            setMessages(data.content || []);
-            setTotalElements(data.totalElements || 0);
-        } catch (error) {
-            if (id !== requestId.current) {
-                return;
-            }
-
-            toastError(error);
-        } finally {
-            if (id === requestId.current && !silent) {
-                setLoading(false);
-            }
-        }
-    }, [page, pageSize, debouncedIdentifier, debouncedBackendName, businessDomainIdentifierQuery, processingModeServiceQuery]);
-
-    useEffect(() => {
-        void loadMessages();
-    }, [loadMessages]);
 
     useEffect(() => {
         let cancelled = false;
@@ -193,9 +155,9 @@ export default function MessagesAdminPage() {
                     variant="secondary"
                     tooltip="Refresh"
                     icon={ArrowsRotateRight}
-                    onPress={onRefreshClick}
-                    isDisabled={refreshing}
-                    isSpinning={refreshing || loading}
+                    onPress={pagedList.refresh}
+                    isDisabled={pagedList.refreshing}
+                    isSpinning={pagedList.refreshing || pagedList.loading}
                 />
             </PageHeader>
             <MessageFiltersPanel
@@ -211,7 +173,7 @@ export default function MessagesAdminPage() {
                 onProcessingModesServiceChange={onProcessingModeServiceChange}
             />
 
-            {loading ? (
+            {pagedList.loading ? (
                 <SpinnerView className="mt-60"/>
             ) : (
                 <>
@@ -235,7 +197,7 @@ export default function MessagesAdminPage() {
                                     <Table.Column>Action.s</Table.Column>
                                 </Table.Header>
                                 <Table.Body>
-                                    {messages.map((message) => (
+                                    {pagedList.items.map((message) => (
                                         <Table.Row key={message.identifier}>
                                             <Table.Cell>
                                                 <Tooltip delay={0}>
@@ -309,20 +271,19 @@ export default function MessagesAdminPage() {
                         </Table.ScrollContainer>
                     </Table>
 
-                    {!loading && !refreshing && messages && messages.length === 0 && (
+                    {pagedList.items.length === 0 && !pagedList.refreshing && (
                         <EmptyState text="No message available" className="mt-50"/>
                     )}
 
                     {
-                        totalElements > 0 && (
-
+                        pagedList.totalElements > 0 && (
                             <div className="flex justify-center mt-4">
                                 <PaginationControls
-                                    page={page}
-                                    pageSize={pageSize}
-                                    totalElements={totalElements}
-                                    onPageChange={setPage}
-                                    onPageSizeChange={setPageSize}
+                                    page={pagedList.page}
+                                    pageSize={pagedList.pageSize}
+                                    totalElements={pagedList.totalElements}
+                                    onPageChange={pagedList.setPage}
+                                    onPageSizeChange={pagedList.setPageSize}
                                 />
                             </div>
                         )

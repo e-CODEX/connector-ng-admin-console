@@ -44,8 +44,6 @@ export async function getProcessingMode(identifier: string): Promise<ConnectorPr
     return restApiCall<ConnectorProcessingModeDetailResponse>(`api/v1/admin/processing-modes/${identifier}`);
 }
 
-export async function listProcessingModeServices(params?: { businessDomain: string }): Promise<ConnectorProcessingModeService[]> {
-    return restApiCall<ConnectorProcessingModeService[]>("api/v1/services", {
-        params
-    });
+export async function listProcessingModeServices(businessDomain: string): Promise<ConnectorProcessingModeService[]> {
+    return restApiCall<ConnectorProcessingModeService[]>(`api/v1/processing-modes/${businessDomain}/services`);
 }

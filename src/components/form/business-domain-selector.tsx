@@ -14,7 +14,6 @@ interface BusinessDomainSelectorProps {
     identifiers: string[];
     value: string;
     onValueChange: (identifier: string) => void;
-    error?: string;
     label?: string;
     isRequired?: boolean;
     isDisabled?: boolean;
@@ -28,27 +27,24 @@ export function BusinessDomainSelector({
                                            identifiers,
                                            value,
                                            onValueChange,
-                                           error,
                                            label = "Business domain",
                                            isRequired = false,
                                            isDisabled,
                                            showLabel = true,
                                            className = "min-w-70",
                                        }: BusinessDomainSelectorProps) {
-    const showError = isRequired && !!error;
-
     return (
         <Select
             aria-label={label}
             value={value}
             onChange={(key) => onValueChange(key as string)}
-            isInvalid={showError}
             isRequired={isRequired}
             isDisabled={isDisabled}
             className={className}
+            placeholder="Select a business domain"
         >
             {showLabel && <Label className="font-semibold">{label}</Label>}
-            <Select.Trigger>
+            <Select.Trigger className="flex-1">
                 <Select.Value/>
                 <Select.Indicator/>
             </Select.Trigger>
@@ -62,7 +58,7 @@ export function BusinessDomainSelector({
                     ))}
                 </ListBox>
             </Select.Popover>
-            {isRequired && <FieldError>{error}</FieldError>}
+            <FieldError />
         </Select>
     );
 }

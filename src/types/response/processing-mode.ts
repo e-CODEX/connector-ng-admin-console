@@ -8,6 +8,8 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
+import { PartyRoleType } from "@/types/global";
+
 export interface ConnectorProcessingModeResponse {
     uuid: string;
     description: string;
@@ -28,7 +30,7 @@ export interface ConnectorProcessingModeParty {
     identifier: string;
     identifierType: string;
     role: string;
-    roleType: string;
+    roleType: PartyRoleType;
     isHome: boolean;
 }
 

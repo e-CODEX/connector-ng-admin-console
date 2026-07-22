@@ -9,7 +9,8 @@
  */
 
 import {
-    ConnectorProcessingModeDetailResponse,
+    ConnectorProcessingModeAction,
+    ConnectorProcessingModeDetailResponse, ConnectorProcessingModeParty,
     ConnectorProcessingModeResponse,
     ConnectorProcessingModeService
 } from "@/types/response/processing-mode";
@@ -46,4 +47,12 @@ export async function getProcessingMode(identifier: string): Promise<ConnectorPr
 
 export async function listProcessingModeServices(businessDomain: string): Promise<ConnectorProcessingModeService[]> {
     return restApiCall<ConnectorProcessingModeService[]>(`api/v1/processing-modes/${businessDomain}/services`);
+}
+
+export async function listProcessingModeActions(businessDomain: string): Promise<ConnectorProcessingModeAction[]> {
+    return restApiCall<ConnectorProcessingModeAction[]>(`api/v1/processing-modes/${businessDomain}/actions`);
+}
+
+export async function listProcessingModeParties(businessDomain: string): Promise<ConnectorProcessingModeParty[]> {
+    return restApiCall<ConnectorProcessingModeParty[]>(`api/v1/processing-modes/${businessDomain}/parties`);
 }

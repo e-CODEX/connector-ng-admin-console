@@ -21,3 +21,7 @@ export type TransportStepMessageType = "BUSINESS" | "EVIDENCE";
 export type TransportStepStatus = "DELIVERED" | "FAILED" | "SUBMITTED" | "DOWNLOADED" | "READY_FOR_DOWNLOAD";
 
 export type BusinessDocumentAesType = "SIGNATURE_BASED" | "AUTHENTICATION_BASED";
+
+export type PartyRoleType = "INITIATOR" | "RESPONDER";
+
+export type LinkPartnerType = "BACKEND" | "GATEWAY";

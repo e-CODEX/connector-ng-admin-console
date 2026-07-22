@@ -8,26 +8,29 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { Input, Label, TextField } from "@heroui/react";
+import { FieldError, Input, Label, TextField } from "@heroui/react";
 
 interface FormTextFieldProps {
     label: string;
     value: string;
     required?: boolean;
     type?: "text" | "number";
-    onChange: (value: string) => void;
+    onChange?: (value: string) => void;
+    isReadOnly?: boolean;
 }
 
-export function FormTextField({ label, value = "", type = "text", required = false, onChange }: FormTextFieldProps) {
+export function FormTextField({ label, value = "", type = "text", required = false, isReadOnly = false, onChange }: FormTextFieldProps) {
     return (
         <TextField
             value={value}
             onChange={onChange}
             isRequired={required}
             className="w-full"
+            isReadOnly={isReadOnly}
         >
             <Label className="text-sm font-semibold text-default-700">{label}</Label>
             <Input type={type}/>
+            <FieldError />
         </TextField>
     );
 }

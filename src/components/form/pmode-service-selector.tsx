@@ -13,9 +13,8 @@ import { ConnectorProcessingModeService } from "@/types/response/processing-mode
 
 export interface ProcessingModeServiceSelectorProps {
     services: ConnectorProcessingModeService[];
-    value: string;
+    value?: string | null;
     onValueChange: (service: ConnectorProcessingModeService | null) => void;
-    error?: string;
     label?: string;
     showType?: boolean;
     isRequired?: boolean;
@@ -23,21 +22,18 @@ export interface ProcessingModeServiceSelectorProps {
     className?: string;
 }
 
-const keyOf = (service: ConnectorProcessingModeService) => `${service.type}:${service.name}`;
+const keyOf = (service: ConnectorProcessingModeService) => service.name;
 
 export function ProcessingModeServiceSelector({
                                                   services,
                                                   value,
                                                   onValueChange,
-                                                  error,
                                                   label = "Service",
                                                   showType = false,
                                                   isRequired = false,
                                                   isDisabled,
                                                   className = "min-w-70",
                                               }: ProcessingModeServiceSelectorProps) {
-    const showError = isRequired && !!error;
-
     const handleChange = (key: Key | null) => {
         onValueChange(services.find((service) => keyOf(service) === key) ?? null);
     };
@@ -46,10 +42,10 @@ export function ProcessingModeServiceSelector({
         <Select
             value={value}
             onChange={handleChange}
-            isInvalid={showError}
             isRequired={isRequired}
             isDisabled={isDisabled}
             className={className}
+            placeholder="Select a service"
         >
             <Label className="font-semibold">{label}</Label>
             <Select.Trigger>
@@ -65,7 +61,7 @@ export function ProcessingModeServiceSelector({
                                 {showType ? (
                                     `${service.name} (${service.type})`
                                 ) : (
-                                    `${service.name}`
+                                    service.name
                                 )}
                                 <ListBox.ItemIndicator/>
                             </ListBox.Item>
@@ -73,7 +69,7 @@ export function ProcessingModeServiceSelector({
                     })}
                 </ListBox>
             </Select.Popover>
-            {isRequired && <FieldError>{error}</FieldError>}
+            <FieldError/>
         </Select>
     );
 }

@@ -12,17 +12,76 @@
 
 import { SendMessageFormData } from "@/types/send-message-form";
 import { FormTextField } from "@/components/form/form-text-field";
+import { ConnectorProcessingModeAction, ConnectorProcessingModeParty, ConnectorProcessingModeService } from "@/types/response/processing-mode";
+import { ProcessingModeServiceSelector } from "@/components/form/pmode-service-selector";
+import { useState } from "react";
+import { ProcessingModePartySelector } from "@/components/form/pmode-party-selector";
+import { ProcessingModeActionSelector } from "@/components/form/pmode-action-selector";
+import { useLinkPartners } from "@/hooks/use-link-partners";
+import { LinkPartnerSelector } from "@/components/form/link-partner-selector";
+import { ConnectorLinkPartnerResponse } from "@/types/response/link-partner";
 
 interface OutboundMessageFormProps {
     data: SendMessageFormData;
     onChange: (next: SendMessageFormData) => void;
+    businessDomainIdentifier: string;
+    processingModesServices: ConnectorProcessingModeService[];
+    processingModesActions: ConnectorProcessingModeAction[];
+    processingModesParties: ConnectorProcessingModeParty[];
 }
 
-export function OutboundMessageForm({ data, onChange, }: OutboundMessageFormProps) {
+export function OutboundMessageForm({
+                                        data,
+                                        onChange,
+                                        processingModesServices,
+                                        processingModesActions,
+                                        processingModesParties,
+                                        businessDomainIdentifier
+                                    }: OutboundMessageFormProps) {
+    const [processingModeServiceName, setProcessingModeServiceName] = useState<string | null>(null);
+    const [processingModeActionName, setProcessingModeActionName] = useState<string | null>(null);
+    const [processingModeFromPartyName, setProcessingModeFromPartyName] = useState<string | null>(null);
+    const [processingModeToPartyName, setProcessingModeToPartyName] = useState<string | null>(null);
+    const [backendLinkPartnerName, setBackendLinkPartnerName] = useState<string | null>(null);
+
+    const backendLinkPartners = useLinkPartners("BACKEND");
+
     const { as4Properties } = data;
 
+    const onProcessingModeServiceChange = (service: ConnectorProcessingModeService | null) => {
+        if (!service) return;
+        updateAs4({ service: { ...service } });
+        setProcessingModeServiceName(service.name);
+    };
+
+    const onProcessingModeActionChange = (action: ConnectorProcessingModeAction | null) => {
+        if (!action) return;
+        updateAs4({ action: { ...action } });
+        setProcessingModeActionName(action.name);
+    };
+
+    const onProcessingModeFromPartyChange = (party: ConnectorProcessingModeParty | null) => {
+        if (!party) return;
+        updateAs4({
+            fromParty: { ...party }
+        });
+        setProcessingModeFromPartyName(`${party.identifier}-${party.roleType}`);
+    };
+
+    const onProcessingModeToPartyChange = (party: ConnectorProcessingModeParty | null) => {
+        if (!party) return;
+        updateAs4({ toParty: { ...party } });
+        setProcessingModeToPartyName(`${party.identifier}-${party.roleType}`);
+    };
+
+    const onBackendLinkPartnerChange = (partner: ConnectorLinkPartnerResponse | null) => {
+        if (!partner) return;
+        update({ backendName: partner.name })
+        setBackendLinkPartnerName(partner.name);
+    }
+
     const update = (patch: Partial<SendMessageFormData>) => {
-        onChange({ ...data, ...patch, });
+        onChange({ ...data, ...patch, businessDomainIdentifier });
     };
 
     const updateAs4 = (patch: Partial<SendMessageFormData["as4Properties"]>) => {
@@ -60,11 +119,11 @@ export function OutboundMessageForm({ data, onChange, }: OutboundMessageFormProp
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-5 gap-y-2">
-                    <FormTextField
-                        label="Backend Name"
-                        value={data.backendName}
-                        required
-                        onChange={(value) => update({ backendName: value })}
+                    <LinkPartnerSelector
+                        partners={backendLinkPartners}
+                        value={backendLinkPartnerName}
+                        onValueChange={onBackendLinkPartnerChange}
+                        isRequired={true}
                     />
                     <FormTextField
                         label="Original Sender"
@@ -82,128 +141,40 @@ export function OutboundMessageForm({ data, onChange, }: OutboundMessageFormProp
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-5 gap-y-2">
-                    <FormTextField
-                        label="Service"
-                        value={as4Properties.service.name}
-                        required
-                        onChange={(value) =>
-                            updateAs4({
-                                service: {
-                                    ...as4Properties.service,
-                                    name: value,
-                                },
-                            })
-                        }
+                    <ProcessingModeServiceSelector
+                        services={processingModesServices}
+                        value={processingModeServiceName}
+                        onValueChange={onProcessingModeServiceChange}
+                        isRequired={true}
+                        showType={true}
                     />
 
-                    <FormTextField
-                        label="Service Type"
-                        value={as4Properties.service.type}
-                        onChange={(value) =>
-                            updateAs4({
-                                service: {
-                                    ...as4Properties.service,
-                                    type: value,
-                                },
-                            })
-                        }
-                    />
-
-                    <FormTextField
-                        label="Action"
-                        value={as4Properties.action.name}
-                        required
-                        onChange={(value) =>
-                            updateAs4({
-                                action: {
-                                    ...as4Properties.action,
-                                    name: value,
-                                },
-                            })
-                        }
+                    <ProcessingModeActionSelector
+                        actions={processingModesActions}
+                        value={processingModeActionName}
+                        onValueChange={onProcessingModeActionChange}
+                        isRequired={true}
                     />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-5 gap-y-2">
-                    <FormTextField
-                        label="From Party Id"
-                        value={as4Properties.fromParty.identifier}
-                        required
-                        onChange={(value) =>
-                            updateAs4({
-                                fromParty: {
-                                    ...as4Properties.fromParty,
-                                    identifier: value,
-                                },
-                            })
-                        }
+                    <ProcessingModePartySelector
+                        label="From Party"
+                        parties={processingModesParties}
+                        value={processingModeFromPartyName}
+                        onValueChange={onProcessingModeFromPartyChange}
+                        isRequired={true}
+                        showType={true}
                     />
 
-                    <FormTextField
-                        label="From Party Role"
-                        value={as4Properties.fromParty.role}
-                        onChange={(value) =>
-                            updateAs4({
-                                fromParty: {
-                                    ...as4Properties.fromParty,
-                                    role: value,
-                                },
-                            })
-                        }
-                    />
-
-                    <FormTextField
-                        label="From Party Type"
-                        value={as4Properties.fromParty.identifierType}
-                        onChange={(value) =>
-                            updateAs4({
-                                fromParty: {
-                                    ...as4Properties.fromParty,
-                                    identifierType: value,
-                                },
-                            })
-                        }
-                    />
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-5 gap-y-2">
-                    <FormTextField
-                        label="To Party Id"
-                        value={as4Properties.toParty.identifier}
-                        required
-                        onChange={(value) =>
-                            updateAs4({
-                                toParty: {
-                                    ...as4Properties.toParty,
-                                    identifier: value,
-                                },
-                            })
-                        }
-                    />
-
-                    <FormTextField
-                        label="To Party Role"
-                        value={as4Properties.toParty.role}
-                        onChange={(value) =>
-                            updateAs4({
-                                toParty: {
-                                    ...as4Properties.toParty,
-                                    role: value,
-                                },
-                            })
-                        }
-                    />
-
-                    <FormTextField
-                        label="To Party Type"
-                        value={as4Properties.toParty.identifierType}
-                        onChange={(value) =>
-                            updateAs4({
-                                toParty: {
-                                    ...as4Properties.toParty,
-                                    identifierType: value,
-                                },
-                            })
-                        }
+                    <ProcessingModePartySelector
+                        label="To Party"
+                        parties={processingModesParties}
+                        value={processingModeToPartyName}
+                        onValueChange={onProcessingModeToPartyChange}
+                        isRequired={true}
+                        showType={true}
+                        role="RESPONDER"
                     />
                 </div>
             </div>

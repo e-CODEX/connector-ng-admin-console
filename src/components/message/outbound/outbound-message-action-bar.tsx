@@ -14,19 +14,22 @@ import { Button, Spinner } from "@heroui/react";
 import { FloppyDisk, PaperPlane } from "@gravity-ui/icons";
 
 interface OutboundMessageActionBarProps {
+    formId: string;
     isSending?: boolean;
-    onSend?: () => void;
+    onSubmit?: () => void;
     onSaveAsXml?: () => void;
 }
 
-export function OutboundMessageActionBar({ isSending = false, onSend, onSaveAsXml }: OutboundMessageActionBarProps) {
+export function OutboundMessageActionBar({ isSending = false, onSubmit, onSaveAsXml, formId }: OutboundMessageActionBarProps) {
     return (
         <div className="flex flex-wrap gap-3 justify-end">
             <Button
+                type="submit"
+                form={formId}
                 variant="primary"
                 className="font-semibold"
                 isPending={isSending}
-                onPress={onSend}>
+                onPress={onSubmit}>
 
                 {isSending ? <Spinner color="current" size="sm"/> : <PaperPlane className="mr-2 size-4"/>}
                 {isSending ? "Sending..." : "Send message"}

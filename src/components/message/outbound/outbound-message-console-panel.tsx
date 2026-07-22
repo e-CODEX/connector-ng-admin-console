@@ -9,14 +9,32 @@
  */
 
 interface OutboundMessageConsolePanelProps {
-    content?: string;
+    contents?: OutboundMessageConsoleContent[];
 }
 
-export function OutboundMessageConsolePanel({ content = "Ready.", }: OutboundMessageConsolePanelProps) {
+export interface OutboundMessageConsoleContent {
+    message: string;
+    level: "INFO" | "ERROR" | "WARNING" | "SUCCESS";
+}
+
+const LEVEL_TEXT_COLOR: Record<OutboundMessageConsoleContent["level"], string> = {
+    INFO: "text-white",
+    ERROR: "text-red-400",
+    WARNING: "text-amber-400",
+    SUCCESS: "text-green-400",
+};
+
+const DEFAULT_CONTENT: OutboundMessageConsoleContent = { message: "Ready.", level: "INFO" };
+
+export function OutboundMessageConsolePanel({ contents = [DEFAULT_CONTENT] }: OutboundMessageConsolePanelProps) {
     return (
         <div>
-            <pre className="h-56 overflow-y-auto bg-black px-4 py-4 font-mono text-xs text-green-400 font-semibold">
-                    {content}
+            <pre className="h-56 overflow-y-auto bg-black px-4 py-4 font-mono text-sm font-semibold whitespace-pre-wrap">
+                {contents.map((content, index) => (
+                    <div key={index} className={LEVEL_TEXT_COLOR[content.level]}>
+                        {content.message}
+                    </div>
+                ))}
             </pre>
         </div>
     );

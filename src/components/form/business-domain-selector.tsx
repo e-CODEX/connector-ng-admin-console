@@ -11,8 +11,9 @@
 import { FieldError, Label, ListBox, Select } from "@heroui/react";
 
 interface BusinessDomainSelectorProps {
+    name?: string;
     identifiers: string[];
-    value: string;
+    value?: string | null;
     onValueChange: (identifier: string) => void;
     label?: string;
     isRequired?: boolean;
@@ -24,6 +25,7 @@ interface BusinessDomainSelectorProps {
 export const asBusinessDomainSelectorFilter = (value: string, selector: string) => (value === selector ? undefined : value);
 
 export function BusinessDomainSelector({
+                                           name,
                                            identifiers,
                                            value,
                                            onValueChange,
@@ -35,6 +37,7 @@ export function BusinessDomainSelector({
                                        }: BusinessDomainSelectorProps) {
     return (
         <Select
+            name={name}
             aria-label={label}
             value={value}
             onChange={(key) => onValueChange(key as string)}
@@ -58,7 +61,7 @@ export function BusinessDomainSelector({
                     ))}
                 </ListBox>
             </Select.Popover>
-            <FieldError />
+            <FieldError/>
         </Select>
     );
 }

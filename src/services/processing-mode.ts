@@ -10,7 +10,8 @@
 
 import {
     ConnectorProcessingModeAction,
-    ConnectorProcessingModeDetailResponse, ConnectorProcessingModeParty,
+    ConnectorProcessingModeDetailResponse,
+    ConnectorProcessingModeParty,
     ConnectorProcessingModeResponse,
     ConnectorProcessingModeService
 } from "@/types/response/processing-mode";
@@ -24,15 +25,12 @@ export async function listProcessingModes():
 
 export async function createProcessingMode(payload: ProcessingModeCreationRequest): Promise<ConnectorProcessingModeResponse> {
     const formData = new FormData();
-    const { description, businessDomainIdentifier, processingModeXmlFile } = payload;
-    formData.append("processingModeXmlFile", processingModeXmlFile);
-    formData.append(
-        "metadata",
-        new Blob(
-            [JSON.stringify({ description, businessDomainIdentifier })],
-            { type: "application/json" }
-        )
-    );
+    const { description, businessDomainIdentifier, processingModeFile, truststore } = payload;
+    formData.append("businessDomainIdentifier", businessDomainIdentifier);
+    formData.append("processingModeFile", processingModeFile);
+    formData.append("description", description);
+    formData.append("truststore.password", truststore.password);
+    formData.append("truststore.truststoreFile", truststore.truststoreFile);
 
     return restApiCall<ConnectorProcessingModeResponse>("api/v1/admin/processing-modes", {
             method: "POST",

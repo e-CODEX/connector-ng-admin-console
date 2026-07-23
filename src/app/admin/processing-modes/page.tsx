@@ -15,7 +15,7 @@ import React, { useState } from "react";
 import { Button, Table, Tooltip, useOverlayState } from "@heroui/react";
 import { ConnectorProcessingModeResponse } from "@/types/response/processing-mode";
 import { createProcessingMode, listProcessingModes } from "@/services/processing-mode";
-import { formatDate, toastError, toastSuccess, truncate } from "@/utils";
+import { toastError, toastSuccess, truncate } from "@/utils";
 import { ProcessingModeDetailsView } from "@/components/processing-mode/detail/processing-mode-detail-view";
 import { ArrowsRotateRight, Eye, Plus } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/page-header-button";
@@ -24,6 +24,7 @@ import { Workflow } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { useList } from "@/hooks/use-list";
+import { DateTime } from "@/components/common/date-time";
 
 export default function ProcessingModesAdminPage() {
     const [selectedProcessingMode, setSelectedProcessingMode] = useState<ConnectorProcessingModeResponse | null>(null);
@@ -93,7 +94,9 @@ export default function ProcessingModesAdminPage() {
                                             <Table.Cell>{pMode.businessDomainIdentifier}</Table.Cell>
                                             <Table.Cell>{pMode.description}</Table.Cell>
                                             <Table.Cell>{pMode.filename}</Table.Cell>
-                                            <Table.Cell>{formatDate(pMode.createdAt)}</Table.Cell>
+                                            <Table.Cell>
+                                                <DateTime value={pMode.createdAt} precision="second"/>
+                                            </Table.Cell>
                                             <Table.Cell>
                                                 <div className="flex items-center gap-1">
                                                     <Tooltip delay={0}>

@@ -15,7 +15,7 @@ import React, { useState } from "react";
 import { ConnectorAttachmentResponse } from "@/types/response/attachments";
 import { Button, Table, Tooltip, useOverlayState } from "@heroui/react";
 import { listAttachments } from "@/services/attachment";
-import { formatBytes, formatDate, truncate } from "@/utils";
+import { formatBytes, truncate } from "@/utils";
 import { PaginationControls } from "@/components/paging/pagination-controls";
 import { AttachmentDetailsView } from "@/components/attachment/attachment-details-view";
 import { ArrowsRotateRight, Eye } from "@gravity-ui/icons";
@@ -25,6 +25,7 @@ import { Paperclip } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { usePagedList } from "@/hooks/use-paged-list";
+import { DateTime } from "@/components/common/date-time";
 
 export default function AttachmentsAdminPage() {
     const [selectedAttachment, setSelectedAttachment] = useState<ConnectorAttachmentResponse | null>(null);
@@ -90,7 +91,9 @@ export default function AttachmentsAdminPage() {
                                                 <AttachmentStorageChip type={attachment.storage}/>
                                             </Table.Cell>
                                             <Table.Cell>{attachment.type}</Table.Cell>
-                                            <Table.Cell>{formatDate(attachment.createdAt)}</Table.Cell>
+                                            <Table.Cell>
+                                                <DateTime value={attachment.createdAt} precision="second"/>
+                                            </Table.Cell>
                                             <Table.Cell>
                                                 <div className="flex items-center gap-1">
                                                     <Tooltip delay={0}>

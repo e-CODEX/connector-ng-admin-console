@@ -16,7 +16,7 @@ import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { Button, Table, Tooltip, useOverlayState } from "@heroui/react";
 import { listTransportSteps } from "@/services/transport-step";
 import { TransportStepFiltersPanel } from "@/components/transport-step/transport-step-filters-panel";
-import { formatDate, truncate } from "@/utils";
+import { truncate } from "@/utils";
 import { PaginationControls } from "@/components/paging/pagination-controls";
 import { ConnectorTransportStepResponse } from "@/types/response/transport-step";
 import { TransportStepDetailsView } from "@/components/transport-step/transport-step-details-view";
@@ -28,6 +28,7 @@ import { Route } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { usePagedList } from "@/hooks/use-paged-list";
+import { DateTime } from "@/components/common/date-time";
 
 export default function TransportStepsAdminPage() {
     const [selectedTransportStep, setSelectedTransportStep] = useState<ConnectorTransportStepResponse | null>(null);
@@ -130,7 +131,9 @@ export default function TransportStepsAdminPage() {
                                             <Table.Cell>
                                                 <TransportDeliveryStatusChip status={transportStep.status}/>
                                             </Table.Cell>
-                                            <Table.Cell>{formatDate(transportStep.createdAt)}</Table.Cell>
+                                            <Table.Cell>
+                                                <DateTime value={transportStep.createdAt} precision="millis"/>
+                                            </Table.Cell>
                                             <Table.Cell>
                                                 <div className="flex items-center gap-1">
                                                     <Tooltip delay={0}>

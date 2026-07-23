@@ -56,7 +56,7 @@ export function BusinessDocumentAesTypeChip({ aesType, size = "sm", variant = "p
           (aesType && AES_TYPE_PRESENTATION[aesType]) ?? UNKNOWN_PRESENTATION;
 
     return (
-        <Chip color={color} variant={variant} size={size} className={`px-2 py-1 ${className}`}>
+        <Chip color={color} variant={variant} size={size} className={`px-2 py-0.5 ${className}`}>
             {showIcon ? <Icon aria-hidden className="size-3.5 shrink-0"/> : null}
             <Chip.Label className="font-semibold">{label}</Chip.Label>
         </Chip>

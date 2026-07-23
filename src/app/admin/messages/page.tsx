@@ -14,7 +14,7 @@ import React, { useState } from "react";
 import { ConnectorMessage } from "@/types/response/message";
 import { listMessages } from "@/services/message";
 import { Button, Table, Tooltip, useOverlayState } from "@heroui/react";
-import { formatDate, truncate } from "@/utils";
+import { truncate } from "@/utils";
 import { PaginationControls } from "@/components/paging/pagination-controls";
 import { MessageTransportStepsDetailView } from "@/components/message/detail/message-transport-steps-detail-view";
 import { PageHeader } from "@/components/common/page-header";
@@ -34,6 +34,7 @@ import { asBusinessDomainSelectorFilter } from "@/components/form/business-domai
 import { usePagedList } from "@/hooks/use-paged-list";
 import { useProcessingModeServices } from "@/hooks/use-processing-mode-services";
 import { ConnectorProcessingModeService } from "@/types/response/processing-mode";
+import { DateTime } from "@/components/common/date-time";
 
 const IDENTIFIER_LENGTH = 15;
 const ALL_SELECTOR = "All";
@@ -200,7 +201,9 @@ export default function MessagesAdminPage() {
                                             <Table.Cell>
                                                 <MessageDeliveryStatusChip message={message}/>
                                             </Table.Cell>
-                                            <Table.Cell>{formatDate(message.createdAt)}</Table.Cell>
+                                            <Table.Cell>
+                                                <DateTime value={message.createdAt} precision="millis"/>
+                                            </Table.Cell>
                                             <Table.Cell>
                                                 <div className="flex items-center gap-1">
                                                     <Tooltip delay={0}>

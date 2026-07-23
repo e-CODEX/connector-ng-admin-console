@@ -12,20 +12,6 @@ import { toast } from "@heroui/react";
 import { ConnectorMessageStatsItem } from "@/types/response/stats";
 import { DownloadedFile } from "@/lib/rest";
 
-export const formatDate = (date: string) => {
-    if (!date) return "";
-    return new Date(date).toLocaleString(undefined, {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        fractionalSecondDigits: 3,
-        hour12: false,
-    });
-}
-
 export const truncate = (s: string, n = 36) => {
     if (s == null) return "";
     return s.length > n ? `${s.slice(0, n)}…` : s;

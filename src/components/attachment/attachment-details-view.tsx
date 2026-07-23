@@ -14,9 +14,9 @@ import { Modal, useOverlayState } from "@heroui/react";
 import { formatBytes, formatDate } from "@/utils";
 import React from "react";
 import { ConnectorAttachmentResponse } from "@/types/response/attachments";
-import { Eye } from "@gravity-ui/icons";
 import { DetailRow } from "@/components/common/detail-row";
 import { AttachmentStorageChip } from "@/components/attachment/attachment-storage-chip";
+import { Paperclip } from "lucide-react";
 
 interface AttachmentDetailsViewProps {
     attachment: ConnectorAttachmentResponse | null;
@@ -32,7 +32,7 @@ export function AttachmentDetailsView({ attachment, state }: AttachmentDetailsVi
                         <Modal.CloseTrigger/>
                         <Modal.Header>
                             <Modal.Icon className="bg-default text-foreground">
-                                <Eye className="size-5"/>
+                                <Paperclip className="size-5"/>
                             </Modal.Icon>
                             <Modal.Heading className="font-semibold">Attachments Details</Modal.Heading>
                         </Modal.Header>

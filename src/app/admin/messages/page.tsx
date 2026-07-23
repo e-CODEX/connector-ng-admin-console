@@ -208,8 +208,7 @@ export default function MessagesAdminPage() {
                                                             isIconOnly
                                                             size="sm"
                                                             variant="tertiary"
-                                                            onPress={() => onDetailsClick(
-                                                                message)}
+                                                            onPress={() => onDetailsClick(message)}
                                                         >
                                                             <Eye/>
                                                         </Button>

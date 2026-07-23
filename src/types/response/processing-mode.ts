@@ -8,7 +8,7 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { PartyRoleType } from "@/types/global";
+import { KeystoreType, PartyRoleType } from "@/types/global";
 
 export interface ConnectorProcessingModeResponse {
     uuid: string;
@@ -23,6 +23,7 @@ export interface ConnectorProcessingModeDetailResponse extends ConnectorProcessi
     parties: ConnectorProcessingModeParty[];
     services: ConnectorProcessingModeService[];
     actions: ConnectorProcessingModeAction[];
+    truststore: ConnectorProcessingModeTruststoreResponse;
 }
 
 export interface ConnectorProcessingModeParty {
@@ -41,4 +42,10 @@ export interface ConnectorProcessingModeService {
 
 export interface ConnectorProcessingModeAction {
     name: string;
+}
+
+export interface ConnectorProcessingModeTruststoreResponse {
+    filename: string;
+    password: string;
+    type: KeystoreType;
 }

@@ -12,7 +12,7 @@ import { CheckCircle2, Clock, Send, XCircle } from "lucide-react";
 import { Chip } from "@heroui/react";
 import type { ComponentType } from "react";
 import { ConnectorMessage } from "@/types/response/message";
-import { formatDate } from "@/utils";
+import { DateTime, formatDateTime } from "@/components/common/date-time";
 
 type DeliveryState =
     | "rejected"
@@ -89,33 +89,20 @@ interface MessageDeliveryStatusChipProps {
 }
 
 export function MessageDeliveryStatusChip({ message, showLabel = true, showDate = true }: MessageDeliveryStatusChipProps) {
-    const {
-              label,
-              description,
-              icon: Icon,
-              color,
-              timestamp,
-          } = getDeliveryPresentation(message);
+    const { label, description, icon: Icon, color, timestamp } = getDeliveryPresentation(message);
 
-    const formattedDate = timestamp ? formatDate(timestamp) : null;
-    const ariaLabel = formattedDate
-        ? `${description} on ${formattedDate}`
-        : description;
+    const spokenDate = formatDateTime(timestamp, { precision: "minute", timeZone: "UTC" });
+    const ariaLabel = spokenDate ? `${description} on ${spokenDate} UTC` : description;
 
     return (
-        <Chip
-            className="px-2"
-            color={color}
-            variant="soft"
-            size="md"
-            aria-label={ariaLabel}
-        >
+        <Chip className="px-2" color={color} variant="soft" size="md" aria-label={ariaLabel}>
             <Icon className="size-3.5 shrink-0" aria-hidden="true"/>
             {showLabel && <Chip.Label>{label}</Chip.Label>}
-            {showDate && formattedDate && (
-                <Chip.Label className="opacity-70">{formattedDate}</Chip.Label>
+            {showDate && timestamp && (
+                <Chip.Label className="opacity-70">
+                    <DateTime value={timestamp} precision="millis" aria-hidden="true"/>
+                </Chip.Label>
             )}
         </Chip>
     );
 }
-

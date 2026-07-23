@@ -11,13 +11,14 @@
 "use client";
 
 import { Modal, useOverlayState } from "@heroui/react";
-import { formatDate, toastError } from "@/utils";
+import { toastError } from "@/utils";
 import React, { useEffect, useState } from "react";
 import { ConnectorProcessingModeDetailResponse, ConnectorProcessingModeResponse } from "@/types/response/processing-mode";
 import { getProcessingMode } from "@/services/processing-mode";
 import { DetailRow } from "@/components/common/detail-row";
 import { ProcessingModeDetailsSection } from "@/components/processing-mode/detail/processing-mode-detail-section";
 import { Workflow } from "lucide-react";
+import { DateTime } from "@/components/common/date-time";
 
 interface ProcessingModeDetailsViewProps {
     processingMode: ConnectorProcessingModeResponse | null;
@@ -85,8 +86,8 @@ export function ProcessingModeDetailsView({ processingMode, state }: ProcessingM
                                         <DetailRow label="Business domain" value={processingMode.businessDomainIdentifier}/>
                                         <DetailRow label="Description" value={processingMode.description}/>
                                         <DetailRow label="Filename" value={processingMode.filename}/>
-                                        <DetailRow label="Created at" value={formatDate(processingMode.createdAt)}/>
-                                        <DetailRow label="Updated at" value={formatDate(processingMode.updatedAt)}/>
+                                        <DetailRow label="Created at" value={<DateTime value={processingMode.createdAt} precision="second"/>}/>
+                                        <DetailRow label="Updated at" value={<DateTime value={processingMode.updatedAt} precision="second"/>}/>
                                     </div>
                                     <ProcessingModeDetailsSection processingMode={details} loading={loading}/>
                                 </div>

@@ -15,7 +15,7 @@ import React from "react";
 import { ConnectorBusinessDomainResponse } from "@/types/response/business-domain";
 import { Table, useOverlayState } from "@heroui/react";
 import { createBusinessDomain, listBusinessDomains } from "@/services/business-domain";
-import { formatDate, toastError, toastSuccess, truncate } from "@/utils";
+import { toastError, toastSuccess, truncate } from "@/utils";
 import { ArrowsRotateRight, Plus } from "@gravity-ui/icons";
 import { BusinessDomainCreationView } from "@/components/business-domain/business-domain-creation-view";
 import { PageHeaderButton } from "@/components/common/page-header-button";
@@ -24,6 +24,7 @@ import { Building2 } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { useList } from "@/hooks/use-list";
+import { DateTime } from "@/components/common/date-time";
 
 export default function BusinessDomainsAdminPage() {
     const list = useList<ConnectorBusinessDomainResponse>(listBusinessDomains);
@@ -81,8 +82,12 @@ export default function BusinessDomainsAdminPage() {
                                             <Table.Cell>
                                                 <BooleanChip value={businessDomain.enabled}/>
                                             </Table.Cell>
-                                            <Table.Cell>{formatDate(businessDomain.createdAt)}</Table.Cell>
-                                            <Table.Cell>{formatDate(businessDomain.updatedAt)}</Table.Cell>
+                                            <Table.Cell>
+                                                <DateTime value={businessDomain.createdAt} precision="second"/>
+                                            </Table.Cell>
+                                            <Table.Cell>
+                                                <DateTime value={businessDomain.updatedAt} precision="second"/>
+                                            </Table.Cell>
                                         </Table.Row>
                                     ))}
                                 </Table.Body>

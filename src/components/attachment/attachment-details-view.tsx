@@ -11,13 +11,14 @@
 "use client";
 
 import { Modal, useOverlayState } from "@heroui/react";
-import { formatBytes, formatDate } from "@/utils";
+import { formatBytes } from "@/utils";
 import React from "react";
 import { ConnectorAttachmentResponse } from "@/types/response/attachments";
 import { DetailRow } from "@/components/common/detail-row";
 import { AttachmentStorageChip } from "@/components/attachment/attachment-storage-chip";
 import { Paperclip } from "lucide-react";
 import { ModalHeaderIcon } from "@/components/common/modal-header-icon";
+import { DateTime } from "@/components/common/date-time";
 
 interface AttachmentDetailsViewProps {
     attachment: ConnectorAttachmentResponse | null;
@@ -47,8 +48,12 @@ export function AttachmentDetailsView({ attachment, state }: AttachmentDetailsVi
                                         <AttachmentStorageChip type={attachment.storage}/>
                                     }/>
                                     <DetailRow label="Type" value={attachment.type}/>
-                                    <DetailRow label="Created at" value={formatDate(attachment.createdAt)}/>
-                                    <DetailRow label="Updated at" value={formatDate(attachment.updatedAt)}/>
+                                    <DetailRow label="Created at" value={
+                                        <DateTime value={attachment.createdAt} precision="millis"/>
+                                    }/>
+                                    <DetailRow label="Updated at" value={
+                                        <DateTime value={attachment.updatedAt} precision="millis"/>
+                                    }/>
                                 </div>
                             )}
                         </Modal.Body>

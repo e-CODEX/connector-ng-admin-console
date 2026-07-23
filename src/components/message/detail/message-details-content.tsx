@@ -12,7 +12,7 @@
 
 import { Button, Table, Tooltip, useOverlayState } from "@heroui/react";
 import { ConnectorMessageDetailsResponse, ConnectorMessageEvidence } from "@/types/response/message";
-import { formatBytes, formatDate, saveFile, toastError, truncate } from "@/utils";
+import { formatBytes, saveFile, toastError, truncate } from "@/utils";
 import React, { useState } from "react";
 import { DetailRow } from "@/components/common/detail-row";
 import { DetailSection } from "@/components/common/detail-section";
@@ -24,6 +24,7 @@ import { MessageDeliveryStatusChip } from "@/components/message/chip/message-del
 import { ConnectorAttachmentResponse } from "@/types/response/attachments";
 import { AttachmentDetailsView } from "@/components/attachment/attachment-details-view";
 import { BusinessDetailsBusinessContentSection } from "@/components/message/detail/business-details-business-content-section";
+import { DateTime } from "@/components/common/date-time";
 
 interface MessageDetailsContentProps {
     message: ConnectorMessageDetailsResponse | null;
@@ -79,22 +80,32 @@ export function MessageDetailsContent({ message, loading }: MessageDetailsConten
                 }/>
                 <DetailRow
                     label="Status"
-                    value={
-                        <MessageDeliveryStatusChip message={message}/>
-                    }
+                    value={<MessageDeliveryStatusChip message={message}/>}
                 />
-                <DetailRow label="Created at"
-                           value={formatDate(message.createdAt)}/>
-                <DetailRow label="Updated at"
-                           value={formatDate(message.updatedAt)}/>
-                <DetailRow label="Deleted at"
-                           value={formatDate(message.deletedAt)}/>
-                <DetailRow label="Rejected at"
-                           value={formatDate(message.rejectedAt)}/>
-                <DetailRow label="Confirmed at"
-                           value={formatDate(message.confirmedAt)}/>
-                <DetailRow label="Delivered to Link Partner at"
-                           value={formatDate(message.deliveredToLinkPartnerAt)}/>
+                <DetailRow
+                    label="Created at"
+                    value={<DateTime value={message.createdAt} precision="millis"/>}
+                />
+                <DetailRow
+                    label="Updated at"
+                    value={<DateTime value={message.updatedAt} precision="millis"/>}
+                />
+                <DetailRow
+                    label="Deleted at"
+                    value={<DateTime value={message.deletedAt} precision="millis"/>}
+                />
+                <DetailRow
+                    label="Rejected at"
+                    value={<DateTime value={message.rejectedAt} precision="millis"/>}
+                />
+                <DetailRow
+                    label="Confirmed at"
+                    value={<DateTime value={message.confirmedAt} precision="millis"/>}
+                />
+                <DetailRow
+                    label="Delivered to Link Partner at"
+                    value={<DateTime value={message.deliveredToLinkPartnerAt} precision="millis"/>}
+                />
             </div>
 
             <div>
@@ -140,8 +151,7 @@ export function MessageDetailsContent({ message, loading }: MessageDetailsConten
                                                 attachment.size)}</Table.Cell>
                                             <Table.Cell>{attachment.storage}</Table.Cell>
                                             <Table.Cell>{attachment.type}</Table.Cell>
-                                            <Table.Cell>{formatDate(
-                                                attachment.createdAt)}</Table.Cell>
+                                            <Table.Cell><DateTime value={attachment.createdAt} precision="millis"/></Table.Cell>
                                         </Table.Row>
                                     ))}
                                 </Table.Body>
@@ -170,14 +180,14 @@ export function MessageDetailsContent({ message, loading }: MessageDetailsConten
                                     {evidences.map((evidence) => (
                                         <Table.Row key={evidence.uuid}>
                                             <Table.Cell>
-                                                                            <span className="font-semibold truncate inline-block">
-                                                                                {truncate(evidence.uuid, 10)}
-                                                                            </span>
+                                                <span className="font-semibold truncate inline-block">
+                                                    {truncate(evidence.uuid, 10)}
+                                                </span>
                                             </Table.Cell>
                                             <Table.Cell>{evidence.type}</Table.Cell>
-                                            <Table.Cell>{formatDate(evidence.deliveredToLinkPartnerAt)}</Table.Cell>
-                                            <Table.Cell>{formatDate(evidence.createdAt)}</Table.Cell>
-                                            <Table.Cell>{formatDate(evidence.updatedAt)}</Table.Cell>
+                                            <Table.Cell><DateTime value={evidence.deliveredToLinkPartnerAt} precision="millis"/></Table.Cell>
+                                            <Table.Cell><DateTime value={evidence.createdAt} precision="millis"/></Table.Cell>
+                                            <Table.Cell><DateTime value={evidence.updatedAt} precision="millis"/></Table.Cell>
                                             <Table.Cell>
                                                 <div className="flex items-center gap-1">
                                                     <Tooltip delay={0}>
@@ -224,7 +234,7 @@ export function MessageDetailsContent({ message, loading }: MessageDetailsConten
                                             <Table.Cell>{error.label}</Table.Cell>
                                             <Table.Cell>{error.source}</Table.Cell>
                                             <Table.Cell>{error.details}</Table.Cell>
-                                            <Table.Cell>{formatDate(error.createdAt)}</Table.Cell>
+                                            <Table.Cell><DateTime value={error.createdAt} precision="millis"/></Table.Cell>
                                         </Table.Row>
                                     ))}
                                 </Table.Body>

@@ -10,11 +10,12 @@
 
 import { ConnectorTransportStepResponse } from "@/types/response/transport-step";
 import { DetailRow } from "@/components/common/detail-row";
-import { formatDate } from "@/utils";
 import { Table } from "@heroui/react";
 import { DetailSection } from "@/components/common/detail-section";
 import { TransportStepMessageTypeChip } from "@/components/message/chip/message-type-chip";
 import { TransportDeliveryStatusChip } from "@/components/transport-step/transport-step-status-chip";
+import { DateTime } from "@/components/common/date-time";
+import React from "react";
 
 interface TransportStepDetailsProps {
     transportStep: ConnectorTransportStepResponse;
@@ -38,8 +39,8 @@ export function TransportStepDetailsContent({ transportStep }: TransportStepDeta
                         <TransportDeliveryStatusChip status={transportStep.status}/>
                     }
                 />
-                <DetailRow label="Created at" value={formatDate(transportStep.createdAt)}/>
-                <DetailRow label="Updated at" value={formatDate(transportStep.updatedAt)}/>
+                <DetailRow label="Created at" value={<DateTime value={transportStep.createdAt} precision="millis"/>}/>
+                <DetailRow label="Updated at" value={<DateTime value={transportStep.updatedAt} precision="millis"/>}/>
             </div>
 
             <DetailSection
@@ -60,7 +61,7 @@ export function TransportStepDetailsContent({ transportStep }: TransportStepDeta
                                         <Table.Cell>
                                             <TransportDeliveryStatusChip status={status.status}/>
                                         </Table.Cell>
-                                        <Table.Cell>{formatDate(status.createdAt)}</Table.Cell>
+                                        <Table.Cell><DateTime value={status.createdAt} precision="millis"/></Table.Cell>
                                     </Table.Row>
                                 ))}
                             </Table.Body>

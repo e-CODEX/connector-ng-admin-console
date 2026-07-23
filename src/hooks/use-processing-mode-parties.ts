@@ -13,15 +13,22 @@
 import { listProcessingModeParties } from "@/services/processing-mode";
 import { ConnectorProcessingModeParty } from "@/types/response/processing-mode";
 import { useDomainScopedList } from "@/hooks/use-domain-scoped-list";
+import { PartyRoleType } from "@/types/global";
 
 export function useProcessingModeParties(businessDomainIdentifier: string, allSelector?: string) {
     return useDomainScopedList<ConnectorProcessingModeParty>(
         businessDomainIdentifier,
         listProcessingModeParties,
         {
-            allSelector, allItem: (name) => ({
-                name, identifier: "", identifierType: "", role: "", roleType: "", isHome: false,
-            })
+            allSelector,
+            allItem: (name): ConnectorProcessingModeParty => ({
+                name,
+                identifier: "",
+                identifierType: "",
+                role: "",
+                roleType: "" as PartyRoleType,
+                isHome: false,
+            }),
         },
     );
 }

@@ -26,17 +26,18 @@ import { useProcessingModeServices } from "@/hooks/use-processing-mode-services"
 import { useProcessingModeActions } from "@/hooks/use-processing-mode-actions";
 import { useProcessingModeParties } from "@/hooks/use-processing-mode-parties";
 import { Form } from "@heroui/react";
+import { DEFAULT_FINAL_RECIPIENT, DEFAULT_ORIGINAL_SENDER } from "@/constants/constants";
 
 const initialMessageFormData: SendMessageFormData = {
     businessDomainIdentifier: "",
     backendMessageIdentifier: "",
-    backendName: "backend_alice",
+    backendName: "",
     as4Properties: {
         ebmsMessageIdentifier: "",
         referenceToIdentifier: "",
         conversationIdentifier: "",
-        originalSender: "alice",
-        finalRecipient: "bob",
+        originalSender: DEFAULT_ORIGINAL_SENDER,
+        finalRecipient: DEFAULT_FINAL_RECIPIENT,
         fromParty: {
             name: "",
             identifier: "BL",

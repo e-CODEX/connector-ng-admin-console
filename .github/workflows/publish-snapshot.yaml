@@ -1,0 +1,11 @@
+on:
+    push:
+        branches:
+            - develop
+jobs:
+    docker:
+        name: Docker build and push
+        uses: e-CODEX/workflows/.github/workflows/docker-build-push.yaml@main
+        with:
+            image-name: connector-ng-admin-ui
+            registry: scm.ecodex.eu/ecodex-docker-snapshots

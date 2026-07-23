@@ -19,7 +19,7 @@ import { formatDate, toastError, toastSuccess, truncate } from "@/utils";
 import { ProcessingModeDetailsView } from "@/components/processing-mode/processing-mode-detail-view";
 import { ArrowsRotateRight, Eye, Plus } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/page-header-button";
-import { ProcessingModeCreationView } from "@/components/processing-mode/processing-mode-creation-view";
+import { ProcessingModeCreationView } from "@/components/processing-mode/creation/processing-mode-creation-view";
 import { Workflow } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";

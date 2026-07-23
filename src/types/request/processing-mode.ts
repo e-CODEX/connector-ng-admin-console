@@ -11,5 +11,11 @@
 export interface ProcessingModeCreationRequest {
     businessDomainIdentifier: string;
     description: string;
-    processingModeXmlFile: File
+    processingModeFile: File
+    truststore: ProcessingModeTruststoreCreationRequest
+}
+
+interface ProcessingModeTruststoreCreationRequest {
+    password: string;
+    truststoreFile: File
 }

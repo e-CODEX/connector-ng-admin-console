@@ -10,20 +10,14 @@
 
 "use client";
 
-import { Button, Modal, Table, Tooltip, useOverlayState } from "@heroui/react";
-import { ConnectorMessage, ConnectorMessageDetailsResponse, ConnectorMessageEvidence } from "@/types/response/message";
-import { formatBytes, formatDate, saveFile, toastError, truncate } from "@/utils";
+import { Modal, useOverlayState } from "@heroui/react";
+import { ConnectorMessage, ConnectorMessageDetailsResponse } from "@/types/response/message";
+import { toastError } from "@/utils";
 import React, { useEffect, useState } from "react";
 import { Eye } from "@gravity-ui/icons";
 import { getMessage } from "@/services/message";
-import { DetailRow } from "@/components/common/detail-row";
-import { DetailSection } from "@/components/common/detail-section";
-import { ConnectorProcessingModeParty } from "@/types/response/processing-mode";
-import { ArrowDownToLine } from "lucide-react";
-import { downloadEvidence } from "@/services/evidence";
-import { MessageDirectionChip } from "@/components/message/chip/message-direction-chip";
-import { MessageDeliveryStatusChip } from "@/components/message/chip/message-delivery-status-chip";
 import { SpinnerView } from "@/components/common/spinner-view";
+import { MessageDetailsContent } from "@/components/message/detail/message-details-content";
 
 interface MessageDetailsViewProps {
     message: ConnectorMessage | null;
@@ -34,20 +28,6 @@ export function MessageDetailsView({ message, state }: MessageDetailsViewProps) 
     const [details, setDetails] = useState<ConnectorMessageDetailsResponse | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-
-    const onDownloadEvidenceClicked = async (evidence: ConnectorMessageEvidence) => {
-        try {
-            const file = await downloadEvidence(evidence.uuid, evidence.type)
-            saveFile(file);
-        } catch (error) {
-            toastError(error);
-        }
-    }
-
-    const detailParty = (party: ConnectorProcessingModeParty) => {
-        return `${party.identifier}(${party.identifierType})`
-    }
-
     const identifier = message?.identifier;
 
     useEffect(() => {
@@ -102,183 +82,10 @@ export function MessageDetailsView({ message, state }: MessageDetailsViewProps) 
                         <Modal.Body>
                             {message && (
                                 <div className="flex flex-col">
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8">
-                                        <DetailRow label="Identifier" value={message.identifier}/>
-                                        <DetailRow label="Business domain" value={message.businessDomainIdentifier}/>
-                                        <DetailRow label="Conversation" value={message.as4Properties.conversationIdentifier}/>
-                                        <DetailRow label="Backend ID" value={message.backendMessageIdentifier}/>
-                                        <DetailRow label="From" value={detailParty(message.as4Properties.fromParty)}/>
-                                        <DetailRow label="To" value={detailParty(message.as4Properties.toParty)}/>
-                                        <DetailRow label="Backend" value={message.backendName}/>
-                                        <DetailRow label="Gateway" value={message.gatewayName}/>
-                                        <DetailRow label="Service" value={message.as4Properties.service.name}/>
-                                        <DetailRow label="Action" value={message.as4Properties.action.name}/>
-                                        <DetailRow label="Direction" value={
-                                            <MessageDirectionChip
-                                                direction={message.direction}
-                                            />
-                                        }/>
-                                        <DetailRow
-                                            label="Status"
-                                            value={
-                                                <MessageDeliveryStatusChip message={message}/>
-                                            }
-                                        />
-                                        <DetailRow label="Created at"
-                                                   value={formatDate(message.createdAt)}/>
-                                        <DetailRow label="Updated at"
-                                                   value={formatDate(message.updatedAt)}/>
-                                        <DetailRow label="Deleted at"
-                                                   value={formatDate(message.deletedAt)}/>
-                                        <DetailRow label="Rejected at"
-                                                   value={formatDate(message.rejectedAt)}/>
-                                        <DetailRow label="Confirmed at"
-                                                   value={formatDate(message.confirmedAt)}/>
-                                        <DetailRow label="Delivered to Link Partner at"
-                                                   value={formatDate(message.deliveredToLinkPartnerAt)}/>
-                                    </div>
-
                                     {loading ? (
                                         <SpinnerView className="mt-60"/>
                                     ) : (
-                                        <>
-                                            {details && !loading && (
-                                                <>
-
-                                                    <DetailSection
-                                                        title="Business Content"
-                                                        isEmpty={!details?.businessContent}
-                                                        emptyLabel="Not Yet Implemented."
-                                                    >
-                                                        <DetailRow label="N/A" value="N/A"/>
-                                                    </DetailSection>
-
-                                                    <DetailSection
-                                                        title="Attachments"
-                                                        isEmpty={!details.attachments?.length}
-                                                        emptyLabel="No attachments."
-                                                    >
-                                                        <Table>
-                                                            <Table.ScrollContainer>
-                                                                <Table.Content aria-label="Message attachments">
-                                                                    <Table.Header>
-                                                                        <Table.Column isRowHeader>Identifier</Table.Column>
-                                                                        <Table.Column>Name</Table.Column>
-                                                                        <Table.Column>Content Type</Table.Column>
-                                                                        <Table.Column>Size</Table.Column>
-                                                                        <Table.Column>Storage</Table.Column>
-                                                                        <Table.Column>Type</Table.Column>
-                                                                        <Table.Column>Created at</Table.Column>
-                                                                    </Table.Header>
-                                                                    <Table.Body>
-                                                                        {details.attachments.map((attachment) => (
-                                                                            <Table.Row key={attachment.identifier}>
-                                                                                <Table.Cell>
-                                                                            <span className="font-semibold truncate inline-block">
-                                                                                {truncate(attachment.identifier, 10)}
-                                                                            </span>
-                                                                                </Table.Cell>
-                                                                                <Table.Cell>{attachment.name}</Table.Cell>
-                                                                                <Table.Cell>{attachment.contentType}</Table.Cell>
-                                                                                <Table.Cell>{formatBytes(
-                                                                                    attachment.size)}</Table.Cell>
-                                                                                <Table.Cell>{attachment.storage}</Table.Cell>
-                                                                                <Table.Cell>{attachment.type}</Table.Cell>
-                                                                                <Table.Cell>{formatDate(
-                                                                                    attachment.createdAt)}</Table.Cell>
-                                                                            </Table.Row>
-                                                                        ))}
-                                                                    </Table.Body>
-                                                                </Table.Content>
-                                                            </Table.ScrollContainer>
-                                                        </Table>
-                                                    </DetailSection>
-
-                                                    <DetailSection
-                                                        title="Evidences"
-                                                        isEmpty={!details.evidences?.length}
-                                                        emptyLabel="No evidences."
-                                                    >
-                                                        <Table>
-                                                            <Table.ScrollContainer>
-                                                                <Table.Content aria-label="Message evidence">
-                                                                    <Table.Header>
-                                                                        <Table.Column isRowHeader>Identifier</Table.Column>
-                                                                        <Table.Column>Type</Table.Column>
-                                                                        <Table.Column>Delivered to link partner at</Table.Column>
-                                                                        <Table.Column>Created at</Table.Column>
-                                                                        <Table.Column>Updated at</Table.Column>
-                                                                        <Table.Column>Action</Table.Column>
-                                                                    </Table.Header>
-                                                                    <Table.Body>
-                                                                        {details.evidences.map((evidence) => (
-                                                                            <Table.Row key={evidence.uuid}>
-                                                                                <Table.Cell>
-                                                                            <span className="font-semibold truncate inline-block">
-                                                                                {truncate(evidence.uuid, 10)}
-                                                                            </span>
-                                                                                </Table.Cell>
-                                                                                <Table.Cell>{evidence.type}</Table.Cell>
-                                                                                <Table.Cell>{formatDate(evidence.deliveredToLinkPartnerAt)}</Table.Cell>
-                                                                                <Table.Cell>{formatDate(evidence.createdAt)}</Table.Cell>
-                                                                                <Table.Cell>{formatDate(evidence.updatedAt)}</Table.Cell>
-                                                                                <Table.Cell>
-                                                                                    <div className="flex items-center gap-1">
-                                                                                        <Tooltip delay={0}>
-                                                                                            <Button
-                                                                                                isIconOnly
-                                                                                                size="sm"
-                                                                                                variant="secondary"
-                                                                                                onPress={() => onDownloadEvidenceClicked(evidence)}
-                                                                                            >
-                                                                                                <ArrowDownToLine/>
-                                                                                            </Button>
-                                                                                            <Tooltip.Content showArrow>
-                                                                                                <Tooltip.Arrow/>
-                                                                                                <p>Download</p>
-                                                                                            </Tooltip.Content>
-                                                                                        </Tooltip>
-                                                                                    </div>
-                                                                                </Table.Cell>
-                                                                            </Table.Row>
-                                                                        ))}
-                                                                    </Table.Body>
-                                                                </Table.Content>
-                                                            </Table.ScrollContainer>
-                                                        </Table>
-                                                    </DetailSection>
-
-                                                    <DetailSection
-                                                        title="Errors"
-                                                        isEmpty={!details.errors?.length}
-                                                        emptyLabel="No errors."
-                                                    >
-                                                        <Table>
-                                                            <Table.ScrollContainer>
-                                                                <Table.Content aria-label="Message errors">
-                                                                    <Table.Header>
-                                                                        <Table.Column isRowHeader>Label</Table.Column>
-                                                                        <Table.Column>Source</Table.Column>
-                                                                        <Table.Column>Description</Table.Column>
-                                                                        <Table.Column>Created at</Table.Column>
-                                                                    </Table.Header>
-                                                                    <Table.Body>
-                                                                        {details.errors.map((error, i) => (
-                                                                            <Table.Row key={`${error.label}-${i}`}>
-                                                                                <Table.Cell>{error.label}</Table.Cell>
-                                                                                <Table.Cell>{error.source}</Table.Cell>
-                                                                                <Table.Cell>{error.details}</Table.Cell>
-                                                                                <Table.Cell>{formatDate(error.createdAt)}</Table.Cell>
-                                                                            </Table.Row>
-                                                                        ))}
-                                                                    </Table.Body>
-                                                                </Table.Content>
-                                                            </Table.ScrollContainer>
-                                                        </Table>
-                                                    </DetailSection>
-                                                </>
-                                            )}
-                                        </>
+                                        <MessageDetailsContent message={details} loading={loading}/>
                                     )}
 
                                     {error && (

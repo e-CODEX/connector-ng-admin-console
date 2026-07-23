@@ -25,3 +25,5 @@ export type BusinessDocumentAesType = "SIGNATURE_BASED" | "AUTHENTICATION_BASED"
 export type PartyRoleType = "INITIATOR" | "RESPONDER";
 
 export type LinkPartnerType = "BACKEND" | "GATEWAY";
+
+export type DetachedSignatureMimeType = "BINARY" | "XML" | "PKCS7";

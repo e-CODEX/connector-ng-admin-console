@@ -17,6 +17,7 @@ import { ConnectorAttachmentResponse } from "@/types/response/attachments";
 import { DetailRow } from "@/components/common/detail-row";
 import { AttachmentStorageChip } from "@/components/attachment/attachment-storage-chip";
 import { Paperclip } from "lucide-react";
+import { ModalHeaderIcon } from "@/components/common/modal-header-icon";
 
 interface AttachmentDetailsViewProps {
     attachment: ConnectorAttachmentResponse | null;
@@ -31,9 +32,7 @@ export function AttachmentDetailsView({ attachment, state }: AttachmentDetailsVi
                     <Modal.Dialog className="sm:max-w-200">
                         <Modal.CloseTrigger/>
                         <Modal.Header>
-                            <Modal.Icon className="bg-default text-foreground">
-                                <Paperclip className="size-5"/>
-                            </Modal.Icon>
+                            <ModalHeaderIcon icon={Paperclip} tone="accent"/>
                             <Modal.Heading className="font-semibold">Attachments Details</Modal.Heading>
                         </Modal.Header>
                         <Modal.Body>

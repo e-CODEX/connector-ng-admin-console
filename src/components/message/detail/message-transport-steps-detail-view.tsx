@@ -12,13 +12,14 @@
 
 import { Modal, useOverlayState } from "@heroui/react";
 import { ConnectorMessage } from "@/types/response/message";
-import { Eye } from "@gravity-ui/icons";
 import React, { useEffect, useState } from "react";
 import { ConnectorTransportStepResponse } from "@/types/response/transport-step";
 import { getMessageTransportStep } from "@/services/message";
-import { TransportStepDetails } from "@/components/transport-step/transport-step-details";
+import { TransportStepDetailsContent } from "@/components/transport-step/transport-step-details-content";
 import { toastError } from "@/utils";
 import { SpinnerView } from "@/components/common/spinner-view";
+import { Route } from "lucide-react";
+import { ModalHeaderIcon } from "@/components/common/modal-header-icon";
 
 interface MessageTransportStepsDetailViewProps {
     message: ConnectorMessage | null;
@@ -65,9 +66,7 @@ export function MessageTransportStepsDetailView({ message, state }: MessageTrans
                     <Modal.Dialog className="sm:max-w-200">
                         <Modal.CloseTrigger/>
                         <Modal.Header>
-                            <Modal.Icon className="bg-default text-foreground">
-                                <Eye className="size-5"/>
-                            </Modal.Icon>
+                            <ModalHeaderIcon icon={Route} tone="accent"/>
                             <Modal.Heading className="font-semibold">Message Transport Steps Details</Modal.Heading>
                         </Modal.Header>
                         <Modal.Body>
@@ -75,7 +74,7 @@ export function MessageTransportStepsDetailView({ message, state }: MessageTrans
                                 <SpinnerView className="mt-60"/>
                             ) : (
                                 <>
-                                    {transportStep && <TransportStepDetails transportStep={transportStep}/>}
+                                    {transportStep && <TransportStepDetailsContent transportStep={transportStep}/>}
                                 </>
                             )}
                             {error && (

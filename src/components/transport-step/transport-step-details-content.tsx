@@ -20,7 +20,7 @@ interface TransportStepDetailsProps {
     transportStep: ConnectorTransportStepResponse;
 }
 
-export function TransportStepDetails({ transportStep }: TransportStepDetailsProps) {
+export function TransportStepDetailsContent({ transportStep }: TransportStepDetailsProps) {
     return (
         <div className="flex flex-col">
             <div>

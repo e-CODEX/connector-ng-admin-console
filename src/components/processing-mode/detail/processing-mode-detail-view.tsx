@@ -13,11 +13,11 @@
 import { Modal, useOverlayState } from "@heroui/react";
 import { formatDate, toastError } from "@/utils";
 import React, { useEffect, useState } from "react";
-import { Eye } from "@gravity-ui/icons";
 import { ConnectorProcessingModeDetailResponse, ConnectorProcessingModeResponse } from "@/types/response/processing-mode";
 import { getProcessingMode } from "@/services/processing-mode";
 import { DetailRow } from "@/components/common/detail-row";
 import { ProcessingModeDetailsSection } from "@/components/processing-mode/detail/processing-mode-detail-section";
+import { Workflow } from "lucide-react";
 
 interface ProcessingModeDetailsViewProps {
     processingMode: ConnectorProcessingModeResponse | null;
@@ -73,7 +73,7 @@ export function ProcessingModeDetailsView({ processingMode, state }: ProcessingM
                         <Modal.CloseTrigger/>
                         <Modal.Header>
                             <Modal.Icon className="bg-default text-foreground">
-                                <Eye className="size-5"/>
+                                <Workflow className="size-5"/>
                             </Modal.Icon>
                             <Modal.Heading className="font-semibold">Processing Mode Details</Modal.Heading>
                         </Modal.Header>

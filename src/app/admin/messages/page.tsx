@@ -21,12 +21,12 @@ import { PageHeader } from "@/components/common/page-header";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { MessageFiltersPanel } from "@/components/message/message-filters-panel";
 import { MessageDetailsView } from "@/components/message/detail/message-details-view";
-import { ArrowsRotateRight, Eye, SquareBars } from "@gravity-ui/icons";
+import { ArrowsRotateRight, Eye } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/page-header-button";
 import { MessageReportingView } from "@/components/message/report/message-reporting-view";
 import { MessageDirectionChip } from "@/components/message/chip/message-direction-chip";
 import { MessageDeliveryStatusChip } from "@/components/message/chip/message-delivery-status-chip";
-import { Mail, Route } from "lucide-react";
+import { ChartPie, Mail, Route } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { useBusinessDomainIdentifiers } from "@/hooks/use-business-domain-identifiers";
@@ -119,7 +119,7 @@ export default function MessagesAdminPage() {
                 <PageHeaderButton
                     variant="primary"
                     tooltip="See reporting"
-                    icon={SquareBars}
+                    icon={ChartPie}
                     onPress={onReportClicked}
                 />
 

@@ -12,8 +12,9 @@
 
 import { Button, FieldError, Form, Input, Label, ListBox, Modal, Select, Spinner, Switch, TextField, useOverlayState } from "@heroui/react";
 import React, { useEffect, useState } from "react";
-import { Plus } from "@gravity-ui/icons";
 import { BusinessDomainCreationRequest } from "@/types/request/business-domain";
+import { Plus } from "lucide-react";
+import { ModalHeaderIcon } from "@/components/common/modal-header-icon";
 
 interface BusinessDomainCreationViewProps {
     state: ReturnType<typeof useOverlayState>;
@@ -90,9 +91,7 @@ export function BusinessDomainCreationView({ state, onSubmit }: BusinessDomainCr
                     <Modal.Dialog className="sm:max-w-150">
                         <Modal.CloseTrigger/>
                         <Modal.Header>
-                            <Modal.Icon className="bg-default text-foreground">
-                                <Plus className="size-5"/>
-                            </Modal.Icon>
+                            <ModalHeaderIcon icon={Plus} tone="accent"/>
                             <Modal.Heading className="font-semibold">Create A Business Domain</Modal.Heading>
                         </Modal.Header>
                         <Modal.Body>

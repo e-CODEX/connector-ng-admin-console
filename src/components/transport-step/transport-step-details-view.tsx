@@ -13,8 +13,9 @@
 import { Modal, useOverlayState } from "@heroui/react";
 import React from "react";
 import { ConnectorTransportStepResponse } from "@/types/response/transport-step";
-import { Eye } from "@gravity-ui/icons";
-import { TransportStepDetails } from "@/components/transport-step/transport-step-details";
+import { TransportStepDetailsContent } from "@/components/transport-step/transport-step-details-content";
+import { Route } from "lucide-react";
+import { ModalHeaderIcon } from "@/components/common/modal-header-icon";
 
 interface TransportStepDetailsViewProps {
     transportStep: ConnectorTransportStepResponse | null;
@@ -29,13 +30,11 @@ export function TransportStepDetailsView({ transportStep, state }: TransportStep
                     <Modal.Dialog className="sm:max-w-200">
                         <Modal.CloseTrigger/>
                         <Modal.Header>
-                            <Modal.Icon className="bg-default text-foreground">
-                                <Eye className="size-5"/>
-                            </Modal.Icon>
+                            <ModalHeaderIcon icon={Route} tone="accent"/>
                             <Modal.Heading className="font-semibold">Transport Step Details</Modal.Heading>
                         </Modal.Header>
                         <Modal.Body>
-                            {transportStep && <TransportStepDetails transportStep={transportStep}/>}
+                            {transportStep && <TransportStepDetailsContent transportStep={transportStep}/>}
                         </Modal.Body>
                     </Modal.Dialog>
                 </Modal.Container>

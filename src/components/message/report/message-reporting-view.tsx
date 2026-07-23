@@ -10,8 +10,9 @@
 
 import { Modal, useOverlayState } from "@heroui/react";
 import React from "react";
-import { SquareBars } from "@gravity-ui/icons";
 import { MessageReportingContent } from "@/components/message/report/message-reporting-content";
+import { ChartPie } from "lucide-react";
+import { ModalHeaderIcon } from "@/components/common/modal-header-icon";
 
 interface MessageReportingViewProps {
     state: ReturnType<typeof useOverlayState>;
@@ -33,9 +34,7 @@ export function MessageReportingView({ state }: MessageReportingViewProps) {
                     <Modal.Dialog className="sm:max-w-350 sm:min-h-200">
                         <Modal.CloseTrigger/>
                         <Modal.Header>
-                            <Modal.Icon className="bg-default text-foreground">
-                                <SquareBars className="size-5"/>
-                            </Modal.Icon>
+                            <ModalHeaderIcon icon={ChartPie} tone="accent"/>
                             <Modal.Heading className="font-semibold">Message Reporting</Modal.Heading>
                         </Modal.Header>
                         {state.isOpen && <MessageReportingContent/>}

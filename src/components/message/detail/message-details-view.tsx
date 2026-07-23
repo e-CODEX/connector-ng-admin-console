@@ -14,10 +14,11 @@ import { Modal, useOverlayState } from "@heroui/react";
 import { ConnectorMessage, ConnectorMessageDetailsResponse } from "@/types/response/message";
 import { toastError } from "@/utils";
 import React, { useEffect, useState } from "react";
-import { Eye } from "@gravity-ui/icons";
 import { getMessage } from "@/services/message";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { MessageDetailsContent } from "@/components/message/detail/message-details-content";
+import { Mail } from "lucide-react";
+import { ModalHeaderIcon } from "@/components/common/modal-header-icon";
 
 interface MessageDetailsViewProps {
     message: ConnectorMessage | null;
@@ -74,9 +75,7 @@ export function MessageDetailsView({ message, state }: MessageDetailsViewProps) 
                     <Modal.Dialog className="sm:max-w-300">
                         <Modal.CloseTrigger/>
                         <Modal.Header>
-                            <Modal.Icon className="bg-default text-foreground">
-                                <Eye className="size-5"/>
-                            </Modal.Icon>
+                            <ModalHeaderIcon icon={Mail} tone="accent"/>
                             <Modal.Heading className="font-semibold">Message Details</Modal.Heading>
                         </Modal.Header>
                         <Modal.Body>

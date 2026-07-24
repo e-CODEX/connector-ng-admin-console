@@ -10,7 +10,7 @@
 
 import { TransportStepMessageType, TransportStepStatus } from "@/types/global";
 
-export interface ConnectorTransportStepResponse {
+export interface ConnectorTransportStep {
     identifier: string;
     remoteSystemIdentifier: string;
     transportedMessageIdentifier: string;

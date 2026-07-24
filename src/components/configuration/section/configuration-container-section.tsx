@@ -12,33 +12,35 @@
 
 import React, { useEffect, useState } from "react";
 import { ContainerConfiguration } from "@/types/response/configuration";
-import { getContainerConfiguration } from "@/services/configuration";
 import { toastError } from "@/utils";
 import { ConfigurationBlock } from "@/components/configuration/configuration-block";
 import { ConfigurationSignatureView } from "@/components/configuration/view/configuration-signature-view";
 import { SpinnerView } from "@/components/common/spinner-view";
+import { useConfigurationService } from "@/hooks/use-http-service";
 
 export function ConfigurationContainerSection() {
     const [loading, setLoading] = useState(true);
     const [config, setConfig] = useState<ContainerConfiguration | null>(null);
 
-    const loadConfig = async () => {
-        setLoading(true);
-        try {
-            const data = await getContainerConfiguration();
-            setConfig(data || null);
-        } catch (error) {
-            toastError(error);
-        } finally {
-            setLoading(false);
-        }
-    }
+    const configurationService = useConfigurationService();
 
     useEffect(() => {
+        const loadConfig = async () => {
+            setLoading(true);
+            try {
+                const data = await configurationService.getContainerConfiguration();
+                setConfig(data || null);
+            } catch (error) {
+                toastError(error);
+            } finally {
+                setLoading(false);
+            }
+        }
+
         (async () => {
             await loadConfig();
         })()
-    }, [])
+    }, [configurationService])
 
     if (!config) {
         return null;

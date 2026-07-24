@@ -8,7 +8,6 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { API_BASE_URL } from "@/lib/config";
 import { RestApiError } from "@/lib/rest/rest-api-error";
 
 interface ApiError {
@@ -16,7 +15,7 @@ interface ApiError {
     message: string;
 }
 
-type RestApiOptions = RequestInit & {
+export type RestApiOptions = RequestInit & {
     params?: Record<string, string | number | boolean>;
 };
 
@@ -34,9 +33,9 @@ function toQuery(params: Record<string, string | number | boolean | undefined | 
 
 /** Performs the call and throws RestApiError on a non-2xx response. */
 async function restApiFetch(
+    baseUrl: string,
     path: string,
     options: RestApiOptions,
-    baseUrl: string,
 ): Promise<Response> {
     const { params, ...init } = options;
     const qs = params ? `?${toQuery(params)}` : "";
@@ -85,18 +84,19 @@ async function extractErrorMessage(response: Response): Promise<string> {
  * );
  * ```
  */
+
 export async function restApiCall<T>(
+    baseUrl: string,
     path: string,
     options: RestApiOptions = {},
-    baseUrl: string         = API_BASE_URL,
 ): Promise<T> {
-    const response = await restApiFetch(path, options, baseUrl);
+    const response = await restApiFetch(baseUrl, path, options);
 
     if (response.status === 204) {
         return undefined as T;   // no content
     }
 
-    return response.json() as Promise<T>;
+    return response.json();
 }
 
 export interface DownloadedFile {
@@ -106,15 +106,15 @@ export interface DownloadedFile {
 }
 
 export async function restApiDownload(
+    baseUrl: string,
     path: string,
     options: RestApiOptions & { defaultFilename?: string } = {},
-    baseUrl: string                                        = API_BASE_URL,
 ): Promise<DownloadedFile> {
     const { defaultFilename = "download", ...rest } = options;
-    const response = await restApiFetch(path, {
+    const response = await restApiFetch(baseUrl, path, {
         ...rest,
         headers: { Accept: "application/octet-stream, */*", ...rest.headers },
-    }, baseUrl);
+    });
 
     const blob = await response.blob();
     return {

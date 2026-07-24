@@ -10,34 +10,36 @@
 
 import React, { useEffect, useState } from "react";
 import { MessageProcessingConfiguration } from "@/types/response/configuration";
-import { getMessageProcessingConfiguration } from "@/services/configuration";
 import { toastError } from "@/utils";
 import { ConfigurationBlock } from "@/components/configuration/configuration-block";
 import { ConfigurationDetailRow } from "@/components/configuration/configuration-detail-row";
 import { BooleanChip } from "@/components/common/boolean-chip";
 import { SpinnerView } from "@/components/common/spinner-view";
+import { useConfigurationService } from "@/hooks/use-http-service";
 
 export function ConfigurationMessageProcessingSection() {
     const [loading, setLoading] = useState(true);
     const [config, setConfig] = useState<MessageProcessingConfiguration | null>(null);
 
-    const loadConfig = async () => {
-        setLoading(true)
-        try {
-            const data = await getMessageProcessingConfiguration()
-            setConfig(data || [])
-        } catch (error) {
-            toastError(error)
-        } finally {
-            setLoading(false)
-        }
-    }
+    const configurationService = useConfigurationService();
 
     useEffect(() => {
+        const loadConfig = async () => {
+            setLoading(true)
+            try {
+                const data = await configurationService.getMessageProcessingConfiguration()
+                setConfig(data || [])
+            } catch (error) {
+                toastError(error)
+            } finally {
+                setLoading(false)
+            }
+        }
+
         (async () => {
             await loadConfig()
         })()
-    }, [])
+    }, [configurationService])
 
     if (!config) {
         return null;

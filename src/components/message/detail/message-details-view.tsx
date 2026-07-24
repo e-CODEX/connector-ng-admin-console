@@ -14,11 +14,11 @@ import { Modal, useOverlayState } from "@heroui/react";
 import { ConnectorMessage, ConnectorMessageDetailsResponse } from "@/types/response/message";
 import { toastError } from "@/utils";
 import React, { useEffect, useState } from "react";
-import { getMessage } from "@/services/message";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { MessageDetailsContent } from "@/components/message/detail/message-details-content";
 import { Mail } from "lucide-react";
 import { ModalHeaderIcon } from "@/components/common/modal-header-icon";
+import { useMessageService } from "@/hooks/use-http-service";
 
 interface MessageDetailsViewProps {
     message: ConnectorMessage | null;
@@ -30,6 +30,8 @@ export function MessageDetailsView({ message, state }: MessageDetailsViewProps) 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const identifier = message?.identifier;
+
+    const messageService = useMessageService();
 
     useEffect(() => {
         if (!state.isOpen || !identifier) {
@@ -43,7 +45,7 @@ export function MessageDetailsView({ message, state }: MessageDetailsViewProps) 
             setError(null);
             setDetails(null);
             try {
-                const data = await getMessage(identifier);
+                const data = await messageService.retrieveMessage(identifier);
 
                 if (!active) {
                     return;
@@ -66,7 +68,7 @@ export function MessageDetailsView({ message, state }: MessageDetailsViewProps) 
         return () => {
             active = false;
         };
-    }, [state.isOpen, identifier]);
+    }, [state.isOpen, identifier, messageService]);
 
     return (
         <Modal state={state}>

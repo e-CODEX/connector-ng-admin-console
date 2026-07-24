@@ -13,13 +13,13 @@
 import { Modal, useOverlayState } from "@heroui/react";
 import { ConnectorMessage } from "@/types/response/message";
 import React, { useEffect, useState } from "react";
-import { ConnectorTransportStepResponse } from "@/types/response/transport-step";
-import { getMessageTransportStep } from "@/services/message";
+import { ConnectorTransportStep } from "@/types/response/transport-step";
 import { TransportStepDetailsContent } from "@/components/transport-step/transport-step-details-content";
 import { toastError } from "@/utils";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { Route } from "lucide-react";
 import { ModalHeaderIcon } from "@/components/common/modal-header-icon";
+import { useMessageService } from "@/hooks/use-http-service";
 
 interface MessageTransportStepsDetailViewProps {
     message: ConnectorMessage | null;
@@ -27,9 +27,11 @@ interface MessageTransportStepsDetailViewProps {
 }
 
 export function MessageTransportStepsDetailView({ message, state }: MessageTransportStepsDetailViewProps) {
-    const [transportStep, setTransportStep] = useState<ConnectorTransportStepResponse | null>(null);
+    const [transportStep, setTransportStep] = useState<ConnectorTransportStep | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    const messageService = useMessageService();
 
     const identifier = message?.identifier;
 
@@ -43,7 +45,7 @@ export function MessageTransportStepsDetailView({ message, state }: MessageTrans
             setError(null);
             setTransportStep(null);
             try {
-                const data = await getMessageTransportStep(identifier);
+                const data = await messageService.getMessageTransportStep(identifier);
                 if (!active) return;
                 setTransportStep(data);
             } catch (e) {
@@ -57,7 +59,7 @@ export function MessageTransportStepsDetailView({ message, state }: MessageTrans
         return () => {
             active = false;
         };
-    }, [state.isOpen, identifier]);
+    }, [state.isOpen, identifier, messageService]);
 
     return (
         <Modal state={state}>

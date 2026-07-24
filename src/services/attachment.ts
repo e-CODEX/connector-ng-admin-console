@@ -12,24 +12,33 @@ import { PaginatedResponse } from "@/types/response/paginated-response";
 import { ConnectorAttachmentResponse } from "@/types/response/attachments";
 import { restApiCall } from "@/lib/rest";
 
-export async function listAttachments(params?: {
-    page?: number,
-    size?: number
-}):
-    Promise<PaginatedResponse<ConnectorAttachmentResponse>> {
-    return restApiCall<PaginatedResponse<ConnectorAttachmentResponse>>("api/v1/admin/attachments", {
-        params
-    });
+export type ListAttachmentsParams = {
+    page?: number;
+    size?: number;
 }
 
-export function uploadMessageAttachment(file: Blob) {
-    const data = new FormData();
-    data.append("attachments", file, "business-document.pdf");
-    data.append("attachments", file, "business-document2.pdf");
+export function createAttachmentService(baseUrl: string) {
+    return {
+        async listAttachments(params?: ListAttachmentsParams):
+            Promise<PaginatedResponse<ConnectorAttachmentResponse>> {
+            return restApiCall<PaginatedResponse<ConnectorAttachmentResponse>>(
+                baseUrl,
+                "api/v1/admin/attachments",
+                { params }
+            );
+        },
+        async uploadMessageAttachment(file: Blob) {
+            const data = new FormData();
+            data.append("attachments", file, "business-document.pdf");
+            data.append("attachments", file, "business-document2.pdf");
 
-    return restApiCall<string[]>("api/v1/attachments/upload", {
-            method: "POST",
-            body: data,
+            return restApiCall<string[]>(
+                baseUrl,
+                "api/v1/attachments/upload",
+                { method: "POST", body: data, }
+            );
         }
-    );
+    }
 }
+
+export type AttachmentService = ReturnType<typeof createAttachmentService>;

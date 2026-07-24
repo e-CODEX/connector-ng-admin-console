@@ -9,19 +9,19 @@
  */
 
 import { FieldError, Key, Label, ListBox, Select } from "@heroui/react";
-import { ConnectorLinkPartnerResponse } from "@/types/response/link-partner";
+import { ConnectorLinkPartner } from "@/types/response/link-partner";
 
 export interface LinkPartnerSelectorProps {
-    partners: ConnectorLinkPartnerResponse[];
+    partners: ConnectorLinkPartner[];
     value?: string | null;
-    onValueChange: (service: ConnectorLinkPartnerResponse | null) => void;
+    onValueChange: (service: ConnectorLinkPartner | null) => void;
     label?: string;
     isRequired?: boolean;
     isDisabled?: boolean;
     className?: string;
 }
 
-const keyOf = (linkPartner: ConnectorLinkPartnerResponse) => linkPartner.name;
+const keyOf = (linkPartner: ConnectorLinkPartner) => linkPartner.name;
 
 export function LinkPartnerSelector({
                                         partners,

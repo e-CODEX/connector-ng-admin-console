@@ -9,18 +9,26 @@
  */
 
 import { PaginatedResponse } from "@/types/response/paginated-response";
-import { ConnectorTransportStepResponse } from "@/types/response/transport-step";
+import { ConnectorTransportStep } from "@/types/response/transport-step";
 import { restApiCall } from "@/lib/rest";
 
-export async function listTransportSteps(params?: {
+export type ListTransportStepsParams = {
     page?: number,
     size?: number,
     messageOrRemoteSystemIdentifier?: string,
     linkPartnerName?: string
-}):
-    Promise<PaginatedResponse<ConnectorTransportStepResponse>> {
-    return restApiCall<PaginatedResponse<ConnectorTransportStepResponse>>("api/v1/admin/transport-steps", {
-            params
-        }
-    );
 }
+
+export function createTransportStepsService(baseUrl: string) {
+    return {
+        async listTransportSteps(params: ListTransportStepsParams): Promise<PaginatedResponse<ConnectorTransportStep>> {
+            return restApiCall<PaginatedResponse<ConnectorTransportStep>>(
+                baseUrl,
+                "api/v1/admin/transport-steps",
+                { params }
+            )
+        }
+    }
+}
+
+export type TransportStepsService = ReturnType<typeof createTransportStepsService>;

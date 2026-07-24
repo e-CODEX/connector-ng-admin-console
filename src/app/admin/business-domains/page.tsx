@@ -12,9 +12,8 @@
 
 import { PageHeader } from "@/components/common/page-header";
 import React from "react";
-import { ConnectorBusinessDomainResponse } from "@/types/response/business-domain";
+import { ConnectorBusinessDomain } from "@/types/response/business-domain";
 import { Table, useOverlayState } from "@heroui/react";
-import { createBusinessDomain, listBusinessDomains } from "@/services/business-domain";
 import { toastError, toastSuccess, truncate } from "@/utils";
 import { ArrowsRotateRight, Plus } from "@gravity-ui/icons";
 import { BusinessDomainCreationView } from "@/components/business-domain/business-domain-creation-view";
@@ -25,9 +24,12 @@ import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { useList } from "@/hooks/use-list";
 import { DateTime } from "@/components/common/date-time";
+import { useBusinessDomainService } from "@/hooks/use-http-service";
 
 export default function BusinessDomainsAdminPage() {
-    const list = useList<ConnectorBusinessDomainResponse>(listBusinessDomains);
+    const businessDomainService = useBusinessDomainService();
+
+    const list = useList<ConnectorBusinessDomain>(businessDomainService.listBusinessDomains);
 
     const addModal = useOverlayState();
 
@@ -105,7 +107,7 @@ export default function BusinessDomainsAdminPage() {
                 state={addModal}
                 onSubmit={async (payload) => {
                     try {
-                        await createBusinessDomain(payload);
+                        await businessDomainService.createBusinessDomain(payload);
                         await list.refresh();
                         toastSuccess("Business domain created successfully");
                         addModal.close();

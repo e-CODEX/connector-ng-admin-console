@@ -12,34 +12,37 @@
 
 import React, { useEffect, useState } from "react";
 import { BusinessDomainConfiguration } from "@/types/response/configuration";
-import { getBusinessDomainsConfig } from "@/services/configuration";
 import { toastError } from "@/utils";
 import { Table } from "@heroui/react";
 import { ConfigurationBlock } from "@/components/configuration/configuration-block";
 import { BooleanChip } from "@/components/common/boolean-chip";
 import { SpinnerView } from "@/components/common/spinner-view";
+import { useConfigurationService } from "@/hooks/use-http-service";
 
 export function ConfigurationBusinessDomainsSection() {
     const [loading, setLoading] = useState(true);
     const [config, setConfig] = useState<BusinessDomainConfiguration | null>(null);
 
-    const loadConfig = async () => {
-        setLoading(true)
-        try {
-            const data = await getBusinessDomainsConfig()
-            setConfig(data || [])
-        } catch (error) {
-            toastError(error)
-        } finally {
-            setLoading(false)
-        }
-    }
+    const configurationService = useConfigurationService();
+
 
     useEffect(() => {
+        const loadConfig = async () => {
+            setLoading(true)
+            try {
+                const data = await configurationService.getBusinessDomainsConfig()
+                setConfig(data || [])
+            } catch (error) {
+                toastError(error)
+            } finally {
+                setLoading(false)
+            }
+        }
+
         (async () => {
             await loadConfig()
         })()
-    }, [])
+    }, [configurationService])
 
     if (!config) {
         return null;

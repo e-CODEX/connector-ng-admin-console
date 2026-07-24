@@ -11,9 +11,9 @@
 import { MessageDirectionStatsPanel } from "@/components/dashboard/message/stats/message-direction-stats-panel";
 import { ArrowDownLeft, ArrowUpRight, MessagesSquare } from "lucide-react";
 import { usePolledFetch } from "@/hooks/pooled-fetch";
-import { getMessageStats } from "@/services/message";
 import { Spinner } from "@heroui/react";
 import { Period, periodToParams } from "@/types/period";
+import { useMessageService } from "@/hooks/use-http-service";
 
 interface MessageStatsSectionProps {
     period: Period;
@@ -23,8 +23,10 @@ interface MessageStatsSectionProps {
 }
 
 export function MessageStatsSection({ period, businessDomain, refreshToken, refreshInterval }: MessageStatsSectionProps) {
+    const messageService = useMessageService();
+
     const { data, loading, error } = usePolledFetch(() =>
-        getMessageStats({ ...periodToParams(period), businessDomain }), refreshInterval, [period, businessDomain, refreshToken]);
+        messageService.getMessageStats({ ...periodToParams(period), businessDomain }), refreshInterval, [period, businessDomain, refreshToken]);
 
     if (!data) {
         return (

@@ -12,9 +12,9 @@
 
 import { Period, periodToParams } from "@/types/period";
 import { usePolledFetch } from "@/hooks/pooled-fetch";
-import { getMessageReports } from "@/services/message";
 import { Spinner } from "@heroui/react";
 import { MessageReportingStats } from "@/components/dashboard/message/reporting/message-reporting-stats";
+import { useMessageService } from "@/hooks/use-http-service";
 
 
 interface MessageReportingSectionProps {
@@ -25,8 +25,10 @@ interface MessageReportingSectionProps {
 }
 
 export function MessageReportingSection({ period, businessDomain, refreshToken, refreshInterval }: MessageReportingSectionProps) {
+    const messageService = useMessageService();
+
     const { data, loading, error } = usePolledFetch(() =>
-        getMessageReports({ ...periodToParams(period), businessDomain }), refreshInterval, [period, businessDomain, refreshToken]);
+        messageService.getMessageReports({ ...periodToParams(period), businessDomain }), refreshInterval, [period, businessDomain, refreshToken]);
 
     if (!data) {
         return (

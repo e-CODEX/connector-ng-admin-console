@@ -12,34 +12,36 @@
 
 import React, { useEffect, useState } from "react";
 import { BusinessDocumentConfiguration } from "@/types/response/configuration";
-import { getBusinessDocumentConfiguration } from "@/services/configuration";
 import { toastError } from "@/utils";
 import { ConfigurationBlock } from "@/components/configuration/configuration-block";
 import { ConfigurationDetailRow } from "@/components/configuration/configuration-detail-row";
 import { ConfigurationSignatureView } from "@/components/configuration/view/configuration-signature-view";
 import { SpinnerView } from "@/components/common/spinner-view";
+import { useConfigurationService } from "@/hooks/use-http-service";
 
 export function ConfigurationBusinessDocumentSection() {
     const [loading, setLoading] = useState(true);
     const [config, setConfig] = useState<BusinessDocumentConfiguration | null>(null);
 
-    const loadConfig = async () => {
-        setLoading(true)
-        try {
-            const data = await getBusinessDocumentConfiguration()
-            setConfig(data || [])
-        } catch (error) {
-            toastError(error)
-        } finally {
-            setLoading(false)
-        }
-    }
+    const configurationService = useConfigurationService();
 
     useEffect(() => {
+        const loadConfig = async () => {
+            setLoading(true)
+            try {
+                const data = await configurationService.getBusinessDocumentConfiguration()
+                setConfig(data || [])
+            } catch (error) {
+                toastError(error)
+            } finally {
+                setLoading(false)
+            }
+        }
+
         (async () => {
             await loadConfig()
         })()
-    }, [])
+    }, [configurationService])
 
     if (!config) {
         return null;

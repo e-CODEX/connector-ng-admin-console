@@ -8,7 +8,7 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { ConnectorTransportStepResponse } from "@/types/response/transport-step";
+import { ConnectorTransportStep } from "@/types/response/transport-step";
 import { DetailRow } from "@/components/common/detail-row";
 import { Table } from "@heroui/react";
 import { DetailSection } from "@/components/common/detail-section";
@@ -18,7 +18,7 @@ import { DateTime } from "@/components/common/date-time";
 import React from "react";
 
 interface TransportStepDetailsProps {
-    transportStep: ConnectorTransportStepResponse;
+    transportStep: ConnectorTransportStep;
 }
 
 export function TransportStepDetailsContent({ transportStep }: TransportStepDetailsProps) {

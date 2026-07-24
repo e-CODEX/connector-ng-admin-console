@@ -12,17 +12,19 @@
 
 import { useEffect, useState } from "react";
 import { toastError } from "@/utils";
-import { listLinkPartners } from "@/services/link-partner";
-import { ConnectorLinkPartnerResponse } from "@/types/response/link-partner";
+import { ConnectorLinkPartner } from "@/types/response/link-partner";
 import { LinkPartnerType } from "@/types/global";
+import { useLinkPartnerService } from "@/hooks/use-http-service";
 
 export function useLinkPartners(linkType: LinkPartnerType, allLabel?: string) {
-    const [partners, setPartners] = useState<ConnectorLinkPartnerResponse[]>([]);
+    const [partners, setPartners] = useState<ConnectorLinkPartner[]>([]);
+
+    const linkPartnersService = useLinkPartnerService();
 
     useEffect(() => {
         let cancelled = false;
 
-        listLinkPartners({ linkType })
+        linkPartnersService.listLinkPartners({ linkType })
             .then((linkPartners) => {
                 if (cancelled) return;
                 setPartners(
@@ -39,7 +41,7 @@ export function useLinkPartners(linkType: LinkPartnerType, allLabel?: string) {
         return () => {
             cancelled = true;
         };
-    }, [allLabel, linkType]);
+    }, [allLabel, linkType, linkPartnersService]);
 
     return partners;
 }

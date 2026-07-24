@@ -9,12 +9,12 @@
  */
 
 import { usePolledFetch } from "@/hooks/pooled-fetch";
-import { getHealthInfo } from "@/services/actuator";
 import { Spinner } from "@heroui/react";
 import { HealthCard } from "@/components/dashboard/health/health-card";
 import { Database, MessagesSquare } from "lucide-react";
 import { CardHeart, HardDrive } from "@gravity-ui/icons";
 import { asNumber, formatBytes } from "@/utils";
+import { useActuatorService } from "@/hooks/use-http-service";
 
 interface BackendHealthSectionProps {
     refreshToken?: number;
@@ -22,7 +22,9 @@ interface BackendHealthSectionProps {
 }
 
 export function BackendHealthSection({ refreshToken, refreshInterval }: BackendHealthSectionProps) {
-    const { data, loading, error } = usePolledFetch(() => getHealthInfo(), refreshInterval, [refreshToken]);
+    const actuatorService = useActuatorService();
+
+    const { data, loading, error } = usePolledFetch(() => actuatorService.getHealthInfo(), refreshInterval, [refreshToken]);
 
     if (!data) {
         return (

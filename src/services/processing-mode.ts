@@ -9,48 +9,48 @@
  */
 
 import {
+    ConnectorProcessingMode,
     ConnectorProcessingModeAction,
-    ConnectorProcessingModeDetailResponse,
+    ConnectorProcessingModeDetail,
     ConnectorProcessingModeParty,
-    ConnectorProcessingModeResponse,
     ConnectorProcessingModeService
 } from "@/types/response/processing-mode";
 import { restApiCall } from "@/lib/rest";
 import { ProcessingModeCreationRequest } from "@/types/request/processing-mode";
 
-export async function listProcessingModes():
-    Promise<ConnectorProcessingModeResponse[]> {
-    return restApiCall<ConnectorProcessingModeResponse[]>("api/v1/admin/processing-modes");
-}
+export function createProcessingModeService(baseUrl: string) {
+    return {
+        async listProcessingModes(): Promise<ConnectorProcessingMode[]> {
+            return restApiCall<ConnectorProcessingMode[]>(baseUrl, "api/v1/admin/processing-modes");
+        },
+        async retrieveProcessingMode(identifier: string): Promise<ConnectorProcessingModeDetail> {
+            return restApiCall<ConnectorProcessingModeDetail>(baseUrl, `api/v1/admin/processing-modes/${identifier}`);
+        },
+        async listProcessingModeServices(businessDomain: string): Promise<ConnectorProcessingModeService[]> {
+            return restApiCall<ConnectorProcessingModeService[]>(baseUrl, `api/v1/processing-modes/${businessDomain}/services`);
+        },
+        async listProcessingModeActions(businessDomain: string): Promise<ConnectorProcessingModeAction[]> {
+            return restApiCall<ConnectorProcessingModeAction[]>(baseUrl, `api/v1/processing-modes/${businessDomain}/actions`);
+        },
+        async listProcessingModeParties(businessDomain: string): Promise<ConnectorProcessingModeParty[]> {
+            return restApiCall<ConnectorProcessingModeParty[]>(baseUrl, `api/v1/processing-modes/${businessDomain}/parties`);
+        },
+        async createProcessingMode(payload: ProcessingModeCreationRequest): Promise<ConnectorProcessingMode> {
+            const formData = new FormData();
+            const { description, businessDomainIdentifier, processingModeFile, truststore } = payload;
+            formData.append("businessDomainIdentifier", businessDomainIdentifier);
+            formData.append("processingModeFile", processingModeFile);
+            formData.append("description", description);
+            formData.append("truststore.password", truststore.password);
+            formData.append("truststore.truststoreFile", truststore.truststoreFile);
 
-export async function createProcessingMode(payload: ProcessingModeCreationRequest): Promise<ConnectorProcessingModeResponse> {
-    const formData = new FormData();
-    const { description, businessDomainIdentifier, processingModeFile, truststore } = payload;
-    formData.append("businessDomainIdentifier", businessDomainIdentifier);
-    formData.append("processingModeFile", processingModeFile);
-    formData.append("description", description);
-    formData.append("truststore.password", truststore.password);
-    formData.append("truststore.truststoreFile", truststore.truststoreFile);
-
-    return restApiCall<ConnectorProcessingModeResponse>("api/v1/admin/processing-modes", {
-            method: "POST",
-            body: formData
+            return restApiCall<ConnectorProcessingMode>(baseUrl, "api/v1/admin/processing-modes", {
+                    method: "POST",
+                    body: formData
+                }
+            )
         }
-    )
+    }
 }
 
-export async function getProcessingMode(identifier: string): Promise<ConnectorProcessingModeDetailResponse> {
-    return restApiCall<ConnectorProcessingModeDetailResponse>(`api/v1/admin/processing-modes/${identifier}`);
-}
-
-export async function listProcessingModeServices(businessDomain: string): Promise<ConnectorProcessingModeService[]> {
-    return restApiCall<ConnectorProcessingModeService[]>(`api/v1/processing-modes/${businessDomain}/services`);
-}
-
-export async function listProcessingModeActions(businessDomain: string): Promise<ConnectorProcessingModeAction[]> {
-    return restApiCall<ConnectorProcessingModeAction[]>(`api/v1/processing-modes/${businessDomain}/actions`);
-}
-
-export async function listProcessingModeParties(businessDomain: string): Promise<ConnectorProcessingModeParty[]> {
-    return restApiCall<ConnectorProcessingModeParty[]>(`api/v1/processing-modes/${businessDomain}/parties`);
-}
+export type ProcessingModeService = ReturnType<typeof createProcessingModeService>;

@@ -8,5 +8,16 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-export const DEFAULT_ORIGINAL_SENDER = process.env.NEXT_PUBLIC_DEFAULT_ORIGINAL_SENDER || "alice";
-export const DEFAULT_FINAL_RECIPIENT = process.env.NEXT_PUBLIC_DEFAULT_FINAL_RECIPIENT || "bob";
+import { useContext } from "react";
+import { AppConfigContext } from "@/app/providers";
+import { AppConfig } from "@/config/config";
+
+export function useAppConfig(): AppConfig {
+    const config = useContext(AppConfigContext);
+
+    if (!config) {
+        throw new Error("useAppConfig must be used within the AppConfig");
+    }
+
+    return config;
+}

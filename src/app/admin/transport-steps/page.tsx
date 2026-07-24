@@ -14,11 +14,10 @@ import { PageHeader } from "@/components/common/page-header";
 import React, { useState } from "react";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { Button, Table, Tooltip, useOverlayState } from "@heroui/react";
-import { listTransportSteps } from "@/services/transport-step";
 import { TransportStepFiltersPanel } from "@/components/transport-step/transport-step-filters-panel";
 import { truncate } from "@/utils";
 import { PaginationControls } from "@/components/paging/pagination-controls";
-import { ConnectorTransportStepResponse } from "@/types/response/transport-step";
+import { ConnectorTransportStep } from "@/types/response/transport-step";
 import { TransportStepDetailsView } from "@/components/transport-step/transport-step-details-view";
 import { ArrowsRotateRight, Eye } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/page-header-button";
@@ -29,17 +28,20 @@ import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { usePagedList } from "@/hooks/use-paged-list";
 import { DateTime } from "@/components/common/date-time";
+import { useTransportStepService } from "@/hooks/use-http-service";
 
 export default function TransportStepsAdminPage() {
-    const [selectedTransportStep, setSelectedTransportStep] = useState<ConnectorTransportStepResponse | null>(null);
+    const [selectedTransportStep, setSelectedTransportStep] = useState<ConnectorTransportStep | null>(null);
     const [messageOrRemoteSystemIdentifierQuery, setMessageOrRemoteSystemIdentifierQuery] = useState("");
     const [linkPartnerNameQuery, setLinkPartnerNameQuery] = useState("");
     const debouncedMessageOrRemoteSystemIdentifier = useDebouncedValue(messageOrRemoteSystemIdentifierQuery);
     const debouncedLinkPartnerName = useDebouncedValue(linkPartnerNameQuery);
 
-    const pagedList = usePagedList<ConnectorTransportStepResponse>(
+    const transportStepService = useTransportStepService();
+
+    const pagedList = usePagedList<ConnectorTransportStep>(
         ({ page, size }) =>
-            listTransportSteps({
+            transportStepService.listTransportSteps({
                 page,
                 size,
                 messageOrRemoteSystemIdentifier: debouncedMessageOrRemoteSystemIdentifier || undefined,
@@ -60,7 +62,7 @@ export default function TransportStepsAdminPage() {
 
     const detailsModal = useOverlayState();
 
-    const onDetailsClick = (step: ConnectorTransportStepResponse) => {
+    const onDetailsClick = (step: ConnectorTransportStep) => {
         setSelectedTransportStep(step);
         detailsModal.open();
     };

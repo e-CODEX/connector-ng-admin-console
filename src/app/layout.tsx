@@ -17,6 +17,9 @@ import { AppFooter } from "@/components/common/app-footer";
 import React from "react";
 import { Toast } from "@heroui/react";
 import { Providers } from "@/app/providers";
+import { getAppConfig } from "@/config/config.server";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
     title: siteConfig.title,
@@ -24,6 +27,8 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children, }: Readonly<{ children: React.ReactNode; }>) {
+    const config = getAppConfig();
+
     return (
         <html
             lang="en"
@@ -31,7 +36,7 @@ export default function RootLayout({ children, }: Readonly<{ children: React.Rea
             suppressHydrationWarning
         >
         <body className="min-h-full flex flex-col bg-background text-foreground">
-        <Providers>
+        <Providers config={config}>
             <div className="relative flex flex-col min-h-screen">
                 <AppMainNavbar/>
                 <main className="grow px-3 pt-22 pb-12">

@@ -72,6 +72,7 @@ export interface MessageProcessingConfiguration {
     outboundMessageVerificationMode: MessageVerificationMode;
     inboundMessageVerificationMode: MessageVerificationMode;
     sendGeneratedEvidencesToBackend: boolean;
+    autoTriggerDeliveryEvidences: boolean;
 }
 
 // queue config

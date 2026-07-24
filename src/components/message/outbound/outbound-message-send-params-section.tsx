@@ -10,13 +10,13 @@
 
 "use client";
 
-import {FileSourceMode, PayloadGenerationMode, SendParameters} from "@/types/send-message-form";
-import {FormTextField} from "@/components/form/form-text-field";
-import {FileSourceModeSelect} from "@/components/message/outbound/outbound-message-file-mode-select";
-import {RequestModeSelectField} from "@/components/message/outbound/outbound-message-request-mode-select";
-import {FileUpload} from "@/components/message/outbound/outbound-message-file-upload";
-import {ExecutionModeSelectField} from "@/components/message/outbound/outbound-message-execution-mode-select";
-import {ReuseFieldSelectField} from "@/components/message/outbound/outbound-message-reuse-files-select";
+import { FileSourceMode, PayloadGenerationMode, SendParameters } from "@/types/send-message-form";
+import { FormTextField } from "@/components/form/form-text-field";
+import { FileSourceModeSelect } from "@/components/message/outbound/outbound-message-file-mode-select";
+import { RequestModeSelectField } from "@/components/message/outbound/outbound-message-request-mode-select";
+import { FileUpload } from "@/components/message/outbound/outbound-message-file-upload";
+import { ExecutionModeSelectField } from "@/components/message/outbound/outbound-message-execution-mode-select";
+import { ReuseFieldSelectField } from "@/components/message/outbound/outbound-message-reuse-files-select";
 
 interface OutboundMessageSendParametersSectionProps {
     data: SendParameters;
@@ -49,12 +49,12 @@ export function OutboundMessageSendParametersSection({
             <div className="grid grid-cols-1 gap-5 lg:grid-cols-4">
                 <RequestModeSelectField
                     value={data.mode}
-                    onChange={(value) => update({mode: value})}
+                    onChange={(value) => update({ mode: value })}
                 />
 
                 <ExecutionModeSelectField
                     value={data.payloadGenerationMode}
-                    onChange={(value) => update({payloadGenerationMode: value})}
+                    onChange={(value) => update({ payloadGenerationMode: value })}
                 />
 
                 {!isSequential && (
@@ -64,7 +64,7 @@ export function OutboundMessageSendParametersSection({
                             type="number"
                             value={String(data.generatorThreads)}
                             onChange={(value) =>
-                                update({generatorThreads: normalizeThreads(value)})
+                                update({ generatorThreads: normalizeThreads(value) })
                             }
                         />
 
@@ -73,7 +73,7 @@ export function OutboundMessageSendParametersSection({
                             type="number"
                             value={String(data.submitterThreads)}
                             onChange={(value) =>
-                                update({submitterThreads: normalizeThreads(value)})
+                                update({ submitterThreads: normalizeThreads(value) })
                             }
                         />
                     </>
@@ -84,24 +84,34 @@ export function OutboundMessageSendParametersSection({
                     type="number"
                     value={String(data.repeatCount)}
                     onChange={(value) =>
-                        update({repeatCount: Number(value) || 0})
+                        update({ repeatCount: Number(value) || 0 })
                     }
                 />
 
                 <FileSourceModeSelect
                     value={data.fileSource}
-                    onChange={(value) => update({fileSource: value})}
+                    onChange={(value) => update({ fileSource: value })}
                 />
 
                 {isGenerated ?
-                    <FormTextField
-                        label="Attachment Size (MB)"
-                        type="number"
-                        value={String(data.attachmentSizeMB)}
-                        onChange={(value) =>
-                            update({attachmentSizeMB: Number(value) || 0})
-                        }
-                    />
+                    <>
+                        <FormTextField
+                            label="Attachment Size (MB)"
+                            type="number"
+                            value={String(data.attachmentSizeMB)}
+                            onChange={(value) =>
+                                update({ attachmentSizeMB: Number(value) || 0 })
+                            }
+                        />
+                        <FormTextField
+                            label="Attachment number"
+                            type="number"
+                            value={String(data.attachmentNumber)}
+                            onChange={(value) =>
+                                update({ attachmentNumber: Number(value) || 0 })
+                            }
+                        />
+                    </>
                     :
                     <FileUpload
                         onFilesSelect={onFilesSelect}
@@ -111,7 +121,7 @@ export function OutboundMessageSendParametersSection({
 
                 <ReuseFieldSelectField
                     value={data.reuseFiles}
-                    onChange={(value) => update({reuseFiles: value})}/>
+                    onChange={(value) => update({ reuseFiles: value })}/>
 
             </div>
         </section>

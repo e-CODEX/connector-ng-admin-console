@@ -8,16 +8,16 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import {PaginatedResponse} from "@/types/response/paginated-response";
-import {ConnectorMessage, ConnectorMessageDetails} from "@/types/response/message";
-import {ConnectorTransportStep} from "@/types/response/transport-step";
-import {createSoapOutboundMessagePayload} from "@/utils/message-outbound/soap-message-builder";
-import {createBffRestOutboundMessagePayLoad} from "@/utils/message-outbound/rest-message-builder";
-import {ConnectorMessageStats} from "@/types/response/stats";
-import {ConnectorMessageReport} from "@/types/response/reporting";
-import {DownloadedFile, restApiCall, restApiDownload} from "@/lib/rest";
-import {BFF_API_BASE_URL} from "@/lib/config";
-import {RequestMode, SendMessageArgs, SendMessageResponse,} from "@/types/send-message-form";
+import { PaginatedResponse } from "@/types/response/paginated-response";
+import { ConnectorMessage, ConnectorMessageDetails } from "@/types/response/message";
+import { ConnectorTransportStep } from "@/types/response/transport-step";
+import { createSoapOutboundMessagePayload } from "@/utils/message-outbound/soap-message-builder";
+import { createBffRestOutboundMessagePayLoad } from "@/utils/message-outbound/rest-message-builder";
+import { ConnectorMessageStats } from "@/types/response/stats";
+import { ConnectorMessageReport } from "@/types/response/reporting";
+import { DownloadedFile, restApiCall, restApiDownload } from "@/lib/rest";
+import { BFF_API_BASE_URL } from "@/lib/config";
+import { RequestMode, SendMessageArgs, SendMessageResponse, } from "@/types/send-message-form";
 
 
 export async function listMessages(params?: {
@@ -81,9 +81,9 @@ export async function sendMessage({
                                       documents,
                                   }: SendMessageArgs): Promise<SendMessageResponse[]> {
     if (parameters.mode === RequestMode.REST) {
-        return sendRestMessage({formData, parameters, documents});
+        return sendRestMessage({ formData, parameters, documents });
     }
-    return sendSoapMessage({formData, parameters, documents});
+    return sendSoapMessage({ formData, parameters, documents });
 
 }
 
@@ -121,11 +121,16 @@ async function sendRestMessage({
             )
         );
 
-    const results: PromiseSettledResult<SendMessageResponse>[] = [];
-    results.push(...(await Promise.allSettled(createRequests())));
+    const results = await Promise.allSettled(createRequests());
 
+    const firstFailure = results.find(
+        (r): r is PromiseRejectedResult => r.status === "rejected"
+    );
+
+    if (firstFailure) {
+        throw firstFailure.reason;
+    }
     return results;
-
 }
 
 
@@ -164,9 +169,15 @@ async function sendSoapMessage({
             )
         );
 
-    const results: PromiseSettledResult<SendMessageResponse>[] = [];
-    results.push(...(await Promise.allSettled(createRequests())));
+    const results = await Promise.allSettled(createRequests());
 
+    const firstFailure = results.find(
+        (r): r is PromiseRejectedResult => r.status === "rejected"
+    );
+
+    if (firstFailure) {
+        throw firstFailure.reason;
+    }
     return results;
 
 }

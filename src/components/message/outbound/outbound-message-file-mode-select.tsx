@@ -1,5 +1,5 @@
-import {Label, ListBox, Select} from "@heroui/react";
-import {FileSourceMode} from "@/types/send-message-form";
+import { Label, ListBox, Select } from "@heroui/react";
+import { FileSourceMode } from "@/types/send-message-form";
 
 
 type FileSourceSelectProps = {

@@ -1,11 +1,13 @@
 "use client";
 
-import {useState} from "react";
-import {PageHeader} from "@/components/common/page-header";
-import {OutboundMessageForm} from "@/components/message/outbound/outbound-message-form";
-import {OutboundMessageSendParametersSection} from "@/components/message/outbound/outbound-message-send-params-section";
-import {OutboundMessageActionBar} from "@/components/message/outbound/outbound-message-action-bar";
-import {OutboundMessageConsolePanel} from "@/components/message/outbound/outbound-message-console-panel";
+import { useState } from "react";
+import { PageHeader } from "@/components/common/page-header";
+import { OutboundMessageForm } from "@/components/message/outbound/outbound-message-form";
+import {
+    OutboundMessageSendParametersSection
+} from "@/components/message/outbound/outbound-message-send-params-section";
+import { OutboundMessageActionBar } from "@/components/message/outbound/outbound-message-action-bar";
+import { OutboundMessageConsolePanel } from "@/components/message/outbound/outbound-message-console-panel";
 import {
     FileSourceMode,
     PayloadGenerationMode,
@@ -13,8 +15,8 @@ import {
     SendMessageFormData,
     SendParameters,
 } from "@/types/send-message-form";
-import {sendMessage} from "@/services/message";
-import {toastError} from "@/utils";
+import { sendMessage } from "@/services/message";
+import { toastError } from "@/utils";
 
 const initialMessageFormData: SendMessageFormData = {
     businessDomainIdentifier: "",
@@ -55,6 +57,7 @@ const initialMessageFormData: SendMessageFormData = {
 const initialSendParameters: SendParameters = {
     mode: RequestMode.SOAP,
     attachmentSizeMB: 1,
+    attachmentNumber: 0,
     repeatCount: 1,
     submitterThreads: 5,
     generatorThreads: 3,
@@ -89,7 +92,11 @@ export default function MessageOutboundPage() {
 
             setLogs((prev) => `[${new Date().toLocaleTimeString()}] Message sent\n${prev}`);
         } catch (error) {
-            setLogs((prev) => `[${new Date().toLocaleTimeString()}] Send failed\n${prev}`);
+            setLogs(prev =>
+                `[${new Date().toLocaleTimeString()}] Send failed. ${
+                    error instanceof Error ? error.message : String(error)
+                }\n${prev}`
+            );
             toastError(error)
         } finally {
             setIsSending(false);

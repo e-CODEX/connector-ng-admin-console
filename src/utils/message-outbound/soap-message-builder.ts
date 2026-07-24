@@ -8,10 +8,10 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import {v4 as uuidv4} from 'uuid';
-import {FileSourceMode, PayloadGenerationMode, SendMessageFormData, SendParameters} from "@/types/send-message-form";
-import {getDocumentAsBase64String, getXmlContentAsBase64String} from "@/utils/fileUtils";
-import {ExecutionMode, SoapOutboundMessageRequest, TestExecution} from "@/types/request/message";
+import { v4 as uuidv4 } from 'uuid';
+import { FileSourceMode, PayloadGenerationMode, SendMessageFormData, SendParameters } from "@/types/send-message-form";
+import { getDocumentAsBase64String, getXmlContentAsBase64String } from "@/utils/fileUtils";
+import { ExecutionMode, SoapOutboundMessageRequest, TestExecution } from "@/types/request/message";
 
 
 /**
@@ -89,6 +89,7 @@ export const createSoapOutboundMessagePayload = async (
             payloadDefinition: {
                 source: parameters.payloadGenerationMode,
                 generatorThreads: parameters.generatorThreads,
+                attachmentNb: parameters.attachmentNumber,
             },
             submitterThreads: parameters.submitterThreads,
             reuseFiles: true,

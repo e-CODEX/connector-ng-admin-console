@@ -1,5 +1,5 @@
-import {Label, ListBox, Select} from "@heroui/react";
-import {PayloadGenerationMode} from "@/types/send-message-form";
+import { Label, ListBox, Select } from "@heroui/react";
+import { PayloadGenerationMode } from "@/types/send-message-form";
 
 interface ExecutionModeSelectFieldProps {
     value: PayloadGenerationMode;
@@ -21,7 +21,7 @@ const requestOptions = [
     },
 ];
 
-export function ExecutionModeSelectField({value, onChange}: ExecutionModeSelectFieldProps) {
+export function ExecutionModeSelectField({ value, onChange }: ExecutionModeSelectFieldProps) {
     return (
         <div className="w-full">
             <Label className="text-sm font-semibold text-default-700">Payload generation</Label>

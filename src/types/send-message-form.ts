@@ -8,7 +8,7 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import {ConnectorMessage} from "@/types/response/message";
+import { ConnectorMessage } from "@/types/response/message";
 
 export type SendMessageFormData = Pick<
     ConnectorMessage,
@@ -36,6 +36,7 @@ export enum RequestMode {
 export interface SendParameters {
     mode: RequestMode;
     attachmentSizeMB: number;
+    attachmentNumber: number;
     repeatCount: number;
     fileSource: FileSourceMode;
     submitterThreads: number;

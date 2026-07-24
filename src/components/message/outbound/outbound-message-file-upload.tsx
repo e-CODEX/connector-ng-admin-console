@@ -11,8 +11,8 @@
 "use client";
 
 
-import {Button, Label, toast} from "@heroui/react";
-import {useRef, useState} from "react";
+import { Button, Label, toast } from "@heroui/react";
+import { useRef, useState } from "react";
 
 
 interface FileUploadProps {

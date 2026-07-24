@@ -37,8 +37,8 @@ export function ReuseFieldSelectField({
                 }}
             >
                 <Select.Trigger>
-                    <Select.Value />
-                    <Select.Indicator />
+                    <Select.Value/>
+                    <Select.Indicator/>
                 </Select.Trigger>
 
                 <Select.Popover>

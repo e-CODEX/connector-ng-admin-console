@@ -49,7 +49,7 @@ export const generatePdfBlob = async (sizeMB: number, customText = "e-CODEX test
         window.crypto.getRandomValues(filler.subarray(offset, offset + currentChunkSize));
     }
 
-    return new Blob([headerArray, filler, footerArray], {type: 'application/pdf'});
+    return new Blob([headerArray, filler, footerArray], { type: 'application/pdf' });
 };
 
 export const getDocumentAsBase64String = async (document?: Blob) => {
@@ -83,7 +83,7 @@ export const getXmlContentAsBlob = async (
 ): Promise<Blob> => {
     return xmlContent
         ? xmlContent
-        : new Blob(['<?xml version="1.0" encoding="UTF-8"?><testMessage>Test</testMessage>'], {type: "application/xml"});
+        : new Blob(['<?xml version="1.0" encoding="UTF-8"?><testMessage>Test</testMessage>'], { type: "application/xml" });
 };
 
 
@@ -152,5 +152,5 @@ export const base64ToBlob = (base64: string, mimeType = "application/octet-strea
     for (let i = 0; i < binary.length; i++) {
         bytes[i] = binary.charCodeAt(i);
     }
-    return new Blob([bytes], {type: mimeType});
+    return new Blob([bytes], { type: mimeType });
 }

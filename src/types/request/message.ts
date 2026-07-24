@@ -8,7 +8,7 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import {PayloadGenerationMode, RequestMode} from "@/types/send-message-form";
+import { PayloadGenerationMode, RequestMode } from "@/types/send-message-form";
 
 export interface SendMessageResponse {
     identifier: string;
@@ -26,6 +26,7 @@ export enum ExecutionMode {
 export interface PayloadDefinition {
     source: PayloadGenerationMode;
     generatorThreads: number;
+    attachmentNb: number
 }
 
 export interface TestConfiguration {

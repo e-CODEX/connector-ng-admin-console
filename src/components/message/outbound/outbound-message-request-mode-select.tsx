@@ -1,5 +1,5 @@
-import {Label, ListBox, Select} from "@heroui/react";
-import {RequestMode} from "@/types/send-message-form";
+import { Label, ListBox, Select } from "@heroui/react";
+import { RequestMode } from "@/types/send-message-form";
 
 interface RequestModeSelectFieldProps {
     value: RequestMode;
@@ -15,7 +15,7 @@ const requestOptions = [
     },
 ];
 
-export function RequestModeSelectField({value, onChange}: RequestModeSelectFieldProps) {
+export function RequestModeSelectField({ value, onChange }: RequestModeSelectFieldProps) {
     return (
         <div className="w-full">
             <Label className="text-sm font-semibold text-default-700">Mode</Label>

@@ -88,7 +88,7 @@ async function extractErrorMessage(response: Response): Promise<string> {
 export async function restApiCall<T>(
     path: string,
     options: RestApiOptions = {},
-    baseUrl: string         = API_BASE_URL,
+    baseUrl: string = API_BASE_URL,
 ): Promise<T> {
     const response = await restApiFetch(path, options, baseUrl);
 
@@ -108,7 +108,7 @@ export interface DownloadedFile {
 export async function restApiDownload(
     path: string,
     options: RestApiOptions & { defaultFilename?: string } = {},
-    baseUrl: string                                        = API_BASE_URL,
+    baseUrl: string = API_BASE_URL,
 ): Promise<DownloadedFile> {
     const { defaultFilename = "download", ...rest } = options;
     const response = await restApiFetch(path, {

@@ -68,6 +68,9 @@ export function ConfigurationMessageProcessingSection() {
                             <ConfigurationDetailRow label="Transport step identifier suffix">
                                 {config.transportIdSuffix}
                             </ConfigurationDetailRow>
+                            <ConfigurationDetailRow label="Auto trigger delivery evidence submission">
+                                <BooleanChip value={config.autoTriggerDeliveryEvidences}/>
+                            </ConfigurationDetailRow>
                             <ConfigurationDetailRow label="Outbound message verification mode">
                                 {config.outboundMessageVerificationMode}
                             </ConfigurationDetailRow>

@@ -20,34 +20,33 @@ import {
     RoutingConfiguration
 } from "@/types/response/configuration";
 
-export async function getBusinessDomainsConfig(): Promise<BusinessDomainConfiguration> {
-    return restApiCall<BusinessDomainConfiguration>("api/v1/admin/configurations/business-domains");
+export function createConfigurationService(baseUrl: string) {
+    return {
+        async getBusinessDomainsConfig(): Promise<BusinessDomainConfiguration> {
+            return restApiCall<BusinessDomainConfiguration>(baseUrl, "api/v1/admin/configurations/business-domains");
+        },
+        async getEvidenceConfiguration(): Promise<EvidenceConfiguration> {
+            return restApiCall<EvidenceConfiguration>(baseUrl, "api/v1/admin/configurations/evidence");
+        },
+        async getContainerConfiguration(): Promise<ContainerConfiguration> {
+            return restApiCall<ContainerConfiguration>(baseUrl, "api/v1/admin/configurations/container");
+        },
+        async getBusinessDocumentConfiguration(): Promise<BusinessDocumentConfiguration> {
+            return restApiCall<BusinessDocumentConfiguration>(baseUrl, "api/v1/admin/configurations/business-document");
+        },
+        async getMessageProcessingConfiguration(): Promise<MessageProcessingConfiguration> {
+            return restApiCall<MessageProcessingConfiguration>(baseUrl, "api/v1/admin/configurations/message-processing");
+        },
+        async getQueueConfiguration(): Promise<QueueConfiguration> {
+            return restApiCall<QueueConfiguration>(baseUrl, "api/v1/admin/configurations/queues");
+        },
+        async getRoutingConfiguration(): Promise<RoutingConfiguration> {
+            return restApiCall<RoutingConfiguration>(baseUrl, "api/v1/admin/configurations/routing");
+        },
+        async getLinkPartnerConfiguration(): Promise<LinkPartnerConfiguration> {
+            return restApiCall(baseUrl, "api/v1/admin/configurations/backend-link-partners");
+        }
+    }
 }
 
-export async function getEvidenceConfiguration(): Promise<EvidenceConfiguration> {
-    return restApiCall<EvidenceConfiguration>("api/v1/admin/configurations/evidence");
-}
-
-export async function getContainerConfiguration(): Promise<ContainerConfiguration> {
-    return restApiCall<ContainerConfiguration>("api/v1/admin/configurations/container");
-}
-
-export async function getBusinessDocumentConfiguration(): Promise<BusinessDocumentConfiguration> {
-    return restApiCall<BusinessDocumentConfiguration>("api/v1/admin/configurations/business-document");
-}
-
-export async function getMessageProcessingConfiguration(): Promise<MessageProcessingConfiguration> {
-    return restApiCall<MessageProcessingConfiguration>("api/v1/admin/configurations/message-processing");
-}
-
-export async function getQueueConfiguration(): Promise<QueueConfiguration> {
-    return restApiCall<QueueConfiguration>("api/v1/admin/configurations/queues");
-}
-
-export async function getRoutingConfiguration(): Promise<RoutingConfiguration> {
-    return restApiCall<RoutingConfiguration>("api/v1/admin/configurations/routing");
-}
-
-export async function getLinkPartnerConfiguration(): Promise<LinkPartnerConfiguration> {
-    return restApiCall("api/v1/admin/configurations/backend-link-partners");
-}
+export type ConfigurationService = ReturnType<typeof createConfigurationService>;

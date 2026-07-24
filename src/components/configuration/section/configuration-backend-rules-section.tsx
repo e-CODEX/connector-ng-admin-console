@@ -12,35 +12,37 @@
 
 import React, { useEffect, useState } from "react";
 import { RoutingConfiguration } from "@/types/response/configuration";
-import { getRoutingConfiguration } from "@/services/configuration";
 import { toastError } from "@/utils";
 import { Table } from "@heroui/react";
 import { ConfigurationBlock } from "@/components/configuration/configuration-block";
 import { ConfigurationDetailRow } from "@/components/configuration/configuration-detail-row";
 import { BooleanChip } from "@/components/common/boolean-chip";
 import { SpinnerView } from "@/components/common/spinner-view";
+import { useConfigurationService } from "@/hooks/use-http-service";
 
 export function ConfigurationBackendRulesSection() {
     const [loading, setLoading] = useState(true);
     const [config, setConfig] = useState<RoutingConfiguration | null>(null);
 
-    const loadConfig = async () => {
-        setLoading(true)
-        try {
-            const data = await getRoutingConfiguration()
-            setConfig(data || [])
-        } catch (error) {
-            toastError(error)
-        } finally {
-            setLoading(false)
-        }
-    }
+    const configurationService = useConfigurationService();
 
     useEffect(() => {
+        const loadConfig = async () => {
+            setLoading(true)
+            try {
+                const data = await configurationService.getRoutingConfiguration()
+                setConfig(data || [])
+            } catch (error) {
+                toastError(error)
+            } finally {
+                setLoading(false)
+            }
+        }
+
         (async () => {
             await loadConfig()
         })()
-    }, [])
+    }, [configurationService])
 
     if (!config) {
         return null;

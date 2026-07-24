@@ -18,13 +18,13 @@ import { DetailRow } from "@/components/common/detail-row";
 import { DetailSection } from "@/components/common/detail-section";
 import { ConnectorProcessingModeParty } from "@/types/response/processing-mode";
 import { ArrowDownToLine } from "lucide-react";
-import { downloadEvidence } from "@/services/evidence";
 import { MessageDirectionChip } from "@/components/message/chip/message-direction-chip";
 import { MessageDeliveryStatusChip } from "@/components/message/chip/message-delivery-status-chip";
 import { ConnectorAttachmentResponse } from "@/types/response/attachments";
 import { AttachmentDetailsView } from "@/components/attachment/attachment-details-view";
 import { BusinessDetailsBusinessContentSection } from "@/components/message/detail/business-details-business-content-section";
 import { DateTime } from "@/components/common/date-time";
+import { useEvidenceService } from "@/hooks/use-http-service";
 
 interface MessageDetailsContentProps {
     message: ConnectorMessageDetailsResponse | null;
@@ -34,6 +34,8 @@ interface MessageDetailsContentProps {
 export function MessageDetailsContent({ message, loading }: MessageDetailsContentProps) {
     const [selectedBusinessAttachment, setSelectedBusinessAttachment] = useState<ConnectorAttachmentResponse | null>(null);
 
+    const evidenceService = useEvidenceService();
+
     const businessAttachmentDetailsModal = useOverlayState();
 
     if (!message || loading) {
@@ -42,7 +44,7 @@ export function MessageDetailsContent({ message, loading }: MessageDetailsConten
 
     const onDownloadEvidenceClicked = async (evidence: ConnectorMessageEvidence) => {
         try {
-            const file = await downloadEvidence(evidence.uuid, evidence.type)
+            const file = await evidenceService.downloadEvidence(evidence.uuid, evidence.type)
             saveFile(file);
         } catch (error) {
             toastError(error);

@@ -8,10 +8,13 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { getAppInfo } from "@/services/actuator";
-import { AppInfoResponse } from "@/types/response/actuator";
+"use client"
+
+import { AppBuildInfo } from "@/types/response/actuator";
 import { Chip } from "@heroui/react";
 import { AppHealthIndicatorView } from "@/components/common/app-health-indicator-view";
+import { useActuatorService } from "@/hooks/use-http-service";
+import { useEffect, useState } from "react";
 
 const SNAPSHOT_SUFFIX = "-SNAPSHOT";
 
@@ -42,21 +45,38 @@ function formatBuildTime(iso: string): string {
     }).format(date);
 }
 
-async function resolveInfo(): Promise<AppInfoResponse | undefined> {
-    try {
-        return await getAppInfo();
-    } catch {
-        return undefined;
-    }
-}
+export function AppInfoView({ variant = "footer", className = "", }: AppInfoProps) {
+    const [appBuildInfo, setAppBuildInfo] = useState<AppBuildInfo | undefined>(undefined);
+    const actuatorService = useActuatorService();
 
-export async function AppInfoView({ variant = "footer", className = "", }: AppInfoProps) {
-    const resolved = await resolveInfo();
-    const build = resolved?.build;
+    useEffect(() => {
+        let cancelled = false;
+
+        const getAppInfo = async () => {
+            try {
+                if (!cancelled) {
+                    const resolved = await actuatorService.getAppInfo();
+                    setAppBuildInfo(resolved.build);
+                }
+            } catch {
+                if (!cancelled) {
+                    setAppBuildInfo(undefined);
+                }
+            }
+        }
+
+        void getAppInfo();
+
+        return () => {
+            cancelled = true;
+        }
+
+    }, [actuatorService]);
+
 
     const size = variant === "statusbar" ? "sm" : "md";
 
-    if (!build) {
+    if (!appBuildInfo) {
         return (
             <Chip color="default" variant="soft" size={size} className={className}>
                 version unavailable
@@ -64,15 +84,15 @@ export async function AppInfoView({ variant = "footer", className = "", }: AppIn
         );
     }
 
-    const version = splitVersion(build.version);
-    const buildTime = formatBuildTime(build.time);
+    const version = splitVersion(appBuildInfo.version);
+    const buildTime = formatBuildTime(appBuildInfo.time);
 
     const versionChip = (
         <Chip
             color="default"
             variant="soft"
             size={size}
-            title={`${build.name} · built ${buildTime} UTC`}
+            title={`${appBuildInfo.name} · built ${buildTime} UTC`}
         >
             <Chip.Label className="font-mono">v{version.base}</Chip.Label>
         </Chip>
@@ -110,7 +130,7 @@ export async function AppInfoView({ variant = "footer", className = "", }: AppIn
                 aria-hidden="true"
                 className="bg-divider hidden h-4 w-px sm:block"
             />
-            <time dateTime={build.time} title={build.time} className="font-semibold">
+            <time dateTime={appBuildInfo.time} title={appBuildInfo.time} className="font-semibold">
                 Built {buildTime} UTC
             </time>
         </div>

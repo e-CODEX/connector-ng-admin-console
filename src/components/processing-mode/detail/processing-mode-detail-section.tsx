@@ -12,14 +12,14 @@
 
 import { Table } from "@heroui/react";
 import React from "react";
-import { ConnectorProcessingModeDetailResponse } from "@/types/response/processing-mode";
+import { ConnectorProcessingModeDetail } from "@/types/response/processing-mode";
 import { DetailSection } from "@/components/common/detail-section";
 import { BooleanChip } from "@/components/common/boolean-chip";
 import { ConfigurationKeystoreView } from "@/components/configuration/view/configuration-keystore-view";
 import { Keystore } from "@/types/response/configuration";
 
 interface ProcessingModeDetailsSectionProps {
-    processingMode: ConnectorProcessingModeDetailResponse | null;
+    processingMode: ConnectorProcessingModeDetail | null;
     loading: boolean;
 }
 

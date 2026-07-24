@@ -13,8 +13,7 @@
 import { PageHeader } from "@/components/common/page-header";
 import React, { useState } from "react";
 import { Button, Table, Tooltip, useOverlayState } from "@heroui/react";
-import { ConnectorProcessingModeResponse } from "@/types/response/processing-mode";
-import { createProcessingMode, listProcessingModes } from "@/services/processing-mode";
+import { ConnectorProcessingMode } from "@/types/response/processing-mode";
 import { toastError, toastSuccess, truncate } from "@/utils";
 import { ProcessingModeDetailsView } from "@/components/processing-mode/detail/processing-mode-detail-view";
 import { ArrowsRotateRight, Eye, Plus } from "@gravity-ui/icons";
@@ -25,20 +24,23 @@ import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { useList } from "@/hooks/use-list";
 import { DateTime } from "@/components/common/date-time";
+import { useProcessingModeService } from "@/hooks/use-http-service";
 
 export default function ProcessingModesAdminPage() {
-    const [selectedProcessingMode, setSelectedProcessingMode] = useState<ConnectorProcessingModeResponse | null>(null);
+    const [selectedProcessingMode, setSelectedProcessingMode] = useState<ConnectorProcessingMode | null>(null);
 
     const detailsModal = useOverlayState();
     const addModal = useOverlayState();
 
-    const list = useList<ConnectorProcessingModeResponse>(listProcessingModes);
+    const processingModeService = useProcessingModeService();
+
+    const list = useList<ConnectorProcessingMode>(processingModeService.listProcessingModes);
 
     const onAddClick = () => {
         addModal.open();
     }
 
-    const onDetailsClick = (processingMode: ConnectorProcessingModeResponse) => {
+    const onDetailsClick = (processingMode: ConnectorProcessingMode) => {
         setSelectedProcessingMode(processingMode);
         detailsModal.open();
     };
@@ -130,7 +132,7 @@ export default function ProcessingModesAdminPage() {
                         state={addModal}
                         onSubmit={async (payload) => {
                             try {
-                                await createProcessingMode(payload);
+                                await processingModeService.createProcessingMode(payload);
                                 await list.refresh();
                                 toastSuccess("Processing mode created successfully");
                                 addModal.close();

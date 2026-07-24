@@ -11,12 +11,22 @@
 "use client";
 
 import { ThemeProvider } from "next-themes";
-import React from "react";
+import React, { createContext } from "react";
+import { AppConfig } from "@/config/config";
 
-export function Providers({ children }: { children: React.ReactNode }) {
+interface ProvidersProps {
+    children: React.ReactNode;
+    config: AppConfig
+}
+
+export const AppConfigContext = createContext<AppConfig | null>(null);
+
+export function Providers({ children, config }: ProvidersProps) {
     return (
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            {children}
-        </ThemeProvider>
+        <AppConfigContext value={config}>
+            <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+                {children}
+            </ThemeProvider>
+        </AppConfigContext>
     );
 }

@@ -16,30 +16,32 @@ import { ConfigurationBlock } from "@/components/configuration/configuration-blo
 import { EvidenceConfiguration } from "@/types/response/configuration";
 import React, { useEffect, useState } from "react";
 import { toastError } from "@/utils";
-import { getEvidenceConfiguration } from "@/services/configuration";
 import { SpinnerView } from "@/components/common/spinner-view";
+import { useConfigurationService } from "@/hooks/use-http-service";
 
 export function ConfigurationEvidenceSection() {
     const [loading, setLoading] = useState(true);
     const [config, setConfig] = useState<EvidenceConfiguration | null>(null);
 
-    const loadConfig = async () => {
-        setLoading(true)
-        try {
-            const data = await getEvidenceConfiguration()
-            setConfig(data || null)
-        } catch (error) {
-            toastError(error)
-        } finally {
-            setLoading(false)
-        }
-    }
+    const configurationService = useConfigurationService();
 
     useEffect(() => {
+        const loadConfig = async () => {
+            setLoading(true)
+            try {
+                const data = await configurationService.getEvidenceConfiguration()
+                setConfig(data || null)
+            } catch (error) {
+                toastError(error)
+            } finally {
+                setLoading(false)
+            }
+        }
+
         (async () => {
             await loadConfig()
         })()
-    }, [])
+    }, [configurationService])
 
     if (!config) {
         return null;

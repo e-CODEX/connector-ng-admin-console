@@ -12,13 +12,13 @@
 
 import { Modal, useOverlayState } from "@heroui/react";
 import React from "react";
-import { ConnectorTransportStepResponse } from "@/types/response/transport-step";
+import { ConnectorTransportStep } from "@/types/response/transport-step";
 import { TransportStepDetailsContent } from "@/components/transport-step/transport-step-details-content";
 import { Route } from "lucide-react";
 import { ModalHeaderIcon } from "@/components/common/modal-header-icon";
 
 interface TransportStepDetailsViewProps {
-    transportStep: ConnectorTransportStepResponse | null;
+    transportStep: ConnectorTransportStep | null;
     state: ReturnType<typeof useOverlayState>;
 }
 

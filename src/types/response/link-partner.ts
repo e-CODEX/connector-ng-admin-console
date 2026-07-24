@@ -10,7 +10,7 @@
 
 import { LinkPartnerType } from "@/types/global";
 
-export interface ConnectorLinkPartnerResponse {
+export interface ConnectorLinkPartner {
     name: string;
     description: string;
     enabled: boolean;

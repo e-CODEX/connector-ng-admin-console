@@ -8,21 +8,29 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { ConnectorBusinessDomainResponse } from "@/types/response/business-domain";
+import { ConnectorBusinessDomain } from "@/types/response/business-domain";
 import { BusinessDomainCreationRequest } from "@/types/request/business-domain";
 import { restApiCall } from "@/lib/rest";
 
-export async function listBusinessDomains(): Promise<ConnectorBusinessDomainResponse[]> {
-    return restApiCall<ConnectorBusinessDomainResponse[]>("api/v1/admin/business-domains");
+
+export function createBusinessDomainService(baseUrl: string) {
+    return {
+        async listBusinessDomains(): Promise<ConnectorBusinessDomain[]> {
+            return restApiCall<ConnectorBusinessDomain[]>(baseUrl, "api/v1/admin/business-domains");
+        },
+        async createBusinessDomain(payload: BusinessDomainCreationRequest): Promise<ConnectorBusinessDomain> {
+            return restApiCall<ConnectorBusinessDomain>(
+                baseUrl,
+                "api/v1/admin/business-domains", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                }
+            )
+        }
+    }
 }
 
-export async function createBusinessDomain(payload: BusinessDomainCreationRequest): Promise<ConnectorBusinessDomainResponse> {
-    return restApiCall<ConnectorBusinessDomainResponse>("api/v1/admin/business-domains", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(payload)
-        }
-    )
-}
+export type BusinessDomainService = ReturnType<typeof createBusinessDomainService>;

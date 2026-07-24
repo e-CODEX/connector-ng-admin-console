@@ -27,9 +27,3 @@ export interface SendMessageResponse {
   identifier?: string;
   status?: string;
 }
-
-export interface SendMessageArgs {
-  formData: SendMessageFormData;
-  parameters: SendParameters;
-  document?: Blob;
-}

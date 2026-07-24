@@ -11,9 +11,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getHealthInfo } from "@/services/actuator";
 import { Chip } from "@heroui/react";
 import { HealthStatus } from "@/types/global";
+import { useActuatorService } from "@/hooks/use-http-service";
 
 type ChipColor = "success" | "danger" | "warning" | "default";
 
@@ -37,12 +37,14 @@ export function AppHealthIndicatorView({ pollIntervalMs = 60_000, size = "sm", }
     const [status, setStatus] = useState<HealthStatus>("UNKNOWN");
     const [isInitialLoad, setIsInitialLoad] = useState(true);
 
+    const actuatorService = useActuatorService();
+
     useEffect(() => {
         let cancelled = false;
 
         const getHealthStatus = async () => {
             try {
-                const body = await getHealthInfo();
+                const body = await actuatorService.getHealthInfo();
                 if (!cancelled) {
                     setStatus(body.status ?? "UNKNOWN");
                 }
@@ -64,7 +66,7 @@ export function AppHealthIndicatorView({ pollIntervalMs = 60_000, size = "sm", }
             cancelled = true;
             clearInterval(id);
         };
-    }, [pollIntervalMs]);
+    }, [pollIntervalMs, actuatorService]);
 
     const { label, dot, color } = PRESENTATION[status];
 

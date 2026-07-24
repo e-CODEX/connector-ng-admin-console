@@ -10,7 +10,7 @@
 
 import { KeystoreType, PartyRoleType } from "@/types/global";
 
-export interface ConnectorProcessingModeResponse {
+export interface ConnectorProcessingMode {
     uuid: string;
     description: string;
     filename: string;
@@ -19,7 +19,7 @@ export interface ConnectorProcessingModeResponse {
     updatedAt: string;
 }
 
-export interface ConnectorProcessingModeDetailResponse extends ConnectorProcessingModeResponse {
+export interface ConnectorProcessingModeDetail extends ConnectorProcessingMode {
     parties: ConnectorProcessingModeParty[];
     services: ConnectorProcessingModeService[];
     actions: ConnectorProcessingModeAction[];

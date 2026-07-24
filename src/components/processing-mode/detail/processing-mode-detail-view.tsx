@@ -13,21 +13,23 @@
 import { Modal, useOverlayState } from "@heroui/react";
 import { toastError } from "@/utils";
 import React, { useEffect, useState } from "react";
-import { ConnectorProcessingModeDetailResponse, ConnectorProcessingModeResponse } from "@/types/response/processing-mode";
-import { getProcessingMode } from "@/services/processing-mode";
+import { ConnectorProcessingModeDetail, ConnectorProcessingMode } from "@/types/response/processing-mode";
 import { DetailRow } from "@/components/common/detail-row";
 import { ProcessingModeDetailsSection } from "@/components/processing-mode/detail/processing-mode-detail-section";
 import { Workflow } from "lucide-react";
 import { DateTime } from "@/components/common/date-time";
+import { useProcessingModeService } from "@/hooks/use-http-service";
 
 interface ProcessingModeDetailsViewProps {
-    processingMode: ConnectorProcessingModeResponse | null;
+    processingMode: ConnectorProcessingMode | null;
     state: ReturnType<typeof useOverlayState>;
 }
 
 export function ProcessingModeDetailsView({ processingMode, state }: ProcessingModeDetailsViewProps) {
-    const [details, setDetails] = useState<ConnectorProcessingModeDetailResponse | null>(null);
+    const [details, setDetails] = useState<ConnectorProcessingModeDetail | null>(null);
     const [loading, setLoading] = useState(false);
+
+    const processingModeService = useProcessingModeService();
 
     const identifier = processingMode?.uuid;
 
@@ -42,7 +44,7 @@ export function ProcessingModeDetailsView({ processingMode, state }: ProcessingM
             setLoading(true);
             setDetails(null);
             try {
-                const data = await getProcessingMode(identifier);
+                const data = await processingModeService.retrieveProcessingMode(identifier);
                 if (!active) {
                     return;
                 }
@@ -64,7 +66,7 @@ export function ProcessingModeDetailsView({ processingMode, state }: ProcessingM
         return () => {
             active = false;
         };
-    }, [state.isOpen, identifier]);
+    }, [state.isOpen, identifier, processingModeService]);
 
     return (
         <Modal state={state}>

@@ -9,8 +9,22 @@
  */
 
 import { restApiCall } from "@/lib/rest";
-import { ConnectorLinkPartnerResponse } from "@/types/response/link-partner";
+import { ConnectorLinkPartner } from "@/types/response/link-partner";
 
-export async function listLinkPartners(params: { linkType?: string }): Promise<ConnectorLinkPartnerResponse[]> {
-    return restApiCall<ConnectorLinkPartnerResponse[]>("api/v1/link-partners", { params });
+export type ListLinkPartnersParams = {
+    linkType: string;
 }
+
+export function createLinkPartnersService(baseUrl: string) {
+    return {
+        async listLinkPartners(params: ListLinkPartnersParams): Promise<ConnectorLinkPartner[]> {
+            return restApiCall<ConnectorLinkPartner[]>(
+                baseUrl,
+                "api/v1/link-partners",
+                { params }
+            );
+        }
+    }
+}
+
+export type LinkPartnersService = ReturnType<typeof createLinkPartnersService>;

@@ -17,7 +17,6 @@ import { OutboundMessageSendParametersSection } from "@/components/message/outbo
 import { OutboundMessageActionBar } from "@/components/message/outbound/outbound-message-action-bar";
 import { OutboundMessageConsoleContent, OutboundMessageConsolePanel } from "@/components/message/outbound/outbound-message-console-panel";
 import { SendMessageFormData, SendParameters, } from "@/types/send-message-form";
-import { sendMessage } from "@/services/message";
 import { toastError } from "@/utils";
 import { Send } from "lucide-react";
 import { useBusinessDomainIdentifiers } from "@/hooks/use-business-domain-identifiers";
@@ -26,43 +25,46 @@ import { useProcessingModeServices } from "@/hooks/use-processing-mode-services"
 import { useProcessingModeActions } from "@/hooks/use-processing-mode-actions";
 import { useProcessingModeParties } from "@/hooks/use-processing-mode-parties";
 import { Form } from "@heroui/react";
-import { DEFAULT_FINAL_RECIPIENT, DEFAULT_ORIGINAL_SENDER } from "@/constants/constants";
+import { useMessageService } from "@/hooks/use-http-service";
+import { useAppConfig } from "@/hooks/use-app-config";
 
-const initialMessageFormData: SendMessageFormData = {
-    businessDomainIdentifier: "",
-    backendMessageIdentifier: "",
-    backendName: "",
-    as4Properties: {
-        ebmsMessageIdentifier: "",
-        referenceToIdentifier: "",
-        conversationIdentifier: "",
-        originalSender: DEFAULT_ORIGINAL_SENDER,
-        finalRecipient: DEFAULT_FINAL_RECIPIENT,
-        fromParty: {
-            name: "",
-            identifier: "BL",
-            identifierType: "urn:oasis:names:tc:ebcore:partyid-type:ecodex",
-            role: "GW",
-            roleType: "INITIATOR",
-            isHome: true,
+const buildInitialMessageFormData = (defaultOriginalSender: string, defaultFinalRecipient: string): SendMessageFormData => {
+    return {
+        businessDomainIdentifier: "",
+        backendMessageIdentifier: "",
+        backendName: "",
+        as4Properties: {
+            ebmsMessageIdentifier: "",
+            referenceToIdentifier: "",
+            conversationIdentifier: "",
+            originalSender: defaultOriginalSender,
+            finalRecipient: defaultFinalRecipient,
+            fromParty: {
+                name: "",
+                identifier: "BL",
+                identifierType: "urn:oasis:names:tc:ebcore:partyid-type:ecodex",
+                role: "GW",
+                roleType: "INITIATOR",
+                isHome: true,
+            },
+            toParty: {
+                name: "",
+                identifier: "RE",
+                identifierType: "urn:oasis:names:tc:ebcore:partyid-type:ecodex",
+                role: "GW",
+                roleType: "RESPONDER",
+                isHome: false,
+            },
+            service: {
+                name: "EPO",
+                type: "urn:e-codex:services:",
+            },
+            action: {
+                name: "Form_A",
+            },
         },
-        toParty: {
-            name: "",
-            identifier: "RE",
-            identifierType: "urn:oasis:names:tc:ebcore:partyid-type:ecodex",
-            role: "GW",
-            roleType: "RESPONDER",
-            isHome: false,
-        },
-        service: {
-            name: "EPO",
-            type: "urn:e-codex:services:",
-        },
-        action: {
-            name: "Form_A",
-        },
-    },
-};
+    };
+}
 
 const initialSendParameters: SendParameters = {
     mode: "SOAP",
@@ -71,11 +73,18 @@ const initialSendParameters: SendParameters = {
 };
 
 export default function MessageOutboundPage() {
-    const [messageFormData, setMessageFormData] = useState<SendMessageFormData>(initialMessageFormData);
+    const { defaultOriginalSender, defaultFinalRecipient } = useAppConfig();
+
+    const [messageFormData, setMessageFormData] = useState<SendMessageFormData>(buildInitialMessageFormData(
+        defaultOriginalSender,
+        defaultFinalRecipient
+    ));
     const [sendParameters, setSendParameters] = useState<SendParameters>(initialSendParameters);
     const [logs, setLogs] = useState<OutboundMessageConsoleContent[]>([{ message: "Ready.", level: "INFO" }]);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSending, setIsSending] = useState(false);
+
+    const messageService = useMessageService();
 
     const [businessDomainIdentifierQuery, setBusinessDomainIdentifierQuery] = useState<string>("");
     const businessDomainIdentifiers = useBusinessDomainIdentifiers();
@@ -107,7 +116,7 @@ export default function MessageOutboundPage() {
                 { message: `[${new Date().toLocaleTimeString()}] Sending message...\n`, level: "INFO" },
             ]);
 
-            await sendMessage({
+            await messageService.sendMessage({
                 formData: messageFormData,
                 parameters: sendParameters,
             });

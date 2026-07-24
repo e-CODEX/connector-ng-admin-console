@@ -11,16 +11,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { listBusinessDomains } from "@/services/business-domain";
 import { toastError } from "@/utils";
+import { useBusinessDomainService } from "@/hooks/use-http-service";
 
 export function useBusinessDomainIdentifiers(allLabel?: string) {
+    const businessDomainsService = useBusinessDomainService();
+
     const [identifiers, setIdentifiers] = useState<string[]>([]);
 
     useEffect(() => {
         let cancelled = false;
 
-        listBusinessDomains()
+        businessDomainsService.listBusinessDomains()
             .then((domains) => {
                 if (cancelled) return;
                 const names = domains.map((d) => d.identifier);
@@ -34,7 +36,7 @@ export function useBusinessDomainIdentifiers(allLabel?: string) {
         return () => {
             cancelled = true;
         };
-    }, [allLabel]);
+    }, [allLabel, businessDomainsService]);
 
     return identifiers;
 }

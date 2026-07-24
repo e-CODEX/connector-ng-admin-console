@@ -12,7 +12,6 @@
 
 import React, { useState } from "react";
 import { ConnectorMessage } from "@/types/response/message";
-import { listMessages } from "@/services/message";
 import { Button, Table, Tooltip, useOverlayState } from "@heroui/react";
 import { truncate } from "@/utils";
 import { PaginationControls } from "@/components/paging/pagination-controls";
@@ -35,6 +34,7 @@ import { usePagedList } from "@/hooks/use-paged-list";
 import { useProcessingModeServices } from "@/hooks/use-processing-mode-services";
 import { ConnectorProcessingModeService } from "@/types/response/processing-mode";
 import { DateTime } from "@/components/common/date-time";
+import { useMessageService } from "@/hooks/use-http-service";
 
 const IDENTIFIER_LENGTH = 15;
 const ALL_SELECTOR = "All";
@@ -53,9 +53,11 @@ export default function MessagesAdminPage() {
     const businessDomainIdentifiers = useBusinessDomainIdentifiers(ALL_SELECTOR);
     const processingModeServices = useProcessingModeServices(businessDomainIdentifierQuery, ALL_SELECTOR);
 
+    const messageService = useMessageService();
+
     const pagedList = usePagedList<ConnectorMessage>(
         ({ page, size }) =>
-            listMessages({
+            messageService.listMessages({
                 page,
                 size,
                 identifier: asFilter(debouncedIdentifier),

@@ -12,33 +12,35 @@
 
 import React, { useEffect, useState } from "react";
 import { QueueConfiguration } from "@/types/response/configuration";
-import { getQueueConfiguration } from "@/services/configuration";
 import { toastError } from "@/utils";
 import { ConfigurationBlock } from "@/components/configuration/configuration-block";
 import { ConfigurationDetailRow } from "@/components/configuration/configuration-detail-row";
 import { SpinnerView } from "@/components/common/spinner-view";
+import { useConfigurationService } from "@/hooks/use-http-service";
 
 export function ConfigurationJmsQueueSection() {
     const [loading, setLoading] = useState(true);
     const [config, setConfig] = useState<QueueConfiguration | null>(null);
 
-    const loadConfig = async () => {
-        setLoading(true)
-        try {
-            const data = await getQueueConfiguration()
-            setConfig(data || [])
-        } catch (error) {
-            toastError(error)
-        } finally {
-            setLoading(false)
-        }
-    }
+    const configurationService = useConfigurationService();
 
     useEffect(() => {
+        const loadConfig = async () => {
+            setLoading(true)
+            try {
+                const data = await configurationService.getQueueConfiguration()
+                setConfig(data || [])
+            } catch (error) {
+                toastError(error)
+            } finally {
+                setLoading(false)
+            }
+        }
+
         (async () => {
             await loadConfig()
         })()
-    }, [])
+    }, [configurationService])
 
     if (!config) {
         return null;

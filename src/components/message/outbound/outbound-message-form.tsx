@@ -19,7 +19,7 @@ import { ProcessingModePartySelector } from "@/components/form/pmode-party-selec
 import { ProcessingModeActionSelector } from "@/components/form/pmode-action-selector";
 import { useLinkPartners } from "@/hooks/use-link-partners";
 import { LinkPartnerSelector } from "@/components/form/link-partner-selector";
-import { ConnectorLinkPartnerResponse } from "@/types/response/link-partner";
+import { ConnectorLinkPartner } from "@/types/response/link-partner";
 
 interface OutboundMessageFormProps {
     data: SendMessageFormData;
@@ -74,7 +74,7 @@ export function OutboundMessageForm({
         setProcessingModeToPartyName(`${party.identifier}-${party.roleType}`);
     };
 
-    const onBackendLinkPartnerChange = (partner: ConnectorLinkPartnerResponse | null) => {
+    const onBackendLinkPartnerChange = (partner: ConnectorLinkPartner | null) => {
         if (!partner) return;
         update({ backendName: partner.name })
         setBackendLinkPartnerName(partner.name);

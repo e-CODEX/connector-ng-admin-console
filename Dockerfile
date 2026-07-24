@@ -26,8 +26,6 @@ COPY --from=build ${BUILD_OUTPUT_FOLDER}/.next/standalone ${APP_FOLDER}
 COPY --from=build ${BUILD_OUTPUT_FOLDER}/.next/static ${APP_FOLDER}/.next/static
 COPY --from=build ${BUILD_OUTPUT_FOLDER}/public ${APP_FOLDER}/public
 
-USER $USERNAME
-
 EXPOSE 3000
 
 CMD ["node", "server.js"]

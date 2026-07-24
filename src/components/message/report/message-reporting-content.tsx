@@ -10,8 +10,8 @@
 
 import { Button, Description, Dropdown, Kbd, Key, Label, Modal, Table } from "@heroui/react";
 import { type RangeValue } from "react-aria-components";
-import React, { Fragment, useEffect, useRef, useState } from "react";
-import { exportMessageReports, getMessageReports, MessageReportExportFormat } from "@/services/message";
+import React, { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import { MessageReportExportFormat } from "@/services/message";
 import { getLocalTimeZone, now, ZonedDateTime } from "@internationalized/date";
 import { saveFile, toastError } from "@/utils";
 import { ArrowUpFromSquare, Magnifier } from "@gravity-ui/icons";
@@ -22,13 +22,13 @@ import { SearchCriteriaBox } from "@/components/form/search-criteria-box";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { asBusinessDomainSelectorFilter, BusinessDomainSelector } from "@/components/form/business-domain-selector";
 import { useBusinessDomainIdentifiers } from "@/hooks/use-business-domain-identifiers";
+import { useMessageService } from "@/hooks/use-http-service";
 
 const ALL_BUSINESS_DOMAIN_SELECTOR = "All Business domains";
 
 const tz = getLocalTimeZone();
 const granularity: DateTimeRangeGranularity = "day";
 
-/** Evaluated per mount, not at import time, so a long-lived tab stays correct. */
 function buildDefaultRange(): RangeValue<ZonedDateTime> {
     const todayZoned = now(tz);
     return { start: todayZoned, end: todayZoned };
@@ -72,30 +72,6 @@ function toExportFormat(formatKey: Key): MessageReportExportFormat {
     }
 }
 
-async function fetchReports(
-    params: { selected: RangeValue<ZonedDateTime> | null; domain: string },
-    isCurrent: () => boolean,
-    handlers: {
-        onSuccess: (data: ConnectorMessageReportResponse) => void;
-        onError: (error: unknown) => void;
-        onSettled: () => void;
-    },
-) {
-    try {
-        const data = await getMessageReports({
-            businessDomain: asBusinessDomainSelectorFilter(params.domain, ALL_BUSINESS_DOMAIN_SELECTOR),
-            ...toReportRange(params.selected, granularity),
-        });
-        if (!isCurrent()) return;
-        handlers.onSuccess(data);
-    } catch (error) {
-        if (!isCurrent()) return;
-        handlers.onError(error);
-    } finally {
-        if (isCurrent()) handlers.onSettled();
-    }
-}
-
 export function MessageReportingContent() {
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
@@ -105,24 +81,36 @@ export function MessageReportingContent() {
     const [hasLoaded, setHasLoaded] = useState(false);
     const requestId = useRef(0);
 
+    const messageService = useMessageService();
+
     const businessDomainIdentifiers = useBusinessDomainIdentifiers(ALL_BUSINESS_DOMAIN_SELECTOR);
 
-    const loadReports = (selected: RangeValue<ZonedDateTime> | null, domain: string) => {
-        const id = ++requestId.current;
-        const isCurrent = () => id === requestId.current;
+    const loadReports = useCallback(
+        (selected: RangeValue<ZonedDateTime> | null, domain: string) => {
+            const id = ++requestId.current;
+            const isCurrent = () => id === requestId.current;
 
-        return fetchReports({ selected, domain }, isCurrent, {
-            onSuccess: (data) => {
-                setMessageReports(data);
-                setHasLoaded(true);
-            },
-            onError: (error) => toastError(error),
-            onSettled: () => {
-                setLoading(false);
-                setRefreshing(false);
-            },
-        });
-    };
+            return (async () => {
+                try {
+                    const data = await messageService.getMessageReports({
+                        businessDomain: asBusinessDomainSelectorFilter(domain, ALL_BUSINESS_DOMAIN_SELECTOR),
+                        ...toReportRange(selected, granularity),
+                    });
+                    if (!isCurrent()) return;
+                    setMessageReports(data);
+                    setHasLoaded(true);
+                } catch (error) {
+                    if (isCurrent()) toastError(error);
+                } finally {
+                    if (isCurrent()) {
+                        setLoading(false);
+                        setRefreshing(false);
+                    }
+                }
+            })();
+        },
+        [messageService],
+    );
 
     useEffect(() => {
         const idRef = requestId;
@@ -130,7 +118,7 @@ export function MessageReportingContent() {
         return () => {
             idRef.current++;
         };
-    }, []);
+    }, [loadReports]);
 
     const onBusinessDomainIdentifierChange = (value: string) => {
         setBusinessDomainIdentifierQuery(value);
@@ -150,7 +138,7 @@ export function MessageReportingContent() {
         };
 
         try {
-            const file = await exportMessageReports(params);
+            const file = await messageService.exportMessageReports(params);
             saveFile(file);
         } catch (error) {
             toastError(error);

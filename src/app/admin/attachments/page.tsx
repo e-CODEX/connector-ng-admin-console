@@ -14,7 +14,6 @@ import { PageHeader } from "@/components/common/page-header";
 import React, { useState } from "react";
 import { ConnectorAttachmentResponse } from "@/types/response/attachments";
 import { Button, Table, Tooltip, useOverlayState } from "@heroui/react";
-import { listAttachments } from "@/services/attachment";
 import { formatBytes, truncate } from "@/utils";
 import { PaginationControls } from "@/components/paging/pagination-controls";
 import { AttachmentDetailsView } from "@/components/attachment/attachment-details-view";
@@ -26,11 +25,14 @@ import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { usePagedList } from "@/hooks/use-paged-list";
 import { DateTime } from "@/components/common/date-time";
+import { useAttachmentService } from "@/hooks/use-http-service";
 
 export default function AttachmentsAdminPage() {
     const [selectedAttachment, setSelectedAttachment] = useState<ConnectorAttachmentResponse | null>(null);
 
-    const pagedList = usePagedList<ConnectorAttachmentResponse>(listAttachments);
+    const attachmentService = useAttachmentService();
+
+    const pagedList = usePagedList<ConnectorAttachmentResponse>(attachmentService.listAttachments);
 
     const detailsModal = useOverlayState();
 

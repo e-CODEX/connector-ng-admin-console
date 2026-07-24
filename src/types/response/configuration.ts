@@ -8,7 +8,7 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { ConnectorBusinessDomainResponse } from "@/types/response/business-domain";
+import { ConnectorBusinessDomain } from "@/types/response/business-domain";
 import { BusinessDocumentAesType, KeystoreType } from "@/types/global";
 
 export interface LinkPartnerConfiguration {
@@ -57,7 +57,7 @@ export interface LinkPartnerProperties {
 // business domain config
 
 export interface BusinessDomainConfiguration {
-    defaults: ConnectorBusinessDomainResponse[]
+    defaults: ConnectorBusinessDomain[]
 }
 
 // message verification

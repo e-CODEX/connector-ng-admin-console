@@ -30,6 +30,6 @@ export interface AppBuildInfo {
     readonly time: string;
 }
 
-export interface AppInfoResponse {
+export interface AppInfo {
     readonly build?: AppBuildInfo;
 }

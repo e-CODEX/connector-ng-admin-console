@@ -11,8 +11,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { ConnectorQueueStatsResponse } from "@/types/response/queue";
-import { loadQueueStats } from "@/services/queue";
+import { ConnectorQueueStats } from "@/types/response/queue";
 import { PageHeaderButton } from "@/components/common/page-header-button";
 import { ArrowsRotateRight } from "@gravity-ui/icons";
 import { PageHeader } from "@/components/common/page-header";
@@ -21,11 +20,14 @@ import { Layers } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { useList } from "@/hooks/use-list";
+import { useQueueService } from "@/hooks/use-http-service";
 
 export default function QueueAdminPage() {
     const [selectedQueue, setSelectedQueue] = useState<string | null>(null)
 
-    const list = useList<ConnectorQueueStatsResponse>(loadQueueStats);
+    const queueService = useQueueService();
+
+    const list = useList<ConnectorQueueStats>(queueService.loadQueueStats);
 
     return (
         <div>

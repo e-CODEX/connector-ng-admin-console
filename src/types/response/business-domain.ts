@@ -8,7 +8,7 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-export interface ConnectorBusinessDomainResponse {
+export interface ConnectorBusinessDomain {
     identifier: string;
     description: string;
     enabled: boolean;

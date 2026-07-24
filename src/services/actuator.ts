@@ -9,14 +9,19 @@
  */
 
 import { restApiCall } from "@/lib/rest";
-import { AppInfoResponse, ActuatorHealthResponse } from "@/types/response/actuator";
+import { ActuatorHealthResponse, AppInfo } from "@/types/response/actuator";
 
-export async function getHealthInfo():
-    Promise<ActuatorHealthResponse> {
-    return restApiCall<ActuatorHealthResponse>("actuator/health");
+export function createActuatorService(baseUrl: string) {
+    return {
+        async getHealthInfo():
+            Promise<ActuatorHealthResponse> {
+            return restApiCall<ActuatorHealthResponse>(baseUrl, "actuator/health");
+        },
+        async getAppInfo():
+            Promise<AppInfo> {
+            return restApiCall<AppInfo>(baseUrl, "actuator/info");
+        }
+    }
 }
 
-export async function getAppInfo():
-    Promise<AppInfoResponse> {
-    return restApiCall<AppInfoResponse>("actuator/info");
-}
+export type ActuatorService = ReturnType<typeof createActuatorService>;

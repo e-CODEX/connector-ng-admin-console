@@ -10,50 +10,14 @@
 
 import { PaginatedResponse } from "@/types/response/paginated-response";
 import { ConnectorMessage, ConnectorMessageDetailsResponse } from "@/types/response/message";
-import { ConnectorTransportStepResponse } from "@/types/response/transport-step";
-import { SendMessageArgs, SendMessageResponse, } from "@/types/send-message-form";
-import { createSoapOutboundMessagePayload } from "@/utils/message-outbound/soap-message-builder";
-import { createRestOutboundMessagePayLoad } from "@/utils/message-outbound/rest-message-builder";
-import { ConnectorMessageStatsResponse } from "@/types/response/stats";
+import { ConnectorTransportStep } from "@/types/response/transport-step";
+import { SendMessageFormData, SendMessageResponse, SendParameters, } from "@/types/send-message-form";
+import { createSoapOutboundMessagePayload } from "@/lib/rest/message-outbound/soap-message-builder";
+import { createRestOutboundMessagePayLoad } from "@/lib/rest/message-outbound/rest-message-builder";
+import { ConnectorMessageStats } from "@/types/response/stats";
 import { ConnectorMessageReportResponse } from "@/types/response/reporting";
 import { DownloadedFile, restApiCall, restApiDownload } from "@/lib/rest";
-import { BFF_API_BASE_URL } from "@/lib/config";
-
-
-export async function listMessages(params?: {
-    page?: number,
-    size?: number,
-    identifier?: string,
-    backendName?: string,
-    businessDomain? : string,
-    service?: string,
-}):
-    Promise<PaginatedResponse<ConnectorMessage>> {
-    return restApiCall<PaginatedResponse<ConnectorMessage>>("api/v1/admin/messages", {
-            params
-        }
-    );
-}
-
-export async function getMessage(identifier: string): Promise<ConnectorMessageDetailsResponse> {
-    return restApiCall<ConnectorMessageDetailsResponse>(`api/v1/admin/messages/${identifier}`);
-}
-
-export async function getMessageTransportStep(identifier: string): Promise<ConnectorTransportStepResponse> {
-    return restApiCall<ConnectorTransportStepResponse>(`api/v1/admin/messages/${identifier}/transport-steps`);
-}
-
-export async function getMessageStats(params: { from?: string; to?: string; businessDomain?: string; }): Promise<ConnectorMessageStatsResponse> {
-    return restApiCall<ConnectorMessageStatsResponse>("api/v1/admin/messages/stats", {
-        params
-    });
-}
-
-export async function getMessageReports(params: { from?: string; to?: string; businessDomain?: string; }): Promise<ConnectorMessageReportResponse> {
-    return restApiCall<ConnectorMessageReportResponse>("api/v1/admin/messages/reports", {
-        params
-    });
-}
+import { createAttachmentService } from "@/services/attachment";
 
 const MESSAGE_REPORT_EXPORT_FORMATS = {
     CSV: "csv",
@@ -61,40 +25,103 @@ const MESSAGE_REPORT_EXPORT_FORMATS = {
     XLSX: "xlsx",
 } as const;
 
-function getExportExtension(format: MessageReportExportFormat,): string {
+const getExportExtension = (format: MessageReportExportFormat,): string => {
     return MESSAGE_REPORT_EXPORT_FORMATS[format];
 }
 
 export type MessageReportExportFormat = keyof typeof MESSAGE_REPORT_EXPORT_FORMATS;
 
-export async function exportMessageReports(params: { from?: string; to?: string; format: MessageReportExportFormat }): Promise<DownloadedFile> {
-    return restApiDownload("api/v1/admin/messages/reports/export", {
-        params, defaultFilename: `message-report.${getExportExtension(params.format)}`,
-    });
+export type ListMessageParams = {
+    page?: number,
+    size?: number,
+    identifier?: string,
+    backendName?: string,
+    businessDomain?: string,
+    service?: string
 }
 
-export async function sendMessage({ formData, parameters, document, }: SendMessageArgs): Promise<SendMessageResponse> {
-    if (parameters.mode === "REST") {
-        return sendRestMessage({ formData, parameters, document });
+export type GetMessageReportParams = {
+    from?: string;
+    to?: string;
+    businessDomain?: string;
+}
+
+export type ExportMessageReportsParams = {
+    from?: string;
+    to?: string;
+    format: MessageReportExportFormat
+}
+
+interface SendMessageArgs {
+    formData: SendMessageFormData;
+    parameters: SendParameters;
+    document?: Blob;
+}
+
+export function createMessageService(baseUrl: string, bffUrl: string) {
+    return {
+        async listMessages(params?: ListMessageParams):
+            Promise<PaginatedResponse<ConnectorMessage>> {
+            return restApiCall<PaginatedResponse<ConnectorMessage>>(
+                baseUrl,
+                "api/v1/admin/messages",
+                { params }
+            );
+        },
+        async retrieveMessage(identifier: string): Promise<ConnectorMessageDetailsResponse> {
+            return restApiCall<ConnectorMessageDetailsResponse>(baseUrl, `api/v1/admin/messages/${identifier}`);
+        },
+        async getMessageTransportStep(identifier: string): Promise<ConnectorTransportStep> {
+            return restApiCall<ConnectorTransportStep>(baseUrl, `api/v1/admin/messages/${identifier}/transport-steps`);
+        },
+        async getMessageStats(params: { from?: string; to?: string; businessDomain?: string; }): Promise<ConnectorMessageStats> {
+            return restApiCall<ConnectorMessageStats>(
+                baseUrl,
+                "api/v1/admin/messages/stats",
+                { params }
+            );
+        },
+        async getMessageReports(params: GetMessageReportParams): Promise<ConnectorMessageReportResponse> {
+            return restApiCall<ConnectorMessageReportResponse>(
+                baseUrl,
+                "api/v1/admin/messages/reports",
+                { params }
+            );
+        },
+        async sendMessage({ formData, parameters, document, }: SendMessageArgs): Promise<SendMessageResponse> {
+            if (parameters.mode === "REST") {
+                return sendRestMessage(baseUrl, { formData, parameters, document });
+            }
+
+            return sendSoapMessage(bffUrl, { formData, parameters, document });
+        },
+        async exportMessageReports(params: ExportMessageReportsParams): Promise<DownloadedFile> {
+            return restApiDownload(
+                baseUrl,
+                "api/v1/admin/messages/reports/export",
+                {
+                    params, defaultFilename: `message-report.${getExportExtension(params.format)}`,
+                }
+            );
+        }
     }
-
-    return sendSoapMessage({ formData, parameters, document });
 }
 
-async function sendRestMessage({ formData, parameters, document, }: SendMessageArgs): Promise<SendMessageResponse> {
+async function sendRestMessage(baseUrl: string, { formData, parameters, document, }: SendMessageArgs): Promise<SendMessageResponse> {
     void formData;
     void parameters;
     void document;
 
-    const payload = await createRestOutboundMessagePayLoad(formData, parameters, document);
+    const payload = await createRestOutboundMessagePayLoad(createAttachmentService(baseUrl), formData, parameters, document);
 
-    return restApiCall("api/v1/messages/outbound", {
-        method: "POST",
-        body: payload,
-    })
+    return restApiCall(
+        baseUrl,
+        "api/v1/messages/outbound",
+        { method: "POST", body: payload, }
+    )
 }
 
-async function sendSoapMessage({ formData, parameters, document, }: SendMessageArgs): Promise<SendMessageResponse> {
+async function sendSoapMessage(bffUrl: string, { formData, parameters, document, }: SendMessageArgs): Promise<SendMessageResponse> {
     void formData;
     void parameters;
     void document;
@@ -102,6 +129,7 @@ async function sendSoapMessage({ formData, parameters, document, }: SendMessageA
     const payload = await createSoapOutboundMessagePayload(formData, parameters, document);
 
     return restApiCall<SendMessageResponse>(
+        bffUrl,
         "bff/api/v1/submit-message",
         {
             method: "POST",
@@ -109,7 +137,8 @@ async function sendSoapMessage({ formData, parameters, document, }: SendMessageA
                 "Content-Type": "application/json",
             },
             body: JSON.stringify(payload),
-        },
-        BFF_API_BASE_URL
+        }
     )
 }
+
+export type MessageService = ReturnType<typeof createMessageService>;

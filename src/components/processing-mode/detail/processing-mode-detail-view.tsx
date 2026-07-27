@@ -82,20 +82,8 @@ export function ProcessingModeDetailsView({ processingMode, state }: ProcessingM
                             <Modal.Heading className="font-semibold">Processing Mode Details</Modal.Heading>
                         </Modal.Header>
                         <Modal.Body>
-                            {processingMode && (
-                                <div className="flex flex-col">
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8">
-                                        <DetailRow
-                                            label="Identifier"
-                                            value={<CopyableIdentifier identifier={processingMode.uuid} iconPosition="right"/>}/>
-                                        <DetailRow label="Business domain" value={processingMode.businessDomainIdentifier}/>
-                                        <DetailRow label="Description" value={processingMode.description}/>
-                                        <DetailRow label="Filename" value={processingMode.filename}/>
-                                        <DetailRow label="Created at" value={<DateTime value={processingMode.createdAt} precision="second"/>}/>
-                                        <DetailRow label="Updated at" value={<DateTime value={processingMode.updatedAt} precision="second"/>}/>
-                                    </div>
-                                    <ProcessingModeDetailsSection processingMode={details} loading={loading}/>
-                                </div>
+                            {details && (
+                                <ProcessingModeDetailsSection processingMode={details} loading={loading}/>
                             )}
                         </Modal.Body>
                     </Modal.Dialog>

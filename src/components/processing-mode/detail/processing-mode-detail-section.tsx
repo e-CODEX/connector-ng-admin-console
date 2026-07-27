@@ -17,6 +17,9 @@ import { DetailSection } from "@/components/common/detail-section";
 import { BooleanChip } from "@/components/common/boolean-chip";
 import { ConfigurationKeystoreView } from "@/components/configuration/view/configuration-keystore-view";
 import { Keystore } from "@/types/response/configuration";
+import { DetailRow } from "@/components/common/detail-row";
+import { CopyableIdentifier } from "@/components/common/copyable-identifier";
+import { DateTime } from "@/components/common/date-time";
 
 interface ProcessingModeDetailsSectionProps {
     processingMode: ConnectorProcessingModeDetail | null;
@@ -36,7 +39,17 @@ export function ProcessingModeDetailsSection({ processingMode, loading }: Proces
     }
 
     return (
-        <>
+        <div className="flex flex-col">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8">
+                <DetailRow
+                    label="Identifier"
+                    value={<CopyableIdentifier identifier={processingMode.uuid} iconPosition="right"/>}/>
+                <DetailRow label="Business domain" value={processingMode.businessDomainIdentifier}/>
+                <DetailRow label="Description" value={processingMode.description}/>
+                <DetailRow label="Filename" value={processingMode.filename}/>
+                <DetailRow label="Created at" value={<DateTime value={processingMode.createdAt} precision="second"/>}/>
+                <DetailRow label="Updated at" value={<DateTime value={processingMode.updatedAt} precision="second"/>}/>
+            </div>
             <DetailSection title="Parties" isEmpty={!parties?.length} emptyLabel="No parties available.">
                 <Table>
                     <Table.ScrollContainer>
@@ -122,7 +135,41 @@ export function ProcessingModeDetailsSection({ processingMode, loading }: Proces
 
             <DetailSection title="Truststore" isEmpty={!truststore} emptyLabel="No truststore available.">
                 <ConfigurationKeystoreView keystore={keystore} />
+                {truststore.certificateInfo && (
+                    <Table>
+                        <Table.ScrollContainer>
+                            <Table.Content aria-label="Processing mode actions">
+                                <Table.Header>
+                                    <Table.Column isRowHeader>Alias</Table.Column>
+                                    <Table.Column isRowHeader>Subject</Table.Column>
+                                    <Table.Column isRowHeader>Issuer</Table.Column>
+                                    <Table.Column isRowHeader>Key Algorithm</Table.Column>
+                                    <Table.Column isRowHeader>Sign Algorithm</Table.Column>
+                                    <Table.Column isRowHeader>Entry Type</Table.Column>
+                                    <Table.Column isRowHeader>Validity</Table.Column>
+                                </Table.Header>
+                                <Table.Body>
+                                    {truststore.certificateInfo.map((certInfo, i) => (
+                                        <Table.Row key={`${certInfo.alias}-${i}`}>
+                                            <Table.Cell>
+                                            <span className="block max-w-60 truncate font-semibold">
+                                                {certInfo.alias}
+                                            </span>
+                                            </Table.Cell>
+                                            <Table.Cell>{certInfo.subject}</Table.Cell>
+                                            <Table.Cell>{certInfo.issuer}</Table.Cell>
+                                            <Table.Cell>{certInfo.keyAlgorithm}</Table.Cell>
+                                            <Table.Cell>{certInfo.signatureAlgorithm}</Table.Cell>
+                                            <Table.Cell>{certInfo.entryType}</Table.Cell>
+                                            <Table.Cell>{certInfo.validity}</Table.Cell>
+                                        </Table.Row>
+                                    ))}
+                                </Table.Body>
+                            </Table.Content>
+                        </Table.ScrollContainer>
+                    </Table>
+                )}
             </DetailSection>
-        </>
+        </div>
     );
 }

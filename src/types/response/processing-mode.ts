@@ -23,7 +23,7 @@ export interface ConnectorProcessingModeDetail extends ConnectorProcessingMode {
     parties: ConnectorProcessingModeParty[];
     services: ConnectorProcessingModeService[];
     actions: ConnectorProcessingModeAction[];
-    truststore: ConnectorProcessingModeTruststoreResponse;
+    truststore: ConnectorProcessingModeTruststore;
 }
 
 export interface ConnectorProcessingModeParty {
@@ -44,8 +44,22 @@ export interface ConnectorProcessingModeAction {
     name: string;
 }
 
-export interface ConnectorProcessingModeTruststoreResponse {
+export interface ConnectorProcessingModeTruststore {
     filename: string;
     password: string;
     type: KeystoreType;
+    certificateInfo: ConnectorProcessingModeTruststoreCertificateInfo[]
+}
+
+export interface ConnectorProcessingModeTruststoreCertificateInfo {
+    alias: string;
+    entryType: string;
+    subject: string;
+    issuer: string;
+    serialNumber: string;
+    notBefore: string;
+    notAfter: string;
+    signatureAlgorithm: string;
+    keyAlgorithm: string;
+    validity: string;
 }

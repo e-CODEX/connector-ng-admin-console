@@ -12,14 +12,14 @@
 
 import React, { useState } from "react";
 import { ConnectorMessage } from "@/types/response/message";
-import { Button, Table, Tooltip, useOverlayState } from "@heroui/react";
+import { Table, useOverlayState } from "@heroui/react";
 import { PaginationControls } from "@/components/paging/pagination-controls";
 import { MessageTransportStepsDetailView } from "@/components/message/detail/message-transport-steps-detail-view";
 import { PageHeader } from "@/components/common/page-header";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { MessageFiltersPanel } from "@/components/message/message-filters-panel";
 import { MessageDetailsView } from "@/components/message/detail/message-details-view";
-import { ArrowsRotateRight, Eye } from "@gravity-ui/icons";
+import { ArrowsRotateRight } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/page-header-button";
 import { MessageReportingView } from "@/components/message/report/message-reporting-view";
 import { MessageDirectionChip } from "@/components/message/chip/message-direction-chip";
@@ -35,6 +35,7 @@ import { ConnectorProcessingModeService } from "@/types/response/processing-mode
 import { DateTime } from "@/components/common/date-time";
 import { useMessageService } from "@/hooks/use-http-service";
 import { CopyableIdentifier } from "@/components/common/copyable-identifier";
+import { ActionButton } from "@/components/common/action-button";
 
 const IDENTIFIER_LENGTH = 10;
 const ALL_SELECTOR = "All";
@@ -204,36 +205,9 @@ export default function MessagesAdminPage() {
                                             </Table.Cell>
                                             <Table.Cell>
                                                 <div className="flex items-center gap-1">
-                                                    <Tooltip delay={0}>
-                                                        <Button
-                                                            isIconOnly
-                                                            size="sm"
-                                                            variant="tertiary"
-                                                            onPress={() => onDetailsClick(message)}
-                                                        >
-                                                            <Eye/>
-                                                        </Button>
-                                                        <Tooltip.Content showArrow>
-                                                            <Tooltip.Arrow/>
-                                                            <p>Details</p>
-                                                        </Tooltip.Content>
-                                                    </Tooltip>
-
-                                                    <Tooltip delay={0}>
-                                                        <Button
-                                                            isIconOnly
-                                                            size="sm"
-                                                            variant="tertiary"
-                                                            onPress={() => onTransportStepsClick(
-                                                                message)}
-                                                        >
-                                                            <Route/>
-                                                        </Button>
-                                                        <Tooltip.Content showArrow>
-                                                            <Tooltip.Arrow/>
-                                                            <p>Transport steps</p>
-                                                        </Tooltip.Content>
-                                                    </Tooltip>
+                                                    <ActionButton onPress={() => onDetailsClick(message)}/>
+                                                    <ActionButton label="Transport steps" icon={Route}
+                                                                  onPress={() => onTransportStepsClick(message)}/>
                                                 </div>
                                             </Table.Cell>
                                         </Table.Row>

@@ -12,11 +12,11 @@
 
 import { PageHeader } from "@/components/common/page-header";
 import React, { useState } from "react";
-import { Button, Table, Tooltip, useOverlayState } from "@heroui/react";
+import { Table, useOverlayState } from "@heroui/react";
 import { ConnectorProcessingMode } from "@/types/response/processing-mode";
 import { toastError, toastSuccess } from "@/utils";
 import { ProcessingModeDetailsView } from "@/components/processing-mode/detail/processing-mode-detail-view";
-import { ArrowsRotateRight, Eye, Plus } from "@gravity-ui/icons";
+import { ArrowsRotateRight, Plus } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/page-header-button";
 import { ProcessingModeCreationView } from "@/components/processing-mode/creation/processing-mode-creation-view";
 import { Workflow } from "lucide-react";
@@ -26,6 +26,7 @@ import { useList } from "@/hooks/use-list";
 import { DateTime } from "@/components/common/date-time";
 import { useProcessingModeService } from "@/hooks/use-http-service";
 import { CopyableIdentifier } from "@/components/common/copyable-identifier";
+import { ActionButton } from "@/components/common/action-button";
 
 export default function ProcessingModesAdminPage() {
     const [selectedProcessingMode, setSelectedProcessingMode] = useState<ConnectorProcessingMode | null>(null);
@@ -99,20 +100,7 @@ export default function ProcessingModesAdminPage() {
                                             </Table.Cell>
                                             <Table.Cell>
                                                 <div className="flex items-center gap-1">
-                                                    <Tooltip delay={0}>
-                                                        <Button
-                                                            isIconOnly
-                                                            size="sm"
-                                                            variant="tertiary"
-                                                            onPress={() => onDetailsClick(pMode)}
-                                                        >
-                                                            <Eye/>
-                                                        </Button>
-                                                        <Tooltip.Content showArrow>
-                                                            <Tooltip.Arrow/>
-                                                            <p>Details</p>
-                                                        </Tooltip.Content>
-                                                    </Tooltip>
+                                                    <ActionButton onPress={() => onDetailsClick(pMode)}/>
                                                 </div>
                                             </Table.Cell>
                                         </Table.Row>

@@ -13,10 +13,11 @@ import { useBusinessDomainIdentifiers } from "@/hooks/use-business-domain-identi
 import React, { useState } from "react";
 import { toastError } from "@/utils";
 import { Button, Description, FieldError, Fieldset, Form, Input, Label, Modal, Spinner, TextField } from "@heroui/react";
-import { ArrowUpToLine, Plus } from "@gravity-ui/icons";
 import { BusinessDomainSelector } from "@/components/form/business-domain-selector";
 import { FileSelectField } from "@/components/form/file-select-field";
 import { processingModeCreationSchema, ProcessingModeCreationValues, toFieldErrors } from "@/schemas/processing-mode-creation";
+import { Plus, ArrowUpToLine } from "lucide-react";
+import { ModalHeaderIcon } from "@/components/common/modal-header-icon";
 
 
 interface ProcessingModeCreationFormProps {
@@ -125,9 +126,7 @@ export function ProcessingModeCreationForm({ onSubmit }: ProcessingModeCreationF
             <Modal.CloseTrigger/>
 
             <Modal.Header>
-                <Modal.Icon className="bg-default text-foreground">
-                    <Plus className="size-5"/>
-                </Modal.Icon>
+                <ModalHeaderIcon icon={Plus} tone="accent"/>
                 <Modal.Heading className="font-semibold">Load A Processing Mode</Modal.Heading>
             </Modal.Header>
 

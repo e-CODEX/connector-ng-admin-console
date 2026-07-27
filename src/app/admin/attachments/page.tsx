@@ -13,11 +13,11 @@
 import { PageHeader } from "@/components/common/page-header";
 import React, { useState } from "react";
 import { ConnectorAttachmentResponse } from "@/types/response/attachments";
-import { Button, Table, Tooltip, useOverlayState } from "@heroui/react";
+import { Table, useOverlayState } from "@heroui/react";
 import { formatBytes, truncate } from "@/utils";
 import { PaginationControls } from "@/components/paging/pagination-controls";
 import { AttachmentDetailsView } from "@/components/attachment/attachment-details-view";
-import { ArrowsRotateRight, Eye } from "@gravity-ui/icons";
+import { ArrowsRotateRight } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/page-header-button";
 import { AttachmentStorageChip } from "@/components/attachment/attachment-storage-chip";
 import { Paperclip } from "lucide-react";
@@ -27,6 +27,7 @@ import { usePagedList } from "@/hooks/use-paged-list";
 import { DateTime } from "@/components/common/date-time";
 import { useAttachmentService } from "@/hooks/use-http-service";
 import { CopyableIdentifier } from "@/components/common/copyable-identifier";
+import { ActionButton } from "@/components/common/action-button";
 
 export default function AttachmentsAdminPage() {
     const [selectedAttachment, setSelectedAttachment] = useState<ConnectorAttachmentResponse | null>(null);
@@ -81,7 +82,7 @@ export default function AttachmentsAdminPage() {
                                     {pagedList.items.map((attachment) => (
                                         <Table.Row key={attachment.identifier}>
                                             <Table.Cell>
-                                                <CopyableIdentifier identifier={attachment.identifier} />
+                                                <CopyableIdentifier identifier={attachment.identifier}/>
                                             </Table.Cell>
                                             <Table.Cell>{attachment.name}</Table.Cell>
                                             <Table.Cell>{attachment.contentType}</Table.Cell>
@@ -96,20 +97,7 @@ export default function AttachmentsAdminPage() {
                                             </Table.Cell>
                                             <Table.Cell>
                                                 <div className="flex items-center gap-1">
-                                                    <Tooltip delay={0}>
-                                                        <Button
-                                                            isIconOnly
-                                                            size="sm"
-                                                            variant="tertiary"
-                                                            onPress={() => onDetailsClick(attachment)}
-                                                        >
-                                                            <Eye/>
-                                                        </Button>
-                                                        <Tooltip.Content showArrow>
-                                                            <Tooltip.Arrow/>
-                                                            <p>Details</p>
-                                                        </Tooltip.Content>
-                                                    </Tooltip>
+                                                    <ActionButton onPress={() => onDetailsClick(attachment)}/>
                                                 </div>
                                             </Table.Cell>
                                         </Table.Row>

@@ -26,8 +26,17 @@ export function createUserService(baseUrl: string) {
                 }
             )
         },
+        async blockUser(identifier: string): Promise<ConnectorUser> {
+            return restApiCall<ConnectorUser>(baseUrl, `api/v1/admin/user/${identifier}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ enabled: false })
+            })
+        },
         async listAllUsers(): Promise<ConnectorUser[]> {
-            return restApiCall<ConnectorUser[]>(baseUrl, "api/v1/admin/users");
+            return restApiCall<ConnectorUser[]>(baseUrl, "api/v1/users");
         }
     }
 }

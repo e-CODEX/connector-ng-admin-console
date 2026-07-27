@@ -10,7 +10,7 @@
 
 import { ConnectorAttachmentResponse } from "@/types/response/attachments";
 import { ConnectorProcessingModeAction, ConnectorProcessingModeParty, ConnectorProcessingModeService } from "@/types/response/processing-mode";
-import { BusinessDocumentAesType, DetachedSignatureMimeType, MessageDirection } from "@/types/global";
+import { BusinessDocumentAesType, ConnectorEvidenceType, DetachedSignatureMimeType, MessageDirection } from "@/types/global";
 
 
 export interface ConnectorMessage {
@@ -68,7 +68,7 @@ interface ConnectorAS4Properties {
 
 export interface ConnectorMessageEvidence {
     uuid: string;
-    type: string;
+    type: ConnectorEvidenceType;
     createdAt: string;
     updatedAt: string;
     deliveredToLinkPartnerAt: string;

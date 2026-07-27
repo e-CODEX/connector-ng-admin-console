@@ -13,7 +13,6 @@
 import React, { useState } from "react";
 import { ConnectorMessage } from "@/types/response/message";
 import { Button, Table, Tooltip, useOverlayState } from "@heroui/react";
-import { truncate } from "@/utils";
 import { PaginationControls } from "@/components/paging/pagination-controls";
 import { MessageTransportStepsDetailView } from "@/components/message/detail/message-transport-steps-detail-view";
 import { PageHeader } from "@/components/common/page-header";
@@ -35,8 +34,9 @@ import { useProcessingModeServices } from "@/hooks/use-processing-mode-services"
 import { ConnectorProcessingModeService } from "@/types/response/processing-mode";
 import { DateTime } from "@/components/common/date-time";
 import { useMessageService } from "@/hooks/use-http-service";
+import { CopyableIdentifier } from "@/components/common/copyable-identifier";
 
-const IDENTIFIER_LENGTH = 15;
+const IDENTIFIER_LENGTH = 10;
 const ALL_SELECTOR = "All";
 
 const asFilter = (value: string) => value === ALL_SELECTOR || value === "" ? undefined : value;
@@ -175,20 +175,16 @@ export default function MessagesAdminPage() {
                                     {pagedList.items.map((message) => (
                                         <Table.Row key={message.identifier}>
                                             <Table.Cell>
-                                                <Tooltip delay={0}>
-                                                        <span
-                                                            className="font-semibold truncate inline-block">
-                                                            {truncate(message.identifier, IDENTIFIER_LENGTH)}
-                                                        </span>
-                                                    <Tooltip.Content showArrow>
-                                                        <Tooltip.Arrow/>
-                                                        <p>{message.identifier}</p>
-                                                    </Tooltip.Content>
-                                                </Tooltip>
+                                                <CopyableIdentifier identifier={message.identifier} visibleChars={IDENTIFIER_LENGTH}/>
                                             </Table.Cell>
-                                            <Table.Cell>{truncate(message.as4Properties.conversationIdentifier, IDENTIFIER_LENGTH)}</Table.Cell>
+                                            <Table.Cell>
+                                                <CopyableIdentifier identifier={message.as4Properties.conversationIdentifier}
+                                                                    visibleChars={IDENTIFIER_LENGTH}/>
+                                            </Table.Cell>
                                             <Table.Cell>{message.businessDomainIdentifier}</Table.Cell>
-                                            <Table.Cell>{truncate(message.backendMessageIdentifier, IDENTIFIER_LENGTH)}</Table.Cell>
+                                            <Table.Cell>
+                                                <CopyableIdentifier identifier={message.backendMessageIdentifier} visibleChars={IDENTIFIER_LENGTH}/>
+                                            </Table.Cell>
                                             <Table.Cell>{message.as4Properties.fromParty.identifier}</Table.Cell>
                                             <Table.Cell>{message.as4Properties.toParty.identifier}</Table.Cell>
                                             <Table.Cell>{message.backendName}</Table.Cell>

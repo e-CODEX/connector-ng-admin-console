@@ -19,6 +19,7 @@ import { ProcessingModeDetailsSection } from "@/components/processing-mode/detai
 import { Workflow } from "lucide-react";
 import { DateTime } from "@/components/common/date-time";
 import { useProcessingModeService } from "@/hooks/use-http-service";
+import { CopyableIdentifier } from "@/components/common/copyable-identifier";
 
 interface ProcessingModeDetailsViewProps {
     processingMode: ConnectorProcessingMode | null;
@@ -84,7 +85,9 @@ export function ProcessingModeDetailsView({ processingMode, state }: ProcessingM
                             {processingMode && (
                                 <div className="flex flex-col">
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8">
-                                        <DetailRow label="Identifier" value={processingMode.uuid}/>
+                                        <DetailRow
+                                            label="Identifier"
+                                            value={<CopyableIdentifier identifier={processingMode.uuid} iconPosition="right"/>}/>
                                         <DetailRow label="Business domain" value={processingMode.businessDomainIdentifier}/>
                                         <DetailRow label="Description" value={processingMode.description}/>
                                         <DetailRow label="Filename" value={processingMode.filename}/>

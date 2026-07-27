@@ -14,7 +14,7 @@ import { PageHeader } from "@/components/common/page-header";
 import React, { useState } from "react";
 import { Button, Table, Tooltip, useOverlayState } from "@heroui/react";
 import { ConnectorProcessingMode } from "@/types/response/processing-mode";
-import { toastError, toastSuccess, truncate } from "@/utils";
+import { toastError, toastSuccess } from "@/utils";
 import { ProcessingModeDetailsView } from "@/components/processing-mode/detail/processing-mode-detail-view";
 import { ArrowsRotateRight, Eye, Plus } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/page-header-button";
@@ -25,6 +25,7 @@ import { SpinnerView } from "@/components/common/spinner-view";
 import { useList } from "@/hooks/use-list";
 import { DateTime } from "@/components/common/date-time";
 import { useProcessingModeService } from "@/hooks/use-http-service";
+import { CopyableIdentifier } from "@/components/common/copyable-identifier";
 
 export default function ProcessingModesAdminPage() {
     const [selectedProcessingMode, setSelectedProcessingMode] = useState<ConnectorProcessingMode | null>(null);
@@ -88,10 +89,7 @@ export default function ProcessingModesAdminPage() {
                                     {list.items.map((pMode) => (
                                         <Table.Row key={pMode.uuid}>
                                             <Table.Cell>
-                                                <span
-                                                    className="font-semibold truncate inline-block">
-                                                    {truncate(pMode.uuid)}
-                                                </span>
+                                                <CopyableIdentifier identifier={pMode.uuid}/>
                                             </Table.Cell>
                                             <Table.Cell>{pMode.businessDomainIdentifier}</Table.Cell>
                                             <Table.Cell>{pMode.description}</Table.Cell>

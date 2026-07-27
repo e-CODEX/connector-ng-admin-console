@@ -19,6 +19,7 @@ import { AttachmentStorageChip } from "@/components/attachment/attachment-storag
 import { Paperclip } from "lucide-react";
 import { ModalHeaderIcon } from "@/components/common/modal-header-icon";
 import { DateTime } from "@/components/common/date-time";
+import { CopyableIdentifier } from "@/components/common/copyable-identifier";
 
 interface AttachmentDetailsViewProps {
     attachment: ConnectorAttachmentResponse | null;
@@ -39,7 +40,9 @@ export function AttachmentDetailsView({ attachment, state }: AttachmentDetailsVi
                         <Modal.Body>
                             {attachment && (
                                 <div className="flex flex-col">
-                                    <DetailRow label="Identifier" value={attachment.identifier}/>
+                                    <DetailRow label="Identifier" value={
+                                        <CopyableIdentifier identifier={attachment.identifier} iconPosition="right" visibleChars={100}/>
+                                    }/>
                                     <DetailRow label="Name" value={attachment.name}/>
                                     <DetailRow label="Content type" value={attachment.contentType}/>
                                     <DetailRow label="Description" value={attachment.description}/>

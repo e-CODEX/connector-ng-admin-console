@@ -15,7 +15,6 @@ import React, { useState } from "react";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { Button, Table, Tooltip, useOverlayState } from "@heroui/react";
 import { TransportStepFiltersPanel } from "@/components/transport-step/transport-step-filters-panel";
-import { truncate } from "@/utils";
 import { PaginationControls } from "@/components/paging/pagination-controls";
 import { ConnectorTransportStep } from "@/types/response/transport-step";
 import { TransportStepDetailsView } from "@/components/transport-step/transport-step-details-view";
@@ -29,6 +28,9 @@ import { SpinnerView } from "@/components/common/spinner-view";
 import { usePagedList } from "@/hooks/use-paged-list";
 import { DateTime } from "@/components/common/date-time";
 import { useTransportStepService } from "@/hooks/use-http-service";
+import { CopyableIdentifier } from "@/components/common/copyable-identifier";
+
+const IDENTIFIER_LENGTH = 30;
 
 export default function TransportStepsAdminPage() {
     const [selectedTransportStep, setSelectedTransportStep] = useState<ConnectorTransportStep | null>(null);
@@ -112,20 +114,17 @@ export default function TransportStepsAdminPage() {
                                     {pagedList.items.map((transportStep) => (
                                         <Table.Row key={transportStep.identifier}>
                                             <Table.Cell>
-                                                <Tooltip delay={0}>
-                                                        <span
-                                                            className="font-semibold truncate inline-block">
-                                                            {truncate(transportStep.identifier)}
-                                                        </span>
-                                                    <Tooltip.Content showArrow>
-                                                        <Tooltip.Arrow/>
-                                                        <p>{transportStep.identifier}</p>
-                                                    </Tooltip.Content>
-                                                </Tooltip>
+                                                <CopyableIdentifier identifier={transportStep.identifier} visibleChars={IDENTIFIER_LENGTH}/>
                                             </Table.Cell>
-                                            <Table.Cell>{truncate(transportStep.transportedMessageIdentifier)}</Table.Cell>
+                                            <Table.Cell>
+                                                <CopyableIdentifier identifier={transportStep.transportedMessageIdentifier}
+                                                                    visibleChars={IDENTIFIER_LENGTH}/>
+                                            </Table.Cell>
                                             <Table.Cell>{transportStep.linkPartnerName}</Table.Cell>
-                                            <Table.Cell>{truncate(transportStep.remoteSystemIdentifier)}</Table.Cell>
+                                            <Table.Cell>
+                                                <CopyableIdentifier identifier={transportStep.remoteSystemIdentifier}
+                                                                    visibleChars={IDENTIFIER_LENGTH}/>
+                                            </Table.Cell>
                                             <Table.Cell>{
                                                 <TransportStepMessageTypeChip messageType={transportStep.messageType}/>
                                             }</Table.Cell>

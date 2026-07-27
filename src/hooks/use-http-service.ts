@@ -22,6 +22,7 @@ import { createMessageService } from "@/services/message";
 import { createProcessingModeService } from "@/services/processing-mode";
 import { createQueueService } from "@/services/queue";
 import { createTransportStepsService } from "@/services/transport-step";
+import { createUserService } from "@/services/user";
 
 export function useActuatorService() {
     const { apiUrl } = useAppConfig();
@@ -81,4 +82,9 @@ export function useTransportStepService() {
     const { apiUrl } = useAppConfig();
 
     return useMemo(() => createTransportStepsService(apiUrl), [apiUrl]);
+}
+
+export function useUserService() {
+    const { apiUrl } = useAppConfig();
+    return useMemo(() => createUserService(apiUrl), [apiUrl]);
 }

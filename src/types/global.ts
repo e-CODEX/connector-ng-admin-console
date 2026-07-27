@@ -27,3 +27,14 @@ export type PartyRoleType = "INITIATOR" | "RESPONDER";
 export type LinkPartnerType = "BACKEND" | "GATEWAY";
 
 export type DetachedSignatureMimeType = "BINARY" | "XML" | "PKCS7";
+
+export type ConnectorEvidenceType =
+    | "SUBMISSION_ACCEPTANCE"
+    | "SUBMISSION_REJECTION"
+    | "RELAY_REMMD_ACCEPTANCE"
+    | "RELAY_REMMD_REJECTION"
+    | "RELAY_REMMD_FAILURE"
+    | "DELIVERY"
+    | "NON_DELIVERY"
+    | "RETRIEVAL"
+    | "NON_RETRIEVAL";

@@ -25,6 +25,7 @@ import { AttachmentDetailsView } from "@/components/attachment/attachment-detail
 import { BusinessDetailsBusinessContentSection } from "@/components/message/detail/business-details-business-content-section";
 import { DateTime } from "@/components/common/date-time";
 import { useEvidenceService } from "@/hooks/use-http-service";
+import { EvidenceTypeChip } from "@/components/common/evidence-chip";
 
 interface MessageDetailsContentProps {
     message: ConnectorMessageDetailsResponse | null;
@@ -186,7 +187,9 @@ export function MessageDetailsContent({ message, loading }: MessageDetailsConten
                                                     {truncate(evidence.uuid, 10)}
                                                 </span>
                                             </Table.Cell>
-                                            <Table.Cell>{evidence.type}</Table.Cell>
+                                            <Table.Cell>
+                                                <EvidenceTypeChip type={evidence.type} />
+                                            </Table.Cell>
                                             <Table.Cell><DateTime value={evidence.deliveredToLinkPartnerAt} precision="millis"/></Table.Cell>
                                             <Table.Cell><DateTime value={evidence.createdAt} precision="millis"/></Table.Cell>
                                             <Table.Cell><DateTime value={evidence.updatedAt} precision="millis"/></Table.Cell>

@@ -12,9 +12,9 @@ import { toast } from "@heroui/react";
 import { ConnectorMessageStatsItem } from "@/types/response/stats";
 import { DownloadedFile } from "@/lib/rest";
 
-export const truncate = (s: string, n = 36) => {
-    if (s == null) return "";
-    return s.length > n ? `${s.slice(0, n)}…` : s;
+export const truncate = (value: string, visibleChars = 36): string => {
+    if (value == null) return "";
+    return value.length > visibleChars ? `${value.slice(0, visibleChars)}\u2026` : value;
 }
 
 export function formatBytes(bytes: number, decimals = 1): string {

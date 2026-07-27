@@ -16,19 +16,30 @@ import { TransportStepMessageTypeChip } from "@/components/message/chip/message-
 import { TransportDeliveryStatusChip } from "@/components/transport-step/transport-step-status-chip";
 import { DateTime } from "@/components/common/date-time";
 import React from "react";
+import { CopyableIdentifier } from "@/components/common/copyable-identifier";
 
 interface TransportStepDetailsProps {
     transportStep: ConnectorTransportStep;
 }
 
+const IDENTIFIER_LENGTH = 100;
+
 export function TransportStepDetailsContent({ transportStep }: TransportStepDetailsProps) {
     return (
         <div className="flex flex-col">
             <div>
-                <DetailRow label="Identifier" value={transportStep.identifier}/>
-                <DetailRow label="Transported Message ID" value={transportStep.transportedMessageIdentifier}/>
+                <DetailRow
+                    label="Identifier"
+                    value={<CopyableIdentifier identifier={transportStep.identifier} iconPosition="right" visibleChars={IDENTIFIER_LENGTH}/>}
+                />
+                <DetailRow
+                    label="Transported Message ID"
+                    value={<CopyableIdentifier identifier={transportStep.transportedMessageIdentifier} iconPosition="right" visibleChars={IDENTIFIER_LENGTH}/>}
+                />
                 <DetailRow label="Link Partner Name" value={transportStep.linkPartnerName}/>
-                <DetailRow label="Remote System Identifier" value={transportStep.remoteSystemIdentifier}/>
+                <DetailRow
+                    label="Remote System Identifier"
+                    value={<CopyableIdentifier identifier={transportStep.remoteSystemIdentifier} iconPosition="right" visibleChars={IDENTIFIER_LENGTH}/>}/>
                 <DetailRow label="Message Type" value={
                     <TransportStepMessageTypeChip messageType={transportStep.messageType}/>
                 }/>

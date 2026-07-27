@@ -26,6 +26,7 @@ import { SpinnerView } from "@/components/common/spinner-view";
 import { usePagedList } from "@/hooks/use-paged-list";
 import { DateTime } from "@/components/common/date-time";
 import { useAttachmentService } from "@/hooks/use-http-service";
+import { CopyableIdentifier } from "@/components/common/copyable-identifier";
 
 export default function AttachmentsAdminPage() {
     const [selectedAttachment, setSelectedAttachment] = useState<ConnectorAttachmentResponse | null>(null);
@@ -80,10 +81,7 @@ export default function AttachmentsAdminPage() {
                                     {pagedList.items.map((attachment) => (
                                         <Table.Row key={attachment.identifier}>
                                             <Table.Cell>
-                                                <span
-                                                    className="font-semibold truncate inline-block">
-                                                    {truncate(attachment.identifier)}
-                                                </span>
+                                                <CopyableIdentifier identifier={attachment.identifier} />
                                             </Table.Cell>
                                             <Table.Cell>{attachment.name}</Table.Cell>
                                             <Table.Cell>{attachment.contentType}</Table.Cell>

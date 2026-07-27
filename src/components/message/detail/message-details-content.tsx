@@ -12,7 +12,7 @@
 
 import { Button, Table, Tooltip, useOverlayState } from "@heroui/react";
 import { ConnectorMessageDetailsResponse, ConnectorMessageEvidence } from "@/types/response/message";
-import { formatBytes, saveFile, toastError, truncate } from "@/utils";
+import { formatBytes, saveFile, toastError } from "@/utils";
 import React, { useState } from "react";
 import { DetailRow } from "@/components/common/detail-row";
 import { DetailSection } from "@/components/common/detail-section";
@@ -26,11 +26,14 @@ import { BusinessDetailsBusinessContentSection } from "@/components/message/deta
 import { DateTime } from "@/components/common/date-time";
 import { useEvidenceService } from "@/hooks/use-http-service";
 import { EvidenceTypeChip } from "@/components/common/evidence-chip";
+import { CopyableIdentifier } from "@/components/common/copyable-identifier";
 
 interface MessageDetailsContentProps {
     message: ConnectorMessageDetailsResponse | null;
     loading: boolean;
 }
+
+const IDENTIFIER_LENGTH = 100;
 
 export function MessageDetailsContent({ message, loading }: MessageDetailsContentProps) {
     const [selectedBusinessAttachment, setSelectedBusinessAttachment] = useState<ConnectorAttachmentResponse | null>(null);
@@ -66,10 +69,17 @@ export function MessageDetailsContent({ message, loading }: MessageDetailsConten
     return (
         <div className="flex flex-col">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8">
-                <DetailRow label="Identifier" value={message.identifier}/>
+                <DetailRow label="Identifier" value={
+                    <CopyableIdentifier identifier={message.identifier} iconPosition="right" visibleChars={IDENTIFIER_LENGTH}/>
+                }/>
                 <DetailRow label="Business domain" value={message.businessDomainIdentifier}/>
-                <DetailRow label="Conversation" value={message.as4Properties.conversationIdentifier}/>
-                <DetailRow label="Backend ID" value={message.backendMessageIdentifier}/>
+                <DetailRow label="Conversation" value={
+                    <CopyableIdentifier identifier={message.as4Properties.conversationIdentifier} iconPosition="right"
+                                        visibleChars={IDENTIFIER_LENGTH}/>
+                }/>
+                <DetailRow label="Backend ID" value={
+                    <CopyableIdentifier identifier={message.backendMessageIdentifier} iconPosition="right" visibleChars={IDENTIFIER_LENGTH}/>
+                }/>
                 <DetailRow label="From" value={detailParty(message.as4Properties.fromParty)}/>
                 <DetailRow label="To" value={detailParty(message.as4Properties.toParty)}/>
                 <DetailRow label="Backend" value={message.backendName}/>
@@ -144,14 +154,13 @@ export function MessageDetailsContent({ message, loading }: MessageDetailsConten
                                     {attachments.map((attachment) => (
                                         <Table.Row key={attachment.identifier}>
                                             <Table.Cell>
-                                                                            <span className="font-semibold truncate inline-block">
-                                                                                {truncate(attachment.identifier, 10)}
-                                                                            </span>
+                                                <CopyableIdentifier identifier={attachment.identifier} visibleChars={10}/>
                                             </Table.Cell>
                                             <Table.Cell>{attachment.name}</Table.Cell>
                                             <Table.Cell>{attachment.contentType}</Table.Cell>
-                                            <Table.Cell>{formatBytes(
-                                                attachment.size)}</Table.Cell>
+                                            <Table.Cell>
+                                                {formatBytes(attachment.size)}
+                                            </Table.Cell>
                                             <Table.Cell>{attachment.storage}</Table.Cell>
                                             <Table.Cell>{attachment.type}</Table.Cell>
                                             <Table.Cell><DateTime value={attachment.createdAt} precision="millis"/></Table.Cell>
@@ -183,12 +192,10 @@ export function MessageDetailsContent({ message, loading }: MessageDetailsConten
                                     {evidences.map((evidence) => (
                                         <Table.Row key={evidence.uuid}>
                                             <Table.Cell>
-                                                <span className="font-semibold truncate inline-block">
-                                                    {truncate(evidence.uuid, 10)}
-                                                </span>
+                                                <CopyableIdentifier identifier={evidence.uuid} visibleChars={10}/>
                                             </Table.Cell>
                                             <Table.Cell>
-                                                <EvidenceTypeChip type={evidence.type} />
+                                                <EvidenceTypeChip type={evidence.type}/>
                                             </Table.Cell>
                                             <Table.Cell><DateTime value={evidence.deliveredToLinkPartnerAt} precision="millis"/></Table.Cell>
                                             <Table.Cell><DateTime value={evidence.createdAt} precision="millis"/></Table.Cell>

@@ -13,13 +13,10 @@
 import { Modal, useOverlayState } from "@heroui/react";
 import { toastError } from "@/utils";
 import React, { useEffect, useState } from "react";
-import { ConnectorProcessingModeDetail, ConnectorProcessingMode } from "@/types/response/processing-mode";
-import { DetailRow } from "@/components/common/detail-row";
+import { ConnectorProcessingMode, ConnectorProcessingModeDetail } from "@/types/response/processing-mode";
 import { ProcessingModeDetailsSection } from "@/components/processing-mode/detail/processing-mode-detail-section";
 import { Workflow } from "lucide-react";
-import { DateTime } from "@/components/common/date-time";
 import { useProcessingModeService } from "@/hooks/use-http-service";
-import { CopyableIdentifier } from "@/components/common/copyable-identifier";
 
 interface ProcessingModeDetailsViewProps {
     processingMode: ConnectorProcessingMode | null;

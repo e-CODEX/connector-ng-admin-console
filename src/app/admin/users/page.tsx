@@ -15,18 +15,24 @@ import { useList } from "@/hooks/use-list";
 import { ConnectorUser } from "@/types/response/user";
 import { User } from "lucide-react";
 import { PageHeaderButton } from "@/components/common/page-header-button";
-import { ArrowsRotateRight } from "@gravity-ui/icons";
+import { ArrowsRotateRight, Plus } from "@gravity-ui/icons";
 import { PageHeader } from "@/components/common/page-header";
 import React from "react";
 import { SpinnerView } from "@/components/common/spinner-view";
-import { Table } from "@heroui/react";
+import { Table, useOverlayState } from "@heroui/react";
 import { CopyableIdentifier } from "@/components/common/copyable-identifier";
 import { EmptyState } from "@/components/common/empty-state";
 import { BooleanChip } from "@/components/common/boolean-chip";
+import { UserCreationView } from "@/components/user/user-creation-view";
+import { toastError, toastSuccess } from "@/utils";
+import { DateTime } from "@/components/common/date-time";
 
 export default function UserAdminPage() {
     const userService = useUserService();
     const list = useList<ConnectorUser>(userService.listAllUsers);
+
+    const addModal = useOverlayState();
+
     return (
         <div>
             <PageHeader
@@ -34,6 +40,12 @@ export default function UserAdminPage() {
                 title="Users"
                 subtitle="Created users"
             >
+                <PageHeaderButton
+                    variant="primary"
+                    tooltip="Create a new user"
+                    icon={Plus}
+                    onPress={addModal.open}
+                />
 
                 <PageHeaderButton
                     variant="secondary"
@@ -72,8 +84,8 @@ export default function UserAdminPage() {
                                             <Table.Cell>
                                                 <BooleanChip value={user.enabled}/>
                                             </Table.Cell>
-                                            <Table.Cell>{user.createdAt}</Table.Cell>
-                                            <Table.Cell>{user.updatedAt}</Table.Cell>
+                                            <Table.Cell><DateTime value={user.createdAt} /></Table.Cell>
+                                            <Table.Cell><DateTime value={user.updatedAt} /></Table.Cell>
                                             <Table.Cell></Table.Cell>
                                         </Table.Row>
                                     ))}
@@ -87,6 +99,20 @@ export default function UserAdminPage() {
                     )}
                 </>
             )}
+
+            <UserCreationView
+                state={addModal}
+                onSubmit={async (payload) => {
+                    try {
+                        await userService.createUser(payload);
+                        await list.refresh();
+                        toastSuccess("User created successfully");
+                        addModal.close();
+                    } catch (error) {
+                        toastError(error);
+                    }
+                }}
+            />
         </div>
     )
 }

@@ -10,9 +10,22 @@
 
 import { ConnectorUser } from "@/types/response/user";
 import { restApiCall } from "@/lib/rest";
+import { UserCreationRequest } from "@/types/request/user";
 
 export function createUserService(baseUrl: string) {
     return {
+        async createUser(request: UserCreationRequest): Promise<ConnectorUser> {
+            return restApiCall<ConnectorUser>(
+                baseUrl,
+                "api/v1/admin/users", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(request)
+                }
+            )
+        },
         async listAllUsers(): Promise<ConnectorUser[]> {
             return restApiCall<ConnectorUser[]>(baseUrl, "api/v1/admin/users");
         }

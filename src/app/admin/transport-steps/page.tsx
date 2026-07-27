@@ -13,12 +13,12 @@
 import { PageHeader } from "@/components/common/page-header";
 import React, { useState } from "react";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
-import { Button, Table, Tooltip, useOverlayState } from "@heroui/react";
+import { Table, useOverlayState } from "@heroui/react";
 import { TransportStepFiltersPanel } from "@/components/transport-step/transport-step-filters-panel";
 import { PaginationControls } from "@/components/paging/pagination-controls";
 import { ConnectorTransportStep } from "@/types/response/transport-step";
 import { TransportStepDetailsView } from "@/components/transport-step/transport-step-details-view";
-import { ArrowsRotateRight, Eye } from "@gravity-ui/icons";
+import { ArrowsRotateRight } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/page-header-button";
 import { TransportStepMessageTypeChip } from "@/components/message/chip/message-type-chip";
 import { TransportDeliveryStatusChip } from "@/components/transport-step/transport-step-status-chip";
@@ -29,6 +29,7 @@ import { usePagedList } from "@/hooks/use-paged-list";
 import { DateTime } from "@/components/common/date-time";
 import { useTransportStepService } from "@/hooks/use-http-service";
 import { CopyableIdentifier } from "@/components/common/copyable-identifier";
+import { ActionButton } from "@/components/common/action-button";
 
 const IDENTIFIER_LENGTH = 30;
 
@@ -137,21 +138,7 @@ export default function TransportStepsAdminPage() {
                                             </Table.Cell>
                                             <Table.Cell>
                                                 <div className="flex items-center gap-1">
-                                                    <Tooltip delay={0}>
-                                                        <Button
-                                                            isIconOnly
-                                                            size="sm"
-                                                            variant="tertiary"
-                                                            onPress={() => onDetailsClick(
-                                                                transportStep)}
-                                                        >
-                                                            <Eye/>
-                                                        </Button>
-                                                        <Tooltip.Content showArrow>
-                                                            <Tooltip.Arrow/>
-                                                            <p>Details</p>
-                                                        </Tooltip.Content>
-                                                    </Tooltip>
+                                                    <ActionButton onPress={() => onDetailsClick(transportStep)}/>
                                                 </div>
                                             </Table.Cell>
                                         </Table.Row>

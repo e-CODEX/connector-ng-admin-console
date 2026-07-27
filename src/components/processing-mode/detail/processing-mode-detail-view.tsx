@@ -17,6 +17,7 @@ import { ConnectorProcessingMode, ConnectorProcessingModeDetail } from "@/types/
 import { ProcessingModeDetailsSection } from "@/components/processing-mode/detail/processing-mode-detail-section";
 import { Workflow } from "lucide-react";
 import { useProcessingModeService } from "@/hooks/use-http-service";
+import { ModalHeaderIcon } from "@/components/common/modal-header-icon";
 
 interface ProcessingModeDetailsViewProps {
     processingMode: ConnectorProcessingMode | null;
@@ -73,9 +74,7 @@ export function ProcessingModeDetailsView({ processingMode, state }: ProcessingM
                     <Modal.Dialog className="sm:max-w-300">
                         <Modal.CloseTrigger/>
                         <Modal.Header>
-                            <Modal.Icon className="bg-default text-foreground">
-                                <Workflow className="size-5"/>
-                            </Modal.Icon>
+                            <ModalHeaderIcon icon={Workflow} tone="accent"/>
                             <Modal.Heading className="font-semibold">Processing Mode Details</Modal.Heading>
                         </Modal.Header>
                         <Modal.Body>

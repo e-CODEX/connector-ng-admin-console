@@ -15,12 +15,14 @@ import React, { ComponentProps, ComponentType } from "react";
 interface DetailButtonProps
     extends Omit<ComponentProps<typeof Button>, "isIconOnly" | "children"> {
     label?: string;
+    iconAccent?: string;
     icon?: ComponentType<{ className?: string }>;
 }
 
 export function ActionButton({
                                  label = "Details",
                                  icon: Icon = Eye,
+                                 iconAccent = "text-accent",
                                  size = "sm",
                                  variant = "tertiary",
                                  ...buttonProps
@@ -34,7 +36,7 @@ export function ActionButton({
                 aria-label={label}
                 {...buttonProps}
             >
-                <Icon className="size-4 text-accent"/>
+                <Icon className={`size-4 ${iconAccent}`}/>
             </Button>
             <Tooltip.Content showArrow>
                 <Tooltip.Arrow/>

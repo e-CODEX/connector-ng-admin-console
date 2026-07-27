@@ -13,11 +13,11 @@
 import { useUserService } from "@/hooks/use-http-service";
 import { useList } from "@/hooks/use-list";
 import { ConnectorUser } from "@/types/response/user";
-import { User } from "lucide-react";
+import { Lock, User } from "lucide-react";
 import { PageHeaderButton } from "@/components/common/page-header-button";
 import { ArrowsRotateRight, Plus } from "@gravity-ui/icons";
 import { PageHeader } from "@/components/common/page-header";
-import React from "react";
+import React, { useState } from "react";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { Table, useOverlayState } from "@heroui/react";
 import { CopyableIdentifier } from "@/components/common/copyable-identifier";
@@ -26,12 +26,21 @@ import { BooleanChip } from "@/components/common/boolean-chip";
 import { UserCreationView } from "@/components/user/user-creation-view";
 import { toastError, toastSuccess } from "@/utils";
 import { DateTime } from "@/components/common/date-time";
+import { ActionButton } from "@/components/common/action-button";
+import { ConfirmModal } from "@/components/common/confirmation-modal";
 
 export default function UserAdminPage() {
+    const [selectedUser, setSelectedUser] = useState<ConnectorUser | null>(null);
     const userService = useUserService();
     const list = useList<ConnectorUser>(userService.listAllUsers);
 
     const addModal = useOverlayState();
+    const blockConfirmationModal = useOverlayState();
+
+    const onBlockClicked = async (user: ConnectorUser) => {
+        setSelectedUser(user);
+        blockConfirmationModal.open()
+    }
 
     return (
         <div>
@@ -84,9 +93,16 @@ export default function UserAdminPage() {
                                             <Table.Cell>
                                                 <BooleanChip value={user.enabled}/>
                                             </Table.Cell>
-                                            <Table.Cell><DateTime value={user.createdAt} /></Table.Cell>
-                                            <Table.Cell><DateTime value={user.updatedAt} /></Table.Cell>
-                                            <Table.Cell></Table.Cell>
+                                            <Table.Cell><DateTime value={user.createdAt}/></Table.Cell>
+                                            <Table.Cell><DateTime value={user.updatedAt}/></Table.Cell>
+                                            <Table.Cell>
+                                                <div className="flex items-center gap-1">
+                                                    <ActionButton
+                                                        onPress={() => onBlockClicked(user)}
+                                                        icon={Lock} label="Disable"
+                                                        iconAccent="text-warning"/>
+                                                </div>
+                                            </Table.Cell>
                                         </Table.Row>
                                     ))}
                                 </Table.Body>
@@ -112,6 +128,19 @@ export default function UserAdminPage() {
                         toastError(error);
                     }
                 }}
+            />
+
+            <ConfirmModal
+                isDismissable={false}
+                state={blockConfirmationModal}
+                title="Block User"
+                message="Warning: Once this user is blocked, it will no longer be able to log in. Continue?"
+                confirmLabel="Delete"
+                confirmVariant="danger"
+                onConfirm={async () => {
+                    await userService.blockUser(selectedUser!.uuid)
+                }}
+                onCancel={() => blockConfirmationModal.close()}
             />
         </div>
     )

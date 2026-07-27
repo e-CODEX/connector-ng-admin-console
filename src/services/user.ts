@@ -37,6 +37,14 @@ export function createUserService(baseUrl: string) {
         },
         async listAllUsers(): Promise<ConnectorUser[]> {
             return restApiCall<ConnectorUser[]>(baseUrl, "api/v1/users");
+        },
+        async deleteUser(identifier: string): Promise<void> {
+            return restApiCall<void>(baseUrl, `api/v1/admin/user/${identifier}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
         }
     }
 }

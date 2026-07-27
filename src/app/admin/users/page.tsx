@@ -13,7 +13,7 @@
 import { useUserService } from "@/hooks/use-http-service";
 import { useList } from "@/hooks/use-list";
 import { ConnectorUser } from "@/types/response/user";
-import { Lock, User } from "lucide-react";
+import { User, UserLock, UserMinus } from "lucide-react";
 import { PageHeaderButton } from "@/components/common/page-header-button";
 import { ArrowsRotateRight, Plus } from "@gravity-ui/icons";
 import { PageHeader } from "@/components/common/page-header";
@@ -36,10 +36,16 @@ export default function UserAdminPage() {
 
     const addModal = useOverlayState();
     const blockConfirmationModal = useOverlayState();
+    const deleteConfirmationModal = useOverlayState();
 
     const onBlockClicked = async (user: ConnectorUser) => {
         setSelectedUser(user);
         blockConfirmationModal.open()
+    }
+
+    const onDeleteClicked = async (user: ConnectorUser) => {
+        setSelectedUser(user);
+        deleteConfirmationModal.open()
     }
 
     return (
@@ -99,8 +105,13 @@ export default function UserAdminPage() {
                                                 <div className="flex items-center gap-1">
                                                     <ActionButton
                                                         onPress={() => onBlockClicked(user)}
-                                                        icon={Lock} label="Disable"
+                                                        icon={UserLock} label="Disable"
                                                         iconAccent="text-warning"/>
+
+                                                    <ActionButton
+                                                        onPress={() => onDeleteClicked(user)}
+                                                        icon={UserMinus} label="Delete"
+                                                        iconAccent="text-danger"/>
                                                 </div>
                                             </Table.Cell>
                                         </Table.Row>
@@ -135,12 +146,29 @@ export default function UserAdminPage() {
                 state={blockConfirmationModal}
                 title="Block User"
                 message="Warning: Once this user is blocked, it will no longer be able to log in. Continue?"
-                confirmLabel="Delete"
-                confirmVariant="danger"
+                confirmLabel="Block"
+                confirmVariant="danger-soft"
                 onConfirm={async () => {
                     await userService.blockUser(selectedUser!.uuid)
                 }}
                 onCancel={() => blockConfirmationModal.close()}
+            />
+
+            <ConfirmModal
+                isDismissable={false}
+                state={deleteConfirmationModal}
+                title="Delete User"
+                message="
+                Are you sure you want to delete this user? This action is permanent,
+                cannot be undone, and the user will no longer be able to log in.
+                Continue?
+                "
+                confirmLabel="Delete"
+                confirmVariant="danger"
+                onConfirm={async () => {
+                    await userService.deleteUser(selectedUser!.uuid)
+                }}
+                onCancel={() => deleteConfirmationModal.close()}
             />
         </div>
     )

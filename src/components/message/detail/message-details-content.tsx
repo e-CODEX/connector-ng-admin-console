@@ -82,6 +82,8 @@ export function MessageDetailsContent({ message, loading }: MessageDetailsConten
                 }/>
                 <DetailRow label="From" value={detailParty(message.as4Properties.fromParty)}/>
                 <DetailRow label="To" value={detailParty(message.as4Properties.toParty)}/>
+                <DetailRow label="Original sender" value={message.as4Properties.originalSender}/>
+                <DetailRow label="Finall receipient" value={message.as4Properties.finalRecipient}/>
                 <DetailRow label="Backend" value={message.backendName}/>
                 <DetailRow label="Gateway" value={message.gatewayName}/>
                 <DetailRow label="Service" value={message.as4Properties.service.name}/>

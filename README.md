@@ -2,7 +2,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-#### Set environment variables
+### Set environment variables
 
 First, create a file named `.env` in the root directory of the project and add the following content:
 ```env
@@ -12,7 +12,13 @@ DEFAULT_ORIGINAL_SENDER:alice
 DEFAULT_FINAL_RECIPIENT:bob
 ```
 
-#### Run the app
+### Install dependencies
+
+```bash
+npm ci
+```
+
+### Run the app
 
 Run the development server:
 

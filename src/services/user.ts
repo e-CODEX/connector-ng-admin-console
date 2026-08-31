@@ -27,7 +27,7 @@ export function createUserService(baseUrl: string) {
             )
         },
         async blockUser(identifier: string): Promise<ConnectorUser> {
-            return restApiCall<ConnectorUser>(baseUrl, `api/v1/admin/user/${identifier}`, {
+            return restApiCall<ConnectorUser>(baseUrl, `api/v1/admin/users/${identifier}`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json"
@@ -36,10 +36,10 @@ export function createUserService(baseUrl: string) {
             })
         },
         async listAllUsers(): Promise<ConnectorUser[]> {
-            return restApiCall<ConnectorUser[]>(baseUrl, "api/v1/users");
+            return restApiCall<ConnectorUser[]>(baseUrl, "api/v1/admin/users");
         },
         async deleteUser(identifier: string): Promise<void> {
-            return restApiCall<void>(baseUrl, `api/v1/admin/user/${identifier}`, {
+            return restApiCall<void>(baseUrl, `api/v1/admin/users/${identifier}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json"

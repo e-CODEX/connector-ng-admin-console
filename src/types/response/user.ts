@@ -13,6 +13,15 @@ export interface ConnectorUser {
     username: string;
     email: string;
     enabled: boolean;
+    roles: ConnectorUserRole[];
+    createdAt: string;
+    updatedAt: string;
+}
+
+
+export interface ConnectorUserRole {
+    uuid: string;
+    name: string;
     createdAt: string;
     updatedAt: string;
 }

@@ -8,17 +8,17 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { restApiCall } from "@/lib/rest";
+import { RestApiCall } from "@/lib/rest";
 import { ConnectorLinkPartner } from "@/types/response/link-partner";
 
 export type ListLinkPartnersParams = {
     linkType: string;
 }
 
-export function createLinkPartnersService(baseUrl: string) {
+export function createLinkPartnersService(baseUrl: string, call: RestApiCall) {
     return {
         async listLinkPartners(params: ListLinkPartnersParams): Promise<ConnectorLinkPartner[]> {
-            return restApiCall<ConnectorLinkPartner[]>(
+            return call<ConnectorLinkPartner[]>(
                 baseUrl,
                 "api/v1/link-partners",
                 { params }

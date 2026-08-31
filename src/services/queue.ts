@@ -8,13 +8,13 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { restApiCall } from "@/lib/rest";
+import { RestApiCall } from "@/lib/rest";
 import { ConnectorQueueStats } from "@/types/response/queue";
 
-export function createQueueService(baseUrl: string) {
+export function createQueueService(baseUrl: string, call: RestApiCall) {
     return {
         async loadQueueStats(): Promise<ConnectorQueueStats[]> {
-            return restApiCall<ConnectorQueueStats[]>(baseUrl, "api/v1/admin/jms/queues/stats");
+            return call<ConnectorQueueStats[]>(baseUrl, "api/v1/admin/jms/queues/stats");
         }
     }
 }

@@ -9,25 +9,15 @@
  */
 
 import { ConnectorUser } from "@/types/response/user";
-import { restApiCall } from "@/lib/rest";
-import { UserCreationRequest } from "@/types/request/user";
+import { RestApiCall } from "@/lib/rest";
 
-export function createUserService(baseUrl: string) {
+export function createUserService(baseUrl: string, call: RestApiCall) {
     return {
-        async createUser(request: UserCreationRequest): Promise<ConnectorUser> {
-            return restApiCall<ConnectorUser>(
-                baseUrl,
-                "api/v1/admin/users", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(request)
-                }
-            )
+        async listAllUsers(): Promise<ConnectorUser[]> {
+            return call<ConnectorUser[]>(baseUrl, "api/v1/admin/users");
         },
         async blockUser(identifier: string): Promise<ConnectorUser> {
-            return restApiCall<ConnectorUser>(baseUrl, `api/v1/admin/users/${identifier}`, {
+            return call<ConnectorUser>(baseUrl, `api/v1/admin/users/${identifier}`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json"
@@ -35,11 +25,8 @@ export function createUserService(baseUrl: string) {
                 body: JSON.stringify({ enabled: false })
             })
         },
-        async listAllUsers(): Promise<ConnectorUser[]> {
-            return restApiCall<ConnectorUser[]>(baseUrl, "api/v1/admin/users");
-        },
         async deleteUser(identifier: string): Promise<void> {
-            return restApiCall<void>(baseUrl, `api/v1/admin/users/${identifier}`, {
+            return call<void>(baseUrl, `api/v1/admin/users/${identifier}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json"

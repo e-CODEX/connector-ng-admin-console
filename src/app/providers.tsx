@@ -13,20 +13,25 @@
 import { ThemeProvider } from "next-themes";
 import React, { createContext } from "react";
 import { AppConfig } from "@/config/config";
+import { ConnectorUser } from "@/types/response/user";
 
 interface ProvidersProps {
     children: React.ReactNode;
-    config: AppConfig
+    config: AppConfig;
+    user: ConnectorUser | null;
 }
 
 export const AppConfigContext = createContext<AppConfig | null>(null);
+export const UserContext = createContext<ConnectorUser | null>(null);
 
-export function Providers({ children, config }: ProvidersProps) {
+export function Providers({ children, config, user }: ProvidersProps) {
     return (
         <AppConfigContext value={config}>
-            <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-                {children}
-            </ThemeProvider>
+            <UserContext value={user}>
+                <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+                    {children}
+                </ThemeProvider>
+            </UserContext>
         </AppConfigContext>
     );
 }

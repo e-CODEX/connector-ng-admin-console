@@ -8,7 +8,7 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { restApiCall } from "@/lib/rest";
+import { RestApiCall } from "@/lib/rest";
 import {
     BusinessDocumentConfiguration,
     BusinessDomainConfiguration,
@@ -20,31 +20,31 @@ import {
     RoutingConfiguration
 } from "@/types/response/configuration";
 
-export function createConfigurationService(baseUrl: string) {
+export function createConfigurationService(baseUrl: string, call: RestApiCall) {
     return {
         async getBusinessDomainsConfig(): Promise<BusinessDomainConfiguration> {
-            return restApiCall<BusinessDomainConfiguration>(baseUrl, "api/v1/admin/configurations/business-domains");
+            return call<BusinessDomainConfiguration>(baseUrl, "api/v1/admin/configurations/business-domains");
         },
         async getEvidenceConfiguration(): Promise<EvidenceConfiguration> {
-            return restApiCall<EvidenceConfiguration>(baseUrl, "api/v1/admin/configurations/evidence");
+            return call<EvidenceConfiguration>(baseUrl, "api/v1/admin/configurations/evidence");
         },
         async getContainerConfiguration(): Promise<ContainerConfiguration> {
-            return restApiCall<ContainerConfiguration>(baseUrl, "api/v1/admin/configurations/container");
+            return call<ContainerConfiguration>(baseUrl, "api/v1/admin/configurations/container");
         },
         async getBusinessDocumentConfiguration(): Promise<BusinessDocumentConfiguration> {
-            return restApiCall<BusinessDocumentConfiguration>(baseUrl, "api/v1/admin/configurations/business-document");
+            return call<BusinessDocumentConfiguration>(baseUrl, "api/v1/admin/configurations/business-document");
         },
         async getMessageProcessingConfiguration(): Promise<MessageProcessingConfiguration> {
-            return restApiCall<MessageProcessingConfiguration>(baseUrl, "api/v1/admin/configurations/message-processing");
+            return call<MessageProcessingConfiguration>(baseUrl, "api/v1/admin/configurations/message-processing");
         },
         async getQueueConfiguration(): Promise<QueueConfiguration> {
-            return restApiCall<QueueConfiguration>(baseUrl, "api/v1/admin/configurations/queues");
+            return call<QueueConfiguration>(baseUrl, "api/v1/admin/configurations/queues");
         },
         async getRoutingConfiguration(): Promise<RoutingConfiguration> {
-            return restApiCall<RoutingConfiguration>(baseUrl, "api/v1/admin/configurations/routing");
+            return call<RoutingConfiguration>(baseUrl, "api/v1/admin/configurations/routing");
         },
         async getLinkPartnerConfiguration(): Promise<LinkPartnerConfiguration> {
-            return restApiCall(baseUrl, "api/v1/admin/configurations/backend-link-partners");
+            return call(baseUrl, "api/v1/admin/configurations/backend-link-partners");
         }
     }
 }

@@ -23,6 +23,10 @@ import { createProcessingModeService } from "@/services/processing-mode";
 import { createQueueService } from "@/services/queue";
 import { createTransportStepsService } from "@/services/transport-step";
 import { createUserService } from "@/services/user";
+import { restApiCall, restApiDownload } from "@/lib/rest";
+import { createAuthService } from "@/services/auth";
+
+const PROXY_BACKEND_API = "/api/backend"
 
 export function useActuatorService() {
     const { apiUrl } = useAppConfig();
@@ -31,60 +35,47 @@ export function useActuatorService() {
 }
 
 export function useAttachmentService() {
-    const { apiUrl } = useAppConfig();
-
-    return useMemo(() => createAttachmentService(apiUrl), [apiUrl]);
+    return useMemo(() => createAttachmentService(PROXY_BACKEND_API, restApiCall), []);
 }
 
 export function useBusinessDomainService() {
-    const { apiUrl } = useAppConfig();
-
-    return useMemo(() => createBusinessDomainService(apiUrl), [apiUrl]);
+    return useMemo(() => createBusinessDomainService(PROXY_BACKEND_API, restApiCall), []);
 }
 
 export function useConfigurationService() {
-    const { apiUrl } = useAppConfig();
-
-    return useMemo(() => createConfigurationService(apiUrl), [apiUrl]);
+    return useMemo(() => createConfigurationService(PROXY_BACKEND_API, restApiCall), []);
 }
 
 export function useEvidenceService() {
-    const { apiUrl } = useAppConfig();
-
-    return useMemo(() => createEvidenceService(apiUrl), [apiUrl]);
+    return useMemo(() => createEvidenceService(PROXY_BACKEND_API, restApiDownload), []);
 }
 
 export function useLinkPartnerService() {
-    const { apiUrl } = useAppConfig();
-
-    return useMemo(() => createLinkPartnersService(apiUrl), [apiUrl]);
+    return useMemo(() => createLinkPartnersService(PROXY_BACKEND_API, restApiCall), []);
 }
 
 export function useMessageService() {
-    const { apiUrl, bffUrl } = useAppConfig();
+    const { bffUrl } = useAppConfig();
 
-    return useMemo(() => createMessageService(apiUrl, bffUrl), [apiUrl, bffUrl]);
+    return useMemo(() => createMessageService(PROXY_BACKEND_API, bffUrl, restApiCall, restApiDownload), [bffUrl]);
 }
 
 export function useProcessingModeService() {
-    const { apiUrl } = useAppConfig();
-
-    return useMemo(() => createProcessingModeService(apiUrl), [apiUrl]);
+    return useMemo(() => createProcessingModeService(PROXY_BACKEND_API, restApiCall), []);
 }
 
 export function useQueueService() {
-    const { apiUrl } = useAppConfig();
-
-    return useMemo(() => createQueueService(apiUrl), [apiUrl]);
+    return useMemo(() => createQueueService(PROXY_BACKEND_API, restApiCall), []);
 }
 
 export function useTransportStepService() {
-    const { apiUrl } = useAppConfig();
-
-    return useMemo(() => createTransportStepsService(apiUrl), [apiUrl]);
+    return useMemo(() => createTransportStepsService(PROXY_BACKEND_API, restApiCall), []);
 }
 
 export function useUserService() {
-    const { apiUrl } = useAppConfig();
-    return useMemo(() => createUserService(apiUrl), [apiUrl]);
+    return useMemo(() => createUserService(PROXY_BACKEND_API, restApiCall), []);
+}
+
+export function useAuthService() {
+    return useMemo(() => createAuthService(PROXY_BACKEND_API, restApiCall), []);
 }

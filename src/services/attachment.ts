@@ -10,18 +10,17 @@
 
 import { PaginatedResponse } from "@/types/response/paginated-response";
 import { ConnectorAttachmentResponse } from "@/types/response/attachments";
-import { restApiCall } from "@/lib/rest";
+import { RestApiCall } from "@/lib/rest";
 
 export type ListAttachmentsParams = {
     page?: number;
     size?: number;
 }
 
-export function createAttachmentService(baseUrl: string) {
+export function createAttachmentService(baseUrl: string, call: RestApiCall) {
     return {
-        async listAttachments(params?: ListAttachmentsParams):
-            Promise<PaginatedResponse<ConnectorAttachmentResponse>> {
-            return restApiCall<PaginatedResponse<ConnectorAttachmentResponse>>(
+        async listAttachments(params?: ListAttachmentsParams): Promise<PaginatedResponse<ConnectorAttachmentResponse>> {
+            return call<PaginatedResponse<ConnectorAttachmentResponse>>(
                 baseUrl,
                 "api/v1/admin/attachments",
                 { params }
@@ -32,7 +31,7 @@ export function createAttachmentService(baseUrl: string) {
             data.append("attachments", file, "business-document.pdf");
             data.append("attachments", file, "business-document2.pdf");
 
-            return restApiCall<string[]>(
+            return call<string[]>(
                 baseUrl,
                 "api/v1/attachments/upload",
                 { method: "POST", body: data, }

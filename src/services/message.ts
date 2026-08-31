@@ -16,7 +16,7 @@ import { createSoapOutboundMessagePayload } from "@/lib/rest/message-outbound/so
 import { createRestOutboundMessagePayLoad } from "@/lib/rest/message-outbound/rest-message-builder";
 import { ConnectorMessageStats } from "@/types/response/stats";
 import { ConnectorMessageReportResponse } from "@/types/response/reporting";
-import { DownloadedFile, restApiCall, restApiDownload } from "@/lib/rest";
+import { DownloadedFile, RestApiCall, restApiCall, RestApiDownloadCall } from "@/lib/rest";
 import { createAttachmentService } from "@/services/attachment";
 
 const MESSAGE_REPORT_EXPORT_FORMATS = {
@@ -58,31 +58,31 @@ interface SendMessageArgs {
     document?: Blob;
 }
 
-export function createMessageService(baseUrl: string, bffUrl: string) {
+export function createMessageService(baseUrl: string, bffUrl: string, call: RestApiCall, download: RestApiDownloadCall) {
     return {
         async listMessages(params?: ListMessageParams):
             Promise<PaginatedResponse<ConnectorMessage>> {
-            return restApiCall<PaginatedResponse<ConnectorMessage>>(
+            return call<PaginatedResponse<ConnectorMessage>>(
                 baseUrl,
                 "api/v1/admin/messages",
                 { params }
             );
         },
         async retrieveMessage(identifier: string): Promise<ConnectorMessageDetailsResponse> {
-            return restApiCall<ConnectorMessageDetailsResponse>(baseUrl, `api/v1/admin/messages/${identifier}`);
+            return call<ConnectorMessageDetailsResponse>(baseUrl, `api/v1/admin/messages/${identifier}`);
         },
         async getMessageTransportStep(identifier: string): Promise<ConnectorTransportStep> {
-            return restApiCall<ConnectorTransportStep>(baseUrl, `api/v1/admin/messages/${identifier}/transport-steps`);
+            return call<ConnectorTransportStep>(baseUrl, `api/v1/admin/messages/${identifier}/transport-steps`);
         },
         async getMessageStats(params: { from?: string; to?: string; businessDomain?: string; }): Promise<ConnectorMessageStats> {
-            return restApiCall<ConnectorMessageStats>(
+            return call<ConnectorMessageStats>(
                 baseUrl,
                 "api/v1/admin/messages/stats",
                 { params }
             );
         },
         async getMessageReports(params: GetMessageReportParams): Promise<ConnectorMessageReportResponse> {
-            return restApiCall<ConnectorMessageReportResponse>(
+            return call<ConnectorMessageReportResponse>(
                 baseUrl,
                 "api/v1/admin/messages/reports",
                 { params }
@@ -90,13 +90,13 @@ export function createMessageService(baseUrl: string, bffUrl: string) {
         },
         async sendMessage({ formData, parameters, document, }: SendMessageArgs): Promise<SendMessageResponse> {
             if (parameters.mode === "REST") {
-                return sendRestMessage(baseUrl, { formData, parameters, document });
+                return sendRestMessage(baseUrl, call, { formData, parameters, document });
             }
 
-            return sendSoapMessage(bffUrl, { formData, parameters, document });
+            return sendSoapMessage(bffUrl, call, { formData, parameters, document });
         },
         async exportMessageReports(params: ExportMessageReportsParams): Promise<DownloadedFile> {
-            return restApiDownload(
+            return download(
                 baseUrl,
                 "api/v1/admin/messages/reports/export",
                 {
@@ -107,12 +107,16 @@ export function createMessageService(baseUrl: string, bffUrl: string) {
     }
 }
 
-async function sendRestMessage(baseUrl: string, { formData, parameters, document, }: SendMessageArgs): Promise<SendMessageResponse> {
+async function sendRestMessage(baseUrl: string, call: RestApiCall, {
+    formData,
+    parameters,
+    document,
+}: SendMessageArgs): Promise<SendMessageResponse> {
     void formData;
     void parameters;
     void document;
 
-    const payload = await createRestOutboundMessagePayLoad(createAttachmentService(baseUrl), formData, parameters, document);
+    const payload = await createRestOutboundMessagePayLoad(createAttachmentService(baseUrl, call), formData, parameters, document);
 
     return restApiCall(
         baseUrl,
@@ -121,14 +125,18 @@ async function sendRestMessage(baseUrl: string, { formData, parameters, document
     )
 }
 
-async function sendSoapMessage(bffUrl: string, { formData, parameters, document, }: SendMessageArgs): Promise<SendMessageResponse> {
+async function sendSoapMessage(bffUrl: string, call: RestApiCall, {
+    formData,
+    parameters,
+    document,
+}: SendMessageArgs): Promise<SendMessageResponse> {
     void formData;
     void parameters;
     void document;
 
     const payload = await createSoapOutboundMessagePayload(formData, parameters, document);
 
-    return restApiCall<SendMessageResponse>(
+    return call<SendMessageResponse>(
         bffUrl,
         "bff/api/v1/submit-message",
         {

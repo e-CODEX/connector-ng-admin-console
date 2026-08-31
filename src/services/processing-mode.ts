@@ -15,25 +15,25 @@ import {
     ConnectorProcessingModeParty,
     ConnectorProcessingModeService
 } from "@/types/response/processing-mode";
-import { DownloadedFile, restApiCall, restApiDownload } from "@/lib/rest";
+import { DownloadedFile, RestApiCall, RestApiDownloadCall } from "@/lib/rest";
 import { ProcessingModeCreationRequest } from "@/types/request/processing-mode";
 
-export function createProcessingModeService(baseUrl: string) {
+export function createProcessingModeService(baseUrl: string, call: RestApiCall, download: RestApiDownloadCall) {
     return {
         async listProcessingModes(): Promise<ConnectorProcessingMode[]> {
-            return restApiCall<ConnectorProcessingMode[]>(baseUrl, "api/v1/admin/processing-modes");
+            return call<ConnectorProcessingMode[]>(baseUrl, "api/v1/admin/processing-modes");
         },
         async retrieveProcessingMode(identifier: string): Promise<ConnectorProcessingModeDetail> {
-            return restApiCall<ConnectorProcessingModeDetail>(baseUrl, `api/v1/admin/processing-modes/${identifier}`);
+            return call<ConnectorProcessingModeDetail>(baseUrl, `api/v1/admin/processing-modes/${identifier}`);
         },
         async listProcessingModeServices(businessDomain: string): Promise<ConnectorProcessingModeService[]> {
-            return restApiCall<ConnectorProcessingModeService[]>(baseUrl, `api/v1/processing-modes/${businessDomain}/services`);
+            return call<ConnectorProcessingModeService[]>(baseUrl, `api/v1/processing-modes/${businessDomain}/services`);
         },
         async listProcessingModeActions(businessDomain: string): Promise<ConnectorProcessingModeAction[]> {
-            return restApiCall<ConnectorProcessingModeAction[]>(baseUrl, `api/v1/processing-modes/${businessDomain}/actions`);
+            return call<ConnectorProcessingModeAction[]>(baseUrl, `api/v1/processing-modes/${businessDomain}/actions`);
         },
         async listProcessingModeParties(businessDomain: string): Promise<ConnectorProcessingModeParty[]> {
-            return restApiCall<ConnectorProcessingModeParty[]>(baseUrl, `api/v1/processing-modes/${businessDomain}/parties`);
+            return call<ConnectorProcessingModeParty[]>(baseUrl, `api/v1/processing-modes/${businessDomain}/parties`);
         },
         async createProcessingMode(payload: ProcessingModeCreationRequest): Promise<ConnectorProcessingMode> {
             const formData = new FormData();
@@ -44,14 +44,14 @@ export function createProcessingModeService(baseUrl: string) {
             formData.append("truststore.password", truststore.password);
             formData.append("truststore.truststoreFile", truststore.truststoreFile);
 
-            return restApiCall<ConnectorProcessingMode>(baseUrl, "api/v1/admin/processing-modes", {
+            return call<ConnectorProcessingMode>(baseUrl, "api/v1/admin/processing-modes", {
                     method: "POST",
                     body: formData
                 }
             )
         },
         async downloadProcessingMode(uuid: string, name: string): Promise<DownloadedFile> {
-            return restApiDownload(
+            return download(
                 baseUrl,
                 `api/v1/admin/processing-modes/${uuid}/download`,
                 { defaultFilename: name }

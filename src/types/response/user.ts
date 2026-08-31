@@ -8,20 +8,20 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
+import { USER_ROLE } from "@/types/global";
+
 export interface ConnectorUser {
     uuid: string;
     username: string;
     email: string;
     enabled: boolean;
-    roles: ConnectorUserRole[];
+    roles: USER_ROLE[];
     createdAt: string;
     updatedAt: string;
 }
 
-
-export interface ConnectorUserRole {
-    uuid: string;
-    name: string;
-    createdAt: string;
-    updatedAt: string;
+export interface LoginResponse {
+    accessToken: string;
+    refreshToken: string;
+    expiresIn: number;
 }

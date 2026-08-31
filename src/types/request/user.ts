@@ -14,3 +14,8 @@ export interface UserCreationRequest {
     email: string;
     enabled: boolean;
 }
+
+export interface LoginRequest {
+    username: string;
+    password: string;
+}

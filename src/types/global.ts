@@ -38,3 +38,5 @@ export type ConnectorEvidenceType =
     | "NON_DELIVERY"
     | "RETRIEVAL"
     | "NON_RETRIEVAL";
+
+export type USER_ROLE = "ROLE_ADMIN";

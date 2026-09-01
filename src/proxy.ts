@@ -12,7 +12,21 @@ import { NextRequest, NextResponse } from "next/server";
 import { restApiCall } from "@/lib/rest";
 import { createAuthService } from "@/services/auth";
 
-export async function middleware(request: NextRequest) {
+/**
+ * Proxy (Next.js request interception — formerly "middleware").
+ *
+ * Runs on the server BEFORE any route is rendered. Renamed from `middleware.ts` in Next.js 16; defaults to the Node.js runtime.
+ *
+ * Responsibilities
+ * ----------------
+ * 1. Auth gate: redirect unauthenticated requests to /login.
+ * 2. Silent token refresh: when the short-lived `token` cookie has expired but a `refreshToken` cookie is still present,
+ * exchange it for a fresh access token and set the new cookies on the response.
+ *
+ * @param request The incoming Next.js request.
+ * @returns A response that either continues the request or redirects to `/login` when no authentication credentials are available.
+ */
+export async function proxy(request: NextRequest) {
     const hasToken = request.cookies.has("token");
     const refresh = request.cookies.get("refreshToken")?.value;
 

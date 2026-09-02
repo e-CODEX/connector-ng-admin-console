@@ -22,6 +22,7 @@ export interface ConnectorUser {
 
 export interface LoginResponse {
     accessToken: string;
-    refreshToken: string;
     expiresIn: number;
+    refreshToken: string;
+    refreshExpiresIn: number;
 }

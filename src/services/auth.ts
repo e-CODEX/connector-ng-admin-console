@@ -10,22 +10,9 @@
 
 import { ConnectorUser, LoginResponse } from "@/types/response/user";
 import { RestApiCall } from "@/lib/rest";
-import { UserCreationRequest } from "@/types/request/user";
 
 export function createAuthService(baseUrl: string, call: RestApiCall) {
     return {
-        async createUser(request: UserCreationRequest): Promise<ConnectorUser> {
-            return call<ConnectorUser>(
-                baseUrl,
-                "api/v1/admin/users", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(request)
-                }
-            )
-        },
         async login(username: string, password: string): Promise<LoginResponse> {
             return call<LoginResponse>(baseUrl, "api/v1/auth/login", {
                 method: "POST",
@@ -54,7 +41,7 @@ export function createAuthService(baseUrl: string, call: RestApiCall) {
             })
         },
         async me(): Promise<ConnectorUser> {
-            return call<ConnectorUser>(baseUrl, "api/v1/users/me", {
+            return call<ConnectorUser>(baseUrl, "api/v1/auth/me", {
                 headers: {
                     "Content-Type": "application/json"
                 }

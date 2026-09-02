@@ -11,6 +11,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { restApiCall } from "@/lib/rest";
 import { createAuthService } from "@/services/auth";
+import { cookieOptions } from "@/utils";
+
+export const ACCESS_TOKEN_KEY = "accessToken";
+export const REFRESH_TOKEN_KEY = "refreshToken";
 
 /**
  * Proxy (Next.js request interception — formerly "middleware").
@@ -27,41 +31,39 @@ import { createAuthService } from "@/services/auth";
  * @returns A response that either continues the request or redirects to `/login` when no authentication credentials are available.
  */
 export async function proxy(request: NextRequest) {
-    const hasToken = request.cookies.has("token");
-    const refresh = request.cookies.get("refreshToken")?.value;
+    const { pathname } = request.nextUrl;
+    const hasToken = request.cookies.has(ACCESS_TOKEN_KEY);
+    const refresh = request.cookies.get(REFRESH_TOKEN_KEY)?.value;
+
+    if (pathname === "/login" && hasToken) {
+        return NextResponse.redirect(new URL("/", request.url));
+    }
+
+    if (pathname === "/login") {
+        return;
+    }
 
     if (!hasToken && refresh) {
         const apiUrl = process.env.CONNECTOR_API_URL!;
         const authService = createAuthService(apiUrl, restApiCall);
 
-        let refreshedToken;
-
+        let refreshed;
         try {
-            refreshedToken = await authService.refreshToken(refresh);
+            refreshed = await authService.refreshToken(refresh);
         } catch {
-            refreshedToken = null;
+            refreshed = null;
         }
 
-        if (refreshedToken !== null) {
-            const nextResponse = NextResponse.next();
-            nextResponse.cookies.set("token", refreshedToken.accessToken, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
-                sameSite: "lax",
-                path: "/",
-                maxAge: refreshedToken.expiresIn,
-            });
+        if (refreshed) {
+            request.cookies.set(ACCESS_TOKEN_KEY, refreshed.accessToken);
+            const response = NextResponse.next({ request });
 
-            if (refreshedToken.refreshToken) {
-                nextResponse.cookies.set("refreshToken", refreshedToken.refreshToken, {
-                    httpOnly: true,
-                    secure: process.env.NODE_ENV === "production",
-                    sameSite: "lax",
-                    path: "/",
-                    maxAge: 60 * 60 * 24 * 7,
-                });
+            response.cookies.set(ACCESS_TOKEN_KEY, refreshed.accessToken, cookieOptions(refreshed.expiresIn));
+
+            if (refreshed.refreshToken) {
+                response.cookies.set(REFRESH_TOKEN_KEY, refreshed.refreshToken, cookieOptions(refreshed.refreshExpiresIn));
             }
-            return nextResponse;
+            return response;
         }
     }
 
@@ -71,5 +73,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ["/((?!login|forbidden|api/auth|_next/static|_next/image|favicon.ico).*)"]
+    matcher: ["/((?!forbidden|api/auth|_next/static|_next/image|favicon.ico).*)"]
 };

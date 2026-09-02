@@ -16,14 +16,19 @@ import { truncate } from "@/utils";
 const COPY_FEEDBACK_MS = 1500;
 
 export interface CopyableIdentifierProps {
-    identifier: string;
+    identifier: string | null | undefined;
     visibleChars?: number;
     iconPosition?: "left" | "right";
     className?: string;
     textClassName?: string;
 }
 
-export function CopyableIdentifier({ identifier, visibleChars = 36, iconPosition = "left", className, textClassName, }:
+export function CopyableIdentifier({
+                                       identifier, visibleChars = 36,
+                                       iconPosition = "left",
+                                       className,
+                                       textClassName
+                                   }:
                                    CopyableIdentifierProps) {
     const [copied, setCopied] = useState(false);
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -36,7 +41,12 @@ export function CopyableIdentifier({ identifier, visibleChars = 36, iconPosition
         };
     }, []);
 
+    const hasIdentifier = identifier != null && identifier.trim() !== "";
+
     const handleCopy = async () => {
+        if (!hasIdentifier) {
+            return;
+        }
         try {
             await navigator.clipboard.writeText(identifier);
             setCopied(true);
@@ -71,9 +81,9 @@ export function CopyableIdentifier({ identifier, visibleChars = 36, iconPosition
     const text = (
         <span
             className={`font-semibold truncate ${textClassName ?? ""}`}
-            title={identifier}
+            title={identifier ?? undefined}
         >
-            {truncate(identifier, visibleChars)}
+            {truncate(identifier ?? "", visibleChars)}
         </span>
     );
 
@@ -81,13 +91,13 @@ export function CopyableIdentifier({ identifier, visibleChars = 36, iconPosition
         <div className={`inline-flex items-center gap-1 ${className ?? ""}`}>
             {iconPosition === "left" ? (
                 <>
-                    {copyButton}
+                    {hasIdentifier && copyButton}
                     {text}
                 </>
             ) : (
                 <>
                     {text}
-                    {copyButton}
+                    {hasIdentifier && copyButton}
                 </>
             )}
         </div>

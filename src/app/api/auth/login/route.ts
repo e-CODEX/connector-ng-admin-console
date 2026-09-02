@@ -14,6 +14,8 @@ import { getAppConfig } from "@/config/config.server";
 import { RestApiError } from "@/lib/rest/rest-api-error";
 import { restApiCall } from "@/lib/rest";
 import { createAuthService } from "@/services/auth";
+import { cookieOptions } from "@/utils";
+import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from "@/proxy";
 
 export async function POST(request: Request) {
     const { username, password } = await request.json();
@@ -21,30 +23,19 @@ export async function POST(request: Request) {
     const authService = createAuthService(apiUrl, restApiCall);
 
     try {
-        const { accessToken, expiresIn, refreshToken } = await authService.login(username, password);
+        const { accessToken, expiresIn, refreshToken, refreshExpiresIn } = await authService.login(username, password);
 
-        const jar = await cookies();
+        const cookieStore = await cookies();
 
-        jar.set("token", accessToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
-            path: "/",
-            maxAge: expiresIn,
-        });
-        jar.set("refreshToken", refreshToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
-            path: "/",
-            maxAge: 60 * 60 * 24 * 7,
-        });
+        cookieStore.set(ACCESS_TOKEN_KEY, accessToken, cookieOptions(expiresIn));
+        cookieStore.set(REFRESH_TOKEN_KEY, refreshToken, cookieOptions(refreshExpiresIn));
 
         return NextResponse.json({ user: "OK" });
     } catch (e) {
         if (e instanceof RestApiError && e.status === 401) {
             return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
         }
+
         if (e instanceof RestApiError) {
             console.error(e.message);
         }

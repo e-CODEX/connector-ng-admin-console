@@ -13,13 +13,14 @@ import { NextResponse } from "next/server";
 import { getAppConfig } from "@/config/config.server";
 import { authedRestApiCall } from "@/lib/rest/authed-rest-api";
 import { createAuthService } from "@/services/auth";
+import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from "@/proxy";
 
 export async function POST() {
     const { apiUrl } = getAppConfig();
     const authService = createAuthService(apiUrl, authedRestApiCall);
 
     const cookieStore = await cookies();
-    const accessToken = cookieStore.get("token")?.value;
+    const accessToken = cookieStore.get(ACCESS_TOKEN_KEY)?.value;
 
     if (accessToken) {
         try {
@@ -29,7 +30,7 @@ export async function POST() {
         }
     }
 
-    cookieStore.delete("token");
-    cookieStore.delete("refreshToken");
+    cookieStore.delete(ACCESS_TOKEN_KEY);
+    cookieStore.delete(REFRESH_TOKEN_KEY);
     return NextResponse.json({ ok: true });
 }

@@ -10,7 +10,7 @@
 
 "use client";
 
-import { useAuthService, useUserService } from "@/hooks/use-http-service";
+import { useUserService } from "@/hooks/use-http-service";
 import { useList } from "@/hooks/use-list";
 import { ConnectorUser } from "@/types/response/user";
 import { User, UserLock, UserMinus } from "lucide-react";
@@ -32,7 +32,6 @@ import { ConfirmModal } from "@/components/common/confirmation-modal";
 export default function UserAdminPage() {
     const [selectedUser, setSelectedUser] = useState<ConnectorUser | null>(null);
     const userService = useUserService();
-    const authService = useAuthService();
     const list = useList<ConnectorUser>(userService.listAllUsers);
 
     const addModal = useOverlayState();
@@ -132,7 +131,7 @@ export default function UserAdminPage() {
                 state={addModal}
                 onSubmit={async (payload) => {
                     try {
-                        await authService.createUser(payload);
+                        await userService.createUser(payload);
                         await list.refresh();
                         toastSuccess("User created successfully");
                         addModal.close();

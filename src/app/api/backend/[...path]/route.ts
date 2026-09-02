@@ -9,18 +9,18 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { getAppConfig } from "@/config/config.server";
+import { bearerHeader } from "@/lib/rest/bearer-header";
 
 async function proxy(req: NextRequest, path: string[]) {
     const { apiUrl } = getAppConfig();          // <- where /api/backend actually goes
-    const token = (await cookies()).get("token")?.value;
+    const authorization = await bearerHeader();
     const target = `${apiUrl}/${path.join("/")}${req.nextUrl.search}`;
 
     const res = await fetch(target, {
         method: req.method,
         headers: {
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            ...(authorization),
             ...(req.headers.get("content-type")
                 ? { "Content-Type": req.headers.get("content-type")! }
                 : {}),

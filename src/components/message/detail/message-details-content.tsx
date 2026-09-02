@@ -80,6 +80,12 @@ export function MessageDetailsContent({ message, loading }: MessageDetailsConten
                 <DetailRow label="Backend ID" value={
                     <CopyableIdentifier identifier={message.backendMessageIdentifier} iconPosition="right" visibleChars={IDENTIFIER_LENGTH}/>
                 }/>
+                <DetailRow label="Ebms ID" value={
+                    <CopyableIdentifier identifier={message.as4Properties.ebmsMessageIdentifier} iconPosition="right" visibleChars={IDENTIFIER_LENGTH}/>
+                }/>
+                <DetailRow label="Ref to ID" value={
+                    <CopyableIdentifier identifier={message.as4Properties.referenceToIdentifier} iconPosition="right" visibleChars={IDENTIFIER_LENGTH}/>
+                }/>
                 <DetailRow label="From" value={detailParty(message.as4Properties.fromParty)}/>
                 <DetailRow label="To" value={detailParty(message.as4Properties.toParty)}/>
                 <DetailRow label="Original sender" value={message.as4Properties.originalSender}/>

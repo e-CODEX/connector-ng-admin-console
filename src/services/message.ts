@@ -89,11 +89,19 @@ export function createMessageService(baseUrl: string, bffUrl: string) {
             );
         },
         async sendMessage({ formData, parameters, document, }: SendMessageArgs): Promise<SendMessageResponse> {
-            if (parameters.mode === "REST") {
-                return sendRestMessage(baseUrl, { formData, parameters, document });
+            const repeatCount = Math.max(1, parameters.repeatCount || 1);
+            let lastResponse: SendMessageResponse = {};
+
+            for (let i = 0; i < repeatCount; i++) {
+                // Each iteration rebuilds the payload so empty message IDs get fresh UUIDs.
+                if (parameters.mode === "REST") {
+                    lastResponse = await sendRestMessage(baseUrl, { formData, parameters, document });
+                } else {
+                    lastResponse = await sendSoapMessage(bffUrl, { formData, parameters, document });
+                }
             }
 
-            return sendSoapMessage(bffUrl, { formData, parameters, document });
+            return lastResponse;
         },
         async exportMessageReports(params: ExportMessageReportsParams): Promise<DownloadedFile> {
             return restApiDownload(

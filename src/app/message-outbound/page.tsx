@@ -111,9 +111,13 @@ export default function MessageOutboundPage() {
 
         try {
             setIsSending(true);
+            const repeatCount = Math.max(1, sendParameters.repeatCount || 1);
             setLogs((prev) => [
                 ...prev,
-                { message: `[${new Date().toLocaleTimeString()}] Sending message...\n`, level: "INFO" },
+                {
+                    message: `[${new Date().toLocaleTimeString()}] Sending ${repeatCount} message${repeatCount === 1 ? "" : "s"}...\n`,
+                    level: "INFO",
+                },
             ]);
 
             await messageService.sendMessage({
@@ -123,7 +127,10 @@ export default function MessageOutboundPage() {
 
             setLogs((prev) => [
                 ...prev,
-                { message: `[${new Date().toLocaleTimeString()}] Message sent\n`, level: "SUCCESS" }
+                {
+                    message: `[${new Date().toLocaleTimeString()}] ${repeatCount} message${repeatCount === 1 ? "" : "s"} sent\n`,
+                    level: "SUCCESS",
+                },
             ]);
         } catch (error) {
             setLogs((prev) => [

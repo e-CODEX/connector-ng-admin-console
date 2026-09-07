@@ -14,13 +14,13 @@ import { PageHeader } from "@/components/common/page-header";
 import React, { useState } from "react";
 import { ConnectorAttachmentResponse } from "@/types/response/attachments";
 import { Table, useOverlayState } from "@heroui/react";
-import { formatBytes, truncate } from "@/utils";
+import { formatBytes, saveFile, toastError, truncate } from "@/utils";
 import { PaginationControls } from "@/components/paging/pagination-controls";
 import { AttachmentDetailsView } from "@/components/attachment/attachment-details-view";
 import { ArrowsRotateRight } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/page-header-button";
 import { AttachmentStorageChip } from "@/components/attachment/attachment-storage-chip";
-import { Paperclip } from "lucide-react";
+import { ArrowDownToLine, Paperclip } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { usePagedList } from "@/hooks/use-paged-list";
@@ -42,6 +42,15 @@ export default function AttachmentsAdminPage() {
         setSelectedAttachment(attachment);
         detailsModal.open();
     };
+
+    const onDownloadClicked = async (attachment: ConnectorAttachmentResponse) => {
+        try {
+            const file = await attachmentService.downloadAttachment(attachment.identifier, attachment.name);
+            saveFile(file);
+        } catch (error) {
+            toastError(error);
+        }
+    }
 
     return (
         <div>
@@ -98,6 +107,10 @@ export default function AttachmentsAdminPage() {
                                             <Table.Cell>
                                                 <div className="flex items-center gap-1">
                                                     <ActionButton onPress={() => onDetailsClick(attachment)}/>
+                                                    <ActionButton label="Download"
+                                                                  icon={ArrowDownToLine}
+                                                                  onPress={() => onDownloadClicked(attachment)}
+                                                    />
                                                 </div>
                                             </Table.Cell>
                                         </Table.Row>

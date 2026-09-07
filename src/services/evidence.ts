@@ -13,11 +13,10 @@ import { DownloadedFile, restApiDownload } from "@/lib/rest";
 export function createEvidenceService(baseUrl: string) {
     return {
         async downloadEvidence(uuid: string, evidenceType: string): Promise<DownloadedFile> {
-            const params = { defaultFilename: `${evidenceType.toLowerCase()}.xml` }
             return restApiDownload(
                 baseUrl,
                 `api/v1/evidences/${uuid}/download`,
-                { params }
+                { defaultFilename: `${evidenceType.toLowerCase()}.xml` }
             );
         }
     }

@@ -10,7 +10,7 @@
 
 import { PaginatedResponse } from "@/types/response/paginated-response";
 import { ConnectorAttachmentResponse } from "@/types/response/attachments";
-import { restApiCall } from "@/lib/rest";
+import { DownloadedFile, restApiCall, restApiDownload } from "@/lib/rest";
 
 export type ListAttachmentsParams = {
     page?: number;
@@ -36,6 +36,13 @@ export function createAttachmentService(baseUrl: string) {
                 baseUrl,
                 "api/v1/attachments/upload",
                 { method: "POST", body: data, }
+            );
+        },
+        async downloadAttachment(identifier: string, name: string): Promise<DownloadedFile> {
+            return restApiDownload(
+                baseUrl,
+                `api/v1/admin/attachments/${identifier}/download`,
+                { defaultFilename: name }
             );
         }
     }

@@ -10,7 +10,7 @@
 
 "use client";
 
-import { Button, Table, Tooltip, useOverlayState } from "@heroui/react";
+import { Table, useOverlayState } from "@heroui/react";
 import { ConnectorMessageDetailsResponse, ConnectorMessageEvidence } from "@/types/response/message";
 import { formatBytes, saveFile, toastError } from "@/utils";
 import React, { useState } from "react";
@@ -24,9 +24,10 @@ import { ConnectorAttachmentResponse } from "@/types/response/attachments";
 import { AttachmentDetailsView } from "@/components/attachment/attachment-details-view";
 import { BusinessDetailsBusinessContentSection } from "@/components/message/detail/business-details-business-content-section";
 import { DateTime } from "@/components/common/date-time";
-import { useEvidenceService } from "@/hooks/use-http-service";
+import { useAttachmentService, useEvidenceService } from "@/hooks/use-http-service";
 import { EvidenceTypeChip } from "@/components/common/evidence-chip";
 import { CopyableIdentifier } from "@/components/common/copyable-identifier";
+import { ActionButton } from "@/components/common/action-button";
 
 interface MessageDetailsContentProps {
     message: ConnectorMessageDetailsResponse | null;
@@ -38,12 +39,22 @@ const IDENTIFIER_LENGTH = 100;
 export function MessageDetailsContent({ message, loading }: MessageDetailsContentProps) {
     const [selectedBusinessAttachment, setSelectedBusinessAttachment] = useState<ConnectorAttachmentResponse | null>(null);
 
+    const attachmentService = useAttachmentService();
     const evidenceService = useEvidenceService();
 
     const businessAttachmentDetailsModal = useOverlayState();
 
     if (!message || loading) {
         return null;
+    }
+
+    const onDownloadAttachmentClicked = async (attachment: ConnectorAttachmentResponse) => {
+        try {
+            const file = await attachmentService.downloadAttachment(attachment!.identifier, attachment!.name);
+            saveFile(file);
+        } catch (error) {
+            toastError(error);
+        }
     }
 
     const onDownloadEvidenceClicked = async (evidence: ConnectorMessageEvidence) => {
@@ -70,22 +81,27 @@ export function MessageDetailsContent({ message, loading }: MessageDetailsConten
         <div className="flex flex-col">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8">
                 <DetailRow label="Identifier" value={
-                    <CopyableIdentifier identifier={message.identifier} iconPosition="right" visibleChars={IDENTIFIER_LENGTH}/>
-                }/>
+                                                   <CopyableIdentifier identifier={message.identifier} iconPosition="right"
+                                                                       visibleChars={IDENTIFIER_LENGTH}/>
+                                              }/>
                 <DetailRow label="Business domain" value={message.businessDomainIdentifier}/>
                 <DetailRow label="Conversation" value={
-                    <CopyableIdentifier identifier={message.as4Properties.conversationIdentifier} iconPosition="right"
-                                        visibleChars={IDENTIFIER_LENGTH}/>
-                }/>
+                                                     <CopyableIdentifier identifier={message.as4Properties.conversationIdentifier}
+                                                                         iconPosition="right"
+                                                                         visibleChars={IDENTIFIER_LENGTH}/>
+                                                }/>
                 <DetailRow label="Backend ID" value={
-                    <CopyableIdentifier identifier={message.backendMessageIdentifier} iconPosition="right" visibleChars={IDENTIFIER_LENGTH}/>
-                }/>
+                                                   <CopyableIdentifier identifier={message.backendMessageIdentifier} iconPosition="right"
+                                                                       visibleChars={IDENTIFIER_LENGTH}/>
+                                              }/>
                 <DetailRow label="Ebms ID" value={
-                    <CopyableIdentifier identifier={message.as4Properties.ebmsMessageIdentifier} iconPosition="right" visibleChars={IDENTIFIER_LENGTH}/>
-                }/>
+                                                <CopyableIdentifier identifier={message.as4Properties.ebmsMessageIdentifier} iconPosition="right"
+                                                                    visibleChars={IDENTIFIER_LENGTH}/>
+                                           }/>
                 <DetailRow label="Ref to ID" value={
-                    <CopyableIdentifier identifier={message.as4Properties.referenceToIdentifier} iconPosition="right" visibleChars={IDENTIFIER_LENGTH}/>
-                }/>
+                                                  <CopyableIdentifier identifier={message.as4Properties.referenceToIdentifier} iconPosition="right"
+                                                                      visibleChars={IDENTIFIER_LENGTH}/>
+                                             }/>
                 <DetailRow label="From" value={detailParty(message.as4Properties.fromParty)}/>
                 <DetailRow label="To" value={detailParty(message.as4Properties.toParty)}/>
                 <DetailRow label="Original sender" value={message.as4Properties.originalSender}/>
@@ -95,10 +111,10 @@ export function MessageDetailsContent({ message, loading }: MessageDetailsConten
                 <DetailRow label="Service" value={message.as4Properties.service.name}/>
                 <DetailRow label="Action" value={message.as4Properties.action.name}/>
                 <DetailRow label="Direction" value={
-                    <MessageDirectionChip
-                        direction={message.direction}
-                    />
-                }/>
+                                                  <MessageDirectionChip
+                                                     direction={message.direction}
+                                                 />
+                                             }/>
                 <DetailRow
                     label="Status"
                     value={<MessageDeliveryStatusChip message={message}/>}
@@ -157,6 +173,7 @@ export function MessageDetailsContent({ message, loading }: MessageDetailsConten
                                     <Table.Column>Storage</Table.Column>
                                     <Table.Column>Type</Table.Column>
                                     <Table.Column>Created at</Table.Column>
+                                    <Table.Column>Action</Table.Column>
                                 </Table.Header>
                                 <Table.Body>
                                     {attachments.map((attachment) => (
@@ -172,6 +189,12 @@ export function MessageDetailsContent({ message, loading }: MessageDetailsConten
                                             <Table.Cell>{attachment.storage}</Table.Cell>
                                             <Table.Cell>{attachment.type}</Table.Cell>
                                             <Table.Cell><DateTime value={attachment.createdAt} precision="millis"/></Table.Cell>
+                                            <Table.Cell>
+                                                <ActionButton label="Download"
+                                                              icon={ArrowDownToLine}
+                                                              onPress={() => onDownloadAttachmentClicked(attachment)}
+                                                />
+                                            </Table.Cell>
                                         </Table.Row>
                                     ))}
                                 </Table.Body>
@@ -210,20 +233,10 @@ export function MessageDetailsContent({ message, loading }: MessageDetailsConten
                                             <Table.Cell><DateTime value={evidence.updatedAt} precision="millis"/></Table.Cell>
                                             <Table.Cell>
                                                 <div className="flex items-center gap-1">
-                                                    <Tooltip delay={0}>
-                                                        <Button
-                                                            isIconOnly
-                                                            size="sm"
-                                                            variant="secondary"
-                                                            onPress={() => onDownloadEvidenceClicked(evidence)}
-                                                        >
-                                                            <ArrowDownToLine/>
-                                                        </Button>
-                                                        <Tooltip.Content showArrow>
-                                                            <Tooltip.Arrow/>
-                                                            <p>Download</p>
-                                                        </Tooltip.Content>
-                                                    </Tooltip>
+                                                    <ActionButton label="Download"
+                                                                  icon={ArrowDownToLine}
+                                                                  onPress={() => onDownloadEvidenceClicked(evidence)}
+                                                    />
                                                 </div>
                                             </Table.Cell>
                                         </Table.Row>

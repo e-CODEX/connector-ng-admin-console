@@ -80,28 +80,40 @@ export function MessageDetailsContent({ message, loading }: MessageDetailsConten
     return (
         <div className="flex flex-col">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8">
-                <DetailRow label="Identifier" value={
-                                                   <CopyableIdentifier identifier={message.identifier} iconPosition="right"
-                                                                       visibleChars={IDENTIFIER_LENGTH}/>
-                                              }/>
+                <DetailRow
+                    label="Identifier"
+                    value={
+                        <CopyableIdentifier identifier={message.identifier} iconPosition="right" visibleChars={IDENTIFIER_LENGTH}/>
+                    }/>
                 <DetailRow label="Business domain" value={message.businessDomainIdentifier}/>
-                <DetailRow label="Conversation" value={
-                                                     <CopyableIdentifier identifier={message.as4Properties.conversationIdentifier}
-                                                                         iconPosition="right"
-                                                                         visibleChars={IDENTIFIER_LENGTH}/>
-                                                }/>
-                <DetailRow label="Backend ID" value={
-                                                   <CopyableIdentifier identifier={message.backendMessageIdentifier} iconPosition="right"
-                                                                       visibleChars={IDENTIFIER_LENGTH}/>
-                                              }/>
-                <DetailRow label="Ebms ID" value={
-                                                <CopyableIdentifier identifier={message.as4Properties.ebmsMessageIdentifier} iconPosition="right"
-                                                                    visibleChars={IDENTIFIER_LENGTH}/>
-                                           }/>
-                <DetailRow label="Ref to ID" value={
-                                                  <CopyableIdentifier identifier={message.as4Properties.referenceToIdentifier} iconPosition="right"
-                                                                      visibleChars={IDENTIFIER_LENGTH}/>
-                                             }/>
+                <DetailRow
+                    label="Conversation"
+                    value={
+                        <CopyableIdentifier identifier={message.as4Properties.conversationIdentifier}
+                                            iconPosition="right"
+                                            visibleChars={IDENTIFIER_LENGTH}/>
+                    }/>
+                <DetailRow
+                    label="Backend ID"
+                    value={
+                        <CopyableIdentifier identifier={message.backendMessageIdentifier}
+                                            iconPosition="right"
+                                            visibleChars={IDENTIFIER_LENGTH}/>
+                    }/>
+                <DetailRow
+                    label="Ebms ID"
+                    value={
+                        <CopyableIdentifier identifier={message.as4Properties.ebmsMessageIdentifier}
+                                            iconPosition="right"
+                                            visibleChars={IDENTIFIER_LENGTH}/>
+                    }/>
+                <DetailRow
+                    label="Ref to ID"
+                    value={
+                        <CopyableIdentifier identifier={message.as4Properties.referenceToIdentifier}
+                                            iconPosition="right"
+                                            visibleChars={IDENTIFIER_LENGTH}/>
+                    }/>
                 <DetailRow label="From" value={detailParty(message.as4Properties.fromParty)}/>
                 <DetailRow label="To" value={detailParty(message.as4Properties.toParty)}/>
                 <DetailRow label="Original sender" value={message.as4Properties.originalSender}/>
@@ -110,11 +122,7 @@ export function MessageDetailsContent({ message, loading }: MessageDetailsConten
                 <DetailRow label="Gateway" value={message.gatewayName}/>
                 <DetailRow label="Service" value={message.as4Properties.service.name}/>
                 <DetailRow label="Action" value={message.as4Properties.action.name}/>
-                <DetailRow label="Direction" value={
-                                                  <MessageDirectionChip
-                                                     direction={message.direction}
-                                                 />
-                                             }/>
+                <DetailRow label="Direction" value={<MessageDirectionChip direction={message.direction}/>}/>
                 <DetailRow
                     label="Status"
                     value={<MessageDeliveryStatusChip message={message}/>}

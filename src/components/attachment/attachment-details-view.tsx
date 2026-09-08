@@ -10,16 +10,17 @@
 
 "use client";
 
-import { Modal, useOverlayState } from "@heroui/react";
-import { formatBytes } from "@/utils";
+import { Button, Modal, useOverlayState } from "@heroui/react";
+import { formatBytes, saveFile, toastError } from "@/utils";
 import React from "react";
 import { ConnectorAttachmentResponse } from "@/types/response/attachments";
 import { DetailRow } from "@/components/common/detail-row";
 import { AttachmentStorageChip } from "@/components/attachment/attachment-storage-chip";
-import { Paperclip } from "lucide-react";
+import { ArrowDownToLine, Paperclip } from "lucide-react";
 import { ModalHeaderIcon } from "@/components/common/modal-header-icon";
 import { DateTime } from "@/components/common/date-time";
 import { CopyableIdentifier } from "@/components/common/copyable-identifier";
+import { useAttachmentService } from "@/hooks/use-http-service";
 
 interface AttachmentDetailsViewProps {
     attachment: ConnectorAttachmentResponse | null;
@@ -27,6 +28,17 @@ interface AttachmentDetailsViewProps {
 }
 
 export function AttachmentDetailsView({ attachment, state }: AttachmentDetailsViewProps) {
+    const attachmentService = useAttachmentService();
+
+    const onDownloadClicked = async () => {
+        try {
+            const file = await attachmentService.downloadAttachment(attachment!.identifier, attachment!.name);
+            saveFile(file);
+        } catch (error) {
+            toastError(error);
+        }
+    }
+
     return (
         <Modal state={state}>
             <Modal.Backdrop>
@@ -60,6 +72,12 @@ export function AttachmentDetailsView({ attachment, state }: AttachmentDetailsVi
                                 </div>
                             )}
                         </Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="secondary" className="w-full" onPress={() => onDownloadClicked()}>
+                                <ArrowDownToLine />
+                                Download
+                            </Button>
+                        </Modal.Footer>
                     </Modal.Dialog>
                 </Modal.Container>
             </Modal.Backdrop>

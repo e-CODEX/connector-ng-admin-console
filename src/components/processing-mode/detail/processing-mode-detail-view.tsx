@@ -10,14 +10,15 @@
 
 "use client";
 
-import { Modal, useOverlayState } from "@heroui/react";
-import { toastError } from "@/utils";
+import { Button, Modal, useOverlayState } from "@heroui/react";
+import { saveFile, toastError } from "@/utils";
 import React, { useEffect, useState } from "react";
 import { ConnectorProcessingMode, ConnectorProcessingModeDetail } from "@/types/response/processing-mode";
 import { ProcessingModeDetailsSection } from "@/components/processing-mode/detail/processing-mode-detail-section";
-import { Workflow } from "lucide-react";
+import { ArrowDownToLine, Workflow } from "lucide-react";
 import { useProcessingModeService } from "@/hooks/use-http-service";
 import { ModalHeaderIcon } from "@/components/common/modal-header-icon";
+import path from "path";
 
 interface ProcessingModeDetailsViewProps {
     processingMode: ConnectorProcessingMode | null;
@@ -31,6 +32,15 @@ export function ProcessingModeDetailsView({ processingMode, state }: ProcessingM
     const processingModeService = useProcessingModeService();
 
     const identifier = processingMode?.uuid;
+
+    const onDownloadClicked = async () => {
+        try {
+            const file = await processingModeService.downloadProcessingMode(details!.uuid, path.basename(details!.filename));
+            saveFile(file);
+        } catch (error) {
+            toastError(error);
+        }
+    }
 
     useEffect(() => {
         if (!state.isOpen || !identifier) {
@@ -82,6 +92,12 @@ export function ProcessingModeDetailsView({ processingMode, state }: ProcessingM
                                 <ProcessingModeDetailsSection processingMode={details} loading={loading}/>
                             )}
                         </Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="secondary" className="w-full" onPress={() => onDownloadClicked()}>
+                                <ArrowDownToLine />
+                                Download
+                            </Button>
+                        </Modal.Footer>
                     </Modal.Dialog>
                 </Modal.Container>
             </Modal.Backdrop>

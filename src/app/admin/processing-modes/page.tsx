@@ -10,11 +10,12 @@
 
 "use client";
 
+import path from "path";
 import { PageHeader } from "@/components/common/page-header";
 import React, { useState } from "react";
 import { Table, useOverlayState } from "@heroui/react";
 import { ConnectorProcessingMode } from "@/types/response/processing-mode";
-import { toastError, toastSuccess } from "@/utils";
+import { saveFile, toastError, toastSuccess } from "@/utils";
 import { ProcessingModeDetailsView } from "@/components/processing-mode/detail/processing-mode-detail-view";
 import { ArrowsRotateRight, Plus } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/page-header-button";
@@ -27,6 +28,7 @@ import { DateTime } from "@/components/common/date-time";
 import { useProcessingModeService } from "@/hooks/use-http-service";
 import { CopyableIdentifier } from "@/components/common/copyable-identifier";
 import { DetailActionButton } from "@/components/common/action-button/detail-action-button";
+import { DownloadActionButton } from "@/components/common/action-button/download-action-button";
 
 export default function ProcessingModesAdminPage() {
     const [selectedProcessingMode, setSelectedProcessingMode] = useState<ConnectorProcessingMode | null>(null);
@@ -46,6 +48,15 @@ export default function ProcessingModesAdminPage() {
         setSelectedProcessingMode(processingMode);
         detailsModal.open();
     };
+
+    const onDownloadClicked = async (pMode: ConnectorProcessingMode) => {
+        try {
+            const file = await processingModeService.downloadProcessingMode(pMode.uuid, path.basename(pMode.filename));
+            saveFile(file);
+        } catch (error) {
+            toastError(error);
+        }
+    }
 
     return (
         <div>
@@ -101,6 +112,7 @@ export default function ProcessingModesAdminPage() {
                                             <Table.Cell>
                                                 <div className="flex items-center gap-1">
                                                     <DetailActionButton onPress={() => onDetailsClick(pMode)}/>
+                                                    <DownloadActionButton onPress={() => onDownloadClicked(pMode)}/>
                                                 </div>
                                             </Table.Cell>
                                         </Table.Row>

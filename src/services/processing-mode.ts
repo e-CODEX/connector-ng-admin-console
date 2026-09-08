@@ -15,7 +15,7 @@ import {
     ConnectorProcessingModeParty,
     ConnectorProcessingModeService
 } from "@/types/response/processing-mode";
-import { restApiCall } from "@/lib/rest";
+import { DownloadedFile, restApiCall, restApiDownload } from "@/lib/rest";
 import { ProcessingModeCreationRequest } from "@/types/request/processing-mode";
 
 export function createProcessingModeService(baseUrl: string) {
@@ -49,6 +49,13 @@ export function createProcessingModeService(baseUrl: string) {
                     body: formData
                 }
             )
+        },
+        async downloadProcessingMode(uuid: string, name: string): Promise<DownloadedFile> {
+            return restApiDownload(
+                baseUrl,
+                `api/v1/admin/processing-modes/${uuid}/download`,
+                { defaultFilename: name }
+            );
         }
     }
 }

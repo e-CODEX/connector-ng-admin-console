@@ -20,7 +20,7 @@ import { AttachmentDetailsView } from "@/components/attachment/attachment-detail
 import { ArrowsRotateRight } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/page-header-button";
 import { AttachmentStorageChip } from "@/components/attachment/attachment-storage-chip";
-import { ArrowDownToLine, Paperclip } from "lucide-react";
+import { Paperclip } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { usePagedList } from "@/hooks/use-paged-list";
@@ -108,10 +108,7 @@ export default function AttachmentsAdminPage() {
                                             <Table.Cell>
                                                 <div className="flex items-center gap-1">
                                                     <DetailActionButton onPress={() => onDetailsClick(attachment)}/>
-                                                    <DownloadActionButton
-                                                        icon={ArrowDownToLine}
-                                                        onPress={() => onDownloadClicked(attachment)}
-                                                    />
+                                                    <DownloadActionButton onPress={() => onDownloadClicked(attachment)}/>
                                                 </div>
                                             </Table.Cell>
                                         </Table.Row>

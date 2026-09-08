@@ -27,7 +27,8 @@ import { usePagedList } from "@/hooks/use-paged-list";
 import { DateTime } from "@/components/common/date-time";
 import { useAttachmentService } from "@/hooks/use-http-service";
 import { CopyableIdentifier } from "@/components/common/copyable-identifier";
-import { ActionButton } from "@/components/common/action-button";
+import { DetailActionButton } from "@/components/common/action-button/detail-action-button";
+import { DownloadActionButton } from "@/components/common/action-button/download-action-button";
 
 export default function AttachmentsAdminPage() {
     const [selectedAttachment, setSelectedAttachment] = useState<ConnectorAttachmentResponse | null>(null);
@@ -106,10 +107,10 @@ export default function AttachmentsAdminPage() {
                                             </Table.Cell>
                                             <Table.Cell>
                                                 <div className="flex items-center gap-1">
-                                                    <ActionButton onPress={() => onDetailsClick(attachment)}/>
-                                                    <ActionButton label="Download"
-                                                                  icon={ArrowDownToLine}
-                                                                  onPress={() => onDownloadClicked(attachment)}
+                                                    <DetailActionButton onPress={() => onDetailsClick(attachment)}/>
+                                                    <DownloadActionButton
+                                                        icon={ArrowDownToLine}
+                                                        onPress={() => onDownloadClicked(attachment)}
                                                     />
                                                 </div>
                                             </Table.Cell>

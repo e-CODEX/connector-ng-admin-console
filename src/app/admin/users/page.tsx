@@ -26,7 +26,7 @@ import { BooleanChip } from "@/components/common/boolean-chip";
 import { UserCreationView } from "@/components/user/user-creation-view";
 import { toastError, toastSuccess } from "@/utils";
 import { DateTime } from "@/components/common/date-time";
-import { ActionButton } from "@/components/common/action-button";
+import { ActionButton } from "@/components/common/action-button/action-button";
 import { ConfirmModal } from "@/components/common/confirmation-modal";
 
 export default function UserAdminPage() {

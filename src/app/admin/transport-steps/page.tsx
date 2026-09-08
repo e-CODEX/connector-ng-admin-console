@@ -29,7 +29,7 @@ import { usePagedList } from "@/hooks/use-paged-list";
 import { DateTime } from "@/components/common/date-time";
 import { useTransportStepService } from "@/hooks/use-http-service";
 import { CopyableIdentifier } from "@/components/common/copyable-identifier";
-import { ActionButton } from "@/components/common/action-button";
+import { DetailActionButton } from "@/components/common/action-button/detail-action-button";
 
 const IDENTIFIER_LENGTH = 30;
 
@@ -138,7 +138,7 @@ export default function TransportStepsAdminPage() {
                                             </Table.Cell>
                                             <Table.Cell>
                                                 <div className="flex items-center gap-1">
-                                                    <ActionButton onPress={() => onDetailsClick(transportStep)}/>
+                                                    <DetailActionButton onPress={() => onDetailsClick(transportStep)}/>
                                                 </div>
                                             </Table.Cell>
                                         </Table.Row>

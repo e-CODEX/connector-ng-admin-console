@@ -27,7 +27,7 @@ import { DateTime } from "@/components/common/date-time";
 import { useAttachmentService, useEvidenceService } from "@/hooks/use-http-service";
 import { EvidenceTypeChip } from "@/components/common/evidence-chip";
 import { CopyableIdentifier } from "@/components/common/copyable-identifier";
-import { ActionButton } from "@/components/common/action-button";
+import { ActionButton } from "@/components/common/action-button/action-button";
 
 interface MessageDetailsContentProps {
     message: ConnectorMessageDetailsResponse | null;

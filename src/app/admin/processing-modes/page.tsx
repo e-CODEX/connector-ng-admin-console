@@ -26,7 +26,7 @@ import { useList } from "@/hooks/use-list";
 import { DateTime } from "@/components/common/date-time";
 import { useProcessingModeService } from "@/hooks/use-http-service";
 import { CopyableIdentifier } from "@/components/common/copyable-identifier";
-import { ActionButton } from "@/components/common/action-button";
+import { DetailActionButton } from "@/components/common/action-button/detail-action-button";
 
 export default function ProcessingModesAdminPage() {
     const [selectedProcessingMode, setSelectedProcessingMode] = useState<ConnectorProcessingMode | null>(null);
@@ -100,7 +100,7 @@ export default function ProcessingModesAdminPage() {
                                             </Table.Cell>
                                             <Table.Cell>
                                                 <div className="flex items-center gap-1">
-                                                    <ActionButton onPress={() => onDetailsClick(pMode)}/>
+                                                    <DetailActionButton onPress={() => onDetailsClick(pMode)}/>
                                                 </div>
                                             </Table.Cell>
                                         </Table.Row>

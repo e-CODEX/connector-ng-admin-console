@@ -12,7 +12,7 @@ import { Button, Tooltip } from "@heroui/react";
 import { Eye } from "lucide-react";
 import React, { ComponentProps, ComponentType } from "react";
 
-interface DetailButtonProps
+export interface DetailButtonProps
     extends Omit<ComponentProps<typeof Button>, "isIconOnly" | "children"> {
     label?: string;
     iconAccent?: string;

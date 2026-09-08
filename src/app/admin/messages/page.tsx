@@ -35,7 +35,8 @@ import { ConnectorProcessingModeService } from "@/types/response/processing-mode
 import { DateTime } from "@/components/common/date-time";
 import { useMessageService } from "@/hooks/use-http-service";
 import { CopyableIdentifier } from "@/components/common/copyable-identifier";
-import { ActionButton } from "@/components/common/action-button";
+import { ActionButton } from "@/components/common/action-button/action-button";
+import { DetailActionButton } from "@/components/common/action-button/detail-action-button";
 
 const IDENTIFIER_LENGTH = 10;
 const ALL_SELECTOR = "All";
@@ -205,7 +206,7 @@ export default function MessagesAdminPage() {
                                             </Table.Cell>
                                             <Table.Cell>
                                                 <div className="flex items-center gap-1">
-                                                    <ActionButton onPress={() => onDetailsClick(message)}/>
+                                                    <DetailActionButton onPress={() => onDetailsClick(message)}/>
                                                     <ActionButton label="Transport steps" icon={Route}
                                                                   onPress={() => onTransportStepsClick(message)}/>
                                                 </div>

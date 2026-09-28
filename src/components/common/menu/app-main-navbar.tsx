@@ -16,21 +16,38 @@ import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation";
 import { ThemeSwitcher } from "@/components/common/theme-switcher";
-import { Building2, Layers, Mail, Paperclip, Route, Send, Settings, Workflow } from "lucide-react";
+import { Building2, Layers, LucideIcon, Mail, Paperclip, Route, Send, Settings, Workflow } from "lucide-react";
+import { useOptionalUser } from "@/hooks/useUser";
+import { UserMenu } from "@/components/common/menu/user-menu";
+import { USER_ROLE } from "@/types/global";
 
-const navItems= [
-    { label: "Send", href: "/message-outbound", icon: Send },
-    { label: "Messages", href: "/admin/messages", icon: Mail },
-    { label: "Transport-Step", href: "/admin/transport-steps", icon: Route },
-    { label: "Attachments", href: "/admin/attachments", icon: Paperclip },
-    { label: "Queues", href: "/admin/queues", icon: Layers },
-    { label: "Configurations", href: "/admin/configurations", icon: Settings },
-    { label: "Business domain", href: "/admin/business-domains", icon: Building2 },
-    { label: "Processing mode", href: "/admin/processing-modes", icon: Workflow },
+type MenuEntry = {
+    label: string;
+    href: string;
+    icon: LucideIcon;
+    roles?: USER_ROLE[];
+};
+
+const MENU: MenuEntry[] = [
+    { label: "Send", href: "/message-outbound", icon: Send, roles: ["ROLE_ADMIN"] },
+    { label: "Messages", href: "/admin/messages", icon: Mail, roles: ["ROLE_ADMIN"] },
+    { label: "Transport-Step", href: "/admin/transport-steps", icon: Route, roles: ["ROLE_ADMIN"] },
+    { label: "Attachments", href: "/admin/attachments", icon: Paperclip, roles: ["ROLE_ADMIN"] },
+    { label: "Queues", href: "/admin/queues", icon: Layers, roles: ["ROLE_ADMIN"] },
+    { label: "Configurations", href: "/admin/configurations", icon: Settings, roles: ["ROLE_ADMIN"] },
+    { label: "Business domain", href: "/admin/business-domains", icon: Building2, roles: ["ROLE_ADMIN"] },
+    { label: "Processing mode", href: "/admin/processing-modes", icon: Workflow, roles: ["ROLE_ADMIN"] },
 ];
 
 export const AppMainNavbar = () => {
+    const user = useOptionalUser();
     const pathname = usePathname();
+
+    const items = MENU.filter(
+        (item) =>
+            !item.roles ||
+            item.roles.some((itemRole) => user?.roles.includes(itemRole))
+    );
 
     return (
         <HeroNavbar
@@ -53,7 +70,7 @@ export const AppMainNavbar = () => {
             </NavbarContent>
 
             <NavbarContent className="hidden lg:flex gap-5" justify="end">
-                {navItems.map(({ label, href, icon: Icon }) => {
+                {items.map(({ label, href, icon: Icon }) => {
                     const isActive = href === "/"
                         ? pathname === "/"
                         : pathname === href || pathname.startsWith(href + "/");
@@ -67,15 +84,20 @@ export const AppMainNavbar = () => {
                                 }`}
                                 href={href}
                             >
-                                <Icon className="size-4 shrink-0" aria-hidden="true" />
+                                <Icon className="size-4 shrink-0" aria-hidden="true"/>
                                 {label}
                             </Link>
                         </NavbarItem>
                     );
                 })}
+
                 <NavbarItem>
                     <ThemeSwitcher/>
                 </NavbarItem>
+
+                <div className="ml-auto">
+                    <UserMenu/>
+                </div>
             </NavbarContent>
         </HeroNavbar>
     )

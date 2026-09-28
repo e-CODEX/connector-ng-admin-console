@@ -12,12 +12,13 @@ import type { Metadata } from "next";
 import "../styles/globals.css";
 import { siteConfig } from "@/config/site";
 import { GeistMono, GeistSans } from "@/config/fonts";
-import { AppMainNavbar } from "@/components/common/app-main-navbar";
+import { AppMainNavbar } from "@/components/common/menu/app-main-navbar";
 import { AppFooter } from "@/components/common/app-footer";
 import React from "react";
 import { Toast } from "@heroui/react";
 import { Providers } from "@/app/providers";
 import { getAppConfig } from "@/config/config.server";
+import { getCurrentUser } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
@@ -26,8 +27,9 @@ export const metadata: Metadata = {
     description: siteConfig.description,
 };
 
-export default function RootLayout({ children, }: Readonly<{ children: React.ReactNode; }>) {
+export default async function RootLayout({ children, }: Readonly<{ children: React.ReactNode; }>) {
     const config = getAppConfig();
+    const user = await getCurrentUser();
 
     return (
         <html
@@ -36,10 +38,10 @@ export default function RootLayout({ children, }: Readonly<{ children: React.Rea
             suppressHydrationWarning
         >
         <body className="min-h-full flex flex-col bg-background text-foreground">
-        <Providers config={config}>
+        <Providers config={config} user={user}>
             <div className="relative flex flex-col min-h-screen">
                 <AppMainNavbar/>
-                <main className="grow px-3 pt-22 pb-12">
+                <main className="grow flex flex-col px-3 pt-22 pb-12">
                     {children}
                 </main>
                 <AppFooter/>

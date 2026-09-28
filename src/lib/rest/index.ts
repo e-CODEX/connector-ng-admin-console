@@ -58,6 +58,12 @@ async function extractErrorMessage(response: Response): Promise<string> {
     return `HTTP error! ${response.status} ${response.statusText}`;
 }
 
+export type RestApiCall = <T>(
+    baseUrl: string,
+    path: string,
+    options?: RestApiOptions,
+) => Promise<T>;
+
 /**
  * Performs an HTTP request to API and returns the response typed as `T`.
  * Important: Backends have enabled CORS settings. No need to implement the Next.js rewrite mechanism.
@@ -104,6 +110,12 @@ export interface DownloadedFile {
     filename: string;
     contentType: string;
 }
+
+export type RestApiDownloadCall = (
+    baseUrl: string,
+    path: string,
+    options: RestApiOptions & { defaultFilename?: string }
+) => Promise<DownloadedFile>;
 
 export async function restApiDownload(
     baseUrl: string,

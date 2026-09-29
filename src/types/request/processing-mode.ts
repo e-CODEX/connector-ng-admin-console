@@ -19,3 +19,8 @@ interface ProcessingModeTruststoreCreationRequest {
     password: string;
     truststoreFile: File
 }
+
+export interface ProcessingModeEditTruststoreRequest {
+    password: string;
+    truststoreFile: File
+}

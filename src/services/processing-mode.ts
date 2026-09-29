@@ -13,10 +13,11 @@ import {
     ConnectorProcessingModeAction,
     ConnectorProcessingModeDetail,
     ConnectorProcessingModeParty,
-    ConnectorProcessingModeService
+    ConnectorProcessingModeService,
+    ConnectorProcessingModeTruststore
 } from "@/types/response/processing-mode";
 import { DownloadedFile, RestApiCall, RestApiDownloadCall } from "@/lib/rest";
-import { ProcessingModeCreationRequest } from "@/types/request/processing-mode";
+import { ProcessingModeCreationRequest, ProcessingModeEditTruststoreRequest } from "@/types/request/processing-mode";
 
 export function createProcessingModeService(baseUrl: string, call: RestApiCall, download: RestApiDownloadCall) {
     return {
@@ -46,6 +47,18 @@ export function createProcessingModeService(baseUrl: string, call: RestApiCall, 
 
             return call<ConnectorProcessingMode>(baseUrl, "api/v1/admin/processing-modes", {
                     method: "POST",
+                    body: formData
+                }
+            )
+        },
+        async editTruststore(uuid: string, payload: ProcessingModeEditTruststoreRequest): Promise<ConnectorProcessingModeTruststore> {
+            const formData = new FormData();
+            const { truststoreFile, password } = payload;
+            formData.append("password", password);
+            formData.append("truststoreFile", truststoreFile);
+
+            return call<ConnectorProcessingModeTruststore>(baseUrl, `api/v1/admin/processing-modes/${uuid}/truststore`, {
+                    method: "PATCH",
                     body: formData
                 }
             )

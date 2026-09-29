@@ -20,7 +20,7 @@ import { ProcessingModeDetailsView } from "@/components/processing-mode/detail/p
 import { ArrowsRotateRight, Plus } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/page-header-button";
 import { ProcessingModeCreationView } from "@/components/processing-mode/creation/processing-mode-creation-view";
-import { Workflow } from "lucide-react";
+import { Pen, Workflow } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { useList } from "@/hooks/use-list";
@@ -29,12 +29,15 @@ import { useProcessingModeService } from "@/hooks/use-http-service";
 import { CopyableIdentifier } from "@/components/common/copyable-identifier";
 import { DetailActionButton } from "@/components/common/action-button/detail-action-button";
 import { DownloadActionButton } from "@/components/common/action-button/download-action-button";
+import { ActionButton } from "@/components/common/action-button/action-button";
+import { ProcessingModeEditTruststoreView } from "@/components/processing-mode/edit/processing-mode-edit-truststore-view";
 
 export default function ProcessingModesAdminPage() {
     const [selectedProcessingMode, setSelectedProcessingMode] = useState<ConnectorProcessingMode | null>(null);
 
     const detailsModal = useOverlayState();
     const addModal = useOverlayState();
+    const updateTruststoreModal = useOverlayState();
 
     const processingModeService = useProcessingModeService();
 
@@ -47,6 +50,11 @@ export default function ProcessingModesAdminPage() {
     const onDetailsClick = (processingMode: ConnectorProcessingMode) => {
         setSelectedProcessingMode(processingMode);
         detailsModal.open();
+    };
+
+    const onUpdateTruststoreClick = (processingMode: ConnectorProcessingMode) => {
+        setSelectedProcessingMode(processingMode);
+        updateTruststoreModal.open();
     };
 
     const onDownloadClicked = async (pMode: ConnectorProcessingMode) => {
@@ -112,6 +120,10 @@ export default function ProcessingModesAdminPage() {
                                             <Table.Cell>
                                                 <div className="flex items-center gap-1">
                                                     <DetailActionButton onPress={() => onDetailsClick(pMode)}/>
+                                                    <ActionButton
+                                                        label="Edit truststore"
+                                                        icon={Pen}
+                                                        onPress={() => onUpdateTruststoreClick(pMode)}/>
                                                     <DownloadActionButton onPress={() => onDownloadClicked(pMode)}/>
                                                 </div>
                                             </Table.Cell>
@@ -134,6 +146,20 @@ export default function ProcessingModesAdminPage() {
                                 await list.refresh();
                                 toastSuccess("Processing mode created successfully");
                                 addModal.close();
+                            } catch (error) {
+                                toastError(error);
+                            }
+                        }}
+                    />
+
+                    <ProcessingModeEditTruststoreView
+                        processingMode={selectedProcessingMode!}
+                        state={updateTruststoreModal}
+                        onSubmit={async (uuid, payload) => {
+                            try {
+                                await processingModeService.editTruststore(uuid, payload);
+                                toastSuccess("Processing mode truststore updated successfully");
+                                updateTruststoreModal.close();
                             } catch (error) {
                                 toastError(error);
                             }

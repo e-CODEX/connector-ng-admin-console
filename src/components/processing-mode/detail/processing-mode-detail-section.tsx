@@ -138,7 +138,7 @@ export function ProcessingModeDetailsSection({ processingMode, loading }: Proces
                 {truststore.certificateInfo && (
                     <Table>
                         <Table.ScrollContainer>
-                            <Table.Content aria-label="Processing mode actions">
+                            <Table.Content aria-label="Processing mode truststore">
                                 <Table.Header>
                                     <Table.Column isRowHeader>Alias</Table.Column>
                                     <Table.Column isRowHeader>Subject</Table.Column>

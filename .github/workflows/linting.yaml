@@ -1,8 +1,11 @@
+name: ES Code Linting
+
 on:
     push:
     pull_request:
     merge_group:
-name: ES Code Linting
+
 jobs:
     checkstyle:
+        name: Lint ES code
         uses: e-CODEX/workflows/.github/workflows/es-linting.yaml@f25a9778299fa1fce5d3ec64124ffa8630244775

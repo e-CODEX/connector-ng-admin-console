@@ -19,7 +19,7 @@ interface DetailRowProps {
 export function DetailRow({ label, value, className }: DetailRowProps) {
     return (
         <div
-            className={`flex justify-between gap-4 py-1.5 border-b border-separator last:border-b-0 ${className ?? ""}`}>
+            className={`flex justify-between gap-4 py-1.5 border-b border-separator ${className ?? ""}`}>
             <span className="font-semibold text-muted whitespace-nowrap">{label}</span>
             <span className="text-right break-all">{value}</span>
         </div>

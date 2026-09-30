@@ -27,7 +27,7 @@ export function ProcessingModeEditTruststoreView({ processingMode, state, onSubm
         <Modal state={state}>
             <Modal.Backdrop isDismissable={false} isKeyboardDismissDisabled>
                 <Modal.Container size="lg">
-                    <Modal.Dialog className="sm:min-w-200">
+                    <Modal.Dialog className="sm:min-w-250">
                         <ProcessingModeTruststoreEditionForm
                             key={String(state.isOpen)}
                             onSubmit={onSubmit}

@@ -14,10 +14,11 @@ import { toastError } from "@/utils";
 import { Button, Description, FieldError, Fieldset, Form, Input, Label, Modal, Spinner, TextField } from "@heroui/react";
 import { FileSelectField } from "@/components/form/file-select-field";
 import { toFieldErrors } from "@/schemas/processing-mode-creation";
-import { ArrowUpToLine, Plus } from "lucide-react";
+import { ArrowUpToLine, Pen } from "lucide-react";
 import { ModalHeaderIcon } from "@/components/common/modal-header-icon";
 import { processingModeTruststoreEditionSchema, ProcessingModeTruststoreEditionValues } from "@/schemas/processing-mode-truststore-edition";
 import { ConnectorProcessingMode } from "@/types/response/processing-mode";
+import { ProcessingModeDetailHeaderSection } from "@/components/processing-mode/detail/processing-mode-detail-header-section";
 
 
 interface ProcessingModeCreationFormProps {
@@ -100,7 +101,7 @@ export function ProcessingModeTruststoreEditionForm({ onSubmit, processingMode }
             <Modal.CloseTrigger/>
 
             <Modal.Header>
-                <ModalHeaderIcon icon={Plus} tone="accent"/>
+                <ModalHeaderIcon icon={Pen} tone="accent"/>
                 <Modal.Heading className="font-semibold">Edit Processing Mode Truststore</Modal.Heading>
             </Modal.Header>
 
@@ -113,7 +114,15 @@ export function ProcessingModeTruststoreEditionForm({ onSubmit, processingMode }
                     validationBehavior="aria"
                 >
                     <Fieldset className="rounded-xl border border-border bg-surface p-6 shadow-sm">
-                        <Fieldset.Legend>Truststore</Fieldset.Legend>
+                        <Fieldset.Legend>Processing mode info</Fieldset.Legend>
+
+                        <Fieldset.Group className="space-y-4">
+                            <ProcessingModeDetailHeaderSection processingMode={processingMode} />
+                        </Fieldset.Group>
+                    </Fieldset>
+
+                    <Fieldset className="rounded-xl border border-border bg-surface p-6 shadow-sm">
+                        <Fieldset.Legend>New Truststore</Fieldset.Legend>
                         <Description>
                             Certificate store used to validate ASICS container.
                         </Description>

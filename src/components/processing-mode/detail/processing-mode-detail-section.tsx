@@ -17,9 +17,7 @@ import { DetailSection } from "@/components/common/detail-section";
 import { BooleanChip } from "@/components/common/boolean-chip";
 import { ConfigurationKeystoreView } from "@/components/configuration/view/configuration-keystore-view";
 import { Keystore } from "@/types/response/configuration";
-import { DetailRow } from "@/components/common/detail-row";
-import { CopyableIdentifier } from "@/components/common/copyable-identifier";
-import { DateTime } from "@/components/common/date-time";
+import { ProcessingModeDetailHeaderSection } from "@/components/processing-mode/detail/processing-mode-detail-header-section";
 
 interface ProcessingModeDetailsSectionProps {
     processingMode: ConnectorProcessingModeDetail | null;
@@ -40,16 +38,7 @@ export function ProcessingModeDetailsSection({ processingMode, loading }: Proces
 
     return (
         <div className="flex flex-col">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8">
-                <DetailRow
-                    label="Identifier"
-                    value={<CopyableIdentifier identifier={processingMode.uuid} iconPosition="right"/>}/>
-                <DetailRow label="Business domain" value={processingMode.businessDomainIdentifier}/>
-                <DetailRow label="Description" value={processingMode.description}/>
-                <DetailRow label="Filename" value={processingMode.filename}/>
-                <DetailRow label="Created at" value={<DateTime value={processingMode.createdAt} precision="second"/>}/>
-                <DetailRow label="Updated at" value={<DateTime value={processingMode.updatedAt} precision="second"/>}/>
-            </div>
+            <ProcessingModeDetailHeaderSection processingMode={processingMode} />
             <DetailSection title="Parties" isEmpty={!parties?.length} emptyLabel="No parties available.">
                 <Table>
                     <Table.ScrollContainer>

@@ -70,26 +70,30 @@ export const AppMainNavbar = () => {
             </NavbarContent>
 
             <NavbarContent className="hidden lg:flex gap-5" justify="end">
-                {items.map(({ label, href, icon: Icon }) => {
-                    const isActive = href === "/"
-                        ? pathname === "/"
-                        : pathname === href || pathname.startsWith(href + "/");
-                    return (
-                        <NavbarItem key={href} isActive={isActive}>
-                            <Link
-                                className={`flex items-center gap-1.5 whitespace-nowrap transition-colors text-base font-medium pb-0.5 ${
-                                    isActive
-                                        ? "text-white font-semibold border-b-2 border-white"
-                                        : "text-white/80 hover:text-white"
-                                }`}
-                                href={href}
-                            >
-                                <Icon className="size-4 shrink-0" aria-hidden="true"/>
-                                {label}
-                            </Link>
-                        </NavbarItem>
-                    );
-                })}
+                {user && (
+                    <>
+                        {items.map(({ label, href, icon: Icon }) => {
+                            const isActive = href === "/"
+                                ? pathname === "/"
+                                : pathname === href || pathname.startsWith(href + "/");
+                            return (
+                                <NavbarItem key={href} isActive={isActive}>
+                                    <Link
+                                        className={`flex items-center gap-1.5 whitespace-nowrap transition-colors text-base font-medium pb-0.5 ${
+                                            isActive
+                                                ? "text-white font-semibold border-b-2 border-white"
+                                                : "text-white/80 hover:text-white"
+                                        }`}
+                                        href={href}
+                                    >
+                                        <Icon className="size-4 shrink-0" aria-hidden="true"/>
+                                        {label}
+                                    </Link>
+                                </NavbarItem>
+                            );
+                        })}
+                    </>
+                )}
 
                 <NavbarItem>
                     <ThemeSwitcher/>

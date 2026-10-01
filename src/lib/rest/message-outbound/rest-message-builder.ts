@@ -29,6 +29,7 @@ import { AttachmentService } from "@/services/attachment";
  * - A detached digital signature (`detachedSignature`)
  *
  * @param attachmentService - The attachment service.
+ * @param asTestMessage - Whether to mark the message as a test message.
  * @param formData - Main form data containing business and AS4-related properties.
  * @param parameters - parameters to generate a business document for the outbound message.
  * @param document - Optional binary document to attach to the message.
@@ -37,18 +38,20 @@ import { AttachmentService } from "@/services/attachment";
  */
 export const createRestOutboundMessagePayLoad = async (
     attachmentService: AttachmentService,
+    asTestMessage: boolean,
     formData: SendMessageFormData,
     parameters: SendParameters,
     document?: Blob,
     xmlContent?: Blob,
-    detachedSignature?: Blob) => {
+    detachedSignature?: Blob
+) => {
 
     let generatedBlob = document;
     if (!generatedBlob) {
         generatedBlob = await generatePdfBlob(parameters.attachmentSizeMB);
     }
     const attachmentIds = await attachmentService.uploadMessageAttachment(generatedBlob)
-    const metadata = createMessageMetadata(formData, attachmentIds);
+    const metadata = createMessageMetadata(formData, attachmentIds, asTestMessage);
 
     const dataToSubmit = new FormData();
     appendFormData(dataToSubmit, metadata);
@@ -58,20 +61,20 @@ export const createRestOutboundMessagePayLoad = async (
 
 
 async function appendBusinessContentToFormData(data: FormData, metadata: RestOutboundMessageRequest, xmlContent?: Blob, detachedSignatureAsBlob?: Blob) {
-    // add metadata content as JSON file
-    data.append("businessContent.contentFile", new Blob([JSON.stringify(metadata.as4Properties)], { type: "application/json" }));
-
     // add metadata content as XML file as
-    const businessXml = await getXmlContentAsBlob(xmlContent);
-    data.append("businessContent.businessDocument.document", businessXml, "business.xml");
+    const businessContent = await getXmlContentAsBlob(xmlContent);
+    data.append("businessContent.contentFile", businessContent, "business.xml");
+
+    const businessDocument = await generatePdfBlob(2);
+    data.append("businessContent.businessDocument.document", businessDocument, "business.pdf");
 
     // add detached signature file as blob
     const detachedSignature = getDetachedSignatureAsBlob(detachedSignatureAsBlob);
     data.append("businessContent.businessDocument.detachedSignature.signature", detachedSignature, "detached_signature.xml");
 }
 
-function createMessageMetadata(formData: SendMessageFormData, attachmentIds: string[]) {
-    return {
+function createMessageMetadata(formData: SendMessageFormData, attachmentIds: string[], asTestMessage: boolean = false) {
+    const metadata = {
         businessDomainIdentifier: formData.businessDomainIdentifier || 'default_business_domain',
         backendMessageIdentifier: uuidv4(),
         attachments: attachmentIds,
@@ -80,13 +83,6 @@ function createMessageMetadata(formData: SendMessageFormData, attachmentIds: str
             conversationIdentifier: formData.as4Properties?.conversationIdentifier || uuidv4(),
             originalSender: formData.as4Properties.originalSender,
             finalRecipient: formData.as4Properties.finalRecipient,
-            service: {
-                name: formData.as4Properties?.service?.name,
-                type: formData.as4Properties.service?.type
-            },
-            action: {
-                name: formData.as4Properties?.action?.name
-            },
             fromParty: {
                 identifier: formData.as4Properties?.fromParty?.identifier,
                 identifierType: formData.as4Properties?.fromParty?.identifierType,
@@ -108,6 +104,18 @@ function createMessageMetadata(formData: SendMessageFormData, attachmentIds: str
         }
     } as RestOutboundMessageRequest;
 
+    if (!asTestMessage) {
+        metadata.as4Properties.service = {
+            name: formData.as4Properties?.service?.name,
+            type: formData.as4Properties.service?.type
+        }
+
+        metadata.as4Properties.action = {
+            name: formData.as4Properties?.action?.name
+        }
+    }
+
+    return metadata;
 }
 
 

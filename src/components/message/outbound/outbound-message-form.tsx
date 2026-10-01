@@ -13,22 +13,28 @@
 import { SendMessageFormData } from "@/types/send-message-form";
 import { FormTextField } from "@/components/form/form-text-field";
 import { ConnectorProcessingModeAction, ConnectorProcessingModeParty, ConnectorProcessingModeService } from "@/types/response/processing-mode";
-import { ProcessingModeServiceSelector } from "@/components/form/pmode-service-selector";
-import { useState } from "react";
+import { ProcessingModeServiceSelector, serviceKeyOf } from "@/components/form/pmode-service-selector";
 import { ProcessingModePartySelector } from "@/components/form/pmode-party-selector";
-import { ProcessingModeActionSelector } from "@/components/form/pmode-action-selector";
+import { actionKeyOf, ProcessingModeActionSelector } from "@/components/form/pmode-action-selector";
 import { useLinkPartners } from "@/hooks/use-link-partners";
 import { LinkPartnerSelector } from "@/components/form/link-partner-selector";
 import { ConnectorLinkPartner } from "@/types/response/link-partner";
+import { As4PropertiesRequest, PartyInfoRequest } from "@/types/request/message";
+import { emptyAction, emptyParty, emptyService } from "@/components/message/outbound/outbound-message-defaults";
+
+export type FormUpdater = (prev: SendMessageFormData) => SendMessageFormData;
 
 interface OutboundMessageFormProps {
     data: SendMessageFormData;
-    onChange: (next: SendMessageFormData) => void;
-    businessDomainIdentifier: string;
+    onChange: (updater: FormUpdater) => void;
     processingModesServices: ConnectorProcessingModeService[];
     processingModesActions: ConnectorProcessingModeAction[];
     processingModesParties: ConnectorProcessingModeParty[];
+    restrictToTestEntries?: boolean;
 }
+
+const partyKeyOf = (party: Pick<PartyInfoRequest, "identifier" | "identifierType">) =>
+    `${party.identifier}-${party.identifierType}`;
 
 export function OutboundMessageForm({
                                         data,
@@ -36,62 +42,38 @@ export function OutboundMessageForm({
                                         processingModesServices,
                                         processingModesActions,
                                         processingModesParties,
-                                        businessDomainIdentifier
+                                        restrictToTestEntries = true,
                                     }: OutboundMessageFormProps) {
-    const [processingModeServiceName, setProcessingModeServiceName] = useState<string | null>(null);
-    const [processingModeActionName, setProcessingModeActionName] = useState<string | null>(null);
-    const [processingModeFromPartyName, setProcessingModeFromPartyName] = useState<string | null>(null);
-    const [processingModeToPartyName, setProcessingModeToPartyName] = useState<string | null>(null);
-    const [backendLinkPartnerName, setBackendLinkPartnerName] = useState<string | null>(null);
-
     const backendLinkPartners = useLinkPartners("BACKEND");
 
     const { as4Properties } = data;
 
-    const onProcessingModeServiceChange = (service: ConnectorProcessingModeService | null) => {
-        if (!service) return;
-        updateAs4({ service: { ...service } });
-        setProcessingModeServiceName(service.name);
-    };
+    const backendValue = data.backendName || null;
+    const serviceValue = as4Properties.service?.name ? serviceKeyOf(as4Properties.service) : null;
+    const actionValue = as4Properties.action?.name ? actionKeyOf(as4Properties.action) : null;
+    const fromPartyValue = as4Properties.fromParty?.identifier ? partyKeyOf(as4Properties.fromParty) : null;
+    const toPartyValue = as4Properties.toParty?.identifier ? partyKeyOf(as4Properties.toParty) : null;
 
-    const onProcessingModeActionChange = (action: ConnectorProcessingModeAction | null) => {
-        if (!action) return;
-        updateAs4({ action: { ...action } });
-        setProcessingModeActionName(action.name);
-    };
+    const update = (patch: Partial<SendMessageFormData>) =>
+        onChange((prev) => ({ ...prev, ...patch }));
 
-    const onProcessingModeFromPartyChange = (party: ConnectorProcessingModeParty | null) => {
-        if (!party) return;
-        updateAs4({
-            fromParty: { ...party }
-        });
-        setProcessingModeFromPartyName(`${party.identifier}-${party.roleType}`);
-    };
+    const updateAs4 = (patch: Partial<As4PropertiesRequest>) =>
+        onChange((prev) => ({ ...prev, as4Properties: { ...prev.as4Properties, ...patch } }))
 
-    const onProcessingModeToPartyChange = (party: ConnectorProcessingModeParty | null) => {
-        if (!party) return;
-        updateAs4({ toParty: { ...party } });
-        setProcessingModeToPartyName(`${party.identifier}-${party.roleType}`);
-    };
+    const onBackendLinkPartnerChange = (partner: ConnectorLinkPartner | null) =>
+        update({ backendName: partner?.name ?? "" });
 
-    const onBackendLinkPartnerChange = (partner: ConnectorLinkPartner | null) => {
-        if (!partner) return;
-        update({ backendName: partner.name })
-        setBackendLinkPartnerName(partner.name);
-    }
+    const onProcessingModeServiceChange = (service: ConnectorProcessingModeService | null) =>
+        updateAs4({ service: service ? { ...service } : emptyService() });
 
-    const update = (patch: Partial<SendMessageFormData>) => {
-        onChange({ ...data, ...patch, businessDomainIdentifier });
-    };
+    const onProcessingModeActionChange = (action: ConnectorProcessingModeAction | null) =>
+        updateAs4({ action: action ? { ...action } : emptyAction() });
 
-    const updateAs4 = (patch: Partial<SendMessageFormData["as4Properties"]>) => {
-        update({
-            as4Properties: {
-                ...data.as4Properties,
-                ...patch,
-            },
-        });
-    };
+    const onProcessingModeFromPartyChange = (party: ConnectorProcessingModeParty | null) =>
+        updateAs4({ fromParty: party ? { ...party } : emptyParty() });
+
+    const onProcessingModeToPartyChange = (party: ConnectorProcessingModeParty | null) =>
+        updateAs4({ toParty: party ? { ...party } : emptyParty() });
 
     return (
         <section className="rounded-lg border border-separator bg-content1 p-2">
@@ -113,7 +95,7 @@ export function OutboundMessageForm({
 
                     <FormTextField
                         label="Ebms Message Id"
-                        value={as4Properties.ebmsMessageIdentifier}
+                        value={as4Properties.ebmsMessageIdentifier!}
                         onChange={(value) => updateAs4({ ebmsMessageIdentifier: value })}
                     />
                 </div>
@@ -121,9 +103,10 @@ export function OutboundMessageForm({
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-5 gap-y-2">
                     <LinkPartnerSelector
                         partners={backendLinkPartners}
-                        value={backendLinkPartnerName}
+                        value={backendValue}
                         onValueChange={onBackendLinkPartnerChange}
                         isRequired={true}
+                        onlyTestPartners={restrictToTestEntries}
                     />
                     <FormTextField
                         label="Original Sender"
@@ -142,35 +125,42 @@ export function OutboundMessageForm({
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-5 gap-y-2">
                     <ProcessingModeServiceSelector
+                        name="as4Properties.service"
                         services={processingModesServices}
-                        value={processingModeServiceName}
+                        value={serviceValue}
                         onValueChange={onProcessingModeServiceChange}
                         isRequired={true}
                         showType={true}
+                        onlyTestServices={restrictToTestEntries}
                     />
 
                     <ProcessingModeActionSelector
+                        name="as4Properties.action"
                         actions={processingModesActions}
-                        value={processingModeActionName}
+                        value={actionValue}
                         onValueChange={onProcessingModeActionChange}
                         isRequired={true}
+                        onlyTestActions={restrictToTestEntries}
                     />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-5 gap-y-2">
                     <ProcessingModePartySelector
                         label="From Party"
+                        name="as4Properties.fromParty"
                         parties={processingModesParties}
-                        value={processingModeFromPartyName}
+                        value={fromPartyValue}
                         onValueChange={onProcessingModeFromPartyChange}
                         isRequired={true}
                         showType={true}
+                        role="INITIATOR"
                     />
 
                     <ProcessingModePartySelector
                         label="To Party"
+                        name="as4Properties.toParty"
                         parties={processingModesParties}
-                        value={processingModeToPartyName}
+                        value={toPartyValue}
                         onValueChange={onProcessingModeToPartyChange}
                         isRequired={true}
                         showType={true}

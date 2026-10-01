@@ -15,4 +15,5 @@ export interface ConnectorLinkPartner {
     description: string;
     enabled: boolean;
     type: LinkPartnerType;
+    isTest: boolean;
 }

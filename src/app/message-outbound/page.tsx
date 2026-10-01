@@ -12,12 +12,11 @@
 
 import { useState } from "react";
 import { PageHeader } from "@/components/common/page-header";
-import { OutboundMessageForm } from "@/components/message/outbound/outbound-message-form";
+import { FormUpdater, OutboundMessageForm } from "@/components/message/outbound/outbound-message-form";
 import { OutboundMessageSendParametersSection } from "@/components/message/outbound/outbound-message-send-params-section";
 import { OutboundMessageActionBar } from "@/components/message/outbound/outbound-message-action-bar";
-import { OutboundMessageConsoleContent, OutboundMessageConsolePanel } from "@/components/message/outbound/outbound-message-console-panel";
+import { OutboundMessageConsolePanel } from "@/components/message/outbound/outbound-message-console-panel";
 import { SendMessageFormData, SendParameters, } from "@/types/send-message-form";
-import { toastError } from "@/utils";
 import { Send } from "lucide-react";
 import { useBusinessDomainIdentifiers } from "@/hooks/use-business-domain-identifiers";
 import { BusinessDomainSelector } from "@/components/form/business-domain-selector";
@@ -25,8 +24,40 @@ import { useProcessingModeServices } from "@/hooks/use-processing-mode-services"
 import { useProcessingModeActions } from "@/hooks/use-processing-mode-actions";
 import { useProcessingModeParties } from "@/hooks/use-processing-mode-parties";
 import { Form } from "@heroui/react";
-import { useMessageService } from "@/hooks/use-http-service";
 import { useAppConfig } from "@/hooks/use-app-config";
+import { AppMode, OutboundMessageRequestMode } from "@/types/global";
+import { useOutboundMessageSender } from "@/hooks/use-outbound-message-sender";
+import { emptyAs4Selections } from "@/components/message/outbound/outbound-message-defaults";
+
+const FORM_ID = "outbound-message-form";
+
+const DEFAULT_SEND_PARAMETERS: SendParameters = {
+    mode: "SOAP",
+    attachmentSizeMB: 1,
+    repeatCount: 1,
+};
+
+type ModeFeatures = {
+    outboundPageTitle: string;
+    sendAsTestMessage: boolean;
+    restrictToTestEntries: boolean;
+    forcedRequestMode?: OutboundMessageRequestMode;
+};
+
+const MODE_FEATURES = {
+    ADMIN_CONSOLE: {
+        outboundPageTitle: "Send Test Business Message",
+        sendAsTestMessage: true,
+        restrictToTestEntries: true,
+        forcedRequestMode: "REST",
+    },
+    TESTING_CONSOLE: {
+        outboundPageTitle: "Send Business Message",
+        sendAsTestMessage: false,
+        restrictToTestEntries: false,
+        forcedRequestMode: "SOAP",
+    },
+} satisfies Record<AppMode, ModeFeatures>;
 
 const buildInitialMessageFormData = (defaultOriginalSender: string, defaultFinalRecipient: string): SendMessageFormData => {
     return {
@@ -39,139 +70,111 @@ const buildInitialMessageFormData = (defaultOriginalSender: string, defaultFinal
             conversationIdentifier: "",
             originalSender: defaultOriginalSender,
             finalRecipient: defaultFinalRecipient,
-            fromParty: {
-                name: "",
-                identifier: "BL",
-                identifierType: "urn:oasis:names:tc:ebcore:partyid-type:ecodex",
-                role: "GW",
-                roleType: "INITIATOR",
-                isHome: true,
-            },
-            toParty: {
-                name: "",
-                identifier: "RE",
-                identifierType: "urn:oasis:names:tc:ebcore:partyid-type:ecodex",
-                role: "GW",
-                roleType: "RESPONDER",
-                isHome: false,
-            },
-            service: {
-                name: "EPO",
-                type: "urn:e-codex:services:",
-            },
-            action: {
-                name: "Form_A",
-            },
+            ...emptyAs4Selections(),
         },
     };
 }
 
-const initialSendParameters: SendParameters = {
-    mode: "SOAP",
-    attachmentSizeMB: 1,
-    repeatCount: 1,
+type ValidationErrors = Record<string, string>;
+
+const validate = (formData: SendMessageFormData): ValidationErrors => {
+    const errors: ValidationErrors = {};
+    const { as4Properties } = formData;
+
+    if (!formData.businessDomainIdentifier) {
+        errors.businessDomainIdentifier = "Select a business domain"
+    }
+
+    if (!formData.backendName) errors.backendName = "Backend is required";
+    if (!as4Properties.originalSender) errors["as4Properties.originalSender"] = "Required";
+    if (!as4Properties.service?.name) errors["as4Properties.service"] = "Select a service";
+    if (!as4Properties.action?.name) errors["as4Properties.action"] = "Select an action";
+    if (!as4Properties.fromParty?.identifier) errors["as4Properties.fromParty"] = "Select a sending party";
+    if (!as4Properties.toParty?.identifier) errors["as4Properties.toParty"] = "Select a receiving party";
+
+    return errors;
 };
 
 export default function MessageOutboundPage() {
-    const { defaultOriginalSender, defaultFinalRecipient } = useAppConfig();
+    const { defaultOriginalSender, defaultFinalRecipient, appMode } = useAppConfig();
+    const appModeFeatures = MODE_FEATURES[appMode];
 
     const [messageFormData, setMessageFormData] = useState<SendMessageFormData>(buildInitialMessageFormData(
         defaultOriginalSender,
         defaultFinalRecipient
     ));
-    const [sendParameters, setSendParameters] = useState<SendParameters>(initialSendParameters);
-    const [logs, setLogs] = useState<OutboundMessageConsoleContent[]>([{ message: "Ready.", level: "INFO" }]);
-    const [errors, setErrors] = useState<Record<string, string>>({});
-    const [isSending, setIsSending] = useState(false);
+    const [sendParameters, setSendParameters] = useState<SendParameters>(() => ({
+        ...DEFAULT_SEND_PARAMETERS,
+        mode: appModeFeatures.forcedRequestMode ?? DEFAULT_SEND_PARAMETERS.mode,
+    }));
+    const [errors, setErrors] = useState<ValidationErrors>({});
 
-    const messageService = useMessageService();
+    const { logs, log, isSending, submitMessage } = useOutboundMessageSender(appModeFeatures.sendAsTestMessage);
 
-    const [businessDomainIdentifierQuery, setBusinessDomainIdentifierQuery] = useState<string>("");
+    const businessDomainIdentifier = messageFormData.businessDomainIdentifier;
     const businessDomainIdentifiers = useBusinessDomainIdentifiers();
-    const processingModeServices = useProcessingModeServices(businessDomainIdentifierQuery);
-    const processingModeActions = useProcessingModeActions(businessDomainIdentifierQuery);
-    const processingModeParties = useProcessingModeParties(businessDomainIdentifierQuery);
+    const processingModeServices = useProcessingModeServices(businessDomainIdentifier);
+    const processingModeActions = useProcessingModeActions(businessDomainIdentifier);
+    const processingModeParties = useProcessingModeParties(businessDomainIdentifier);
 
-    const validate = (data: SendMessageFormData, domain: string) => {
-        const next: Record<string, string> = {};
-        if (!domain) next.businessDomainIdentifier = "Select a business domain";
-        if (!data.backendName) next.backendName = "Backend is required";
-        if (!data.as4Properties.originalSender) next["as4Properties.originalSender"] = "Required";
-        if (!data.as4Properties.service?.name) next["as4Properties.service"] = "Select a service";
-        if (!data.as4Properties.action?.name) next["as4Properties.action"] = "Select an action";
-        return next;
+    const clearErrors = () => setErrors((prev) => (Object.keys(prev).length > 0 ? {} : prev));
+
+    const handleBusinessDomainChange = (value: string) => {
+        setMessageFormData((prev) => ({
+            ...prev,
+            businessDomainIdentifier: value,
+            as4Properties: { ...prev.as4Properties, ...emptyAs4Selections() },
+        }));
+        clearErrors();
+    };
+
+    const handleFormChange = (updater: FormUpdater) => {
+        setMessageFormData(updater);
+        clearErrors();
     };
 
     const handleSubmission = async () => {
-        const found = validate(messageFormData, businessDomainIdentifierQuery);
+        log("Payloads " + JSON.stringify(messageFormData), "INFO");
+        const found = validate(messageFormData);
         setErrors(found);
+        console.log(found);
         if (Object.keys(found).length > 0) {
+            log("Validation failed, check the highlighted fields " + JSON.stringify(found), "ERROR");
             return
         }
 
-        try {
-            setIsSending(true);
-            const repeatCount = Math.max(1, sendParameters.repeatCount || 1);
-            setLogs((prev) => [
-                ...prev,
-                {
-                    message: `[${new Date().toLocaleTimeString()}] Sending ${repeatCount} message${repeatCount === 1 ? "" : "s"}...\n`,
-                    level: "INFO",
-                },
-            ]);
-
-            await messageService.sendMessage({
-                formData: messageFormData,
-                parameters: sendParameters,
-            });
-
-            setLogs((prev) => [
-                ...prev,
-                {
-                    message: `[${new Date().toLocaleTimeString()}] ${repeatCount} message${repeatCount === 1 ? "" : "s"} sent\n`,
-                    level: "SUCCESS",
-                },
-            ]);
-        } catch (error) {
-            setLogs((prev) => [
-                ...prev,
-                { message: `[${new Date().toLocaleTimeString()}] Send failed\n`, level: "ERROR" }
-            ]);
-            toastError(error)
-        } finally {
-            setIsSending(false);
-        }
+        await submitMessage(messageFormData, sendParameters);
     };
 
     const handleSaveAsXml = () => {
-        setLogs((prev) => [
-            ...prev,
-            { message: `[${new Date().toLocaleTimeString()}] Save as XML clicked\n`, level: "INFO" }
-        ]);
-    };
+        // TODO: not implemented yet
+        log("Save as XML is not implemented yet");
 
-    const onBusinessDomainIdentifierChange = (value: string) => {
-        setBusinessDomainIdentifierQuery(value)
-    }
+    };
 
     return (
         <div>
             <PageHeader
                 icon={Send}
-                title="Send Bussiness Message"
+                title={appModeFeatures.outboundPageTitle}
                 subtitle="Send a business message to a party"
             >
                 <BusinessDomainSelector
                     label="Select a business domain"
                     identifiers={businessDomainIdentifiers}
-                    value={businessDomainIdentifierQuery}
-                    onValueChange={onBusinessDomainIdentifierChange}
+                    value={businessDomainIdentifier}
+                    onValueChange={handleBusinessDomainChange}
                     showLabel={true}
                     className="flex flex-row items-center gap-3 min-w-70"
                 />
+                {errors.businessDomainIdentifier && (
+                    <p role="alert" className="text-xs text-danger">
+                        {errors.businessDomainIdentifier}
+                    </p>
+                )}
 
                 <OutboundMessageActionBar
-                    formId="outbound-message-form"
+                    formId={FORM_ID}
                     onSubmit={handleSubmission}
                     isSending={isSending}
                     onSaveAsXml={handleSaveAsXml}
@@ -180,7 +183,7 @@ export default function MessageOutboundPage() {
 
             <div className="space-y-3">
                 <Form
-                    id="outbound-message-form"
+                    id={FORM_ID}
                     validationBehavior="native"
                     validationErrors={errors}
                     onSubmit={async (e) => {
@@ -191,17 +194,18 @@ export default function MessageOutboundPage() {
                 >
                     <OutboundMessageForm
                         data={messageFormData}
-                        onChange={setMessageFormData}
-                        businessDomainIdentifier={businessDomainIdentifierQuery}
+                        onChange={handleFormChange}
                         processingModesServices={processingModeServices.items}
                         processingModesActions={processingModeActions.items}
                         processingModesParties={processingModeParties.items}
+                        restrictToTestEntries={appModeFeatures.restrictToTestEntries}
                     />
                 </Form>
 
                 <OutboundMessageSendParametersSection
                     data={sendParameters}
                     onChange={setSendParameters}
+                    isModeLocked={true}
                 />
 
                 <OutboundMessageConsolePanel contents={logs}/>

@@ -8,9 +8,16 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
+import { APP_MODES, AppMode } from "@/types/global";
+
 export type AppConfig = {
+    appMode: AppMode;
     apiUrl: string;
     bffUrl: string;
     defaultOriginalSender: string;
     defaultFinalRecipient: string;
 };
+
+export function isAppMode(value: unknown): value is AppMode {
+    return typeof value === "string" && (APP_MODES as readonly string[]).includes(value);
+}

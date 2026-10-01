@@ -10,13 +10,21 @@
 
 import "server-only";
 
-import { AppConfig } from "@/config/config";
+import { AppConfig, isAppMode } from "@/config/config";
+import { APP_MODES, AppMode } from "@/types/global";
 
 export function getAppConfig(): AppConfig {
     return {
+        appMode: parseAppMode(process.env.APP_MODE),
         apiUrl: process.env.CONNECTOR_API_URL ?? "http://localhost:30000",
         bffUrl: process.env.CONNECTOR_BFF_URL ?? "http://localhost:4000",
         defaultOriginalSender: process.env.DEFAULT_ORIGINAL_SENDER ?? "alice",
         defaultFinalRecipient: process.env.DEFAULT_FINAL_RECIPIENT ?? "bob",
     }
+}
+
+function parseAppMode(mode: string | undefined): AppMode {
+    if (mode === undefined || mode === "") return "ADMIN_CONSOLE";
+    if (isAppMode(mode)) return mode;
+    throw new Error(`Invalid APP MPODE: ["${mode}"]. Expected one of: ${APP_MODES.join(", ")}`);
 }

@@ -6,11 +6,16 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 First, create a file named `.env` in the root directory of the project and add the following content:
 ```env
+APP_MODE=ADMIN_CONSOLE
+
 CONNECTOR_API_URL=http://localhost:30000
 CONNECTOR_BFF_URL=http://localhost:4000
-DEFAULT_ORIGINAL_SENDER:alice
-DEFAULT_FINAL_RECIPIENT:bob
+
+DEFAULT_ORIGINAL_SENDER=alice
+DEFAULT_FINAL_RECIPIENT=bob
 ```
+
+mode can be ADMIN_CONSOLE or TESTING_CONSOLE
 
 ### Install dependencies
 

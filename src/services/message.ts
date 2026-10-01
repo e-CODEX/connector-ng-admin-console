@@ -56,6 +56,7 @@ interface SendMessageArgs {
     formData: SendMessageFormData;
     parameters: SendParameters;
     document?: Blob;
+    asTestMessage: boolean;
 }
 
 export function createMessageService(baseUrl: string, bffUrl: string, call: RestApiCall, download: RestApiDownloadCall) {
@@ -88,16 +89,16 @@ export function createMessageService(baseUrl: string, bffUrl: string, call: Rest
                 { params }
             );
         },
-        async sendMessage({ formData, parameters, document, }: SendMessageArgs): Promise<SendMessageResponse> {
+        async sendMessage({ formData, parameters, document, asTestMessage}: SendMessageArgs): Promise<SendMessageResponse> {
             const repeatCount = Math.max(1, parameters.repeatCount || 1);
             let lastResponse: SendMessageResponse = {};
 
             for (let i = 0; i < repeatCount; i++) {
                 // Each iteration rebuilds the payload so empty message IDs get fresh UUIDs.
                 if (parameters.mode === "REST") {
-                    lastResponse = await sendRestMessage(baseUrl, call, download, { formData, parameters, document });
+                    lastResponse = await sendRestMessage(baseUrl, call, download, { formData, parameters, document, asTestMessage });
                 } else {
-                    lastResponse = await sendSoapMessage(bffUrl, call, { formData, parameters, document });
+                    lastResponse = await sendSoapMessage(bffUrl, call, { formData, parameters, document, asTestMessage });
                 }
             }
 
@@ -119,16 +120,25 @@ async function sendRestMessage(baseUrl: string, call: RestApiCall, download: Res
     formData,
     parameters,
     document,
+    asTestMessage
 }: SendMessageArgs): Promise<SendMessageResponse> {
     void formData;
     void parameters;
     void document;
 
-    const payload = await createRestOutboundMessagePayLoad(createAttachmentService(baseUrl, call, download), formData, parameters, document);
+    const payload = await createRestOutboundMessagePayLoad(
+        createAttachmentService(baseUrl, call, download),
+        asTestMessage,
+        formData,
+        parameters,
+        document
+    );
+
+    const path = asTestMessage ? "/api/v1/admin/messages/outbound/test" : "api/v1/messages/outbound";
 
     return restApiCall(
         baseUrl,
-        "api/v1/messages/outbound",
+        path,
         { method: "POST", body: payload, }
     )
 }

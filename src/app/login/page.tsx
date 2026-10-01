@@ -58,7 +58,8 @@ export default function LoginForm() {
                 body: JSON.stringify({ username, password }),
             });
             if (res.ok) {
-                window.location.assign("/");
+                const data = await res.json().catch(() => ({}));
+                window.location.assign(data.mustChangePassword ? "/change-password" : "/");
                 return;
             }
         } catch {

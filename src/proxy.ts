@@ -15,6 +15,7 @@ import { cookieOptions } from "@/utils";
 
 export const ACCESS_TOKEN_KEY = "accessToken";
 export const REFRESH_TOKEN_KEY = "refreshToken";
+export const MUST_CHANGE_PASSWORD = "mustChangePassword";
 
 /**
  * Proxy (Next.js request interception — formerly "middleware").
@@ -34,6 +35,15 @@ export async function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
     const hasToken = request.cookies.has(ACCESS_TOKEN_KEY);
     const refresh = request.cookies.get(REFRESH_TOKEN_KEY)?.value;
+    const mustChangePwd = request.cookies.get(MUST_CHANGE_PASSWORD)?.value === "1";
+
+    if (mustChangePwd && pathname !== "/change-password") {
+        return NextResponse.redirect(new URL("/change-password", request.url));
+    }
+
+    if (!mustChangePwd && pathname === "/change-password") {
+        return NextResponse.redirect(new URL("/", request.url));
+    }
 
     if (pathname === "/login" && hasToken) {
         return NextResponse.redirect(new URL("/", request.url));

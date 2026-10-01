@@ -25,4 +25,5 @@ export interface LoginResponse {
     expiresIn: number;
     refreshToken: string;
     refreshExpiresIn: number;
+    mustChangePassword: boolean;
 }

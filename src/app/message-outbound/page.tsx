@@ -134,12 +134,9 @@ export default function MessageOutboundPage() {
     };
 
     const handleSubmission = async () => {
-        log("Payloads " + JSON.stringify(messageFormData), "INFO");
         const found = validate(messageFormData);
         setErrors(found);
-        console.log(found);
         if (Object.keys(found).length > 0) {
-            log("Validation failed, check the highlighted fields " + JSON.stringify(found), "ERROR");
             return
         }
 

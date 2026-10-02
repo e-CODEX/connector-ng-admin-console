@@ -8,36 +8,57 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
+import { useEffect, useMemo } from "react";
 import { FieldError, Key, Label, ListBox, Select } from "@heroui/react";
 import { ConnectorLinkPartner } from "@/types/response/link-partner";
 
 export interface LinkPartnerSelectorProps {
     partners: ConnectorLinkPartner[];
+    name?: string;
     value?: string | null;
-    onValueChange: (service: ConnectorLinkPartner | null) => void;
+    onValueChange: (partner: ConnectorLinkPartner | null) => void;
     label?: string;
+    onlyTestPartners?: boolean;
+    autoSelectSingle?: boolean;
     isRequired?: boolean;
     isDisabled?: boolean;
     className?: string;
 }
 
-const keyOf = (linkPartner: ConnectorLinkPartner) => linkPartner.name;
+const keyOf = (partner: ConnectorLinkPartner) => partner.name;
 
 export function LinkPartnerSelector({
                                         partners,
+                                        name,
                                         value,
                                         onValueChange,
                                         label = "Backend Name",
+                                        onlyTestPartners = false,
+                                        autoSelectSingle = true,
                                         isRequired = false,
-                                        isDisabled,
+                                        isDisabled = false,
                                         className = "min-w-70",
                                     }: LinkPartnerSelectorProps) {
+    const visiblePartners = useMemo(
+        () => (onlyTestPartners ? partners.filter((partner) => partner.testOnly) : partners),
+        [partners, onlyTestPartners],
+    );
+
+    const singlePartner = visiblePartners.length === 1 ? visiblePartners[0] : null;
+
+    useEffect(() => {
+        if (!autoSelectSingle || isDisabled || !singlePartner) return;
+        if (value === keyOf(singlePartner)) return; // already selected, avoids a loop
+        onValueChange(singlePartner);
+    }, [autoSelectSingle, isDisabled, singlePartner, value, onValueChange]);
+
     const handleChange = (key: Key | null) => {
-        onValueChange(partners.find((party) => keyOf(party) === key) ?? null);
+        onValueChange(visiblePartners.find((partner) => keyOf(partner) === key) ?? null);
     };
 
     return (
         <Select
+            name={name}
             value={value}
             onChange={handleChange}
             isRequired={isRequired}
@@ -52,11 +73,11 @@ export function LinkPartnerSelector({
             </Select.Trigger>
             <Select.Popover>
                 <ListBox>
-                    {partners.map((party) => {
-                        const id = keyOf(party);
+                    {visiblePartners.map((partner) => {
+                        const id = keyOf(partner);
                         return (
-                            <ListBox.Item key={id} id={id} textValue={party.name}>
-                                {party.name}
+                            <ListBox.Item key={id} id={id} textValue={partner.name}>
+                                {partner.name}
                                 <ListBox.ItemIndicator/>
                             </ListBox.Item>
                         );

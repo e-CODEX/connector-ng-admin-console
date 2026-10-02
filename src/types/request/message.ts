@@ -23,7 +23,7 @@ export interface RestOutboundMessageRequest {
     backendMessageIdentifier: string;
     backendName?: string;
     attachments: string[];
-    as4Properties: As4Properties;
+    as4Properties: As4PropertiesRequest;
     businessContent: RestOutboundMessageContent
 }
 
@@ -34,19 +34,19 @@ export interface SoapOutboundMessageRequest {
 
 export interface SoapOutboundMessageDetails {
     backendMessageIdentifier: string;
-    as4Properties: As4Properties;
+    as4Properties: As4PropertiesRequest;
 }
 
-export interface As4Properties {
+export interface As4PropertiesRequest {
     ebmsMessageIdentifier?: string;
     conversationIdentifier: string;
     referenceToIdentifier?: string;
     originalSender: string;
     finalRecipient: string;
-    service: ServiceInfo;
-    action: ActionInfo;
-    fromParty: PartyInfo
-    toParty: PartyInfo;
+    service?: ServiceInfoRequest;
+    action?: ActionInfoRequest;
+    fromParty: PartyInfoRequest
+    toParty: PartyInfoRequest;
 }
 
 interface SoapOutboundMessageContent {
@@ -54,21 +54,20 @@ interface SoapOutboundMessageContent {
     document: BusinessDocumentInfo;
 }
 
-
 interface RestOutboundMessageContent {
     businessDocument: BusinessDocumentInfo;
 }
 
-interface ServiceInfo {
+export interface ServiceInfoRequest {
     name: string;
     type: string;
 }
 
-interface ActionInfo {
+export interface ActionInfoRequest {
     name: string;
 }
 
-interface PartyInfo {
+export interface PartyInfoRequest {
     identifier: string;
     identifierType: string;
     role: string;

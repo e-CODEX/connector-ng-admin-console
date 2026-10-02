@@ -8,17 +8,16 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { ConnectorMessage } from "@/types/response/message";
+import { OutboundMessageRequestMode } from "@/types/global";
+import { RestOutboundMessageRequest } from "@/types/request/message";
 
 export type SendMessageFormData = Pick<
-    ConnectorMessage,
+    RestOutboundMessageRequest,
     "businessDomainIdentifier" | "backendMessageIdentifier" | "backendName" | "as4Properties"
 >;
 
-export type RequestMode = "SOAP" | "REST";
-
 export interface SendParameters {
-  mode: RequestMode;
+  mode: OutboundMessageRequestMode;
   attachmentSizeMB: number;
   repeatCount: number;
 }

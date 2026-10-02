@@ -10,44 +10,68 @@
 
 import { FieldError, Key, Label, ListBox, Select } from "@heroui/react";
 import { ConnectorProcessingModeParty } from "@/types/response/processing-mode";
-import { PartyRoleType } from "@/types/global";
+import { useEffect, useMemo } from "react";
 
-export interface ProcessingModeServiceSelectorProps {
+export interface ProcessingModePartySelectorProps {
     parties: ConnectorProcessingModeParty[];
     value?: string | null;
-    onValueChange: (service: ConnectorProcessingModeParty | null) => void;
+    onValueChange: (party: ConnectorProcessingModeParty | null) => void;
+    /** Only offer parties with this role type. Applied before the single-entry auto-select. */
+    role?: ConnectorProcessingModeParty["roleType"];
+    name?: string;
     label?: string;
     showType?: boolean;
+    autoSelectSingle?: boolean;
     isRequired?: boolean;
     isDisabled?: boolean;
-    role?: PartyRoleType;
     className?: string;
 }
 
-const keyOf = (party: ConnectorProcessingModeParty) => `${party.identifier}-${party.roleType}`;
+const partyKeyOf = (party: Pick<ConnectorProcessingModeParty, "identifier" | "identifierType">) =>
+    `${party.identifier}-${party.identifierType}`;
 
 export function ProcessingModePartySelector({
                                                 parties,
                                                 value,
                                                 onValueChange,
+                                                role = "INITIATOR",
+                                                name,
                                                 label = "Party",
                                                 showType = false,
+                                                autoSelectSingle = true,
                                                 isRequired = false,
-                                                isDisabled,
-                                                role = "INITIATOR",
+                                                isDisabled = false,
                                                 className = "min-w-70",
-                                            }: ProcessingModeServiceSelectorProps) {
-    const visible = parties.filter((party) => {
-        if (party.roleType !== role) return false;
-        return role === "INITIATOR" ? party.isHome : true;
-    });
+                                            }: ProcessingModePartySelectorProps) {
+    const visibleParties = useMemo(
+        () =>
+            role
+                ? parties.filter(
+                    (party) =>
+                        party.roleType === role && (role !== "INITIATOR" || party.isHome),
+                )
+                : parties,
+        [parties, role],
+    );
+
+    useEffect(() => {
+        if (isDisabled || visibleParties.length === 0) return;
+        const isValueVisible = value != null && visibleParties.some((party) => partyKeyOf(party) === value);
+        if (isValueVisible) return;
+        if (autoSelectSingle && visibleParties.length === 1) {
+            onValueChange(visibleParties[0]);
+        } else if (value) {
+            onValueChange(null);
+        }
+    }, [autoSelectSingle, isDisabled, visibleParties, value, onValueChange]);
 
     const handleChange = (key: Key | null) => {
-        onValueChange(parties.find((party) => keyOf(party) === key) ?? null);
+        onValueChange(visibleParties.find((party) => partyKeyOf(party) === key) ?? null);
     };
 
     return (
         <Select
+            name={name}
             value={value}
             onChange={handleChange}
             isRequired={isRequired}
@@ -62,13 +86,12 @@ export function ProcessingModePartySelector({
             </Select.Trigger>
             <Select.Popover>
                 <ListBox>
-                    {visible.map((party) => {
-                        const id = keyOf(party);
-
+                    {visibleParties.map((party) => {
+                        const id = partyKeyOf(party);
                         return (
                             <ListBox.Item key={id} id={id} textValue={party.name}>
                                 {showType ? (
-                                    `${party.roleType} (${party.identifier} - ${party.identifierType} - ${party.isHome ? "Home" : ""})`
+                                    `${party.roleType} (${party.identifier} - ${party.identifierType} ${party.isHome ? " - Home" : ""})`
                                 ) : (
                                     party.identifier
                                 )}
@@ -82,3 +105,4 @@ export function ProcessingModePartySelector({
         </Select>
     );
 }
+

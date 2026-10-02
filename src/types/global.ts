@@ -40,3 +40,9 @@ export type ConnectorEvidenceType =
     | "NON_RETRIEVAL";
 
 export type USER_ROLE = "ROLE_ADMIN";
+
+export const APP_MODES = ["ADMIN_CONSOLE", "TESTING_CONSOLE"] as const;
+
+export type AppMode = (typeof APP_MODES)[number];
+
+export type OutboundMessageRequestMode = "SOAP" | "REST";

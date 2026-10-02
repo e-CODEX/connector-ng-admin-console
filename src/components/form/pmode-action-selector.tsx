@@ -10,34 +10,58 @@
 
 import { FieldError, Key, Label, ListBox, Select } from "@heroui/react";
 import { ConnectorProcessingModeAction } from "@/types/response/processing-mode";
+import { useEffect, useMemo } from "react";
 
-export interface ProcessingModeServiceSelectorProps {
+export interface ProcessingModeActionSelectorProps {
     actions: ConnectorProcessingModeAction[];
+    name?: string;
     value?: string | null;
-    onValueChange: (service: ConnectorProcessingModeAction | null) => void;
+    onValueChange: (action: ConnectorProcessingModeAction | null) => void;
     label?: string;
+    onlyTestActions?: boolean;
+    autoSelectSingle?: boolean;
     isRequired?: boolean;
     isDisabled?: boolean;
     className?: string;
 }
 
-const keyOf = (party: ConnectorProcessingModeAction) => party.name;
+export const actionKeyOf = (action: Pick<ConnectorProcessingModeAction, "name">) => action.name;
 
 export function ProcessingModeActionSelector({
                                                  actions,
                                                  value,
                                                  onValueChange,
+                                                 name,
                                                  label = "Action",
+                                                 onlyTestActions = false,
+                                                 autoSelectSingle = true,
                                                  isRequired = false,
-                                                 isDisabled,
+                                                 isDisabled = false,
                                                  className = "min-w-70",
-                                             }: ProcessingModeServiceSelectorProps) {
+                                             }: ProcessingModeActionSelectorProps) {
+    const visibleActions = useMemo(
+        () => (onlyTestActions ? actions.filter((action) => action.testOnly) : actions),
+        [actions, onlyTestActions],
+    );
+
+    useEffect(() => {
+        if (isDisabled || visibleActions.length === 0) return;
+        const isValueVisible = value != null && visibleActions.some((action) => actionKeyOf(action) === value);
+        if (isValueVisible) return;
+        if (autoSelectSingle && visibleActions.length === 1) {
+            onValueChange(visibleActions[0]);
+        } else if (value) {
+            onValueChange(null);
+        }
+    }, [autoSelectSingle, isDisabled, visibleActions, value, onValueChange]);
+
     const handleChange = (key: Key | null) => {
-        onValueChange(actions.find((party) => keyOf(party) === key) ?? null);
+        onValueChange(visibleActions.find((action) => actionKeyOf(action) === key) ?? null);
     };
 
     return (
         <Select
+            name={name}
             value={value}
             onChange={handleChange}
             isRequired={isRequired}
@@ -52,18 +76,19 @@ export function ProcessingModeActionSelector({
             </Select.Trigger>
             <Select.Popover>
                 <ListBox>
-                    {actions.map((party) => {
-                        const id = keyOf(party);
+                    {visibleActions.map((action) => {
+                        const id = actionKeyOf(action);
                         return (
-                            <ListBox.Item key={id} id={id} textValue={party.name}>
-                                {party.name}
+                            <ListBox.Item key={id} id={id} textValue={action.name}>
+                                {action.name}
                                 <ListBox.ItemIndicator/>
                             </ListBox.Item>
                         );
                     })}
                 </ListBox>
             </Select.Popover>
-            <FieldError />
+            <FieldError/>
         </Select>
     );
 }
+

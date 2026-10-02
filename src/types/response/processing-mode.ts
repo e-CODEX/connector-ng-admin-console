@@ -38,12 +38,12 @@ export interface ConnectorProcessingModeParty {
 export interface ConnectorProcessingModeService {
     name: string;
     type: string;
-    isTest?: boolean;
+    testOnly?: boolean;
 }
 
 export interface ConnectorProcessingModeAction {
     name: string;
-    isTest?: boolean;
+    testOnly?: boolean;
 }
 
 export interface ConnectorProcessingModeTruststore {

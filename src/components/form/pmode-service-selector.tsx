@@ -42,7 +42,7 @@ export function ProcessingModeServiceSelector({
                                                   className = "min-w-70",
                                               }: ProcessingModeServiceSelectorProps) {
     const visibleServices = useMemo(
-        () => (onlyTestServices ? services.filter((service) => service.isTest) : services),
+        () => (onlyTestServices ? services.filter((service) => service.testOnly) : services),
         [services, onlyTestServices],
     );
 

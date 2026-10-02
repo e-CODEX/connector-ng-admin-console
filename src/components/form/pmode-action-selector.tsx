@@ -40,7 +40,7 @@ export function ProcessingModeActionSelector({
                                                  className = "min-w-70",
                                              }: ProcessingModeActionSelectorProps) {
     const visibleActions = useMemo(
-        () => (onlyTestActions ? actions.filter((action) => action.isTest) : actions),
+        () => (onlyTestActions ? actions.filter((action) => action.testOnly) : actions),
         [actions, onlyTestActions],
     );
 

@@ -40,7 +40,7 @@ export function LinkPartnerSelector({
                                         className = "min-w-70",
                                     }: LinkPartnerSelectorProps) {
     const visiblePartners = useMemo(
-        () => (onlyTestPartners ? partners.filter((partner) => partner.isTest) : partners),
+        () => (onlyTestPartners ? partners.filter((partner) => partner.testOnly) : partners),
         [partners, onlyTestPartners],
     );
 

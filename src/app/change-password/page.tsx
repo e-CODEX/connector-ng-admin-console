@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import { Button, FieldError, Form, Input, Label, TextField } from "@heroui/react";
+import { Button, Form } from "@heroui/react";
 import { toastErrorMessage } from "@/utils";
 import { ChangePasswordRequest } from "@/types/request/user";
 import { changePasswordSchema } from "@/schemas/userAuth";
+import { PasswordField } from "@/components/user/password-text-field";
 
 const FORM_ID = "change-password-form"
 type FieldErrors = Partial<Record<keyof ChangePasswordRequest, string>>;
@@ -68,39 +69,32 @@ export default function ChangePasswordPage() {
                     <h1 className="text-xl font-semibold">Change your password</h1>
                     <p className="text-sm">You must set a new password before continuing.</p>
 
-                    <TextField
+                    <PasswordField
+                        label="Current password"
                         isRequired
-                        type="password"
                         value={currentPassword}
                         onChange={setCurrentPassword}
-                    >
-                        <Label>Current password</Label>
-                        <Input/>
-                        <FieldError>{errors.currentPassword}</FieldError>
-                    </TextField>
+                        isInvalid={!!errors.currentPassword}
+                        errorMessage={errors.currentPassword}
+                    />
 
-                    <TextField
+                    <PasswordField
+                        label="New password"
                         isRequired
-                        type="password"
                         value={newPassword}
                         onChange={setNewPassword}
                         isInvalid={!!errors.newPassword}
-                    >
-                        <Label>New password</Label>
-                        <Input/>
-                        <FieldError>{errors.newPassword}</FieldError>
-                    </TextField>
+                        errorMessage={errors.newPassword}
+                    />
 
-                    <TextField
+                    <PasswordField
+                        label="Confirm new password"
                         isRequired
-                        type="password"
                         value={confirmPassword}
                         onChange={setConfirmPassword}
-                        isInvalid={!!errors.confirmPassword}>
-                        <Label>Confirm new password</Label>
-                        <Input/>
-                        <FieldError>{errors.confirmPassword}</FieldError>
-                    </TextField>
+                        isInvalid={!!errors.confirmPassword}
+                        errorMessage={errors.confirmPassword}
+                    />
 
                     <Button
                         type="submit"

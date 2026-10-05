@@ -43,8 +43,8 @@ export interface As4PropertiesRequest {
     referenceToIdentifier?: string;
     originalSender: string;
     finalRecipient: string;
-    service?: ServiceInfoRequest;
-    action?: ActionInfoRequest;
+    service: ServiceInfoRequest;
+    action: ActionInfoRequest;
     fromParty: PartyInfoRequest
     toParty: PartyInfoRequest;
 }

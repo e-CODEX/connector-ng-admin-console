@@ -10,8 +10,9 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { SendMessageFormData, SendParameters } from "@/types/send-message-form";
-import { getDocumentAsBase64String, getXmlContentAsBase64String } from "@/utils/fileUtils";
+import { blobToBase64, getXmlContentAsBase64String } from "@/utils/fileUtils";
 import { SoapOutboundMessageDetails, SoapOutboundMessageRequest } from "@/types/request/message";
+import { readFixtureAsBlob } from "@/actions/fixtureActions";
 
 
 /**
@@ -29,26 +30,28 @@ import { SoapOutboundMessageDetails, SoapOutboundMessageRequest } from "@/types/
  *
  * @param formData - Main form data containing business and AS4-related properties.
  * @param parameters - parameters to generate a business document for the outbound message.
- * @param document - Optional binary document to attach to the message.
- * @param xmlContent - Optional XML payload of metadata as a Blob.
+ * @param businessDocument - The business document.
+ * @param xmlBusinessContent - The business content.
  */
 export const createSoapOutboundMessagePayload = async (
     formData: SendMessageFormData,
     parameters: SendParameters,
-    document?: Blob,
-    xmlContent?: Blob) => {
+    businessDocument?: Blob,
+    xmlBusinessContent?: Blob) => {
 
-    const base64Payload = await getDocumentAsBase64String(parameters.attachmentSizeMB, document);
-
-    const businessXmlContent = await getXmlContentAsBase64String(xmlContent);
+    const businessContentData = xmlBusinessContent !== undefined ? await blobToBase64(xmlBusinessContent) : await getXmlContentAsBase64String();
+    const businessDocumentData = businessDocument !== undefined ? await blobToBase64(businessDocument) : await blobToBase64(await readFixtureAsBlob(
+        "businessDocument.pdf",
+        "application/pdf"
+    ));
 
     const submitMessageRequest: SoapOutboundMessageRequest = {
         messageDetails: createMessageDetails(formData),
         messageContent: {
-            xmlContent: businessXmlContent,
+            xmlContent: businessContentData,
             document: {
-                document: base64Payload,
-                documentName: 'test-attachment.pdf',
+                document: businessDocumentData,
+                documentName: 'business.pdf',
                 aesType: 'SIGNATURE_BASED'
             }
         }

@@ -13,6 +13,7 @@ import { SendMessageFormData, SendParameters } from "@/types/send-message-form";
 import { RestOutboundMessageRequest } from "@/types/request/message";
 import { generatePdfBlob, getDetachedSignatureAsBlob, getXmlContentAsBlob } from "@/utils/fileUtils";
 import { AttachmentService } from "@/services/attachment";
+import { readFixtureAsBlob } from "@/actions/fixtureActions";
 
 /**
  * Creates the payload for sending a REST outbound message.
@@ -32,8 +33,8 @@ import { AttachmentService } from "@/services/attachment";
  * @param asTestMessage - Whether to mark the message as a test message.
  * @param formData - Main form data containing business and AS4-related properties.
  * @param parameters - parameters to generate a business document for the outbound message.
- * @param document - Optional binary document to attach to the message.
- * @param xmlContent - Optional XML payload of metadata as a Blob.
+ * @param businessDocument - The business document.
+ * @param xmlBusinessContent - The business content.
  * @param detachedSignature - Optional detached signature as a Blob.
  */
 export const createRestOutboundMessagePayLoad = async (
@@ -41,36 +42,35 @@ export const createRestOutboundMessagePayLoad = async (
     asTestMessage: boolean,
     formData: SendMessageFormData,
     parameters: SendParameters,
-    document?: Blob,
-    xmlContent?: Blob,
+    businessDocument?: Blob,
+    xmlBusinessContent?: Blob,
     detachedSignature?: Blob
 ) => {
-
-    let generatedBlob = document;
-    if (!generatedBlob) {
-        generatedBlob = await generatePdfBlob(parameters.attachmentSizeMB);
-    }
-    const attachmentIds = await attachmentService.uploadMessageAttachment(generatedBlob)
+    const attachment = await generatePdfBlob(parameters.attachmentSizeMB);
+    const attachmentIds = await attachmentService.uploadMessageAttachment(attachment)
     const metadata = createMessageMetadata(formData, attachmentIds, asTestMessage);
 
     const dataToSubmit = new FormData();
     appendFormData(dataToSubmit, metadata);
-    await appendBusinessContentToFormData(dataToSubmit, metadata, xmlContent, detachedSignature);
+    await appendBusinessContentToFormData(dataToSubmit, metadata, xmlBusinessContent, businessDocument, detachedSignature);
     return dataToSubmit;
 };
 
 
-async function appendBusinessContentToFormData(data: FormData, metadata: RestOutboundMessageRequest, xmlContent?: Blob, detachedSignatureAsBlob?: Blob) {
+async function appendBusinessContentToFormData(formData: FormData, metadata: RestOutboundMessageRequest, xmlBusinessContent?: Blob, businessDocument?: Blob, detachedSignatureAsBlob?: Blob) {
     // add metadata content as XML file as
-    const businessContent = await getXmlContentAsBlob(xmlContent);
-    data.append("businessContent.contentFile", businessContent, "business.xml");
+    const businessContentData = xmlBusinessContent ?? await getXmlContentAsBlob();
+    formData.append("businessContent.contentFile", businessContentData, "business.xml");
 
-    const businessDocument = await generatePdfBlob(2);
-    data.append("businessContent.businessDocument.document", businessDocument, "business.pdf");
+    const businessDocumentData = businessDocument ?? await readFixtureAsBlob("businessDocument.pdf", "application/pdf");
+    formData.append("businessContent.businessDocument.document", businessDocumentData, "business.pdf");
 
-    // add detached signature file as blob
-    const detachedSignature = getDetachedSignatureAsBlob(detachedSignatureAsBlob);
-    data.append("businessContent.businessDocument.detachedSignature.signature", detachedSignature, "detached_signature.xml");
+    if (detachedSignatureAsBlob) {
+        // add detached signature file as blob
+        const signature = metadata.businessContent.businessDocument.detachedSignature;
+        const detachedSignature = getDetachedSignatureAsBlob(detachedSignatureAsBlob);
+        formData.append("businessContent.businessDocument.detachedSignature.signature", detachedSignature, signature?.name);
+    }
 }
 
 function createMessageMetadata(formData: SendMessageFormData, attachmentIds: string[], asTestMessage: boolean = false) {
@@ -96,9 +96,6 @@ function createMessageMetadata(formData: SendMessageFormData, attachmentIds: str
         },
         businessContent: {
             businessDocument: {
-                detachedSignature: {
-                    mimeType: "XML",
-                },
                 aesType: "SIGNATURE_BASED"
             }
         }

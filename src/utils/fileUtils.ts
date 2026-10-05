@@ -67,36 +67,22 @@ export const getDocumentAsBase64String = async (attachmentSize: number, document
  * Generates XML content as a Blob or uses the provided XML Blob
  * and returns it as a Base64-encoded string.
  *
- * If an XML `Blob` is provided, it is converted directly to Base64.
- *
- * @param xmlContent - Optional XML Blob to use instead of generating XML.
  * @returns A promise resolving to a Base64-encoded XML string.
  */
 export const getXmlContentAsBase64String = async (
-    xmlContent?: Blob
 ): Promise<string> => {
-    if (!xmlContent) {
-        const businessXmlContent = '<?xml version="1.0" encoding="UTF-8"?><testMessage>Test</testMessage>';
-        return stringToBase64Utf8(businessXmlContent);
-    }
-    return blobToBase64(xmlContent);
+    const businessXmlContent = '<?xml version="1.0" encoding="UTF-8"?><testMessage>Test</testMessage>';
+    return stringToBase64Utf8(businessXmlContent);
 };
 
 /**
  * Generates XML content blob form data and returns it as a `Blob`.
  *
- * If an XML `Blob` is provided, it is directly returned.
- *
- * @param xmlContent
  */
 export const getXmlContentAsBlob = async (
-    xmlContent?: Blob
 ): Promise<Blob> => {
-    if (!xmlContent) {
-        const businessXmlContent = '<?xml version="1.0" encoding="UTF-8"?><testMessage>Test</testMessage>';
-        return new Blob([businessXmlContent], { type: "application/xml" });
-    }
-    return xmlContent;
+    const businessXmlContent = '<?xml version="1.0" encoding="UTF-8"?><testMessage>Test</testMessage>';
+    return new Blob([businessXmlContent], { type: "application/xml" });
 };
 
 

@@ -97,11 +97,9 @@ export async function restApiCall<T>(
     options: RestApiOptions = {},
 ): Promise<T> {
     const response = await restApiFetch(baseUrl, path, options);
-
     if (response.status === 204) {
         return undefined as T;   // no content
     }
-
     return response.json();
 }
 

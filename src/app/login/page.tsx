@@ -12,7 +12,7 @@
 import { Button, FieldError, Form, Input, Label, Spinner, TextField } from "@heroui/react";
 import React, { useEffect, useState } from "react";
 import { LoginRequest } from "@/types/request/user";
-import { loginSchema } from "@/schemas/user";
+import { loginSchema } from "@/schemas/auth";
 import { toastErrorMessage } from "@/utils";
 import { LockOpen } from "lucide-react";
 
@@ -58,7 +58,8 @@ export default function LoginForm() {
                 body: JSON.stringify({ username, password }),
             });
             if (res.ok) {
-                window.location.assign("/");
+                const data = await res.json().catch(() => ({}));
+                window.location.assign(data.mustChangePassword ? "/change-password" : "/");
                 return;
             }
         } catch {

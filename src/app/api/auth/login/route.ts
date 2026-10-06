@@ -15,7 +15,7 @@ import { RestApiError } from "@/lib/rest/rest-api-error";
 import { restApiCall } from "@/lib/rest";
 import { createAuthService } from "@/services/auth";
 import { cookieOptions } from "@/utils";
-import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from "@/proxy";
+import { ACCESS_TOKEN_KEY, MUST_CHANGE_PASSWORD, REFRESH_TOKEN_KEY } from "@/proxy";
 
 export async function POST(request: Request) {
     const { username, password } = await request.json();
@@ -23,14 +23,20 @@ export async function POST(request: Request) {
     const authService = createAuthService(apiUrl, restApiCall);
 
     try {
-        const { accessToken, expiresIn, refreshToken, refreshExpiresIn } = await authService.login(username, password);
+        const { accessToken, expiresIn, refreshToken, refreshExpiresIn, mustChangePassword } = await authService.login(username, password);
 
         const cookieStore = await cookies();
 
         cookieStore.set(ACCESS_TOKEN_KEY, accessToken, cookieOptions(expiresIn));
         cookieStore.set(REFRESH_TOKEN_KEY, refreshToken, cookieOptions(refreshExpiresIn));
 
-        return NextResponse.json({ user: "OK" });
+        if (mustChangePassword) {
+            cookieStore.set(MUST_CHANGE_PASSWORD, "1", cookieOptions());
+        }else{
+            cookieStore.delete(MUST_CHANGE_PASSWORD)
+        }
+
+        return NextResponse.json({ user: "OK", mustChangePassword});
     } catch (e) {
         if (e instanceof RestApiError && e.status === 401) {
             return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });

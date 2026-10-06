@@ -24,3 +24,18 @@ export const loginSchema = z.object({
     username: z.string().trim().min(1, "Username is required"),
     password: z.string().min(6, "Password must be at least 6 characters"),
 })
+
+export const changePasswordSchema = z
+    .object({
+        currentPassword: z.string().min(1, { error: "Current password is required" }),
+        newPassword: z.string().min(12, { error: "Password must be at least 12 characters" }),
+        confirmPassword: z.string().min(1, { error: "Please confirm your new password" }),
+    })
+    .refine((data) => data.newPassword !== data.currentPassword, {
+        error: "New password must differ from the current password",
+        path: ["newPassword"],
+    })
+    .refine((data) => data.newPassword === data.confirmPassword, {
+        error: "Passwords do not match",
+        path: ["confirmPassword"],
+    });

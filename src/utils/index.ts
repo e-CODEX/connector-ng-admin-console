@@ -83,7 +83,7 @@ export function capitalize(str: string): string {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-export const cookieOptions = (maxAge: number) => ({
+export const cookieOptions = (maxAge?: number) => ({
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax" as const,

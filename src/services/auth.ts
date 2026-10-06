@@ -46,6 +46,15 @@ export function createAuthService(baseUrl: string, call: RestApiCall) {
                     "Content-Type": "application/json"
                 }
             })
-        }
+        },
+        async updatePasswordAfterLogin(currentPassword: string, newPassword: string, refreshToken?: string ): Promise<void> {
+            return call<void>(baseUrl, "api/v1/auth/change-password", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ currentPassword, newPassword, refreshToken }),
+            });
+        },
     }
 }

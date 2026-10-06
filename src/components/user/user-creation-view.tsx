@@ -15,7 +15,7 @@ import { UserCreationRequest } from "@/types/request/user";
 import React, { useEffect, useState } from "react";
 import { ModalHeaderIcon } from "@/components/common/modal-header-icon";
 import { Plus } from "lucide-react";
-import { userCreationSchema } from "@/schemas/user";
+import { userCreationSchema } from "@/schemas/auth";
 
 const FORM_ID = "add-user-form";
 

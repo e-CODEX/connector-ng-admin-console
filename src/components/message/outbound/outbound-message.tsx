@@ -76,10 +76,10 @@ const buildInitialMessageFormData = (defaultOriginalSender: string, defaultFinal
     };
 }
 
-type ValidationErrors = Record<string, string>;
+export type SendMessageValidationErrors = Record<string, string>;
 
-const validate = (formData: SendMessageFormData): ValidationErrors => {
-    const errors: ValidationErrors = {};
+const validate = (formData: SendMessageFormData): SendMessageValidationErrors => {
+    const errors: SendMessageValidationErrors = {};
     const { as4Properties } = formData;
 
     if (!formData.businessDomainIdentifier) {
@@ -92,6 +92,16 @@ const validate = (formData: SendMessageFormData): ValidationErrors => {
     if (!as4Properties.action?.name) errors["as4Properties.action"] = "Select an action";
     if (!as4Properties.fromParty?.identifier) errors["as4Properties.fromParty"] = "Select a sending party";
     if (!as4Properties.toParty?.identifier) errors["as4Properties.toParty"] = "Select a receiving party";
+
+    const businessContent = formData.businessContent;
+
+    const hasDetachedSignature = !!businessContent?.businessDocument?.detachedSignature?.signature;
+    const hasBusinessDocument = !!businessContent?.businessDocument?.document;
+
+    if (hasDetachedSignature && !hasBusinessDocument) {
+        errors["businessContent.businessDocument.document"] =
+            "A business document is required when a detached signature is provided.";
+    }
 
     return errors;
 };
@@ -110,7 +120,7 @@ export default function OutboundMessageComponent() {
         ...DEFAULT_SEND_PARAMETERS,
         mode: appModeFeatures.forcedRequestMode ?? DEFAULT_SEND_PARAMETERS.mode,
     }));
-    const [errors, setErrors] = useState<ValidationErrors>({});
+    const [errors, setErrors] = useState<SendMessageValidationErrors>({});
 
     const { logs, isSending, submitMessage } = useOutboundMessageSender(appModeFeatures.sendAsTestMessage);
 
@@ -220,6 +230,7 @@ export default function OutboundMessageComponent() {
                         processingModesParties={processingModeParties.items}
                         restrictToTestEntries={appModeFeatures.restrictToTestEntries}
                         useDefaultBusinessContent={useDefaultBusinessContent}
+                        errors={errors}
                     />
                 </Form>
 

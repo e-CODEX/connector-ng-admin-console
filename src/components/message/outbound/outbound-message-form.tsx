@@ -24,6 +24,7 @@ import { emptyAction, emptyParty, emptyService } from "@/components/message/outb
 import { FileSelectField } from "@/components/form/file-select-field";
 import React from "react";
 import { ACCEPTED_XMLS, BusinessDocumentAesType, DetachedSignatureMimeType } from "@/types/global";
+import { SendMessageValidationErrors } from "@/components/message/outbound/outbound-message";
 
 export type FormUpdater = (prev: SendMessageFormData) => SendMessageFormData;
 
@@ -65,6 +66,7 @@ interface OutboundMessageFormProps {
     processingModesParties: ConnectorProcessingModeParty[];
     restrictToTestEntries?: boolean;
     useDefaultBusinessContent?: boolean;
+    errors?: SendMessageValidationErrors;
 }
 
 export function OutboundMessageForm({
@@ -74,10 +76,13 @@ export function OutboundMessageForm({
                                         processingModesActions,
                                         processingModesParties,
                                         restrictToTestEntries = true,
-                                        useDefaultBusinessContent = true
+                                        useDefaultBusinessContent = true,
+                                        errors
                                     }: OutboundMessageFormProps) {
 
     const backendLinkPartners = useLinkPartners("BACKEND");
+
+    const businessDocumentError = errors?.["businessContent.businessDocument.document"];
 
     const { as4Properties } = data;
 
@@ -267,6 +272,7 @@ export function OutboundMessageForm({
                             onFileChange={onBusinessDocumentFileSelect}
                             acceptedFileTypes={["*"]}
                             buttonLabel="Choose file ..."
+                            error={businessDocumentError}
                         />
                         <FileSelectField
                             label="Detached signature"

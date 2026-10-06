@@ -43,6 +43,7 @@ export function OutboundMessageSendParametersSection({ data, onChange, isModeLoc
                     label="Attachment Size (MB)"
                     type="number"
                     value={String(data.attachmentSizeMB)}
+                    isReadOnly={isModeLocked}
                     onChange={(value) =>
                         update({ attachmentSizeMB: Number(value) || 0 })
                     }
@@ -52,6 +53,7 @@ export function OutboundMessageSendParametersSection({ data, onChange, isModeLoc
                     label="Repeat"
                     type="number"
                     value={String(data.repeatCount)}
+                    isReadOnly={isModeLocked}
                     onChange={(value) =>
                         update({ repeatCount: Number(value) || 0 })
                     }

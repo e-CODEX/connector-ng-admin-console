@@ -226,7 +226,7 @@ export default function OutboundMessageComponent() {
                 <OutboundMessageSendParametersSection
                     data={sendParameters}
                     onChange={setSendParameters}
-                    isModeLocked={true}
+                    isModeLocked={appModeFeatures.restrictToTestEntries}
                 />
 
                 <OutboundMessageConsolePanel contents={logs}/>

@@ -46,3 +46,5 @@ export const APP_MODES = ["ADMIN_CONSOLE", "TESTING_CONSOLE"] as const;
 export type AppMode = (typeof APP_MODES)[number];
 
 export type OutboundMessageRequestMode = "SOAP" | "REST";
+
+export const ACCEPTED_XMLS = ["application/xml", "text/xml", ".xml"] as string[];

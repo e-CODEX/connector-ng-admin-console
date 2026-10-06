@@ -8,7 +8,7 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { As4PropertiesRequest, PartyInfoRequest } from "@/types/request/message";
+import { As4PropertiesRequest, PartyInfoRequest, RestOutboundMessageContent } from "@/types/request/message";
 
 export type As4Selections = Pick<As4PropertiesRequest, "service" | "action" | "fromParty" | "toParty">;
 export const emptyService = (): As4PropertiesRequest["service"] => ({ name: "", type: "" });
@@ -27,3 +27,12 @@ export const emptyAs4Selections = (): As4Selections => ({
     fromParty: emptyParty(),
     toParty: emptyParty(),
 });
+
+export const emptyBusinessDocument = (): RestOutboundMessageContent => ({
+    contentFile: undefined,
+    businessDocument: {
+        aesType: "SIGNATURE_BASED",
+        document: undefined,
+        detachedSignature: undefined
+    }
+})

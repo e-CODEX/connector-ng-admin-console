@@ -23,11 +23,11 @@ import { BusinessDomainSelector } from "@/components/form/business-domain-select
 import { useProcessingModeServices } from "@/hooks/use-processing-mode-services";
 import { useProcessingModeActions } from "@/hooks/use-processing-mode-actions";
 import { useProcessingModeParties } from "@/hooks/use-processing-mode-parties";
-import { Form } from "@heroui/react";
+import { Form, Switch } from "@heroui/react";
 import { useAppConfig } from "@/hooks/use-app-config";
 import { AppMode, OutboundMessageRequestMode } from "@/types/global";
 import { useOutboundMessageSender } from "@/hooks/use-outbound-message-sender";
-import { emptyAs4Selections } from "@/components/message/outbound/outbound-message-defaults";
+import { emptyAs4Selections, emptyBusinessDocument } from "@/components/message/outbound/outbound-message-defaults";
 
 const FORM_ID = "outbound-message-form";
 
@@ -72,6 +72,7 @@ const buildInitialMessageFormData = (defaultOriginalSender: string, defaultFinal
             finalRecipient: defaultFinalRecipient,
             ...emptyAs4Selections(),
         },
+        businessContent: emptyBusinessDocument()
     };
 }
 
@@ -97,6 +98,8 @@ const validate = (formData: SendMessageFormData): ValidationErrors => {
 
 export default function OutboundMessageComponent() {
     const { defaultOriginalSender, defaultFinalRecipient, appMode } = useAppConfig();
+    const [useDefaultBusinessContent, setUseDefaultBusinessContent] = useState(true);
+
     const appModeFeatures = MODE_FEATURES[appMode];
 
     const [messageFormData, setMessageFormData] = useState<SendMessageFormData>(buildInitialMessageFormData(
@@ -109,7 +112,7 @@ export default function OutboundMessageComponent() {
     }));
     const [errors, setErrors] = useState<ValidationErrors>({});
 
-    const { logs, log, isSending, submitMessage } = useOutboundMessageSender(appModeFeatures.sendAsTestMessage);
+    const { logs, isSending, submitMessage } = useOutboundMessageSender(appModeFeatures.sendAsTestMessage);
 
     const businessDomainIdentifier = messageFormData.businessDomainIdentifier;
     const businessDomainIdentifiers = useBusinessDomainIdentifiers();
@@ -128,6 +131,24 @@ export default function OutboundMessageComponent() {
         clearErrors();
     };
 
+    const handleUseDefaultBusinessContentChange = (isSelected: boolean) => {
+        setUseDefaultBusinessContent(isSelected);
+
+        if (isSelected) {
+            // default content: make sure no custom files are submitted
+            handleFormChange((prev) => ({
+                ...prev,
+                businessContent: {
+                    ...prev.businessContent,
+                    contentFile: undefined,
+                    businessDocument: {
+                        aesType: "SIGNATURE_BASED"
+                    },
+                },
+            }));
+        }
+    };
+
     const handleFormChange = (updater: FormUpdater) => {
         setMessageFormData(updater);
         clearErrors();
@@ -143,12 +164,6 @@ export default function OutboundMessageComponent() {
         await submitMessage(messageFormData, sendParameters);
     };
 
-    const handleSaveAsXml = () => {
-        // TODO: not implemented yet
-        log("Save as XML is not implemented yet");
-
-    };
-
     return (
         <div>
             <PageHeader
@@ -156,6 +171,15 @@ export default function OutboundMessageComponent() {
                 title={appModeFeatures.outboundPageTitle}
                 subtitle="Send a business message to a party"
             >
+                <Switch isSelected={useDefaultBusinessContent} onChange={handleUseDefaultBusinessContentChange}>
+                    <Switch.Content>
+                        Use default business content
+                        <Switch.Control>
+                            <Switch.Thumb />
+                        </Switch.Control>
+                    </Switch.Content>
+                </Switch>
+
                 <BusinessDomainSelector
                     label="Select a business domain"
                     identifiers={businessDomainIdentifiers}
@@ -174,7 +198,6 @@ export default function OutboundMessageComponent() {
                     formId={FORM_ID}
                     onSubmit={handleSubmission}
                     isSending={isSending}
-                    onSaveAsXml={handleSaveAsXml}
                 />
             </PageHeader>
 
@@ -196,6 +219,7 @@ export default function OutboundMessageComponent() {
                         processingModesActions={processingModeActions.items}
                         processingModesParties={processingModeParties.items}
                         restrictToTestEntries={appModeFeatures.restrictToTestEntries}
+                        useDefaultBusinessContent={useDefaultBusinessContent}
                     />
                 </Form>
 

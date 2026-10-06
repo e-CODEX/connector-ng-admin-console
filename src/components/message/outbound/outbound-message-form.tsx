@@ -279,7 +279,6 @@ export function OutboundMessageForm({
                             file={detachedSignatureFile}
                             onFileChange={onDetachedSignatureFileSelect}
                             acceptedFileTypes={ACCEPTED_XMLS.concat([
-                                ".xml",
                                 ".sig",
                                 ".sign",
                                 ".xsig",

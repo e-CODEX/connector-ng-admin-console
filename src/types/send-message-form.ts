@@ -13,7 +13,7 @@ import { RestOutboundMessageRequest } from "@/types/request/message";
 
 export type SendMessageFormData = Pick<
     RestOutboundMessageRequest,
-    "businessDomainIdentifier" | "backendMessageIdentifier" | "backendName" | "as4Properties"
+    "businessDomainIdentifier" | "backendMessageIdentifier" | "backendName" | "as4Properties" | "businessContent"
 >;
 
 export interface SendParameters {

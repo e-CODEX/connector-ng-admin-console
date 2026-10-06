@@ -53,9 +53,8 @@ export type ExportMessageReportsParams = {
 }
 
 interface SendMessageArgs {
-    formData: SendMessageFormData;
+    messageFormData: SendMessageFormData;
     parameters: SendParameters;
-    document?: Blob;
     asTestMessage: boolean;
 }
 
@@ -89,16 +88,16 @@ export function createMessageService(baseUrl: string, bffUrl: string, call: Rest
                 { params }
             );
         },
-        async sendMessage({ formData, parameters, document, asTestMessage}: SendMessageArgs): Promise<SendMessageResponse> {
+        async sendMessage({ messageFormData, parameters, asTestMessage}: SendMessageArgs): Promise<SendMessageResponse> {
             const repeatCount = Math.max(1, parameters.repeatCount || 1);
             let lastResponse: SendMessageResponse = {};
 
             for (let i = 0; i < repeatCount; i++) {
                 // Each iteration rebuilds the payload so empty message IDs get fresh UUIDs.
                 if (parameters.mode === "REST") {
-                    lastResponse = await sendRestMessage(baseUrl, call, download, { formData, parameters, document, asTestMessage });
+                    lastResponse = await sendRestMessage(baseUrl, call, download, { messageFormData, parameters, asTestMessage });
                 } else {
-                    lastResponse = await sendSoapMessage(bffUrl, call, { formData, parameters, document, asTestMessage });
+                    lastResponse = await sendSoapMessage(bffUrl, call, { messageFormData, parameters, asTestMessage });
                 }
             }
 
@@ -117,21 +116,19 @@ export function createMessageService(baseUrl: string, bffUrl: string, call: Rest
 }
 
 async function sendRestMessage(baseUrl: string, call: RestApiCall, download: RestApiDownloadCall, {
-    formData,
+    messageFormData,
     parameters,
-    document,
     asTestMessage
 }: SendMessageArgs): Promise<SendMessageResponse> {
-    void formData;
+    void messageFormData;
     void parameters;
     void document;
 
     const payload = await createRestOutboundMessagePayLoad(
         createAttachmentService(baseUrl, call, download),
         asTestMessage,
-        formData,
-        parameters,
-        document
+        messageFormData,
+        parameters
     );
 
     const path = asTestMessage ? "/api/v1/admin/messages/outbound/test" : "api/v1/messages/outbound";
@@ -143,16 +140,12 @@ async function sendRestMessage(baseUrl: string, call: RestApiCall, download: Res
     )
 }
 
-async function sendSoapMessage(bffUrl: string, call: RestApiCall, {
-    formData,
-    parameters,
-    document,
-}: SendMessageArgs): Promise<SendMessageResponse> {
-    void formData;
+async function sendSoapMessage(bffUrl: string, call: RestApiCall, { messageFormData, parameters }: SendMessageArgs): Promise<SendMessageResponse> {
+    void messageFormData;
     void parameters;
     void document;
 
-    const payload = await createSoapOutboundMessagePayload(formData, parameters, document);
+    const payload = await createSoapOutboundMessagePayload(messageFormData);
 
     return call<SendMessageResponse>(
         bffUrl,

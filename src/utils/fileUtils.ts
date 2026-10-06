@@ -52,17 +52,6 @@ export const generatePdfBlob = async (sizeMB: number, customText = "e-CODEX test
     return new Blob([headerArray, filler, footerArray], { type: 'application/pdf' });
 };
 
-export const getDocumentAsBase64String = async (attachmentSize: number, document?: Blob) => {
-    let base64Payload: string;
-    if (!document) {
-        const generatedBlob = generatePdfBlob(attachmentSize);
-        base64Payload = await blobToBase64(await generatedBlob);
-    } else {
-        base64Payload = await blobToBase64(document);
-    }
-    return base64Payload;
-}
-
 /**
  * Generates XML content as a Blob or uses the provided XML Blob
  * and returns it as a Base64-encoded string.
@@ -95,21 +84,6 @@ export const getXmlContentAsBlob = async (
  */
 export const stringToBase64Utf8 = (input: string): string => {
     return Buffer.from(input, "utf-8").toString("base64");
-}
-
-
-/**
- * Gets the detached signature from the provided blob or generates a dummy signature.
- *
- * @param detachedSignatureAsBlob
- */
-export const getDetachedSignatureAsBlob = (detachedSignatureAsBlob?: Blob) => {
-    let detachedSignature = detachedSignatureAsBlob;
-    if (!detachedSignature) {
-        const signatureXmlContent = "<Signature xmlns='urn:test'>dummy</Signature>";
-        detachedSignature = base64ToBlob(stringToBase64Utf8(signatureXmlContent), "application/xml");
-    }
-    return detachedSignature;
 }
 
 /**

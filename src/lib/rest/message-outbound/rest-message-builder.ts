@@ -11,7 +11,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { SendMessageFormData, SendParameters } from "@/types/send-message-form";
 import { RestOutboundMessageRequest } from "@/types/request/message";
-import { generatePdfBlob, getDetachedSignatureAsBlob, getXmlContentAsBlob } from "@/utils/fileUtils";
+import { generatePdfBlob, getXmlContentAsBlob } from "@/utils/fileUtils";
 import { AttachmentService } from "@/services/attachment";
 import { readFixtureAsBlob } from "@/actions/fixtureActions";
 
@@ -31,90 +31,96 @@ import { readFixtureAsBlob } from "@/actions/fixtureActions";
  *
  * @param attachmentService - The attachment service.
  * @param asTestMessage - Whether to mark the message as a test message.
- * @param formData - Main form data containing business and AS4-related properties.
+ * @param messageFormData - Main form data containing business and AS4-related properties.
  * @param parameters - parameters to generate a business document for the outbound message.
- * @param businessDocument - The business document.
- * @param xmlBusinessContent - The business content.
- * @param detachedSignature - Optional detached signature as a Blob.
  */
 export const createRestOutboundMessagePayLoad = async (
     attachmentService: AttachmentService,
     asTestMessage: boolean,
-    formData: SendMessageFormData,
-    parameters: SendParameters,
-    businessDocument?: Blob,
-    xmlBusinessContent?: Blob,
-    detachedSignature?: Blob
+    messageFormData: SendMessageFormData,
+    parameters: SendParameters
 ) => {
     const attachment = await generatePdfBlob(parameters.attachmentSizeMB);
     const attachmentIds = await attachmentService.uploadMessageAttachment(attachment)
-    const metadata = createMessageMetadata(formData, attachmentIds, asTestMessage);
+    const metadata = createMessageMetadata(messageFormData, attachmentIds, asTestMessage);
+
 
     const dataToSubmit = new FormData();
     appendFormData(dataToSubmit, metadata);
-    await appendBusinessContentToFormData(dataToSubmit, metadata, xmlBusinessContent, businessDocument, detachedSignature);
+    await appendBusinessContentToFormData(dataToSubmit, messageFormData);
     return dataToSubmit;
 };
 
+async function appendBusinessContentToFormData(httpFormData: FormData, messageFormData: SendMessageFormData) {
+    const businessContent = messageFormData.businessContent;
 
-async function appendBusinessContentToFormData(formData: FormData, metadata: RestOutboundMessageRequest, xmlBusinessContent?: Blob, businessDocument?: Blob, detachedSignatureAsBlob?: Blob) {
-    // add metadata content as XML file as
-    const businessContentData = xmlBusinessContent ?? await getXmlContentAsBlob();
-    formData.append("businessContent.contentFile", businessContentData, "business.xml");
+    const xmlBusinessContent = {
+        data: businessContent.contentFile ? businessContent.contentFile : await getXmlContentAsBlob(),
+        fileName: businessContent.contentFile ? businessContent.contentFile.name : "businessContent.xml"
+    }
+    httpFormData.append("businessContent.contentFile", xmlBusinessContent.data, xmlBusinessContent.fileName);
 
-    const businessDocumentData = businessDocument ?? await readFixtureAsBlob("businessDocument.pdf", "application/pdf");
-    formData.append("businessContent.businessDocument.document", businessDocumentData, "business.pdf");
+    const businessDocument = {
+        data: businessContent.businessDocument?.document ? businessContent.businessDocument.document : await readFixtureAsBlob("businessDocument.pdf", "application/pdf"),
+        fileName: businessContent.businessDocument?.document ?  businessContent.businessDocument.document.name : "businessDocument.pdf",
+    }
+    httpFormData.append("businessContent.businessDocument.document", businessDocument.data, businessDocument.fileName);
 
-    if (detachedSignatureAsBlob) {
+    if (!businessContent.businessDocument?.aesType) {
+        httpFormData.append("businessContent.businessDocument.aesType", "SIGNATURE_BASED");
+    }
+
+    const detachedSignature = businessContent.businessDocument?.detachedSignature ? businessContent.businessDocument.detachedSignature.signature : undefined;
+
+    if (detachedSignature) {
         // add detached signature file as blob
-        const signature = metadata.businessContent.businessDocument.detachedSignature;
-        const detachedSignature = getDetachedSignatureAsBlob(detachedSignatureAsBlob);
-        formData.append("businessContent.businessDocument.detachedSignature.signature", detachedSignature, signature?.name);
+        const signature = businessContent.businessDocument?.detachedSignature;
+        httpFormData.append("businessContent.businessDocument.detachedSignature.signature", detachedSignature, detachedSignature.name);
+        httpFormData.append("businessContent.businessDocument.detachedSignature.mimeType", signature!.mimeType);
     }
 }
 
-function createMessageMetadata(formData: SendMessageFormData, attachmentIds: string[], asTestMessage: boolean = false) {
+function createMessageMetadata(messageFormData: SendMessageFormData, attachmentIds: string[], asTestMessage: boolean = false) {
     const metadata = {
-        businessDomainIdentifier: formData.businessDomainIdentifier || 'default_business_domain',
+        businessDomainIdentifier: messageFormData.businessDomainIdentifier || 'default_business_domain',
         backendMessageIdentifier: uuidv4(),
         attachments: attachmentIds,
         as4Properties: {
-            ebmsMessageIdentifier: formData.as4Properties?.ebmsMessageIdentifier || crypto.randomUUID(),
-            conversationIdentifier: formData.as4Properties?.conversationIdentifier || uuidv4(),
-            originalSender: formData.as4Properties.originalSender,
-            finalRecipient: formData.as4Properties.finalRecipient,
+            ebmsMessageIdentifier: messageFormData.as4Properties?.ebmsMessageIdentifier || crypto.randomUUID(),
+            conversationIdentifier: messageFormData.as4Properties?.conversationIdentifier || uuidv4(),
+            originalSender: messageFormData.as4Properties.originalSender,
+            finalRecipient: messageFormData.as4Properties.finalRecipient,
             fromParty: {
-                identifier: formData.as4Properties?.fromParty?.identifier,
-                identifierType: formData.as4Properties?.fromParty?.identifierType,
-                role: formData.as4Properties?.fromParty?.role
+                identifier: messageFormData.as4Properties?.fromParty?.identifier,
+                identifierType: messageFormData.as4Properties?.fromParty?.identifierType,
+                role: messageFormData.as4Properties?.fromParty?.role
             },
             toParty: {
-                identifier: formData.as4Properties?.toParty?.identifier,
-                identifierType: formData.as4Properties?.toParty?.identifierType,
-                role: formData.as4Properties?.toParty?.role
+                identifier: messageFormData.as4Properties?.toParty?.identifier,
+                identifierType: messageFormData.as4Properties?.toParty?.identifierType,
+                role: messageFormData.as4Properties?.toParty?.role
             }
         },
         businessContent: {
             businessDocument: {
-                aesType: "SIGNATURE_BASED"
+                aesType: messageFormData.businessContent.businessDocument?.aesType,
             }
         }
     } as RestOutboundMessageRequest;
 
     if (!asTestMessage) {
         metadata.as4Properties.service = {
-            name: formData.as4Properties?.service?.name,
-            type: formData.as4Properties.service?.type
+            name: messageFormData.as4Properties?.service?.name,
+            type: messageFormData.as4Properties.service?.type
         }
 
         metadata.as4Properties.action = {
-            name: formData.as4Properties?.action?.name
+            name: messageFormData.as4Properties?.action?.name
         }
     }
 
     return metadata;
 }
-
 
 /**
  * Helps flattens nested objects inside a value object using dot notation for keys and supports
@@ -177,4 +183,3 @@ function appendFormData(formData: FormData, value: RestOutboundMessageRequest, k
     }
     formData.append(key, value);
 }
-

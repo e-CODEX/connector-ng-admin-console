@@ -18,6 +18,7 @@ import { FileSelectField } from "@/components/form/file-select-field";
 import { processingModeCreationSchema, ProcessingModeCreationValues, toFieldErrors } from "@/schemas/processing-mode-creation";
 import { Plus, ArrowUpToLine } from "lucide-react";
 import { ModalHeaderIcon } from "@/components/common/modal-header-icon";
+import { ACCEPTED_XMLS } from "@/types/global";
 
 
 interface ProcessingModeCreationFormProps {
@@ -157,7 +158,7 @@ export function ProcessingModeCreationForm({ onSubmit }: ProcessingModeCreationF
                                 label="Processing mode file"
                                 file={pmodeFile}
                                 onFileChange={handlePmodeFileSelect}
-                                acceptedFileTypes={["application/xml", "text/xml", ".xml"]}
+                                acceptedFileTypes={ACCEPTED_XMLS}
                                 buttonLabel="Choose XML file ..."
                                 error={errors.pmodeFile}
                             />

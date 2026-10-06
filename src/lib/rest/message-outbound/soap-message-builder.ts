@@ -9,7 +9,7 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
-import { SendMessageFormData, SendParameters } from "@/types/send-message-form";
+import { SendMessageFormData } from "@/types/send-message-form";
 import { blobToBase64, getXmlContentAsBase64String } from "@/utils/fileUtils";
 import { SoapOutboundMessageDetails, SoapOutboundMessageRequest } from "@/types/request/message";
 import { readFixtureAsBlob } from "@/actions/fixtureActions";
@@ -28,31 +28,29 @@ import { readFixtureAsBlob } from "@/actions/fixtureActions";
  * - A business document (`document`)
  * - XML content (`xmlContent`)
  *
- * @param formData - Main form data containing business and AS4-related properties.
- * @param parameters - parameters to generate a business document for the outbound message.
- * @param businessDocument - The business document.
- * @param xmlBusinessContent - The business content.
+ * @param messageFormData - Main form data containing business and AS4-related properties.
  */
-export const createSoapOutboundMessagePayload = async (
-    formData: SendMessageFormData,
-    parameters: SendParameters,
-    businessDocument?: Blob,
-    xmlBusinessContent?: Blob) => {
+export const createSoapOutboundMessagePayload = async (messageFormData: SendMessageFormData) => {
+    const businessContent = messageFormData.businessContent;
+    const xmlBusinessContent = businessContent.contentFile !== undefined
+        ? await blobToBase64(businessContent.contentFile)
+        : await getXmlContentAsBase64String();
 
-    const businessContentData = xmlBusinessContent !== undefined ? await blobToBase64(xmlBusinessContent) : await getXmlContentAsBase64String();
-    const businessDocumentData = businessDocument !== undefined ? await blobToBase64(businessDocument) : await blobToBase64(await readFixtureAsBlob(
-        "businessDocument.pdf",
-        "application/pdf"
-    ));
+    const businessDocument = businessContent.businessDocument?.document !== undefined
+        ? await blobToBase64(businessContent.businessDocument.document)
+        : await blobToBase64(await readFixtureAsBlob(
+            "businessDocument.pdf",
+            "application/pdf"
+        ));
 
     const submitMessageRequest: SoapOutboundMessageRequest = {
-        messageDetails: createMessageDetails(formData),
+        messageDetails: createMessageDetails(messageFormData),
         messageContent: {
-            xmlContent: businessContentData,
+            xmlContent: xmlBusinessContent,
             document: {
-                document: businessDocumentData,
+                document: businessDocument,
                 documentName: 'business.pdf',
-                aesType: 'SIGNATURE_BASED'
+                aesType: "SIGNATURE_BASED"
             }
         }
     };
@@ -60,8 +58,7 @@ export const createSoapOutboundMessagePayload = async (
     return submitMessageRequest;
 };
 
-
-function createMessageDetails(formData: SendMessageFormData) {
+const createMessageDetails = (formData: SendMessageFormData) => {
     return {
         backendMessageIdentifier: formData.backendMessageIdentifier || uuidv4(),
         as4Properties: {

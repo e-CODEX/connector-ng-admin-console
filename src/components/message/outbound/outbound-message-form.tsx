@@ -19,10 +19,44 @@ import { actionKeyOf, ProcessingModeActionSelector } from "@/components/form/pmo
 import { useLinkPartners } from "@/hooks/use-link-partners";
 import { LinkPartnerSelector } from "@/components/form/link-partner-selector";
 import { ConnectorLinkPartner } from "@/types/response/link-partner";
-import { As4PropertiesRequest, PartyInfoRequest } from "@/types/request/message";
+import { As4PropertiesRequest, BusinessDocumentInfo, PartyInfoRequest, RestOutboundMessageContent } from "@/types/request/message";
 import { emptyAction, emptyParty, emptyService } from "@/components/message/outbound/outbound-message-defaults";
+import { FileSelectField } from "@/components/form/file-select-field";
+import React from "react";
+import { ACCEPTED_XMLS, BusinessDocumentAesType, DetachedSignatureMimeType } from "@/types/global";
+import { SendMessageValidationErrors } from "@/components/message/outbound/outbound-message";
 
 export type FormUpdater = (prev: SendMessageFormData) => SendMessageFormData;
+
+const DEFAULT_AES_TYPE: BusinessDocumentAesType = "SIGNATURE_BASED";
+const BINARY_SIGNATURE_TYPE: DetachedSignatureMimeType = "BINARY";
+const XML_SIGNATURE_TYPE: DetachedSignatureMimeType = "XML";
+const PKCS7_SIGNATURE_TYPE: DetachedSignatureMimeType = "PKCS7";
+
+const DETACHED_SIGNATURE_TYPES_BY_EXTENSION = new Map<string, DetachedSignatureMimeType>([
+    ["p7s", PKCS7_SIGNATURE_TYPE],
+    ["p7m", PKCS7_SIGNATURE_TYPE],
+    ["p7b", PKCS7_SIGNATURE_TYPE],
+    ["xml", XML_SIGNATURE_TYPE],
+    ["xsig", XML_SIGNATURE_TYPE],
+    ["sig", BINARY_SIGNATURE_TYPE],
+    ["sign", BINARY_SIGNATURE_TYPE],
+    ["bin", BINARY_SIGNATURE_TYPE],
+]);
+
+const resolveSignatureType = (filename: string): DetachedSignatureMimeType => {
+    const dot = filename.lastIndexOf(".");
+
+    if (dot < 0) {
+        return BINARY_SIGNATURE_TYPE
+    }
+
+    const extension = filename.slice(dot + 1).toLowerCase();
+    return DETACHED_SIGNATURE_TYPES_BY_EXTENSION.get(extension) ?? BINARY_SIGNATURE_TYPE;
+};
+
+const partyKeyOf = (party: Pick<PartyInfoRequest, "identifier" | "identifierType">) =>
+    `${party.identifier}-${party.identifierType}`;
 
 interface OutboundMessageFormProps {
     data: SendMessageFormData;
@@ -31,10 +65,9 @@ interface OutboundMessageFormProps {
     processingModesActions: ConnectorProcessingModeAction[];
     processingModesParties: ConnectorProcessingModeParty[];
     restrictToTestEntries?: boolean;
+    useDefaultBusinessContent?: boolean;
+    errors?: SendMessageValidationErrors;
 }
-
-const partyKeyOf = (party: Pick<PartyInfoRequest, "identifier" | "identifierType">) =>
-    `${party.identifier}-${party.identifierType}`;
 
 export function OutboundMessageForm({
                                         data,
@@ -43,8 +76,13 @@ export function OutboundMessageForm({
                                         processingModesActions,
                                         processingModesParties,
                                         restrictToTestEntries = true,
+                                        useDefaultBusinessContent = true,
+                                        errors
                                     }: OutboundMessageFormProps) {
+
     const backendLinkPartners = useLinkPartners("BACKEND");
+
+    const businessDocumentError = errors?.["businessContent.businessDocument.document"];
 
     const { as4Properties } = data;
 
@@ -54,11 +92,49 @@ export function OutboundMessageForm({
     const fromPartyValue = as4Properties.fromParty?.identifier ? partyKeyOf(as4Properties.fromParty) : null;
     const toPartyValue = as4Properties.toParty?.identifier ? partyKeyOf(as4Properties.toParty) : null;
 
+    const businessContentFile = data.businessContent?.contentFile ?? null;
+    const businessDocumentFile = data.businessContent?.businessDocument?.document ?? null;
+    const detachedSignatureFile = data.businessContent?.businessDocument?.detachedSignature?.signature ?? null;
+
     const update = (patch: Partial<SendMessageFormData>) =>
         onChange((prev) => ({ ...prev, ...patch }));
 
     const updateAs4 = (patch: Partial<As4PropertiesRequest>) =>
-        onChange((prev) => ({ ...prev, as4Properties: { ...prev.as4Properties, ...patch } }))
+        onChange((prev) => ({ ...prev, as4Properties: { ...prev.as4Properties, ...patch } }));
+
+    const updateBusinessContent = (patch: Partial<RestOutboundMessageContent>) =>
+        onChange((prev) => ({
+            ...prev,
+            businessContent: { ...prev.businessContent, ...patch },
+        }));
+
+    const updateBusinessDocument = (patch: Partial<BusinessDocumentInfo>) =>
+        onChange((prev) => ({
+            ...prev,
+            businessContent: {
+                ...prev.businessContent,
+                businessDocument: {
+                    aesType: DEFAULT_AES_TYPE,
+                    ...prev.businessContent?.businessDocument,
+                    ...patch,
+                },
+            },
+        }));
+
+    const onBusinessContentChanged = (file: File | null) =>
+        updateBusinessContent({
+            contentFile: file ?? undefined
+        })
+
+    const onBusinessDocumentChanged = (file: File | null) =>
+        updateBusinessDocument({ document: file ?? undefined });
+
+    const onDetachedSignatureChanged = (file: File | null) =>
+        updateBusinessDocument({
+            detachedSignature: file
+                ? { signature: file, mimeType: resolveSignatureType(file.name) }
+                : undefined,
+        });
 
     const onBackendLinkPartnerChange = (partner: ConnectorLinkPartner | null) =>
         update({ backendName: partner?.name ?? "" });
@@ -74,6 +150,18 @@ export function OutboundMessageForm({
 
     const onProcessingModeToPartyChange = (party: ConnectorProcessingModeParty | null) =>
         updateAs4({ toParty: party ? { ...party } : emptyParty() });
+
+    const onBusinessContentFileSelect = (businessContent: File | null) => {
+        onBusinessContentChanged(businessContent);
+    };
+
+    const onBusinessDocumentFileSelect = (businessDocument: File | null) => {
+        onBusinessDocumentChanged(businessDocument);
+    };
+
+    const onDetachedSignatureFileSelect = (signature: File | null) => {
+        onDetachedSignatureChanged(signature);
+    };
 
     return (
         <section className="rounded-lg border border-separator bg-content1 p-2">
@@ -167,6 +255,45 @@ export function OutboundMessageForm({
                         role="RESPONDER"
                     />
                 </div>
+
+                {!useDefaultBusinessContent && (
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-5 gap-y-2">
+                        <FileSelectField
+                            label="Business content"
+                            file={businessContentFile}
+                            onFileChange={onBusinessContentFileSelect}
+                            acceptedFileTypes={ACCEPTED_XMLS}
+                            buttonLabel="Choose file ..."
+                        />
+
+                        <FileSelectField
+                            label="Business document"
+                            file={businessDocumentFile}
+                            onFileChange={onBusinessDocumentFileSelect}
+                            acceptedFileTypes={["*"]}
+                            buttonLabel="Choose file ..."
+                            error={businessDocumentError}
+                        />
+                        <FileSelectField
+                            label="Detached signature"
+                            file={detachedSignatureFile}
+                            onFileChange={onDetachedSignatureFileSelect}
+                            acceptedFileTypes={ACCEPTED_XMLS.concat([
+                                ".sig",
+                                ".sign",
+                                ".xsig",
+                                ".bin",
+                                "application/octet-stream",
+                                "application/pkcs7-signature",
+                                ".p12",
+                                ".p7m",
+                                ".p7s",
+                                ".p7b",
+                            ])}
+                            buttonLabel="Choose file ..."
+                        />
+                    </div>
+                )}
             </div>
         </section>
     );

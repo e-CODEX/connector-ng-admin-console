@@ -8,15 +8,7 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { BusinessDocumentAesType } from "@/types/global";
-
-export interface SendMessageResponse {
-    identifier: string;
-}
-
-export interface SoapSendMessageResponse {
-    messageId: string;
-}
+import { BusinessDocumentAesType, DetachedSignatureMimeType } from "@/types/global";
 
 export interface RestOutboundMessageRequest {
     businessDomainIdentifier: string;
@@ -51,11 +43,17 @@ export interface As4PropertiesRequest {
 
 interface SoapOutboundMessageContent {
     xmlContent: string;
-    document: BusinessDocumentInfo;
+    document: {
+        document?: string; // TODO une multipart for the document and its name
+        documentName?: string;
+        detachedSignature?: DetachedSignature;
+        aesType: BusinessDocumentAesType;
+    };
 }
 
-interface RestOutboundMessageContent {
-    businessDocument: BusinessDocumentInfo;
+export interface RestOutboundMessageContent {
+    contentFile?: File
+    businessDocument?: BusinessDocumentInfo;
 }
 
 export interface ServiceInfoRequest {
@@ -74,14 +72,12 @@ export interface PartyInfoRequest {
 }
 
 interface DetachedSignature {
-    signature: string;
-    mimeType: string;
-    name: string;
+    signature: File;
+    mimeType: DetachedSignatureMimeType;
 }
 
-interface BusinessDocumentInfo {
-    document?: string;
-    documentName?: string;
+export interface BusinessDocumentInfo {
+    document?: File;
     detachedSignature?: DetachedSignature;
-    aesType: BusinessDocumentAesType;
+    aesType?: BusinessDocumentAesType;
 }

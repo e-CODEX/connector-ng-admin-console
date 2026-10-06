@@ -33,7 +33,7 @@ export function useOutboundMessageSender(asTestMessage: boolean) {
     }, []);
 
     const submitMessage = useCallback(
-        async (formData: SendMessageFormData, parameters: SendParameters) => {
+        async (messageFormData: SendMessageFormData, parameters: SendParameters) => {
             if (inFlight.current) return;
             inFlight.current = true;
             setIsSending(true);
@@ -43,7 +43,7 @@ export function useOutboundMessageSender(asTestMessage: boolean) {
 
             try {
                 await messageService.sendMessage({
-                    formData,
+                    messageFormData: messageFormData,
                     parameters: { ...parameters, repeatCount },
                     asTestMessage,
                 });

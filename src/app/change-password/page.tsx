@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Button, Form } from "@heroui/react";
 import { toastErrorMessage } from "@/utils";
 import { ChangePasswordRequest } from "@/types/request/user";
-import { changePasswordSchema } from "@/schemas/userAuth";
+import { changePasswordSchema } from "@/schemas/auth";
 import { PasswordField } from "@/components/user/password-text-field";
 
 const FORM_ID = "change-password-form"
@@ -98,6 +98,7 @@ export default function ChangePasswordPage() {
 
                     <Button
                         type="submit"
+                        className="w-full"
                         form={FORM_ID}
                         isDisabled={loading}>Change password</Button>
                 </Form>

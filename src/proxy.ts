@@ -41,6 +41,7 @@ export async function proxy(request: NextRequest) {
         return NextResponse.redirect(new URL("/change-password", request.url));
     }
 
+    //TODO - add fix allowing user to access change-password form even if mustChangePassword is not pending
     if (!mustChangePwd && pathname === "/change-password") {
         return NextResponse.redirect(new URL("/", request.url));
     }

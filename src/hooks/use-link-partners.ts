@@ -29,7 +29,7 @@ export function useLinkPartners(linkType: LinkPartnerType, allLabel?: string) {
                 if (cancelled) return;
                 setPartners(
                     allLabel ?
-                        [{ name: allLabel, enabled: true, description: "All", type: "BACKEND" }, ...linkPartners]
+                        [{ name: allLabel, enabled: true, description: "All", type: "BACKEND", testOnly: false }, ...linkPartners]
                         : linkPartners
                 );
             })

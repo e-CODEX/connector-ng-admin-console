@@ -18,6 +18,8 @@ import { LockOpen } from "lucide-react";
 
 const FORM_ID = "login-form"
 
+const FAILED_LOGIN_MESSAGE =  "Login failed. Please try again later."
+
 type FieldErrors = Partial<Record<keyof LoginRequest, string>>;
 
 export default function LoginForm() {
@@ -62,13 +64,13 @@ export default function LoginForm() {
                 window.location.assign(data.mustChangePassword ? "/change-password" : "/");
                 return;
             }
-            if (res.status === 401 || res.status === 403) {
+            if (res.status === 401) {
                 toastErrorMessage("Invalid username or password.");
             } else {
-                toastErrorMessage("Login failed. Please try again later.");
+                toastErrorMessage(FAILED_LOGIN_MESSAGE);
             }
         } catch {
-            toastErrorMessage("Invalid username or password.");
+            toastErrorMessage(FAILED_LOGIN_MESSAGE);
         } finally {
             setLoading(false);
         }

@@ -32,11 +32,11 @@ export async function POST(request: Request) {
 
         if (mustChangePassword) {
             cookieStore.set(MUST_CHANGE_PASSWORD, "1", cookieOptions());
-        }else{
+        } else {
             cookieStore.delete(MUST_CHANGE_PASSWORD)
         }
 
-        return NextResponse.json({ user: "OK", mustChangePassword});
+        return NextResponse.json({ user: "OK", mustChangePassword }, { status: 201 });
     } catch (e) {
         if (e instanceof RestApiError && e.status === 401) {
             return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });

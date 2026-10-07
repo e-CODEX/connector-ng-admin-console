@@ -62,6 +62,11 @@ export default function LoginForm() {
                 window.location.assign(data.mustChangePassword ? "/change-password" : "/");
                 return;
             }
+            if (res.status === 401 || res.status === 403) {
+                toastErrorMessage("Invalid username or password.");
+            } else {
+                toastErrorMessage("Login failed. Please try again later.");
+            }
         } catch {
             toastErrorMessage("Invalid username or password.");
         } finally {

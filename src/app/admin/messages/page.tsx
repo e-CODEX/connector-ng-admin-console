@@ -41,12 +41,13 @@ import { DetailActionButton } from "@/components/common/action-button/detail-act
 const IDENTIFIER_LENGTH = 10;
 const ALL_SELECTOR = "All";
 
-const asFilter = (value: string) => value === ALL_SELECTOR || value === "" ? undefined : value;
+const asFilter = (value: string) => value === ALL_SELECTOR || value === "*" ? undefined : value;
 
 export default function MessagesAdminPage() {
     const [selectedMessage, setSelectedMessage] = useState<ConnectorMessage | null>(null);
     const [identifierQuery, setIdentifierQuery] = useState("");
     const [backendNameQuery, setBackendNameQuery] = useState("");
+    const [messageDirectionQuery, setMessageDirectionQuery] = useState(ALL_SELECTOR);
     const [businessDomainIdentifierQuery, setBusinessDomainIdentifierQuery] = useState(ALL_SELECTOR);
     const [processingModeServiceQuery, setProcessingModeServiceQuery] = useState(ALL_SELECTOR);
     const debouncedIdentifier = useDebouncedValue(identifierQuery);
@@ -64,14 +65,16 @@ export default function MessagesAdminPage() {
                 size,
                 identifier: asFilter(debouncedIdentifier),
                 backendName: asFilter(debouncedBackendName),
+                direction: asFilter(messageDirectionQuery),
                 businessDomain: asBusinessDomainSelectorFilter(businessDomainIdentifierQuery, ALL_SELECTOR),
                 service: asFilter(processingModeServiceQuery),
             }),
         [
             debouncedIdentifier,
             debouncedBackendName,
+            messageDirectionQuery,
             businessDomainIdentifierQuery,
-            processingModeServiceQuery,
+            processingModeServiceQuery
         ],
     );
 
@@ -82,6 +85,11 @@ export default function MessagesAdminPage() {
 
     const onBackendNameChange = (value: string) => {
         setBackendNameQuery(value);
+        pagedList.setPage(1);
+    };
+
+    const onDirectionChange = (value: string | null) => {
+        setMessageDirectionQuery(value!);
         pagedList.setPage(1);
     };
 
@@ -140,6 +148,7 @@ export default function MessagesAdminPage() {
             <MessageFiltersPanel
                 identifier={identifierQuery}
                 backendName={backendNameQuery}
+                direction={messageDirectionQuery}
                 businessDomainIdentifier={businessDomainIdentifierQuery}
                 processingModeService={processingModeServiceQuery}
                 businessDomainIdentifiers={businessDomainIdentifiers}
@@ -148,6 +157,7 @@ export default function MessagesAdminPage() {
                 onBackendNameChange={onBackendNameChange}
                 onBusinessDomainIdentifierChange={onBusinessDomainIdentifierChange}
                 onProcessingModesServiceChange={onProcessingModeServiceChange}
+                onDirectionChange={onDirectionChange}
             />
 
             {pagedList.loading ? (

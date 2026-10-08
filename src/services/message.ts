@@ -36,6 +36,7 @@ export type ListMessageParams = {
     size?: number,
     identifier?: string,
     backendName?: string,
+    direction?: string,
     businessDomain?: string,
     service?: string
 }

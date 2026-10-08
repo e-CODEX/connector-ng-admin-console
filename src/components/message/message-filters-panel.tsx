@@ -13,10 +13,12 @@ import { SearchCriteriaBox } from "@/components/form/search-criteria-box";
 import { BusinessDomainSelector } from "@/components/form/business-domain-selector";
 import { ProcessingModeServiceSelector } from "@/components/form/pmode-service-selector";
 import { ConnectorProcessingModeService } from "@/types/response/processing-mode";
+import { MessageDirectionSelector } from "@/components/form/message-direction-selector";
 
 interface MessageFiltersPanelProps {
     identifier: string;
     backendName: string;
+    direction: string;
     businessDomainIdentifier: string;
     processingModeService: string;
     businessDomainIdentifiers: string[];
@@ -25,12 +27,14 @@ interface MessageFiltersPanelProps {
     onBackendNameChange: (value: string) => void;
     onBusinessDomainIdentifierChange: (value: string) => void;
     onProcessingModesServiceChange: (service: ConnectorProcessingModeService | null) => void;
+    onDirectionChange: (direction: string | null) => void;
     className?: string;
 }
 
 export function MessageFiltersPanel({
                                         identifier,
                                         backendName,
+                                        direction,
                                         businessDomainIdentifier,
                                         processingModeService,
                                         businessDomainIdentifiers,
@@ -39,6 +43,7 @@ export function MessageFiltersPanel({
                                         onBackendNameChange,
                                         onBusinessDomainIdentifierChange,
                                         onProcessingModesServiceChange,
+                                        onDirectionChange,
                                         className
                                     }: MessageFiltersPanelProps) {
     return (
@@ -59,6 +64,11 @@ export function MessageFiltersPanel({
                     <SearchField.ClearButton/>
                 </SearchField.Group>
             </SearchField>
+            <MessageDirectionSelector
+                value={direction}
+                showAll={true}
+                onValueChange={onDirectionChange}
+            />
             <BusinessDomainSelector
                 identifiers={businessDomainIdentifiers}
                 value={businessDomainIdentifier}

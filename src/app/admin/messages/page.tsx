@@ -41,7 +41,7 @@ import { DetailActionButton } from "@/components/common/action-button/detail-act
 const IDENTIFIER_LENGTH = 10;
 const ALL_SELECTOR = "All";
 
-const asFilter = (value: string) => value === ALL_SELECTOR || value === "" ? undefined : value;
+const asFilter = (value: string) => value === ALL_SELECTOR || value === "*" ? undefined : value;
 
 export default function MessagesAdminPage() {
     const [selectedMessage, setSelectedMessage] = useState<ConnectorMessage | null>(null);
@@ -89,9 +89,7 @@ export default function MessagesAdminPage() {
     };
 
     const onDirectionChange = (value: string | null) => {
-        console.log("HELOOOOOOOO ", value);
         setMessageDirectionQuery(value!);
-        console.log("HIIIIIIIIIIIII ", messageDirectionQuery)
         pagedList.setPage(1);
     };
 

@@ -9,19 +9,32 @@
  */
 
 import { FieldError, Key, Label, ListBox, Select } from "@heroui/react";
+import { useMemo } from "react";
+import { MessageDirection } from "@/types/global";
 
-const DIRECTION_OPTIONS: { id: string; label: string }[] = [
-    { id: "All", label: "All" },
+export const ALL_DIRECTIONS = "*" as const;
+
+export type MessageDirectionFilter = MessageDirection | typeof ALL_DIRECTIONS;
+
+interface DirectionOption {
+    id: MessageDirectionFilter;
+    label: string;
+}
+
+const DIRECTION_OPTIONS: readonly DirectionOption[] = [
     { id: "BACKEND_TO_GATEWAY", label: "Outbound" },
     { id: "GATEWAY_TO_BACKEND", label: "Inbound" },
 ];
 
+const ALL_OPTION: DirectionOption = { id: ALL_DIRECTIONS, label: "All" };
+
 export interface MessageDirectionSelectorProps {
     name?: string;
-    value?: string | null;
-    onValueChange: (direction: string | null) => void;
+    value?: MessageDirectionFilter | null;
+    onValueChange: (direction: MessageDirectionFilter | null) => void;
     label?: string;
     isDisabled?: boolean;
+    showAll?: boolean;
     className?: string;
 }
 
@@ -31,10 +44,16 @@ export function MessageDirectionSelector({
                                              name,
                                              label = "Direction",
                                              isDisabled = false,
+                                             showAll = false,
                                              className = "min-w-70",
                                          }: MessageDirectionSelectorProps) {
+    const options = useMemo(
+        () => (showAll ? [ALL_OPTION, ...DIRECTION_OPTIONS] : DIRECTION_OPTIONS),
+        [showAll],
+    );
+
     const handleChange = (key: Key | null) => {
-        const selected = DIRECTION_OPTIONS.find((option) => option.id === key);
+        const selected = options.find((option) => option.id === key);
         onValueChange(selected?.id ?? null);
     };
 
@@ -54,7 +73,7 @@ export function MessageDirectionSelector({
             </Select.Trigger>
             <Select.Popover>
                 <ListBox>
-                    {DIRECTION_OPTIONS.map((option) => (
+                    {options.map((option) => (
                         <ListBox.Item key={option.id} id={option.id} textValue={option.label}>
                             {option.label}
                             <ListBox.ItemIndicator/>

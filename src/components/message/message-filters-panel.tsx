@@ -66,6 +66,7 @@ export function MessageFiltersPanel({
             </SearchField>
             <MessageDirectionSelector
                 value={direction}
+                showAll={true}
                 onValueChange={onDirectionChange}
             />
             <BusinessDomainSelector

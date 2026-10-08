@@ -22,7 +22,7 @@ import { ArrowsRotateRight } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/page-header-button";
 import { TransportStepMessageTypeChip } from "@/components/message/chip/message-type-chip";
 import { TransportDeliveryStatusChip } from "@/components/transport-step/transport-step-status-chip";
-import { Mail, Route } from "lucide-react";
+import { Route } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { usePagedList } from "@/hooks/use-paged-list";
@@ -30,7 +30,6 @@ import { DateTime } from "@/components/common/date-time";
 import { useTransportStepService } from "@/hooks/use-http-service";
 import { CopyableIdentifier } from "@/components/common/copyable-identifier";
 import { DetailActionButton } from "@/components/common/action-button/detail-action-button";
-import { ActionButton } from "@/components/common/action-button/action-button";
 
 const IDENTIFIER_LENGTH = 30;
 
@@ -67,11 +66,6 @@ export default function TransportStepsAdminPage() {
     const detailsModal = useOverlayState();
 
     const onDetailsClick = (step: ConnectorTransportStep) => {
-        setSelectedTransportStep(step);
-        detailsModal.open();
-    };
-
-    const onMessageDetailsClick = (step: ConnectorTransportStep) => {
         setSelectedTransportStep(step);
         detailsModal.open();
     };
@@ -145,10 +139,6 @@ export default function TransportStepsAdminPage() {
                                             <Table.Cell>
                                                 <div className="flex items-center gap-1">
                                                     <DetailActionButton onPress={() => onDetailsClick(transportStep)}/>
-                                                    <ActionButton
-                                                        label="Show message detail"
-                                                        icon={Mail}
-                                                        onPress={() => onMessageDetailsClick(transportStep)}/>
                                                 </div>
                                             </Table.Cell>
                                         </Table.Row>

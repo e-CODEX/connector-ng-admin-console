@@ -47,6 +47,7 @@ export default function MessagesAdminPage() {
     const [selectedMessage, setSelectedMessage] = useState<ConnectorMessage | null>(null);
     const [identifierQuery, setIdentifierQuery] = useState("");
     const [backendNameQuery, setBackendNameQuery] = useState("");
+    const [messageDirectionQuery, setMessageDirectionQuery] = useState(ALL_SELECTOR);
     const [businessDomainIdentifierQuery, setBusinessDomainIdentifierQuery] = useState(ALL_SELECTOR);
     const [processingModeServiceQuery, setProcessingModeServiceQuery] = useState(ALL_SELECTOR);
     const debouncedIdentifier = useDebouncedValue(identifierQuery);
@@ -64,14 +65,16 @@ export default function MessagesAdminPage() {
                 size,
                 identifier: asFilter(debouncedIdentifier),
                 backendName: asFilter(debouncedBackendName),
+                direction: asFilter(messageDirectionQuery),
                 businessDomain: asBusinessDomainSelectorFilter(businessDomainIdentifierQuery, ALL_SELECTOR),
                 service: asFilter(processingModeServiceQuery),
             }),
         [
             debouncedIdentifier,
             debouncedBackendName,
+            messageDirectionQuery,
             businessDomainIdentifierQuery,
-            processingModeServiceQuery,
+            processingModeServiceQuery
         ],
     );
 
@@ -82,6 +85,13 @@ export default function MessagesAdminPage() {
 
     const onBackendNameChange = (value: string) => {
         setBackendNameQuery(value);
+        pagedList.setPage(1);
+    };
+
+    const onDirectionChange = (value: string | null) => {
+        console.log("HELOOOOOOOO ", value);
+        setMessageDirectionQuery(value!);
+        console.log("HIIIIIIIIIIIII ", messageDirectionQuery)
         pagedList.setPage(1);
     };
 
@@ -140,6 +150,7 @@ export default function MessagesAdminPage() {
             <MessageFiltersPanel
                 identifier={identifierQuery}
                 backendName={backendNameQuery}
+                direction={messageDirectionQuery}
                 businessDomainIdentifier={businessDomainIdentifierQuery}
                 processingModeService={processingModeServiceQuery}
                 businessDomainIdentifiers={businessDomainIdentifiers}
@@ -148,6 +159,7 @@ export default function MessagesAdminPage() {
                 onBackendNameChange={onBackendNameChange}
                 onBusinessDomainIdentifierChange={onBusinessDomainIdentifierChange}
                 onProcessingModesServiceChange={onProcessingModeServiceChange}
+                onDirectionChange={onDirectionChange}
             />
 
             {pagedList.loading ? (

@@ -11,6 +11,7 @@
 import { toast } from "@heroui/react";
 import { ConnectorMessageStatsItem } from "@/types/response/stats";
 import { DownloadedFile } from "@/lib/rest";
+import { ALL_SELECTOR } from "@/types/global";
 
 export const truncate = (value: string, visibleChars = 36): string => {
     if (value == null) return "";
@@ -90,3 +91,5 @@ export const cookieOptions = (maxAge?: number) => ({
     path: "/",
     maxAge,
 });
+
+export const asFilter = (value: string) => value === ALL_SELECTOR || value === "*" || value === "" ? undefined : value;

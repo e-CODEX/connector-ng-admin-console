@@ -30,7 +30,7 @@ const ALL_OPTION: DirectionOption = { id: ALL_DIRECTIONS, label: "All" };
 
 export interface MessageDirectionSelectorProps {
     name?: string;
-    value?: MessageDirectionFilter | null;
+    value?: string | null;
     onValueChange: (direction: MessageDirectionFilter | null) => void;
     label?: string;
     isDisabled?: boolean;

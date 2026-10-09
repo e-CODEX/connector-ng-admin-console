@@ -14,6 +14,16 @@ export type HealthStatus = | "UP" | "DOWN" | "DEGRADED" | "UNKNOWN";
 
 export type AttachmentStorageType = "S3_BUCKET" | "LOCAL_FILE_SYSTEM";
 
+export type AttachmentType =
+    "ATTACHMENT"
+    | "ASICS"
+    | "BUSINESS_CONTENT"
+    | "BUSINESS_DOCUMENT"
+    | "DETACHED_SIGNATURE"
+    | "EVIDENCE_XML"
+    | "PDF_TOKEN"
+    | "XML_TOKEN";
+
 export type KeystoreType = "JKS" | "PKCS12";
 
 export type TransportStepMessageType = "BUSINESS" | "EVIDENCE";
@@ -48,3 +58,5 @@ export type AppMode = (typeof APP_MODES)[number];
 export type OutboundMessageRequestMode = "SOAP" | "REST";
 
 export const ACCEPTED_XMLS = ["application/xml", "text/xml", ".xml"] as string[];
+
+export const ALL_SELECTOR = "All";

@@ -14,7 +14,7 @@ import { PageHeader } from "@/components/common/page-header";
 import React, { useState } from "react";
 import { ConnectorAttachmentResponse } from "@/types/response/attachments";
 import { Table, useOverlayState } from "@heroui/react";
-import { formatBytes, saveFile, toastError, truncate } from "@/utils";
+import { asFilter, formatBytes, saveFile, toastError, truncate } from "@/utils";
 import { PaginationControls } from "@/components/paging/pagination-controls";
 import { AttachmentDetailsView } from "@/components/attachment/attachment-details-view";
 import { ArrowsRotateRight } from "@gravity-ui/icons";
@@ -29,15 +29,66 @@ import { useAttachmentService } from "@/hooks/use-http-service";
 import { CopyableIdentifier } from "@/components/common/copyable-identifier";
 import { DetailActionButton } from "@/components/common/action-button/detail-action-button";
 import { DownloadActionButton } from "@/components/common/action-button/download-action-button";
+import { MessageFiltersPanel } from "@/components/attachment/attachment-filters-panel";
+import { useDebouncedValue } from "@/hooks/use-debounced-value";
+import { AttachmentTypesFilter } from "@/components/form/attachment-type-multi-selector";
+import { ALL_SELECTOR } from "@/types/global";
+import { AttachmentStoragesFilter } from "@/components/form/attachment-storage-multi-selector";
+
+const asTypeFilter = (values: AttachmentTypesFilter[]) => values.length === 0 || values.includes(ALL_SELECTOR) ? undefined : values;
+const asStorageFilter = (values: AttachmentStoragesFilter[]) => values.length === 0 || values.includes(ALL_SELECTOR) ? undefined : values;
 
 export default function AttachmentsAdminPage() {
     const [selectedAttachment, setSelectedAttachment] = useState<ConnectorAttachmentResponse | null>(null);
+    const [messageIdentifierQuery, setMessageIdentifierQuery] = useState("");
+    const [filenameQuery, setFilenameQuery] = useState("");
+    const [typesQuery, setTypesQuery] = useState({ types: [] as AttachmentTypesFilter[] });
+    const [storagesQuery, setStoragesQuery] = useState({ storages: [] as AttachmentStoragesFilter[] });
+    const debouncedMessageIdentifier = useDebouncedValue(messageIdentifierQuery);
+    const debouncedFilename = useDebouncedValue(filenameQuery);
 
     const attachmentService = useAttachmentService();
 
-    const pagedList = usePagedList<ConnectorAttachmentResponse>(attachmentService.listAttachments);
+    const pagedList = usePagedList<ConnectorAttachmentResponse>(
+        ({ page, size }) =>
+            attachmentService.listAttachments({
+                page,
+                size,
+                messageIdentifier: asFilter(debouncedMessageIdentifier),
+                name: asFilter(debouncedFilename),
+                types: asTypeFilter(typesQuery.types),
+                storages: asStorageFilter(storagesQuery.storages)
+            }),
+        [debouncedMessageIdentifier, debouncedFilename, typesQuery, storagesQuery],
+    );
 
     const detailsModal = useOverlayState();
+
+    const onMessageIdentifierChange = (value: string) => {
+        setMessageIdentifierQuery(value);
+        pagedList.setPage(1);
+    };
+
+    const onFilenameChange = (value: string) => {
+        setFilenameQuery(value);
+        pagedList.setPage(1);
+    };
+
+    const onTypesChange = (types: AttachmentTypesFilter[]) => {
+        if (types.length === 0 || types.includes(ALL_SELECTOR)) {
+            setTypesQuery({ types: [] });
+        } else {
+            setTypesQuery((prev) => ({ ...prev, storages: types }));
+        }
+    };
+
+    const onStoragesChange = (types: AttachmentStoragesFilter[]) => {
+        if (types.length === 0 || types.includes(ALL_SELECTOR)) {
+            setStoragesQuery({ storages: [] });
+        } else {
+            setStoragesQuery((prev) => ({ ...prev, storages: types }));
+        }
+    };
 
     const onDetailsClick = (attachment: ConnectorAttachmentResponse) => {
         setSelectedAttachment(attachment);
@@ -69,6 +120,17 @@ export default function AttachmentsAdminPage() {
                     isSpinning={pagedList.refreshing || pagedList.loading}
                 />
             </PageHeader>
+
+            <MessageFiltersPanel
+                messageIdentifier={messageIdentifierQuery}
+                filename={filenameQuery}
+                types={typesQuery.types}
+                storages={storagesQuery.storages}
+                onMessageIdentifierChange={onMessageIdentifierChange}
+                onFilenameChange={onFilenameChange}
+                onTypesChange={onTypesChange}
+                onStoragesChange={onStoragesChange}
+            />
 
             {pagedList.loading ? (
                 <SpinnerView className="mt-60"/>

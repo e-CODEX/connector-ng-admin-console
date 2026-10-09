@@ -8,7 +8,7 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { AttachmentStorageType } from "@/types/global";
+import { AttachmentStorageType, AttachmentType } from "@/types/global";
 
 export interface ConnectorAttachmentResponse {
     identifier: string;
@@ -17,7 +17,7 @@ export interface ConnectorAttachmentResponse {
     size: number;
     description: string;
     storage: AttachmentStorageType;
-    type: string;
+    type: AttachmentType;
     createdAt: string;
     updatedAt: string;
 }

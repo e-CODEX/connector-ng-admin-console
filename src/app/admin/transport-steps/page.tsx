@@ -30,6 +30,7 @@ import { DateTime } from "@/components/common/date-time";
 import { useTransportStepService } from "@/hooks/use-http-service";
 import { CopyableIdentifier } from "@/components/common/copyable-identifier";
 import { DetailActionButton } from "@/components/common/action-button/detail-action-button";
+import { asFilter } from "@/utils";
 
 const IDENTIFIER_LENGTH = 30;
 
@@ -47,8 +48,8 @@ export default function TransportStepsAdminPage() {
             transportStepService.listTransportSteps({
                 page,
                 size,
-                messageOrRemoteSystemIdentifier: debouncedMessageOrRemoteSystemIdentifier || undefined,
-                linkPartnerName: debouncedLinkPartnerName || undefined,
+                messageOrRemoteSystemIdentifier: asFilter(debouncedMessageOrRemoteSystemIdentifier),
+                linkPartnerName: asFilter(debouncedLinkPartnerName),
             }),
         [debouncedMessageOrRemoteSystemIdentifier, debouncedLinkPartnerName],
     );

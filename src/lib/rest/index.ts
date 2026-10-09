@@ -16,15 +16,19 @@ interface ApiError {
 }
 
 export type RestApiOptions = RequestInit & {
-    params?: Record<string, string | number | boolean>;
+    params?: Record<string, string | number | boolean | string[]>;
 };
 
-function toQuery(params: Record<string, string | number | boolean | undefined | null>) {
+function toQuery(params: Record<string, string | string[] | number | boolean | undefined | null>) {
     const sp = new URLSearchParams();
 
     for (const [key, value] of Object.entries(params)) {
         if (value !== undefined && value !== null) {
-            sp.append(key, String(value));
+            if (typeof value === "object" && Array.isArray(value)) {
+                sp.append(key, String(value.join(",")));
+            } else {
+                sp.append(key, String(value));
+            }
         }
     }
 

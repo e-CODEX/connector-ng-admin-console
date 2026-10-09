@@ -15,6 +15,10 @@ import { DownloadedFile, RestApiCall, RestApiDownloadCall } from "@/lib/rest";
 export type ListAttachmentsParams = {
     page?: number;
     size?: number;
+    messageIdentifier?: string;
+    name?: string;
+    types?: string[];
+    storages?: string[];
 }
 
 export function createAttachmentService(baseUrl: string, call: RestApiCall, download: RestApiDownloadCall) {

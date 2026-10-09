@@ -10,20 +10,25 @@
 
 import { Label, SearchField } from "@heroui/react";
 import { SearchCriteriaBox } from "@/components/form/search-criteria-box";
+import { TransportStepStatusesFilter, TransportStepStatusMultiSelector } from "@/components/form/transport-step-status-multi-selector";
 
 interface TransportStepFiltersPanelProps {
     messageOrRemoteSystemIdentifier: string;
     linkPartnerName: string;
+    statuses: TransportStepStatusesFilter[] | [];
     onMessageOrRemoteSystemIdentifierChange: (value: string) => void;
     onLinkPartnerNameChange: (value: string) => void;
+    onStatusesChange: (statuses: TransportStepStatusesFilter[] | []) => void;
     className?: string;
 }
 
 export function TransportStepFiltersPanel({
                                               messageOrRemoteSystemIdentifier,
                                               linkPartnerName,
+                                              statuses,
                                               onMessageOrRemoteSystemIdentifierChange,
                                               onLinkPartnerNameChange,
+                                              onStatusesChange,
                                               className,
                                           }: TransportStepFiltersPanelProps) {
     return (
@@ -49,6 +54,11 @@ export function TransportStepFiltersPanel({
                     <SearchField.ClearButton/>
                 </SearchField.Group>
             </SearchField>
+            <TransportStepStatusMultiSelector
+                values={statuses}
+                showAll={true}
+                onValueChange={onStatusesChange}
+            />
         </SearchCriteriaBox>
     );
 }

@@ -78,15 +78,15 @@ export default function AttachmentsAdminPage() {
         if (types.length === 0 || types.includes(ALL_SELECTOR)) {
             setTypesQuery({ types: [] });
         } else {
-            setTypesQuery((prev) => ({ ...prev, storages: types }));
+            setTypesQuery((prev) => ({ ...prev, types }));
         }
     };
 
-    const onStoragesChange = (types: AttachmentStoragesFilter[]) => {
-        if (types.length === 0 || types.includes(ALL_SELECTOR)) {
+    const onStoragesChange = (storages: AttachmentStoragesFilter[]) => {
+        if (storages.length === 0 || storages.includes(ALL_SELECTOR)) {
             setStoragesQuery({ storages: [] });
         } else {
-            setStoragesQuery((prev) => ({ ...prev, storages: types }));
+            setStoragesQuery((prev) => ({ ...prev, storages }));
         }
     };
 

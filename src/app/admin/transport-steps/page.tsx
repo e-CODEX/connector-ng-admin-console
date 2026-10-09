@@ -31,13 +31,18 @@ import { useTransportStepService } from "@/hooks/use-http-service";
 import { CopyableIdentifier } from "@/components/common/copyable-identifier";
 import { DetailActionButton } from "@/components/common/action-button/detail-action-button";
 import { asFilter } from "@/utils";
+import { ALL_SELECTOR } from "@/types/global";
+import { TransportStepStatusesFilter } from "@/components/form/transport-step-status-multi-selector";
 
 const IDENTIFIER_LENGTH = 30;
+
+const asStatusesFilter = (values: TransportStepStatusesFilter[]) => values.length === 0 || values.includes(ALL_SELECTOR) ? undefined : values;
 
 export default function TransportStepsAdminPage() {
     const [selectedTransportStep, setSelectedTransportStep] = useState<ConnectorTransportStep | null>(null);
     const [messageOrRemoteSystemIdentifierQuery, setMessageOrRemoteSystemIdentifierQuery] = useState("");
     const [linkPartnerNameQuery, setLinkPartnerNameQuery] = useState("");
+    const [statusesQuery, setStatusesQuery] = useState({ statuses: [] as TransportStepStatusesFilter[] });
     const debouncedMessageOrRemoteSystemIdentifier = useDebouncedValue(messageOrRemoteSystemIdentifierQuery);
     const debouncedLinkPartnerName = useDebouncedValue(linkPartnerNameQuery);
 
@@ -50,8 +55,9 @@ export default function TransportStepsAdminPage() {
                 size,
                 messageOrRemoteSystemIdentifier: asFilter(debouncedMessageOrRemoteSystemIdentifier),
                 linkPartnerName: asFilter(debouncedLinkPartnerName),
+                statuses: asStatusesFilter(statusesQuery.statuses)
             }),
-        [debouncedMessageOrRemoteSystemIdentifier, debouncedLinkPartnerName],
+        [debouncedMessageOrRemoteSystemIdentifier, debouncedLinkPartnerName, statusesQuery],
     );
 
     const onMessageOrRemoteSystemIdentifierChange = (value: string) => {
@@ -62,6 +68,14 @@ export default function TransportStepsAdminPage() {
     const onLinkPartnerNameChange = (value: string) => {
         setLinkPartnerNameQuery(value);
         pagedList.setPage(1);
+    };
+
+    const onStatusesChange = (statuses: TransportStepStatusesFilter[]) => {
+        if (statuses.length === 0 || statuses.includes(ALL_SELECTOR)) {
+            setStatusesQuery({ statuses: [] });
+        } else {
+            setStatusesQuery((prev) => ({ ...prev, statuses }));
+        }
     };
 
     const detailsModal = useOverlayState();
@@ -90,8 +104,10 @@ export default function TransportStepsAdminPage() {
             <TransportStepFiltersPanel
                 messageOrRemoteSystemIdentifier={messageOrRemoteSystemIdentifierQuery}
                 linkPartnerName={linkPartnerNameQuery}
+                statuses={statusesQuery.statuses}
                 onMessageOrRemoteSystemIdentifierChange={onMessageOrRemoteSystemIdentifierChange}
                 onLinkPartnerNameChange={onLinkPartnerNameChange}
+                onStatusesChange={onStatusesChange}
             />
 
             {pagedList.loading ? (

@@ -16,7 +16,8 @@ export type ListTransportStepsParams = {
     page?: number,
     size?: number,
     messageOrRemoteSystemIdentifier?: string,
-    linkPartnerName?: string
+    linkPartnerName?: string,
+    statuses?: string[],
 }
 
 export function createTransportStepsService(baseUrl: string, call: RestApiCall) {

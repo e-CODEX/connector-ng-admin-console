@@ -44,7 +44,7 @@ import { ZonedDateTime } from "@internationalized/date";
 import { buildDefaultRange, toDateRange } from "@/types/period";
 import { DateTimeRangeGranularity } from "@/components/form/date-time-range-selector";
 
-const IDENTIFIER_LENGTH = 10;
+const IDENTIFIER_LENGTH = 8;
 
 const granularity: DateTimeRangeGranularity = "minute";
 
@@ -216,6 +216,7 @@ export default function MessagesAdminPage() {
                                             <Table.Cell>{message.as4Properties.action.name}</Table.Cell>
                                             <Table.Cell>
                                                 <MessageDirectionChip
+                                                    showLabel={false}
                                                     direction={message.direction}
                                                 />
                                             </Table.Cell>

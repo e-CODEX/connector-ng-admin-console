@@ -34,6 +34,12 @@ import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { AttachmentTypesFilter } from "@/components/form/attachment-type-multi-selector";
 import { ALL_SELECTOR } from "@/types/global";
 import { AttachmentStoragesFilter } from "@/components/form/attachment-storage-multi-selector";
+import { DateTimeRangeGranularity } from "@/components/form/date-time-range-selector";
+import type { RangeValue } from "react-aria-components";
+import { ZonedDateTime } from "@internationalized/date";
+import { buildDefaultRange, toDateRange } from "@/types/period";
+
+const granularity: DateTimeRangeGranularity = "minute";
 
 const asTypeFilter = (values: AttachmentTypesFilter[]) => values.length === 0 || values.includes(ALL_SELECTOR) ? undefined : values;
 const asStorageFilter = (values: AttachmentStoragesFilter[]) => values.length === 0 || values.includes(ALL_SELECTOR) ? undefined : values;
@@ -44,6 +50,7 @@ export default function AttachmentsAdminPage() {
     const [filenameQuery, setFilenameQuery] = useState("");
     const [typesQuery, setTypesQuery] = useState({ types: [] as AttachmentTypesFilter[] });
     const [storagesQuery, setStoragesQuery] = useState({ storages: [] as AttachmentStoragesFilter[] });
+    const [dateRange, setDateRange] = useState<RangeValue<ZonedDateTime> | null>(buildDefaultRange);
     const debouncedMessageIdentifier = useDebouncedValue(messageIdentifierQuery);
     const debouncedFilename = useDebouncedValue(filenameQuery);
 
@@ -57,9 +64,10 @@ export default function AttachmentsAdminPage() {
                 messageIdentifier: asFilter(debouncedMessageIdentifier),
                 name: asFilter(debouncedFilename),
                 types: asTypeFilter(typesQuery.types),
-                storages: asStorageFilter(storagesQuery.storages)
+                storages: asStorageFilter(storagesQuery.storages),
+                ...toDateRange(dateRange, granularity),
             }),
-        [debouncedMessageIdentifier, debouncedFilename, typesQuery, storagesQuery],
+        [debouncedMessageIdentifier, debouncedFilename, typesQuery, storagesQuery, dateRange],
     );
 
     const detailsModal = useOverlayState();
@@ -126,10 +134,13 @@ export default function AttachmentsAdminPage() {
                 filename={filenameQuery}
                 types={typesQuery.types}
                 storages={storagesQuery.storages}
+                dateRange={dateRange}
+                dateGranularity={granularity}
                 onMessageIdentifierChange={onMessageIdentifierChange}
                 onFilenameChange={onFilenameChange}
                 onTypesChange={onTypesChange}
                 onStoragesChange={onStoragesChange}
+                onDateRangeChange={(next) => setDateRange(next as RangeValue<ZonedDateTime> | null)}
             />
 
             {pagedList.loading ? (

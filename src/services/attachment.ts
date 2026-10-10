@@ -19,6 +19,8 @@ export type ListAttachmentsParams = {
     name?: string;
     types?: string[];
     storages?: string[];
+    from?: string;
+    to?: string;
 }
 
 export function createAttachmentService(baseUrl: string, call: RestApiCall, download: RestApiDownloadCall) {

@@ -14,6 +14,11 @@ import { BusinessDomainSelector } from "@/components/form/business-domain-select
 import { ProcessingModeServiceSelector } from "@/components/form/pmode-service-selector";
 import { ConnectorProcessingModeService } from "@/types/response/processing-mode";
 import { MessageDirectionSelector } from "@/components/form/message-direction-selector";
+import type { RangeValue } from "react-aria-components";
+import { ZonedDateTime } from "@internationalized/date";
+import { DateTimeRangeGranularity, DateTimeRangeSelector } from "@/components/form/date-time-range-selector";
+import React from "react";
+import { ALL_SELECTOR } from "@/types/global";
 
 interface MessageFiltersPanelProps {
     identifier: string;
@@ -23,11 +28,14 @@ interface MessageFiltersPanelProps {
     processingModeService: string;
     businessDomainIdentifiers: string[];
     processingModesServices: ConnectorProcessingModeService[];
+    dateRange: RangeValue<ZonedDateTime> | null;
+    dateGranularity: DateTimeRangeGranularity;
     onIdentifierChange: (value: string) => void;
     onBackendNameChange: (value: string) => void;
     onBusinessDomainIdentifierChange: (value: string) => void;
     onProcessingModesServiceChange: (service: ConnectorProcessingModeService | null) => void;
     onDirectionChange: (direction: string | null) => void;
+    onDateRangeChange: (dateRange: RangeValue<ZonedDateTime> | null) => void;
     className?: string;
 }
 
@@ -39,13 +47,18 @@ export function MessageFiltersPanel({
                                         processingModeService,
                                         businessDomainIdentifiers,
                                         processingModesServices,
+                                        dateRange,
+                                        dateGranularity,
                                         onIdentifierChange,
                                         onBackendNameChange,
                                         onBusinessDomainIdentifierChange,
                                         onProcessingModesServiceChange,
                                         onDirectionChange,
+                                        onDateRangeChange,
                                         className
                                     }: MessageFiltersPanelProps) {
+    const showServiceSelector = businessDomainIdentifier !== "" && businessDomainIdentifier !== ALL_SELECTOR;
+
     return (
         <SearchCriteriaBox className={className}>
             <SearchField className="w-full sm:max-w-xs" value={identifier} onChange={onIdentifierChange}>
@@ -56,6 +69,7 @@ export function MessageFiltersPanel({
                     <SearchField.ClearButton/>
                 </SearchField.Group>
             </SearchField>
+
             <SearchField className="w-full sm:max-w-xs" value={backendName} onChange={onBackendNameChange}>
                 <Label className="text-sm font-medium">Backend name</Label>
                 <SearchField.Group>
@@ -64,20 +78,32 @@ export function MessageFiltersPanel({
                     <SearchField.ClearButton/>
                 </SearchField.Group>
             </SearchField>
+
             <MessageDirectionSelector
                 value={direction}
                 showAll={true}
                 onValueChange={onDirectionChange}
             />
+
             <BusinessDomainSelector
                 identifiers={businessDomainIdentifiers}
                 value={businessDomainIdentifier}
                 onValueChange={onBusinessDomainIdentifierChange}
             />
-            <ProcessingModeServiceSelector
-                services={processingModesServices}
-                value={processingModeService}
-                onValueChange={onProcessingModesServiceChange}
+
+            {showServiceSelector && (
+                <ProcessingModeServiceSelector
+                    services={processingModesServices}
+                    value={processingModeService}
+                    onValueChange={onProcessingModesServiceChange}
+                />
+            )}
+
+            <DateTimeRangeSelector
+                value={dateRange}
+                granularity={dateGranularity}
+                shouldForceLeadingZeros={true}
+                onChange={(next) => onDateRangeChange(next as RangeValue<ZonedDateTime> | null)}
             />
         </SearchCriteriaBox>
     );

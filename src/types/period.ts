@@ -8,6 +8,10 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
+import type { RangeValue } from "react-aria-components";
+import { ZonedDateTime, now, getLocalTimeZone } from "@internationalized/date";
+import { DateTimeRangeGranularity } from "@/components/form/date-time-range-selector";
+
 export type Period =
     | "LAST_HOUR"
     | "TODAY"
@@ -81,4 +85,35 @@ export function periodToParams(period: Period,):
         from: from ? from.toISOString() : undefined,
         to: to ? to.toISOString() : undefined,
     };
+}
+
+const startOfDay = { hour: 0, minute: 0, second: 0, millisecond: 0 } as const;
+const endOfDay = { hour: 23, minute: 59, second: 59, millisecond: 0 } as const;
+
+export const toDateRange = (
+    selected: RangeValue<ZonedDateTime> | null,
+    rangeGranularity: DateTimeRangeGranularity,
+) => {
+    if (!selected) {
+        return { from: "", to: "" };
+    }
+
+    let from = selected.start;
+    let to = selected.end;
+
+    if (rangeGranularity === "day") {
+        from = selected.start.set(startOfDay);
+        to = selected.end.set(endOfDay);
+    }
+
+    return {
+        // ZonedDateTime#toDate() -> absolute instant; toISOString() -> UTC.
+        from: from.toDate().toISOString(),
+        to: to.toDate().toISOString(),
+    };
+}
+
+export const buildDefaultRange = () : RangeValue<ZonedDateTime> => {
+    const todayZoned = now(getLocalTimeZone());
+    return { start: todayZoned.set(startOfDay), end: todayZoned.set(endOfDay) };
 }

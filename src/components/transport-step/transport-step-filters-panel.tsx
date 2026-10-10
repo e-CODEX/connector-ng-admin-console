@@ -11,14 +11,21 @@
 import { Label, SearchField } from "@heroui/react";
 import { SearchCriteriaBox } from "@/components/form/search-criteria-box";
 import { TransportStepStatusesFilter, TransportStepStatusMultiSelector } from "@/components/form/transport-step-status-multi-selector";
+import type { RangeValue } from "react-aria-components";
+import { ZonedDateTime } from "@internationalized/date";
+import { DateTimeRangeGranularity, DateTimeRangeSelector } from "@/components/form/date-time-range-selector";
+import React from "react";
 
 interface TransportStepFiltersPanelProps {
     messageOrRemoteSystemIdentifier: string;
     linkPartnerName: string;
     statuses: TransportStepStatusesFilter[] | [];
+    dateRange: RangeValue<ZonedDateTime> | null;
+    dateGranularity: DateTimeRangeGranularity;
     onMessageOrRemoteSystemIdentifierChange: (value: string) => void;
     onLinkPartnerNameChange: (value: string) => void;
     onStatusesChange: (statuses: TransportStepStatusesFilter[] | []) => void;
+    onDateRangeChange: (dateRange: RangeValue<ZonedDateTime> | null) => void;
     className?: string;
 }
 
@@ -26,9 +33,12 @@ export function TransportStepFiltersPanel({
                                               messageOrRemoteSystemIdentifier,
                                               linkPartnerName,
                                               statuses,
+                                              dateRange,
+                                              dateGranularity,
                                               onMessageOrRemoteSystemIdentifierChange,
                                               onLinkPartnerNameChange,
                                               onStatusesChange,
+                                              onDateRangeChange,
                                               className,
                                           }: TransportStepFiltersPanelProps) {
     return (
@@ -54,10 +64,18 @@ export function TransportStepFiltersPanel({
                     <SearchField.ClearButton/>
                 </SearchField.Group>
             </SearchField>
+
             <TransportStepStatusMultiSelector
                 values={statuses}
                 showAll={true}
                 onValueChange={onStatusesChange}
+            />
+
+            <DateTimeRangeSelector
+                value={dateRange}
+                granularity={dateGranularity}
+                shouldForceLeadingZeros={true}
+                onChange={(next) => onDateRangeChange(next as RangeValue<ZonedDateTime> | null)}
             />
         </SearchCriteriaBox>
     );

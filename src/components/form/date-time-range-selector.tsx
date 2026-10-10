@@ -10,7 +10,7 @@
 
 "use client";
 
-import type { TimeValue } from "@heroui/react";
+import { Button, TimeValue } from "@heroui/react";
 import { DateField, DateRangePicker, Label, RangeCalendar, TimeField, useLocale, } from "@heroui/react";
 import { DateFormatter, DateValue, getLocalTimeZone, now, ZonedDateTime } from "@internationalized/date";
 
@@ -18,45 +18,44 @@ export type DateTimeRangeGranularity = "day" | "hour" | "minute" | "second";
 
 type HourCycle = 12 | 24;
 
+const ClearIcon = ()=> {
+    return (
+        <svg aria-hidden="true" fill="none" height="14" viewBox="0 0 24 24" width="14"
+             stroke="currentColor" strokeLinecap="round" strokeWidth="2">
+            <path d="M6 6l12 12M18 6L6 18"/>
+        </svg>
+    );
+}
+
 export type DateRange = {
     start: DateValue;
     end: DateValue;
 };
 
 export interface DateTimeRangeSelectorProps {
-    /** Field label shown above the input. */
     label?: string;
-    /** Smallest unit shown/editable. Defaults to "second". */
     granularity?: DateTimeRangeGranularity;
-    /** 12- or 24-hour clock. Defaults to 24. */
     hourCycle?: HourCycle;
-    /** Hide the timezone abbreviation in the segments. */
     hideTimeZone?: boolean;
-    /** Force leading zeros on numeric segments. */
     shouldForceLeadingZeros?: boolean;
-    /** Controlled value. */
     value?: DateRange | null;
-    /** Uncontrolled initial value. */
     defaultValue?: DateRange | null;
     maxValue?: ZonedDateTime | null;
-    /** Fires whenever the selected range changes. */
     onChange?: (value: DateRange | null) => void;
-    /** Form field names for the hidden inputs (useful in native forms). */
     startName?: string;
     endName?: string;
     className?: string;
     isDisabled?: boolean;
-    /** Hide the "Selected: ..." helper line under the calendar. */
     showSelectedSummary?: boolean;
 }
 
 const tz = getLocalTimeZone();
 
 export function DateTimeRangeSelector({
-                                          label = "Date range",
+                                          label = "Select a date range",
                                           granularity = "second",
                                           hourCycle = 24,
-                                          hideTimeZone = false,
+                                          hideTimeZone = true,
                                           shouldForceLeadingZeros = false,
                                           value,
                                           defaultValue,
@@ -128,6 +127,17 @@ export function DateTimeRangeSelector({
                                 </DateField.Input>
                             </DateField.InputContainer>
                             <DateField.Suffix>
+                                {!isDisabled && (state.value?.start || state.dateRange?.start) && (
+                                    <Button
+                                        isIconOnly
+                                        aria-label="Clear date range"
+                                        size="sm"
+                                        variant="ghost"
+                                        onPress={() => state.setValue(null)}
+                                    >
+                                        <ClearIcon/>
+                                    </Button>
+                                )}
                                 <DateRangePicker.Trigger>
                                     <DateRangePicker.TriggerIndicator/>
                                 </DateRangePicker.Trigger>
@@ -214,11 +224,11 @@ export function DateTimeRangeSelector({
 
                             {showSelectedSummary && (
                                 <span className="mt-1 text-xs text-muted">
-                Selected:{" "}
+                                    Selected:{" "}
                                     {state.value?.start && state.value?.end
                                         ? formatRange({ end: state.value.end, start: state.value.start })
                                         : "No date selected"}
-              </span>
+                                </span>
                             )}
                         </DateRangePicker.Popover>
                     </>

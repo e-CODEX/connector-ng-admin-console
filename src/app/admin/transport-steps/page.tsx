@@ -33,8 +33,14 @@ import { DetailActionButton } from "@/components/common/action-button/detail-act
 import { asFilter } from "@/utils";
 import { ALL_SELECTOR } from "@/types/global";
 import { TransportStepStatusesFilter } from "@/components/form/transport-step-status-multi-selector";
+import { DateTimeRangeGranularity } from "@/components/form/date-time-range-selector";
+import type { RangeValue } from "react-aria-components";
+import { ZonedDateTime } from "@internationalized/date";
+import { buildDefaultRange, toDateRange } from "@/types/period";
 
 const IDENTIFIER_LENGTH = 30;
+
+const granularity: DateTimeRangeGranularity = "minute";
 
 const asStatusesFilter = (values: TransportStepStatusesFilter[]) => values.length === 0 || values.includes(ALL_SELECTOR) ? undefined : values;
 
@@ -43,6 +49,7 @@ export default function TransportStepsAdminPage() {
     const [messageOrRemoteSystemIdentifierQuery, setMessageOrRemoteSystemIdentifierQuery] = useState("");
     const [linkPartnerNameQuery, setLinkPartnerNameQuery] = useState("");
     const [statusesQuery, setStatusesQuery] = useState({ statuses: [] as TransportStepStatusesFilter[] });
+    const [dateRange, setDateRange] = useState<RangeValue<ZonedDateTime> | null>(buildDefaultRange);
     const debouncedMessageOrRemoteSystemIdentifier = useDebouncedValue(messageOrRemoteSystemIdentifierQuery);
     const debouncedLinkPartnerName = useDebouncedValue(linkPartnerNameQuery);
 
@@ -55,9 +62,10 @@ export default function TransportStepsAdminPage() {
                 size,
                 messageOrRemoteSystemIdentifier: asFilter(debouncedMessageOrRemoteSystemIdentifier),
                 linkPartnerName: asFilter(debouncedLinkPartnerName),
-                statuses: asStatusesFilter(statusesQuery.statuses)
+                statuses: asStatusesFilter(statusesQuery.statuses),
+                ...toDateRange(dateRange, granularity),
             }),
-        [debouncedMessageOrRemoteSystemIdentifier, debouncedLinkPartnerName, statusesQuery],
+        [debouncedMessageOrRemoteSystemIdentifier, debouncedLinkPartnerName, statusesQuery, dateRange],
     );
 
     const onMessageOrRemoteSystemIdentifierChange = (value: string) => {
@@ -105,9 +113,12 @@ export default function TransportStepsAdminPage() {
                 messageOrRemoteSystemIdentifier={messageOrRemoteSystemIdentifierQuery}
                 linkPartnerName={linkPartnerNameQuery}
                 statuses={statusesQuery.statuses}
+                dateRange={dateRange}
+                dateGranularity={granularity}
                 onMessageOrRemoteSystemIdentifierChange={onMessageOrRemoteSystemIdentifierChange}
                 onLinkPartnerNameChange={onLinkPartnerNameChange}
                 onStatusesChange={onStatusesChange}
+                onDateRangeChange={(next) => setDateRange(next as RangeValue<ZonedDateTime> | null)}
             />
 
             {pagedList.loading ? (

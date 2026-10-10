@@ -45,7 +45,7 @@ export function MessageDirectionSelector({
                                              label = "Direction",
                                              isDisabled = false,
                                              showAll = false,
-                                             className = "min-w-70",
+                                             className = "min-w-40",
                                          }: MessageDirectionSelectorProps) {
     const options = useMemo(
         () => (showAll ? [ALL_OPTION, ...DIRECTION_OPTIONS] : DIRECTION_OPTIONS),

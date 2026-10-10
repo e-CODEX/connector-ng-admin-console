@@ -13,11 +13,13 @@ import { ConnectorTransportStep } from "@/types/response/transport-step";
 import { RestApiCall } from "@/lib/rest";
 
 export type ListTransportStepsParams = {
-    page?: number,
-    size?: number,
-    messageOrRemoteSystemIdentifier?: string,
-    linkPartnerName?: string,
-    statuses?: string[],
+    page?: number;
+    size?: number;
+    messageOrRemoteSystemIdentifier?: string;
+    linkPartnerName?: string;
+    statuses?: string[];
+    from?: string;
+    to?: string;
 }
 
 export function createTransportStepsService(baseUrl: string, call: RestApiCall) {

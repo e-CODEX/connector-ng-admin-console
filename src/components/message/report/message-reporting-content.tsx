@@ -12,7 +12,7 @@ import { Button, Description, Dropdown, Kbd, Key, Label, Modal, Table } from "@h
 import { type RangeValue } from "react-aria-components";
 import React, { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { MessageReportExportFormat } from "@/services/message";
-import { getLocalTimeZone, now, ZonedDateTime } from "@internationalized/date";
+import { ZonedDateTime } from "@internationalized/date";
 import { saveFile, toastError } from "@/utils";
 import { ArrowUpFromSquare, Magnifier } from "@gravity-ui/icons";
 import { ConnectorMessageReportResponse } from "@/types/response/reporting";
@@ -23,41 +23,11 @@ import { SpinnerView } from "@/components/common/spinner-view";
 import { asBusinessDomainSelectorFilter, BusinessDomainSelector } from "@/components/form/business-domain-selector";
 import { useBusinessDomainIdentifiers } from "@/hooks/use-business-domain-identifiers";
 import { useMessageService } from "@/hooks/use-http-service";
+import { buildDefaultRange, toDateRange } from "@/types/period";
 
 const ALL_BUSINESS_DOMAIN_SELECTOR = "All Business domains";
 
-const tz = getLocalTimeZone();
 const granularity: DateTimeRangeGranularity = "day";
-
-function buildDefaultRange(): RangeValue<ZonedDateTime> {
-    const todayZoned = now(tz);
-    return { start: todayZoned, end: todayZoned };
-}
-
-function toReportRange(
-    selected: RangeValue<ZonedDateTime> | null,
-    rangeGranularity: DateTimeRangeGranularity,
-) {
-    if (!selected) {
-        return { from: "", to: "" };
-    }
-
-    let from = selected.start;
-    let to = selected.end;
-
-    if (rangeGranularity === "day") {
-        const startOfDay = { hour: 0, minute: 0, second: 0, millisecond: 0 } as const;
-        const endOfDay = { hour: 23, minute: 59, second: 59, millisecond: 0 } as const;
-        from = selected.start.set(startOfDay);
-        to = selected.end.set(endOfDay);
-    }
-
-    return {
-        // ZonedDateTime#toDate() -> absolute instant; toISOString() -> UTC.
-        from: from.toDate().toISOString(),
-        to: to.toDate().toISOString(),
-    };
-}
 
 function toExportFormat(formatKey: Key): MessageReportExportFormat {
     switch (formatKey) {
@@ -77,7 +47,7 @@ export function MessageReportingContent() {
     const [refreshing, setRefreshing] = useState(false);
     const [messageReports, setMessageReports] = useState<ConnectorMessageReportResponse | undefined>(undefined);
     const [businessDomainIdentifierQuery, setBusinessDomainIdentifierQuery] = useState<string>(ALL_BUSINESS_DOMAIN_SELECTOR);
-    const [range, setRange] = useState<RangeValue<ZonedDateTime> | null>(buildDefaultRange);
+    const [dateRange, setDateRange] = useState<RangeValue<ZonedDateTime> | null>(buildDefaultRange);
     const [hasLoaded, setHasLoaded] = useState(false);
     const requestId = useRef(0);
 
@@ -94,7 +64,7 @@ export function MessageReportingContent() {
                 try {
                     const data = await messageService.getMessageReports({
                         businessDomain: asBusinessDomainSelectorFilter(domain, ALL_BUSINESS_DOMAIN_SELECTOR),
-                        ...toReportRange(selected, granularity),
+                        ...toDateRange(selected, granularity),
                     });
                     if (!isCurrent()) return;
                     setMessageReports(data);
@@ -127,12 +97,12 @@ export function MessageReportingContent() {
 
     const onApplyPress = () => {
         setRefreshing(true);
-        void loadReports(range, businessDomainIdentifierQuery);
+        void loadReports(dateRange, businessDomainIdentifierQuery);
     };
 
     const onExportClick = async (formatKey: Key) => {
         const params = {
-            ...toReportRange(range, granularity),
+            ...toDateRange(dateRange, granularity),
             format: toExportFormat(formatKey),
             businessDomain: asBusinessDomainSelectorFilter(businessDomainIdentifierQuery, ALL_BUSINESS_DOMAIN_SELECTOR),
         };
@@ -153,10 +123,10 @@ export function MessageReportingContent() {
                 <SearchCriteriaBox className="mt-0">
                     <DateTimeRangeSelector
                         label="Select a date range"
-                        value={range}
+                        value={dateRange}
                         granularity={granularity}
                         shouldForceLeadingZeros={true}
-                        onChange={(next) => setRange(next as RangeValue<ZonedDateTime> | null)}
+                        onChange={(next) => setDateRange(next as RangeValue<ZonedDateTime> | null)}
                     />
                     <BusinessDomainSelector
                         identifiers={businessDomainIdentifiers}
@@ -171,7 +141,7 @@ export function MessageReportingContent() {
                         <Button
                             variant="primary"
                             isPending={refreshing}
-                            isDisabled={!range}
+                            isDisabled={!dateRange}
                             onPress={onApplyPress}
                         >
                             <Magnifier/>

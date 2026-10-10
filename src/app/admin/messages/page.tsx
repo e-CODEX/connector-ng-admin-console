@@ -39,8 +39,14 @@ import { ActionButton } from "@/components/common/action-button/action-button";
 import { DetailActionButton } from "@/components/common/action-button/detail-action-button";
 import { asFilter } from "@/utils";
 import { ALL_SELECTOR } from "@/types/global";
+import type { RangeValue } from "react-aria-components";
+import { ZonedDateTime } from "@internationalized/date";
+import { buildDefaultRange, toDateRange } from "@/types/period";
+import { DateTimeRangeGranularity } from "@/components/form/date-time-range-selector";
 
 const IDENTIFIER_LENGTH = 10;
+
+const granularity: DateTimeRangeGranularity = "minute";
 
 export default function MessagesAdminPage() {
     const [selectedMessage, setSelectedMessage] = useState<ConnectorMessage | null>(null);
@@ -49,6 +55,7 @@ export default function MessagesAdminPage() {
     const [messageDirectionQuery, setMessageDirectionQuery] = useState(ALL_SELECTOR);
     const [businessDomainIdentifierQuery, setBusinessDomainIdentifierQuery] = useState(ALL_SELECTOR);
     const [processingModeServiceQuery, setProcessingModeServiceQuery] = useState(ALL_SELECTOR);
+    const [dateRange, setDateRange] = useState<RangeValue<ZonedDateTime> | null>(buildDefaultRange);
     const debouncedIdentifier = useDebouncedValue(identifierQuery);
     const debouncedBackendName = useDebouncedValue(backendNameQuery);
 
@@ -67,13 +74,15 @@ export default function MessagesAdminPage() {
                 direction: asFilter(messageDirectionQuery),
                 businessDomain: asBusinessDomainSelectorFilter(businessDomainIdentifierQuery, ALL_SELECTOR),
                 service: asFilter(processingModeServiceQuery),
+                ...toDateRange(dateRange, granularity),
             }),
         [
             debouncedIdentifier,
             debouncedBackendName,
             messageDirectionQuery,
             businessDomainIdentifierQuery,
-            processingModeServiceQuery
+            processingModeServiceQuery,
+            dateRange
         ],
     );
 
@@ -152,11 +161,14 @@ export default function MessagesAdminPage() {
                 processingModeService={processingModeServiceQuery}
                 businessDomainIdentifiers={businessDomainIdentifiers}
                 processingModesServices={processingModeServices.items}
+                dateRange={dateRange}
+                dateGranularity={granularity}
                 onIdentifierChange={onIdentifierChange}
                 onBackendNameChange={onBackendNameChange}
                 onBusinessDomainIdentifierChange={onBusinessDomainIdentifierChange}
                 onProcessingModesServiceChange={onProcessingModeServiceChange}
                 onDirectionChange={onDirectionChange}
+                onDateRangeChange={(next) => setDateRange(next as RangeValue<ZonedDateTime> | null)}
             />
 
             {pagedList.loading ? (

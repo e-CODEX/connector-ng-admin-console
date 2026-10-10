@@ -32,13 +32,15 @@ const getExportExtension = (format: MessageReportExportFormat,): string => {
 export type MessageReportExportFormat = keyof typeof MESSAGE_REPORT_EXPORT_FORMATS;
 
 export type ListMessageParams = {
-    page?: number,
-    size?: number,
-    identifier?: string,
-    backendName?: string,
-    direction?: string,
-    businessDomain?: string,
-    service?: string
+    page?: number;
+    size?: number;
+    identifier?: string;
+    backendName?: string;
+    direction?: string;
+    businessDomain?: string;
+    service?: string;
+    from?: string;
+    to?: string;
 }
 
 export type GetMessageReportParams = {

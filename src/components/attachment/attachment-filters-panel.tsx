@@ -12,16 +12,23 @@ import { Label, SearchField } from "@heroui/react";
 import { SearchCriteriaBox } from "@/components/form/search-criteria-box";
 import { AttachmentTypeMultiSelector, AttachmentTypesFilter } from "@/components/form/attachment-type-multi-selector";
 import { AttachmentStorageMultiSelector, AttachmentStoragesFilter } from "@/components/form/attachment-storage-multi-selector";
+import type { RangeValue } from "react-aria-components";
+import { ZonedDateTime } from "@internationalized/date";
+import { DateTimeRangeGranularity, DateTimeRangeSelector } from "@/components/form/date-time-range-selector";
+import React from "react";
 
 interface MessageFiltersPanelProps {
     messageIdentifier: string;
     filename: string;
     types: AttachmentTypesFilter[] | [];
     storages: AttachmentStoragesFilter[] | [];
+    dateRange: RangeValue<ZonedDateTime> | null;
+    dateGranularity: DateTimeRangeGranularity;
     onMessageIdentifierChange: (value: string) => void;
     onFilenameChange: (value: string) => void;
     onTypesChange: (types: AttachmentTypesFilter[] | []) => void;
     onStoragesChange: (storages: AttachmentStoragesFilter[] | []) => void;
+    onDateRangeChange: (dateRange: RangeValue<ZonedDateTime> | null) => void;
     className?: string;
 }
 
@@ -30,10 +37,13 @@ export function MessageFiltersPanel({
                                         filename,
                                         types,
                                         storages,
+                                        dateRange,
+                                        dateGranularity,
                                         onMessageIdentifierChange,
                                         onFilenameChange,
                                         onTypesChange,
                                         onStoragesChange,
+                                        onDateRangeChange,
                                         className
                                     }: MessageFiltersPanelProps) {
     return (
@@ -46,6 +56,7 @@ export function MessageFiltersPanel({
                     <SearchField.ClearButton/>
                 </SearchField.Group>
             </SearchField>
+
             <SearchField className="w-full sm:max-w-xs" value={filename} onChange={onFilenameChange}>
                 <Label className="text-sm font-medium">Filename</Label>
                 <SearchField.Group>
@@ -54,15 +65,24 @@ export function MessageFiltersPanel({
                     <SearchField.ClearButton/>
                 </SearchField.Group>
             </SearchField>
+
             <AttachmentTypeMultiSelector
                 values={types}
                 showAll={true}
                 onValueChange={onTypesChange}
             />
+
             <AttachmentStorageMultiSelector
                 values={storages}
                 showAll={true}
                 onValueChange={onStoragesChange}
+            />
+
+            <DateTimeRangeSelector
+                value={dateRange}
+                granularity={dateGranularity}
+                shouldForceLeadingZeros={true}
+                onChange={(next) => onDateRangeChange(next as RangeValue<ZonedDateTime> | null)}
             />
         </SearchCriteriaBox>
     );

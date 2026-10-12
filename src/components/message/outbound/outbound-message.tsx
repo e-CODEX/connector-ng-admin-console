@@ -11,7 +11,7 @@
 "use client";
 
 import { useState } from "react";
-import { PageHeader } from "@/components/common/page-header";
+import { PageHeader } from "@/components/common/header/page-header";
 import { FormUpdater, OutboundMessageForm } from "@/components/message/outbound/outbound-message-form";
 import { OutboundMessageSendParametersSection } from "@/components/message/outbound/outbound-message-send-params-section";
 import { OutboundMessageActionBar } from "@/components/message/outbound/outbound-message-action-bar";
@@ -19,7 +19,7 @@ import { OutboundMessageConsolePanel } from "@/components/message/outbound/outbo
 import { SendMessageFormData, SendParameters, } from "@/types/send-message-form";
 import { Send } from "lucide-react";
 import { useBusinessDomainIdentifiers } from "@/hooks/use-business-domain-identifiers";
-import { BusinessDomainSelector } from "@/components/form/business-domain-selector";
+import { BusinessDomainSelector } from "@/components/form/selector/business-domain-selector";
 import { useProcessingModeServices } from "@/hooks/use-processing-mode-services";
 import { useProcessingModeActions } from "@/hooks/use-processing-mode-actions";
 import { useProcessingModeParties } from "@/hooks/use-processing-mode-parties";

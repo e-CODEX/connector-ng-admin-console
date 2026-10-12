@@ -15,7 +15,7 @@ import React from "react";
 import { ConnectorTransportStep } from "@/types/response/transport-step";
 import { TransportStepDetailsContent } from "@/components/transport-step/transport-step-details-content";
 import { Route } from "lucide-react";
-import { ModalHeaderIcon } from "@/components/common/modal-header-icon";
+import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";
 
 interface TransportStepDetailsViewProps {
     transportStep: ConnectorTransportStep | null;

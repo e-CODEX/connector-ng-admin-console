@@ -10,7 +10,7 @@
 
 "use client"
 
-import { PageHeader } from "@/components/common/page-header";
+import { PageHeader } from "@/components/common/header/page-header";
 import React, { useState } from "react";
 import { ConnectorAttachmentResponse } from "@/types/response/attachments";
 import { Table, useOverlayState } from "@heroui/react";
@@ -18,7 +18,7 @@ import { asFilter, formatBytes, saveFile, toastError, truncate } from "@/utils";
 import { PaginationControls } from "@/components/paging/pagination-controls";
 import { AttachmentDetailsView } from "@/components/attachment/attachment-details-view";
 import { ArrowsRotateRight } from "@gravity-ui/icons";
-import { PageHeaderButton } from "@/components/common/page-header-button";
+import { PageHeaderButton } from "@/components/common/header/page-header-button";
 import { AttachmentStorageChip } from "@/components/attachment/attachment-storage-chip";
 import { Paperclip } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
@@ -31,10 +31,10 @@ import { DetailActionButton } from "@/components/common/action-button/detail-act
 import { DownloadActionButton } from "@/components/common/action-button/download-action-button";
 import { MessageFiltersPanel } from "@/components/attachment/attachment-filters-panel";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
-import { AttachmentTypesFilter } from "@/components/form/attachment-type-multi-selector";
+import { AttachmentTypesFilter } from "@/components/form/selector/attachment-type-multi-selector";
 import { ALL_SELECTOR } from "@/types/global";
-import { AttachmentStoragesFilter } from "@/components/form/attachment-storage-multi-selector";
-import { DateTimeRangeGranularity } from "@/components/form/date-time-range-selector";
+import { AttachmentStoragesFilter } from "@/components/form/selector/attachment-storage-multi-selector";
+import { DateTimeRangeGranularity } from "@/components/form/selector/date-time-range-selector";
 import type { RangeValue } from "react-aria-components";
 import { ZonedDateTime } from "@internationalized/date";
 import { buildDefaultRange, toDateRange } from "@/types/period";

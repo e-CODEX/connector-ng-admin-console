@@ -8,7 +8,7 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { AppInfoView } from "@/components/common/app-info-view";
+import { AppInfoView } from "@/components/common/app/app-info-view";
 
 export function AppFooter() {
     return (

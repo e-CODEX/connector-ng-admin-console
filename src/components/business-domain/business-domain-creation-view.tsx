@@ -14,7 +14,7 @@ import { Button, FieldError, Form, Input, Label, ListBox, Modal, Select, Spinner
 import React, { useEffect, useState } from "react";
 import { BusinessDomainCreationRequest } from "@/types/request/business-domain";
 import { Plus } from "lucide-react";
-import { ModalHeaderIcon } from "@/components/common/modal-header-icon";
+import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";
 
 interface BusinessDomainCreationViewProps {
     state: ReturnType<typeof useOverlayState>;

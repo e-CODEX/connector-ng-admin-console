@@ -5,7 +5,7 @@ import { Button, Form } from "@heroui/react";
 import { toastErrorMessage } from "@/utils";
 import { ChangePasswordRequest } from "@/types/request/user";
 import { changePasswordSchema } from "@/schemas/auth";
-import { PasswordField } from "@/components/user/password-text-field";
+import { PasswordField } from "@/components/form/password-text-field";
 
 const FORM_ID = "change-password-form"
 type FieldErrors = Partial<Record<keyof ChangePasswordRequest, string>>;

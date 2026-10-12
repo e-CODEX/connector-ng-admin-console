@@ -12,9 +12,9 @@
 
 import React, { useState } from "react";
 import { ConnectorQueueStats } from "@/types/response/queue";
-import { PageHeaderButton } from "@/components/common/page-header-button";
+import { PageHeaderButton } from "@/components/common/header/page-header-button";
 import { ArrowsRotateRight } from "@gravity-ui/icons";
-import { PageHeader } from "@/components/common/page-header";
+import { PageHeader } from "@/components/common/header/page-header";
 import { QueueCard } from "@/components/queue/QueueCard";
 import { Layers } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";

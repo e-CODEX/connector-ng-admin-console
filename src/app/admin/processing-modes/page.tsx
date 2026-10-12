@@ -11,14 +11,14 @@
 "use client";
 
 import path from "path";
-import { PageHeader } from "@/components/common/page-header";
+import { PageHeader } from "@/components/common/header/page-header";
 import React, { useState } from "react";
 import { Table, useOverlayState } from "@heroui/react";
 import { ConnectorProcessingMode } from "@/types/response/processing-mode";
 import { saveFile, toastError, toastSuccess } from "@/utils";
 import { ProcessingModeDetailsView } from "@/components/processing-mode/detail/processing-mode-detail-view";
 import { ArrowsRotateRight, Plus } from "@gravity-ui/icons";
-import { PageHeaderButton } from "@/components/common/page-header-button";
+import { PageHeaderButton } from "@/components/common/header/page-header-button";
 import { ProcessingModeCreationView } from "@/components/processing-mode/creation/processing-mode-creation-view";
 import { Pen, Workflow } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";

@@ -11,9 +11,9 @@
 import { v4 as uuidv4 } from 'uuid';
 import { SendMessageFormData, SendParameters } from "@/types/send-message-form";
 import { RestOutboundMessageRequest } from "@/types/request/message";
-import { generatePdfBlob, getXmlContentAsBlob } from "@/utils/fileUtils";
+import { generatePdfBlob, getXmlContentAsBlob } from "@/utils/file-utils";
 import { AttachmentService } from "@/services/attachment";
-import { readFixtureAsBlob } from "@/actions/fixtureActions";
+import { readFixtureAsBlob } from "@/actions/fixture-actions";
 
 /**
  * Creates the payload for sending a REST outbound message.

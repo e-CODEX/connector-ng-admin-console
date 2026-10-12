@@ -12,7 +12,7 @@ import { Modal, useOverlayState } from "@heroui/react";
 import React from "react";
 import { MessageReportingContent } from "@/components/message/report/message-reporting-content";
 import { ChartPie } from "lucide-react";
-import { ModalHeaderIcon } from "@/components/common/modal-header-icon";
+import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";
 
 interface MessageReportingViewProps {
     state: ReturnType<typeof useOverlayState>;

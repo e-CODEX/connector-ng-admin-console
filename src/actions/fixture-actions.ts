@@ -12,7 +12,7 @@
 
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { base64ToBlob } from "@/utils/fileUtils";
+import { base64ToBlob } from "@/utils/file-utils";
 
 export async function readFixtureAsBase64(name: string): Promise<string> {
     const filePath = path.join(process.cwd(), "src/fixtures", path.basename(name));

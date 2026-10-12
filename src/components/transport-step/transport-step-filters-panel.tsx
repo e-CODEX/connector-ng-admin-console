@@ -10,10 +10,10 @@
 
 import { Label, SearchField } from "@heroui/react";
 import { SearchCriteriaBox } from "@/components/form/search-criteria-box";
-import { TransportStepStatusesFilter, TransportStepStatusMultiSelector } from "@/components/form/transport-step-status-multi-selector";
+import { TransportStepStatusesFilter, TransportStepStatusMultiSelector } from "@/components/form/selector/transport-step-status-multi-selector";
 import type { RangeValue } from "react-aria-components";
 import { ZonedDateTime } from "@internationalized/date";
-import { DateTimeRangeGranularity, DateTimeRangeSelector } from "@/components/form/date-time-range-selector";
+import { DateTimeRangeGranularity, DateTimeRangeSelector } from "@/components/form/selector/date-time-range-selector";
 import React from "react";
 
 interface TransportStepFiltersPanelProps {

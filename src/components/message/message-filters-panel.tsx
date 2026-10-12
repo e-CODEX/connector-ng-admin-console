@@ -10,13 +10,13 @@
 
 import { Label, SearchField } from "@heroui/react";
 import { SearchCriteriaBox } from "@/components/form/search-criteria-box";
-import { BusinessDomainSelector } from "@/components/form/business-domain-selector";
-import { ProcessingModeServiceSelector } from "@/components/form/pmode-service-selector";
+import { BusinessDomainSelector } from "@/components/form/selector/business-domain-selector";
+import { ProcessingModeServiceSelector } from "@/components/form/selector/pmode-service-selector";
 import { ConnectorProcessingModeService } from "@/types/response/processing-mode";
-import { MessageDirectionSelector } from "@/components/form/message-direction-selector";
+import { MessageDirectionSelector } from "@/components/form/selector/message-direction-selector";
 import type { RangeValue } from "react-aria-components";
 import { ZonedDateTime } from "@internationalized/date";
-import { DateTimeRangeGranularity, DateTimeRangeSelector } from "@/components/form/date-time-range-selector";
+import { DateTimeRangeGranularity, DateTimeRangeSelector } from "@/components/form/selector/date-time-range-selector";
 import React from "react";
 import { ALL_SELECTOR } from "@/types/global";
 

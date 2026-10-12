@@ -15,6 +15,7 @@ import { MessageDirection } from "@/types/global";
 
 interface DirectionPresentation {
     label: string;
+    shortLabel: string;
     description: string;
     icon: ComponentType<{ className?: string }>;
     color: "warning" | "accent";
@@ -23,12 +24,14 @@ interface DirectionPresentation {
 export const MESSAGE_DIRECTION: Record<MessageDirection, DirectionPresentation> = {
     BACKEND_TO_GATEWAY: {
         label: "Outbound",
+        shortLabel: "Out",
         description: "Sent from the backend to the gateway",
         icon: ArrowUpRight,
         color: "warning",
     },
     GATEWAY_TO_BACKEND: {
         label: "Inbound",
+        shortLabel: "In",
         description: "Received from the gateway by the backend",
         icon: ArrowDownLeft,
         color: "accent",
@@ -38,15 +41,21 @@ export const MESSAGE_DIRECTION: Record<MessageDirection, DirectionPresentation> 
 interface MessageDirectionChipProps {
     direction: MessageDirection;
     showLabel?: boolean;
+    labelVariant?: "full" | "short";
 }
 
-export function MessageDirectionChip({ direction, showLabel = true, }: MessageDirectionChipProps) {
-    const { label, description, icon: Icon, color } = MESSAGE_DIRECTION[direction];
+export function MessageDirectionChip({
+                                         direction,
+                                         showLabel = true,
+                                         labelVariant = "full",
+                                     }: MessageDirectionChipProps) {
+    const { label, shortLabel, description, icon: Icon, color } = MESSAGE_DIRECTION[direction];
+    const text = labelVariant === "short" ? shortLabel : label;
 
     return (
         <Chip className="px-2 text-white [&_svg]:text-inherit" color={color} variant="primary" size="md" aria-label={description}>
             <Icon className="size-3.5 shrink-0" aria-hidden="true"/>
-            {showLabel && <Chip.Label className="text-inherit">{label}</Chip.Label>}
+            {showLabel && <Chip.Label className="text-inherit">{text}</Chip.Label>}
         </Chip>
     );
 }

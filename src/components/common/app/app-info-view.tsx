@@ -12,7 +12,7 @@
 
 import { AppBuildInfo } from "@/types/response/actuator";
 import { Chip } from "@heroui/react";
-import { AppHealthIndicatorView } from "@/components/common/app-health-indicator-view";
+import { AppHealthIndicatorView } from "@/components/common/app/app-health-indicator-view";
 import { useActuatorService } from "@/hooks/use-http-service";
 import { useEffect, useState } from "react";
 

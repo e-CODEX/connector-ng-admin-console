@@ -10,14 +10,14 @@
 
 "use client";
 
-import { PageHeader } from "@/components/common/page-header";
+import { PageHeader } from "@/components/common/header/page-header";
 import React from "react";
 import { ConnectorBusinessDomain } from "@/types/response/business-domain";
 import { Table, useOverlayState } from "@heroui/react";
 import { toastError, toastSuccess, truncate } from "@/utils";
 import { ArrowsRotateRight, Plus } from "@gravity-ui/icons";
 import { BusinessDomainCreationView } from "@/components/business-domain/business-domain-creation-view";
-import { PageHeaderButton } from "@/components/common/page-header-button";
+import { PageHeaderButton } from "@/components/common/header/page-header-button";
 import { BooleanChip } from "@/components/common/boolean-chip";
 import { Building2 } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";

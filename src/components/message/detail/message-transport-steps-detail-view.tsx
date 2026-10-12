@@ -18,7 +18,7 @@ import { TransportStepDetailsContent } from "@/components/transport-step/transpo
 import { toastError } from "@/utils";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { Route } from "lucide-react";
-import { ModalHeaderIcon } from "@/components/common/modal-header-icon";
+import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";
 import { useMessageService } from "@/hooks/use-http-service";
 
 interface MessageTransportStepsDetailViewProps {

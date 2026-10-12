@@ -17,7 +17,7 @@ import { ConnectorAttachmentResponse } from "@/types/response/attachments";
 import { DetailRow } from "@/components/common/detail-row";
 import { AttachmentStorageChip } from "@/components/attachment/attachment-storage-chip";
 import { ArrowDownToLine, Paperclip } from "lucide-react";
-import { ModalHeaderIcon } from "@/components/common/modal-header-icon";
+import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";
 import { DateTime } from "@/components/common/date-time";
 import { CopyableIdentifier } from "@/components/common/copyable-identifier";
 import { useAttachmentService } from "@/hooks/use-http-service";

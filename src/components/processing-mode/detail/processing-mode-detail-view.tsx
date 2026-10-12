@@ -17,7 +17,7 @@ import { ConnectorProcessingMode, ConnectorProcessingModeDetail } from "@/types/
 import { ProcessingModeDetailsSection } from "@/components/processing-mode/detail/processing-mode-detail-section";
 import { ArrowDownToLine, Workflow } from "lucide-react";
 import { useProcessingModeService } from "@/hooks/use-http-service";
-import { ModalHeaderIcon } from "@/components/common/modal-header-icon";
+import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";
 import path from "path";
 
 interface ProcessingModeDetailsViewProps {

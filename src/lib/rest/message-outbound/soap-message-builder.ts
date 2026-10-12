@@ -10,9 +10,9 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { SendMessageFormData } from "@/types/send-message-form";
-import { blobToBase64, getXmlContentAsBase64String } from "@/utils/fileUtils";
+import { blobToBase64, getXmlContentAsBase64String } from "@/utils/file-utils";
 import { SoapOutboundMessageDetails, SoapOutboundMessageRequest } from "@/types/request/message";
-import { readFixtureAsBlob } from "@/actions/fixtureActions";
+import { readFixtureAsBlob } from "@/actions/fixture-actions";
 
 
 /**

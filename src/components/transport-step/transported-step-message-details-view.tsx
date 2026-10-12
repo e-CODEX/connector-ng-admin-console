@@ -17,7 +17,7 @@ import React, { useEffect, useState } from "react";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { MessageDetailsContent } from "@/components/message/detail/message-details-content";
 import { Mail } from "lucide-react";
-import { ModalHeaderIcon } from "@/components/common/modal-header-icon";
+import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";
 import { useTransportStepService } from "@/hooks/use-http-service";
 import { ConnectorTransportStep } from "@/types/response/transport-step";
 

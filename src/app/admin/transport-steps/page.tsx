@@ -10,7 +10,7 @@
 
 "use client"
 
-import { PageHeader } from "@/components/common/page-header";
+import { PageHeader } from "@/components/common/header/page-header";
 import React, { useState } from "react";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { Table, useOverlayState } from "@heroui/react";
@@ -19,7 +19,7 @@ import { PaginationControls } from "@/components/paging/pagination-controls";
 import { ConnectorTransportStep } from "@/types/response/transport-step";
 import { TransportStepDetailsView } from "@/components/transport-step/transport-step-details-view";
 import { ArrowsRotateRight } from "@gravity-ui/icons";
-import { PageHeaderButton } from "@/components/common/page-header-button";
+import { PageHeaderButton } from "@/components/common/header/page-header-button";
 import { TransportStepMessageTypeChip } from "@/components/message/chip/message-type-chip";
 import { TransportDeliveryStatusChip } from "@/components/transport-step/transport-step-status-chip";
 import { Mail, Route } from "lucide-react";
@@ -32,8 +32,8 @@ import { CopyableIdentifier } from "@/components/common/copyable-identifier";
 import { DetailActionButton } from "@/components/common/action-button/detail-action-button";
 import { asFilter } from "@/utils";
 import { ALL_SELECTOR } from "@/types/global";
-import { TransportStepStatusesFilter } from "@/components/form/transport-step-status-multi-selector";
-import { DateTimeRangeGranularity } from "@/components/form/date-time-range-selector";
+import { TransportStepStatusesFilter } from "@/components/form/selector/transport-step-status-multi-selector";
+import { DateTimeRangeGranularity } from "@/components/form/selector/date-time-range-selector";
 import type { RangeValue } from "react-aria-components";
 import { ZonedDateTime } from "@internationalized/date";
 import { buildDefaultRange, toDateRange } from "@/types/period";

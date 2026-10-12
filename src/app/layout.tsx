@@ -13,7 +13,7 @@ import "../styles/globals.css";
 import { siteConfig } from "@/config/site";
 import { GeistMono, GeistSans } from "@/config/fonts";
 import { AppMainNavbar } from "@/components/common/menu/app-main-navbar";
-import { AppFooter } from "@/components/common/app-footer";
+import { AppFooter } from "@/components/common/app/app-footer";
 import React from "react";
 import { Toast } from "@heroui/react";
 import { Providers } from "@/app/providers";

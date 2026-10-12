@@ -13,11 +13,11 @@
 import { SendMessageFormData } from "@/types/send-message-form";
 import { FormTextField } from "@/components/form/form-text-field";
 import { ConnectorProcessingModeAction, ConnectorProcessingModeParty, ConnectorProcessingModeService } from "@/types/response/processing-mode";
-import { ProcessingModeServiceSelector, serviceKeyOf } from "@/components/form/pmode-service-selector";
-import { ProcessingModePartySelector } from "@/components/form/pmode-party-selector";
-import { actionKeyOf, ProcessingModeActionSelector } from "@/components/form/pmode-action-selector";
+import { ProcessingModeServiceSelector, serviceKeyOf } from "@/components/form/selector/pmode-service-selector";
+import { ProcessingModePartySelector } from "@/components/form/selector/pmode-party-selector";
+import { actionKeyOf, ProcessingModeActionSelector } from "@/components/form/selector/pmode-action-selector";
 import { useLinkPartners } from "@/hooks/use-link-partners";
-import { LinkPartnerSelector } from "@/components/form/link-partner-selector";
+import { LinkPartnerSelector } from "@/components/form/selector/link-partner-selector";
 import { ConnectorLinkPartner } from "@/types/response/link-partner";
 import { As4PropertiesRequest, BusinessDocumentInfo, PartyInfoRequest, RestOutboundMessageContent } from "@/types/request/message";
 import { emptyAction, emptyParty, emptyService } from "@/components/message/outbound/outbound-message-defaults";

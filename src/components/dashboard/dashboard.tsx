@@ -10,18 +10,18 @@
 
 "use client";
 
-import { PageHeader } from "@/components/common/page-header";
+import { PageHeader } from "@/components/common/header/page-header";
 import { MessageStatsSection } from "@/components/dashboard/message/stats/message-stats-section";
 import { ArrowsRotateRight } from "@gravity-ui/icons";
-import { PageHeaderButton } from "@/components/common/page-header-button";
+import { PageHeaderButton } from "@/components/common/header/page-header-button";
 import { useState } from "react";
-import { PeriodFilterSelector } from "@/components/form/period-filter-selector";
+import { PeriodFilterSelector } from "@/components/form/selector/period-filter-selector";
 import { DEFAULT_PERIOD, Period } from "@/types/period";
 import { MessageReportingSection } from "@/components/dashboard/message/reporting/message-reporting-section";
 import { DashboardSectionBox } from "@/components/dashboard/dashboard-section-box";
 import { BackendHealthSection } from "@/components/dashboard/health/backend-health-section";
 import { Gauge } from "lucide-react";
-import { asBusinessDomainSelectorFilter, BusinessDomainSelector } from "@/components/form/business-domain-selector";
+import { asBusinessDomainSelectorFilter, BusinessDomainSelector } from "@/components/form/selector/business-domain-selector";
 import { useBusinessDomainIdentifiers } from "@/hooks/use-business-domain-identifiers";
 
 const REFRESH_INTERVAL = 60_000;

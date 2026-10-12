@@ -15,7 +15,7 @@ import { Button, Description, FieldError, Fieldset, Form, Input, Label, Modal, S
 import { FileSelectField } from "@/components/form/file-select-field";
 import { toFieldErrors } from "@/schemas/processing-mode-creation";
 import { ArrowUpToLine, Pen } from "lucide-react";
-import { ModalHeaderIcon } from "@/components/common/modal-header-icon";
+import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";
 import { processingModeTruststoreEditionSchema, ProcessingModeTruststoreEditionValues } from "@/schemas/processing-mode-truststore-edition";
 import { ConnectorProcessingMode } from "@/types/response/processing-mode";
 import { ProcessingModeDetailHeaderSection } from "@/components/processing-mode/detail/processing-mode-detail-header-section";

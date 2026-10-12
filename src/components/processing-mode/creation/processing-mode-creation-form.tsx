@@ -13,11 +13,11 @@ import { useBusinessDomainIdentifiers } from "@/hooks/use-business-domain-identi
 import React, { useState } from "react";
 import { toastError } from "@/utils";
 import { Button, Description, FieldError, Fieldset, Form, Input, Label, Modal, Spinner, TextField } from "@heroui/react";
-import { BusinessDomainSelector } from "@/components/form/business-domain-selector";
+import { BusinessDomainSelector } from "@/components/form/selector/business-domain-selector";
 import { FileSelectField } from "@/components/form/file-select-field";
 import { processingModeCreationSchema, ProcessingModeCreationValues, toFieldErrors } from "@/schemas/processing-mode-creation";
 import { Plus, ArrowUpToLine } from "lucide-react";
-import { ModalHeaderIcon } from "@/components/common/modal-header-icon";
+import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";
 import { ACCEPTED_XMLS } from "@/types/global";
 
 

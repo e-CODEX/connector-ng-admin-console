@@ -22,7 +22,7 @@ import { ArrowsRotateRight } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/page-header-button";
 import { TransportStepMessageTypeChip } from "@/components/message/chip/message-type-chip";
 import { TransportDeliveryStatusChip } from "@/components/transport-step/transport-step-status-chip";
-import { Route } from "lucide-react";
+import { Mail, Route } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { usePagedList } from "@/hooks/use-paged-list";
@@ -37,6 +37,8 @@ import { DateTimeRangeGranularity } from "@/components/form/date-time-range-sele
 import type { RangeValue } from "react-aria-components";
 import { ZonedDateTime } from "@internationalized/date";
 import { buildDefaultRange, toDateRange } from "@/types/period";
+import { TransportedStepMessageDetailsView } from "@/components/transport-step/transported-step-message-details-view";
+import { ActionButton } from "@/components/common/action-button/action-button";
 
 const IDENTIFIER_LENGTH = 30;
 
@@ -87,10 +89,16 @@ export default function TransportStepsAdminPage() {
     };
 
     const detailsModal = useOverlayState();
+    const transportedMessageDetailsModal = useOverlayState();
 
     const onDetailsClick = (step: ConnectorTransportStep) => {
         setSelectedTransportStep(step);
         detailsModal.open();
+    };
+
+    const onTransportedMessageDetailsClick = (step: ConnectorTransportStep) => {
+        setSelectedTransportStep(step);
+        transportedMessageDetailsModal.open();
     };
 
     return (
@@ -167,6 +175,10 @@ export default function TransportStepsAdminPage() {
                                             <Table.Cell>
                                                 <div className="flex items-center gap-1">
                                                     <DetailActionButton onPress={() => onDetailsClick(transportStep)}/>
+                                                    <ActionButton
+                                                        label="Transported message details"
+                                                        icon={Mail}
+                                                        onPress={() => onTransportedMessageDetailsClick(transportStep)}/>
                                                 </div>
                                             </Table.Cell>
                                         </Table.Row>
@@ -195,6 +207,8 @@ export default function TransportStepsAdminPage() {
                     }
 
                     <TransportStepDetailsView transportStep={selectedTransportStep} state={detailsModal}/>
+
+                    <TransportedStepMessageDetailsView transportStep={selectedTransportStep} state={transportedMessageDetailsModal}/>
                 </>
             )}
         </div>

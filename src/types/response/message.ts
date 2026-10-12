@@ -31,10 +31,10 @@ export interface ConnectorMessage {
 }
 
 export interface ConnectorMessageDetailsResponse extends ConnectorMessage {
-    businessContent: ConnectorMessageBusinessContent;
-    attachments: ConnectorAttachmentResponse[];
+    businessContent?: ConnectorMessageBusinessContent;
+    attachments?: ConnectorAttachmentResponse[];
     evidences: ConnectorMessageEvidence[];
-    errors: ConnectorMessageError[];
+    errors?: ConnectorMessageError[];
 }
 
 export interface ConnectorMessageBusinessContent {

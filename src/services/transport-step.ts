@@ -11,6 +11,7 @@
 import { PaginatedResponse } from "@/types/response/paginated-response";
 import { ConnectorTransportStep } from "@/types/response/transport-step";
 import { RestApiCall } from "@/lib/rest";
+import { ConnectorMessageDetailsResponse } from "@/types/response/message";
 
 export type ListTransportStepsParams = {
     page?: number;
@@ -30,7 +31,10 @@ export function createTransportStepsService(baseUrl: string, call: RestApiCall) 
                 "api/v1/admin/transport-steps",
                 { params }
             )
-        }
+        },
+        async retrieveTransportedMessage(transportIdentifier: string): Promise<ConnectorMessageDetailsResponse> {
+            return call<ConnectorMessageDetailsResponse>(baseUrl, `api/v1/admin/transport-steps/${transportIdentifier}/message`);
+        },
     }
 }
 

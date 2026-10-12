@@ -123,30 +123,34 @@ export function MessageDetailsContent({ message, loading }: MessageDetailsConten
                 <DetailRow label="Service" value={message.as4Properties.service.name}/>
                 <DetailRow label="Action" value={message.as4Properties.action.name}/>
                 <DetailRow label="Direction" value={<MessageDirectionChip direction={message.direction}/>}/>
-                <DetailRow
-                    label="Status"
-                    value={<MessageDeliveryStatusChip message={message}/>}
-                />
-                <DetailRow
-                    label="Created at"
-                    value={<DateTime value={message.createdAt} precision="millis"/>}
-                />
-                <DetailRow
-                    label="Updated at"
-                    value={<DateTime value={message.updatedAt} precision="millis"/>}
-                />
-                <DetailRow
-                    label="Deleted at"
-                    value={<DateTime value={message.deletedAt} precision="millis"/>}
-                />
-                <DetailRow
-                    label="Rejected at"
-                    value={<DateTime value={message.rejectedAt} precision="millis"/>}
-                />
-                <DetailRow
-                    label="Confirmed at"
-                    value={<DateTime value={message.confirmedAt} precision="millis"/>}
-                />
+                {businessContent && (
+                    <>
+                        <DetailRow
+                            label="Status"
+                            value={<MessageDeliveryStatusChip message={message}/>}
+                        />
+                        <DetailRow
+                            label="Created at"
+                            value={<DateTime value={message.createdAt} precision="millis"/>}
+                        />
+                        <DetailRow
+                            label="Updated at"
+                            value={<DateTime value={message.updatedAt} precision="millis"/>}
+                        />
+                        <DetailRow
+                            label="Deleted at"
+                            value={<DateTime value={message.deletedAt} precision="millis"/>}
+                        />
+                        <DetailRow
+                            label="Rejected at"
+                            value={<DateTime value={message.rejectedAt} precision="millis"/>}
+                        />
+                        <DetailRow
+                            label="Confirmed at"
+                            value={<DateTime value={message.confirmedAt} precision="millis"/>}
+                        />
+                    </>
+                )}
                 <DetailRow
                     label="Delivered to Link Partner at"
                     value={<DateTime value={message.deliveredToLinkPartnerAt} precision="millis"/>}
@@ -154,62 +158,66 @@ export function MessageDetailsContent({ message, loading }: MessageDetailsConten
             </div>
 
             <div>
-                <DetailSection
-                    title="Business Content"
-                    isEmpty={!businessContent}
-                    emptyLabel="Not Yet Implemented."
-                >
-                    <BusinessDetailsBusinessContentSection
-                        businessContent={businessContent}
-                        onAttachmentDetailsClick={onBusinessContentDetailsClick}
-                    />
-                </DetailSection>
+                {businessContent && (
+                    <DetailSection
+                        title="Business Content"
+                        isEmpty={!businessContent}
+                        emptyLabel="Not Yet Implemented."
+                    >
+                        <BusinessDetailsBusinessContentSection
+                            businessContent={businessContent}
+                            onAttachmentDetailsClick={onBusinessContentDetailsClick}
+                        />
+                    </DetailSection>
+                )}
 
-                <DetailSection
-                    title="Attachments"
-                    isEmpty={!attachments?.length}
-                    emptyLabel="No attachments."
-                >
-                    <Table>
-                        <Table.ScrollContainer>
-                            <Table.Content aria-label="Message attachments">
-                                <Table.Header>
-                                    <Table.Column isRowHeader>Identifier</Table.Column>
-                                    <Table.Column>Name</Table.Column>
-                                    <Table.Column>Content Type</Table.Column>
-                                    <Table.Column>Size</Table.Column>
-                                    <Table.Column>Storage</Table.Column>
-                                    <Table.Column>Type</Table.Column>
-                                    <Table.Column>Created at</Table.Column>
-                                    <Table.Column>Action</Table.Column>
-                                </Table.Header>
-                                <Table.Body>
-                                    {attachments.map((attachment) => (
-                                        <Table.Row key={attachment.identifier}>
-                                            <Table.Cell>
-                                                <CopyableIdentifier identifier={attachment.identifier} visibleChars={10}/>
-                                            </Table.Cell>
-                                            <Table.Cell>{attachment.name}</Table.Cell>
-                                            <Table.Cell>{attachment.contentType}</Table.Cell>
-                                            <Table.Cell>
-                                                {formatBytes(attachment.size)}
-                                            </Table.Cell>
-                                            <Table.Cell>{attachment.storage}</Table.Cell>
-                                            <Table.Cell>{attachment.type}</Table.Cell>
-                                            <Table.Cell><DateTime value={attachment.createdAt} precision="millis"/></Table.Cell>
-                                            <Table.Cell>
-                                                <ActionButton label="Download"
-                                                              icon={ArrowDownToLine}
-                                                              onPress={() => onDownloadAttachmentClicked(attachment)}
-                                                />
-                                            </Table.Cell>
-                                        </Table.Row>
-                                    ))}
-                                </Table.Body>
-                            </Table.Content>
-                        </Table.ScrollContainer>
-                    </Table>
-                </DetailSection>
+                {attachments && (
+                    <DetailSection
+                        title="Attachments"
+                        isEmpty={!attachments?.length}
+                        emptyLabel="No attachments."
+                    >
+                        <Table>
+                            <Table.ScrollContainer>
+                                <Table.Content aria-label="Message attachments">
+                                    <Table.Header>
+                                        <Table.Column isRowHeader>Identifier</Table.Column>
+                                        <Table.Column>Name</Table.Column>
+                                        <Table.Column>Content Type</Table.Column>
+                                        <Table.Column>Size</Table.Column>
+                                        <Table.Column>Storage</Table.Column>
+                                        <Table.Column>Type</Table.Column>
+                                        <Table.Column>Created at</Table.Column>
+                                        <Table.Column>Action</Table.Column>
+                                    </Table.Header>
+                                    <Table.Body>
+                                        {attachments.map((attachment) => (
+                                            <Table.Row key={attachment.identifier}>
+                                                <Table.Cell>
+                                                    <CopyableIdentifier identifier={attachment.identifier} visibleChars={10}/>
+                                                </Table.Cell>
+                                                <Table.Cell>{attachment.name}</Table.Cell>
+                                                <Table.Cell>{attachment.contentType}</Table.Cell>
+                                                <Table.Cell>
+                                                    {formatBytes(attachment.size)}
+                                                </Table.Cell>
+                                                <Table.Cell>{attachment.storage}</Table.Cell>
+                                                <Table.Cell>{attachment.type}</Table.Cell>
+                                                <Table.Cell><DateTime value={attachment.createdAt} precision="millis"/></Table.Cell>
+                                                <Table.Cell>
+                                                    <ActionButton label="Download"
+                                                                  icon={ArrowDownToLine}
+                                                                  onPress={() => onDownloadAttachmentClicked(attachment)}
+                                                    />
+                                                </Table.Cell>
+                                            </Table.Row>
+                                        ))}
+                                    </Table.Body>
+                                </Table.Content>
+                            </Table.ScrollContainer>
+                        </Table>
+                    </DetailSection>
+                )}
 
                 <DetailSection
                     title="Evidences"
@@ -255,34 +263,36 @@ export function MessageDetailsContent({ message, loading }: MessageDetailsConten
                     </Table>
                 </DetailSection>
 
-                <DetailSection
-                    title="Errors"
-                    isEmpty={!errors?.length}
-                    emptyLabel="No errors."
-                >
-                    <Table>
-                        <Table.ScrollContainer>
-                            <Table.Content aria-label="Message errors">
-                                <Table.Header>
-                                    <Table.Column isRowHeader>Label</Table.Column>
-                                    <Table.Column>Source</Table.Column>
-                                    <Table.Column>Description</Table.Column>
-                                    <Table.Column>Created at</Table.Column>
-                                </Table.Header>
-                                <Table.Body>
-                                    {errors.map((error, i) => (
-                                        <Table.Row key={`${error.label}-${i}`}>
-                                            <Table.Cell>{error.label}</Table.Cell>
-                                            <Table.Cell>{error.source}</Table.Cell>
-                                            <Table.Cell>{error.details}</Table.Cell>
-                                            <Table.Cell><DateTime value={error.createdAt} precision="millis"/></Table.Cell>
-                                        </Table.Row>
-                                    ))}
-                                </Table.Body>
-                            </Table.Content>
-                        </Table.ScrollContainer>
-                    </Table>
-                </DetailSection>
+                {errors && (
+                    <DetailSection
+                        title="Errors"
+                        isEmpty={!errors?.length}
+                        emptyLabel="No errors."
+                    >
+                        <Table>
+                            <Table.ScrollContainer>
+                                <Table.Content aria-label="Message errors">
+                                    <Table.Header>
+                                        <Table.Column isRowHeader>Label</Table.Column>
+                                        <Table.Column>Source</Table.Column>
+                                        <Table.Column>Description</Table.Column>
+                                        <Table.Column>Created at</Table.Column>
+                                    </Table.Header>
+                                    <Table.Body>
+                                        {errors.map((error, i) => (
+                                            <Table.Row key={`${error.label}-${i}`}>
+                                                <Table.Cell>{error.label}</Table.Cell>
+                                                <Table.Cell>{error.source}</Table.Cell>
+                                                <Table.Cell>{error.details}</Table.Cell>
+                                                <Table.Cell><DateTime value={error.createdAt} precision="millis"/></Table.Cell>
+                                            </Table.Row>
+                                        ))}
+                                    </Table.Body>
+                                </Table.Content>
+                            </Table.ScrollContainer>
+                        </Table>
+                    </DetailSection>
+                )}
             </div>
 
             <AttachmentDetailsView attachment={selectedBusinessAttachment} state={businessAttachmentDetailsModal}/>

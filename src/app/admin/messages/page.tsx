@@ -216,7 +216,7 @@ export default function MessagesAdminPage() {
                                             <Table.Cell>{message.as4Properties.action.name}</Table.Cell>
                                             <Table.Cell>
                                                 <MessageDirectionChip
-                                                    showLabel={false}
+                                                    labelVariant="short"
                                                     direction={message.direction}
                                                 />
                                             </Table.Cell>

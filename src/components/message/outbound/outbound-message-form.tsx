@@ -92,7 +92,7 @@ export function OutboundMessageForm({
     const fromPartyValue = as4Properties.fromParty?.identifier ? partyKeyOf(as4Properties.fromParty) : null;
     const toPartyValue = as4Properties.toParty?.identifier ? partyKeyOf(as4Properties.toParty) : null;
 
-    const businessContentFile = data.businessContent?.contentFile ?? null;
+    const businessContentFile = data.businessContent?.xmlContent ?? null;
     const businessDocumentFile = data.businessContent?.businessDocument?.document ?? null;
     const detachedSignatureFile = data.businessContent?.businessDocument?.detachedSignature?.signature ?? null;
 
@@ -123,7 +123,7 @@ export function OutboundMessageForm({
 
     const onBusinessContentChanged = (file: File | null) =>
         updateBusinessContent({
-            contentFile: file ?? undefined
+            xmlContent: file ?? undefined
         })
 
     const onBusinessDocumentChanged = (file: File | null) =>

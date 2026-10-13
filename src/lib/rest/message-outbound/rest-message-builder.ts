@@ -55,10 +55,10 @@ async function appendBusinessContentToFormData(httpFormData: FormData, messageFo
     const businessContent = messageFormData.businessContent;
 
     const xmlBusinessContent = {
-        data: businessContent.contentFile ? businessContent.contentFile : await getXmlContentAsBlob(),
-        fileName: businessContent.contentFile ? businessContent.contentFile.name : "businessContent.xml"
+        data: businessContent.xmlContent ? businessContent.xmlContent : await getXmlContentAsBlob(),
+        fileName: businessContent.xmlContent ? businessContent.xmlContent.name : "businessContent.xml"
     }
-    httpFormData.append("businessContent.contentFile", xmlBusinessContent.data, xmlBusinessContent.fileName);
+    httpFormData.append("businessContent.xmlContent", xmlBusinessContent.data, xmlBusinessContent.fileName);
 
     const businessDocument = {
         data: businessContent.businessDocument?.document ? businessContent.businessDocument.document : await readFixtureAsBlob("businessDocument.pdf", "application/pdf"),

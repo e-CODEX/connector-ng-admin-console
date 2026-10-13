@@ -29,7 +29,7 @@ export const emptyAs4Selections = (): As4Selections => ({
 });
 
 export const emptyBusinessDocument = (): RestOutboundMessageContent => ({
-    contentFile: undefined,
+    xmlContent: undefined,
     businessDocument: {
         aesType: "SIGNATURE_BASED",
         document: undefined,

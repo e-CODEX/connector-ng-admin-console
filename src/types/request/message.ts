@@ -52,7 +52,7 @@ interface SoapOutboundMessageContent {
 }
 
 export interface RestOutboundMessageContent {
-    contentFile?: File
+    xmlContent?: File
     businessDocument?: BusinessDocumentInfo;
 }
 

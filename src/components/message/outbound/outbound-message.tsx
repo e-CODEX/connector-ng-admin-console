@@ -150,7 +150,7 @@ export default function OutboundMessageComponent() {
                 ...prev,
                 businessContent: {
                     ...prev.businessContent,
-                    contentFile: undefined,
+                    xmlContent: undefined,
                     businessDocument: {
                         aesType: "SIGNATURE_BASED"
                     },

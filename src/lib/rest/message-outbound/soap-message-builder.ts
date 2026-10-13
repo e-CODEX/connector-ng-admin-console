@@ -32,8 +32,8 @@ import { readFixtureAsBlob } from "@/actions/fixture-actions";
  */
 export const createSoapOutboundMessagePayload = async (messageFormData: SendMessageFormData) => {
     const businessContent = messageFormData.businessContent;
-    const xmlBusinessContent = businessContent.contentFile !== undefined
-        ? await blobToBase64(businessContent.contentFile)
+    const xmlBusinessContent = businessContent.xmlContent !== undefined
+        ? await blobToBase64(businessContent.xmlContent)
         : await getXmlContentAsBase64String();
 
     const businessDocument = businessContent.businessDocument?.document !== undefined

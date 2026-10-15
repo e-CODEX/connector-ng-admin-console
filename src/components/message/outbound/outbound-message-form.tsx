@@ -183,8 +183,8 @@ export function OutboundMessageForm({
 
                     <FormTextField
                         label="Ebms Message Id"
-                        value={as4Properties.ebmsMessageIdentifier!}
-                        onChange={(value) => updateAs4({ ebmsMessageIdentifier: value })}
+                        value={as4Properties.ebmsIdentifier}
+                        onChange={(value) => updateAs4({ ebmsIdentifier: value })}
                     />
                 </div>
 

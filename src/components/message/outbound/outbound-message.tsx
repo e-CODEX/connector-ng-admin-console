@@ -65,7 +65,7 @@ const buildInitialMessageFormData = (defaultOriginalSender: string, defaultFinal
         backendMessageIdentifier: "",
         backendName: "",
         as4Properties: {
-            ebmsMessageIdentifier: "",
+            ebmsIdentifier: "",
             referenceToIdentifier: "",
             conversationIdentifier: "",
             originalSender: defaultOriginalSender,

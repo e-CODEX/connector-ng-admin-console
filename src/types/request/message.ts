@@ -30,7 +30,7 @@ export interface SoapOutboundMessageDetails {
 }
 
 export interface As4PropertiesRequest {
-    ebmsMessageIdentifier?: string;
+    ebmsIdentifier: string;
     conversationIdentifier: string;
     referenceToIdentifier?: string;
     originalSender: string;

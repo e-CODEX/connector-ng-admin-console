@@ -83,10 +83,10 @@ async function appendBusinessContentToFormData(httpFormData: FormData, messageFo
 function createMessageMetadata(messageFormData: SendMessageFormData, attachmentIds: string[], asTestMessage: boolean = false) {
     const metadata = {
         businessDomainIdentifier: messageFormData.businessDomainIdentifier || 'default_business_domain',
-        backendMessageIdentifier: uuidv4(),
+        backendMessageIdentifier: messageFormData.backendMessageIdentifier || uuidv4(),
         attachments: attachmentIds,
         as4Properties: {
-            ebmsMessageIdentifier: messageFormData.as4Properties?.ebmsMessageIdentifier || crypto.randomUUID(),
+            ebmsIdentifier: messageFormData.as4Properties?.ebmsIdentifier || undefined,
             conversationIdentifier: messageFormData.as4Properties?.conversationIdentifier || uuidv4(),
             originalSender: messageFormData.as4Properties.originalSender,
             finalRecipient: messageFormData.as4Properties.finalRecipient,

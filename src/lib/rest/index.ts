@@ -43,6 +43,7 @@ async function restApiFetch(
 ): Promise<Response> {
     const { params, ...init } = options;
     const qs = params ? `?${toQuery(params)}` : "";
+
     const response = await fetch(`${baseUrl}/${path}${qs}`, init);
     if (!response.ok) {
         throw new RestApiError(response.status, await extractErrorMessage(response));

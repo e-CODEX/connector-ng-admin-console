@@ -9,78 +9,126 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { restApiCall } from "@/lib/rest";
 import { createAuthService } from "@/services/auth";
 import { cookieOptions } from "@/utils";
+import { decodeJwt } from "jose";
+import { LoginResponse } from "@/types/response/user";
+import { cookies } from "next/headers";
+import { restApiCall } from "@/lib/rest";
+import { ACCESS_TOKEN_KEY, MUST_CHANGE_PASSWORD, REFRESH_TOKEN_KEY } from "@/utils/constants";
 
-export const ACCESS_TOKEN_KEY = "accessToken";
-export const REFRESH_TOKEN_KEY = "refreshToken";
-export const MUST_CHANGE_PASSWORD = "mustChangePassword";
+
+const REFRESH_THRESHOLD_SECONDS = 10;
+const LOGIN_PATH = "/login";
+const CHANGE_PASSWORD_PATH = "/change-password";
+
+/**
+ * Proactively checks access-token expiry: true when the token is within
+ * REFRESH_THRESHOLD_SECONDS of expiring, has no exp, or can't be decoded.
+ */
+function shouldRefreshToken(accessToken: string): boolean {
+    try {
+        const { exp } = decodeJwt(accessToken);
+        if (!exp) {
+            return true;
+        }
+        return exp <= Math.floor(Date.now() / 1000) + REFRESH_THRESHOLD_SECONDS;
+    } catch {
+        return true;
+    }
+}
+
+/**
+ * Builds a response that carries the refreshed tokens back to the browser,
+ * while forwarding the current (mutated) cookies to the downstream render.
+ */
+function createRefreshedTokenResponse(request: NextRequest, refreshed: LoginResponse) {
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set("Cookie", request.cookies.toString());
+
+    const { accessToken, refreshToken, expiresIn, refreshExpiresIn } = refreshed;
+
+    const response = NextResponse.next({ request: { headers: requestHeaders } });
+    response.cookies.set(ACCESS_TOKEN_KEY, accessToken, cookieOptions(expiresIn));
+    response.cookies.set(REFRESH_TOKEN_KEY, refreshToken, cookieOptions(refreshExpiresIn));
+
+    return response;
+}
+
+async function updateRequestCookies(request: NextRequest, refreshed: LoginResponse) {
+    const { accessToken, refreshToken, expiresIn, refreshExpiresIn } = refreshed;
+
+    const cookieStore = await cookies();
+
+    request.cookies.set(ACCESS_TOKEN_KEY, accessToken);
+    cookieStore.set(ACCESS_TOKEN_KEY, accessToken, cookieOptions(expiresIn));
+
+    request.cookies.set(REFRESH_TOKEN_KEY, refreshToken);
+    cookieStore.set(REFRESH_TOKEN_KEY, refreshToken, cookieOptions(refreshExpiresIn));
+}
 
 /**
  * Proxy (Next.js request interception — formerly "middleware").
  *
- * Runs on the server BEFORE any route is rendered. Renamed from `middleware.ts` in Next.js 16; defaults to the Node.js runtime.
- *
- * Responsibilities
- * ----------------
- * 1. Auth gate: redirect unauthenticated requests to /login.
- * 2. Silent token refresh: when the short-lived `token` cookie has expired but a `refreshToken` cookie is still present,
- * exchange it for a fresh access token and set the new cookies on the response.
- *
  * @param request The incoming Next.js request.
- * @returns A response that either continues the request or redirects to `/login` when no authentication credentials are available.
+ * @returns A response that continues the request, refreshes tokens, or redirects.
  */
 export async function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
-    const hasToken = request.cookies.has(ACCESS_TOKEN_KEY);
-    const refresh = request.cookies.get(REFRESH_TOKEN_KEY)?.value;
+
+    const loginUrl = new URL(LOGIN_PATH, request.url);
+    const homeUrl = new URL("/", request.url);
+    const changePasswordUrl = new URL(CHANGE_PASSWORD_PATH, request.url);
+
+    const accessToken = request.cookies.get(ACCESS_TOKEN_KEY)?.value;
+    const refreshToken = request.cookies.get(REFRESH_TOKEN_KEY)?.value;
     const mustChangePwd = request.cookies.get(MUST_CHANGE_PASSWORD)?.value === "1";
 
-    if (mustChangePwd && pathname !== "/change-password") {
-        return NextResponse.redirect(new URL("/change-password", request.url));
+    if (mustChangePwd && pathname !== CHANGE_PASSWORD_PATH) {
+        return NextResponse.redirect(changePasswordUrl);
     }
 
-    //TODO - add fix allowing user to access change-password form even if mustChangePassword is not pending
-    if (!mustChangePwd && pathname === "/change-password") {
-        return NextResponse.redirect(new URL("/", request.url));
+    // Restrict the change-password page to pending mandatory changes.
+    // TODO - allow the user to reach change-password even when not pending.
+    if (!mustChangePwd && pathname === CHANGE_PASSWORD_PATH) {
+        return NextResponse.redirect(homeUrl);
     }
 
-    if (pathname === "/login" && hasToken) {
-        return NextResponse.redirect(new URL("/", request.url));
+    if (pathname === LOGIN_PATH && accessToken) {
+        return NextResponse.redirect(homeUrl);
     }
 
-    if (pathname === "/login") {
-        return;
+    if (pathname === LOGIN_PATH) {
+        return NextResponse.next();
     }
 
-    if (!hasToken && refresh) {
-        const apiUrl = process.env.CONNECTOR_API_URL!;
-        const authService = createAuthService(apiUrl, restApiCall);
-
-        let refreshed;
+    if (refreshToken && (!accessToken || shouldRefreshToken(accessToken))) {
         try {
-            refreshed = await authService.refreshToken(refresh);
+            const apiUrl = process.env.CONNECTOR_API_URL!;
+            const authService = createAuthService(apiUrl, restApiCall);
+            const refreshed = await authService.refreshToken(refreshToken);
+
+            await updateRequestCookies(request, refreshed);
+
+            return createRefreshedTokenResponse(request, refreshed);
         } catch {
-            refreshed = null;
-        }
+            const response = NextResponse.redirect(loginUrl);
+            response.cookies.delete(ACCESS_TOKEN_KEY);
+            response.cookies.delete(REFRESH_TOKEN_KEY);
 
-        if (refreshed) {
-            request.cookies.set(ACCESS_TOKEN_KEY, refreshed.accessToken);
-            const response = NextResponse.next({ request });
+            const cookieStore = await cookies();
+            cookieStore.delete(ACCESS_TOKEN_KEY)
+            cookieStore.delete(REFRESH_TOKEN_KEY)
 
-            response.cookies.set(ACCESS_TOKEN_KEY, refreshed.accessToken, cookieOptions(refreshed.expiresIn));
-
-            if (refreshed.refreshToken) {
-                response.cookies.set(REFRESH_TOKEN_KEY, refreshed.refreshToken, cookieOptions(refreshed.refreshExpiresIn));
-            }
             return response;
         }
     }
 
-    if (!hasToken && !refresh) {
-        return NextResponse.redirect(new URL("/login", request.url));
+    if (!accessToken) {
+        return NextResponse.redirect(loginUrl);
     }
+
+    return NextResponse.next();
 }
 
 export const config = {

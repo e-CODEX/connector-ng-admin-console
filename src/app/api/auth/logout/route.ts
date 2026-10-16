@@ -13,7 +13,7 @@ import { NextResponse } from "next/server";
 import { getAppConfig } from "@/config/config.server";
 import { authedRestApiCall } from "@/lib/rest/authed-rest-api";
 import { createAuthService } from "@/services/auth";
-import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from "@/proxy";
+import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from "@/utils/constants";
 
 export async function POST() {
     const { apiUrl } = getAppConfig();

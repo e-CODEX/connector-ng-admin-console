@@ -11,7 +11,7 @@
 import "server-only";
 
 import { bearerHeader } from "@/lib/rest/bearer-header";
-import { DownloadedFile, restApiCall, restApiDownload, RestApiOptions } from "@/lib/rest/index";
+import { restApiCall, RestApiOptions } from "@/lib/rest/index";
 
 export async function authedRestApiCall<T>(
     baseUrl: string,
@@ -19,17 +19,6 @@ export async function authedRestApiCall<T>(
     options: RestApiOptions = {},
 ): Promise<T> {
     return restApiCall<T>(baseUrl, path, {
-        ...options,
-        headers: { ...options.headers, ...(await bearerHeader()) },
-    });
-}
-
-export async function authedRestApiDownload(
-    baseUrl: string,
-    path: string,
-    options: RestApiOptions & { defaultFilename?: string } = {},
-): Promise<DownloadedFile> {
-    return restApiDownload(baseUrl, path, {
         ...options,
         headers: { ...options.headers, ...(await bearerHeader()) },
     });

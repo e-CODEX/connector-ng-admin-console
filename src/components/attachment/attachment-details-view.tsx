@@ -41,7 +41,7 @@ export function AttachmentDetailsView({ attachment, state }: AttachmentDetailsVi
 
     return (
         <Modal state={state}>
-            <Modal.Backdrop>
+            <Modal.Backdrop isDismissable={false}>
                 <Modal.Container size="lg">
                     <Modal.Dialog className="sm:max-w-200">
                         <Modal.CloseTrigger/>

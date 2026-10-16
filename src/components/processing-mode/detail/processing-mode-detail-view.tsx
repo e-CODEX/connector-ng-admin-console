@@ -19,6 +19,7 @@ import { ArrowDownToLine, Workflow } from "lucide-react";
 import { useProcessingModeService } from "@/hooks/use-http-service";
 import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";
 import path from "path";
+import { SpinnerView } from "@/components/common/spinner-view";
 
 interface ProcessingModeDetailsViewProps {
     processingMode: ConnectorProcessingMode | null;
@@ -79,7 +80,7 @@ export function ProcessingModeDetailsView({ processingMode, state }: ProcessingM
 
     return (
         <Modal state={state}>
-            <Modal.Backdrop>
+            <Modal.Backdrop isDismissable={false}>
                 <Modal.Container size="lg">
                     <Modal.Dialog className="sm:max-w-300">
                         <Modal.CloseTrigger/>
@@ -88,13 +89,17 @@ export function ProcessingModeDetailsView({ processingMode, state }: ProcessingM
                             <Modal.Heading className="font-semibold">Processing Mode Details</Modal.Heading>
                         </Modal.Header>
                         <Modal.Body>
-                            {details && (
-                                <ProcessingModeDetailsSection processingMode={details} loading={loading}/>
-                            )}
+                            <div className="flex flex-col">
+                                {loading ? (
+                                    <SpinnerView className="mt-60"/>
+                                ) : (
+                                    <ProcessingModeDetailsSection processingMode={details} loading={loading}/>
+                                )}
+                            </div>
                         </Modal.Body>
                         <Modal.Footer>
                             <Button variant="secondary" className="w-full" onPress={() => onDownloadClicked()}>
-                                <ArrowDownToLine />
+                                <ArrowDownToLine/>
                                 Download
                             </Button>
                         </Modal.Footer>

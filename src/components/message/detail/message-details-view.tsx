@@ -72,7 +72,7 @@ export function MessageDetailsView({ message, state }: MessageDetailsViewProps) 
 
     return (
         <Modal state={state}>
-            <Modal.Backdrop>
+            <Modal.Backdrop isDismissable={false}>
                 <Modal.Container>
                     <Modal.Dialog className="sm:max-w-300">
                         <Modal.CloseTrigger/>
@@ -81,21 +81,19 @@ export function MessageDetailsView({ message, state }: MessageDetailsViewProps) 
                             <Modal.Heading className="font-semibold">Business Message Details</Modal.Heading>
                         </Modal.Header>
                         <Modal.Body>
-                            {message && (
-                                <div className="flex flex-col">
-                                    {loading ? (
-                                        <SpinnerView className="mt-60"/>
-                                    ) : (
-                                        <MessageDetailsContent message={details} loading={loading}/>
-                                    )}
+                            <div className="flex flex-col">
+                                {loading ? (
+                                    <SpinnerView className="mt-60"/>
+                                ) : (
+                                    <MessageDetailsContent message={details} loading={loading}/>
+                                )}
 
-                                    {error && (
-                                        <div className="flex justify-center py-6">
-                                            <div className="text-destructive">{error}</div>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
+                                {error && (
+                                    <div className="flex justify-center py-6">
+                                        <div className="text-destructive">{error}</div>
+                                    </div>
+                                )}
+                            </div>
                         </Modal.Body>
                     </Modal.Dialog>
                 </Modal.Container>

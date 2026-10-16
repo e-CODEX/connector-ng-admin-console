@@ -63,7 +63,7 @@ export function MessageTransportStepsDetailView({ message, state }: MessageTrans
 
     return (
         <Modal state={state}>
-            <Modal.Backdrop>
+            <Modal.Backdrop isDismissable={false}>
                 <Modal.Container>
                     <Modal.Dialog className="sm:max-w-200">
                         <Modal.CloseTrigger/>

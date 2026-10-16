@@ -21,6 +21,8 @@ import { useOptionalUser } from "@/hooks/useUser";
 import { UserMenu } from "@/components/common/menu/user-menu";
 import { USER_ROLE } from "@/types/global";
 
+const AUTH_ROUTES = ["/login", "/change-password"];
+
 type MenuEntry = {
     label: string;
     href: string;
@@ -43,10 +45,12 @@ export const AppMainNavbar = () => {
     const user = useOptionalUser();
     const pathname = usePathname();
 
+    const onAuthPage = AUTH_ROUTES.some((p) => pathname === p || pathname.startsWith(p + "/"));
+    const showUserChrome = !!user && !onAuthPage;
+
     const items = MENU.filter(
         (item) =>
-            !item.roles ||
-            item.roles.some((itemRole) => user?.roles.includes(itemRole))
+            !item.roles || item.roles.some((itemRole) => user?.roles.includes(itemRole))
     );
 
     return (
@@ -70,7 +74,7 @@ export const AppMainNavbar = () => {
             </NavbarContent>
 
             <NavbarContent className="hidden lg:flex gap-5" justify="end">
-                {user && (
+                {showUserChrome && (
                     <>
                         {items.map(({ label, href, icon: Icon }) => {
                             const isActive = href === "/"
@@ -99,9 +103,9 @@ export const AppMainNavbar = () => {
                     <ThemeSwitcher/>
                 </NavbarItem>
 
-                <div className="ml-auto">
-                    <UserMenu/>
-                </div>
+                {showUserChrome && (
+                    <div className="ml-auto"><UserMenu /></div>
+                )}
             </NavbarContent>
         </HeroNavbar>
     )

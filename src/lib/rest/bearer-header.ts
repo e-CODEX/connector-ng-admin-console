@@ -10,7 +10,7 @@
 
 import "server-only";
 import { cookies } from "next/headers";
-import { ACCESS_TOKEN_KEY } from "@/proxy";
+import { ACCESS_TOKEN_KEY } from "@/utils/constants";
 
 export async function bearerHeader(): Promise<Record<string, string>> {
     const token = (await cookies()).get(ACCESS_TOKEN_KEY)?.value;

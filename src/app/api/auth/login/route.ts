@@ -15,7 +15,7 @@ import { RestApiError } from "@/lib/rest/rest-api-error";
 import { restApiCall } from "@/lib/rest";
 import { createAuthService } from "@/services/auth";
 import { cookieOptions } from "@/utils";
-import { ACCESS_TOKEN_KEY, MUST_CHANGE_PASSWORD, REFRESH_TOKEN_KEY } from "@/proxy";
+import { ACCESS_TOKEN_KEY, MUST_CHANGE_PASSWORD, REFRESH_TOKEN_KEY } from "@/utils/constants";
 
 export async function POST(request: Request) {
     const { username, password } = await request.json();

@@ -1,9 +1,9 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { ACCESS_TOKEN_KEY, MUST_CHANGE_PASSWORD, REFRESH_TOKEN_KEY } from "@/proxy";
 import { createAuthService } from "@/services/auth";
 import { getAppConfig } from "@/config/config.server";
 import { authedRestApiCall } from "@/lib/rest/authed-rest-api";
+import { ACCESS_TOKEN_KEY, MUST_CHANGE_PASSWORD, REFRESH_TOKEN_KEY } from "@/utils/constants";
 
 export async function POST(request: Request) {
     const { currentPassword, newPassword } = await request.json();

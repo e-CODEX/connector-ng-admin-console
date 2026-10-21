@@ -148,18 +148,12 @@ async function sendSoapMessage(bffUrl: string, call: RestApiCall, { messageFormD
     void parameters;
     void document;
 
-    const payload = await createSoapOutboundMessagePayload(messageFormData);
+    const payload = await createSoapOutboundMessagePayload(messageFormData, parameters);
 
     return call<SendMessageResponse>(
         bffUrl,
         "bff/api/v1/submit-message",
-        {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(payload),
-        }
+        { method: "POST", body: payload, }
     )
 }
 

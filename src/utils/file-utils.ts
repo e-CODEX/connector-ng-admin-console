@@ -26,14 +26,14 @@ export const generatePdfBlob = async (sizeMB: number, customText = "e-CODEX test
     const pdfTextStream = `BT\n/F1 18 Tf\n50 720 Td\n(${customText}) Tj\nET\n`;
 
     const header =
-              "%PDF-1.4\n" +
-              "%âãÏÓ\n" +
-              "1 0 obj\n<</Type/Catalog/Pages 2 0 R>>\nendobj\n" +
-              "2 0 obj\n<</Type/Pages/Count 1/Kids[3 0 R]>>\nendobj\n" +
-              "3 0 obj\n<</Type/Page/Parent 2 0 R/MediaBox[0 0 612 792]/Contents 4 0 R/Resources 5 0 R>>\nendobj\n" +
-              fontDefinition +
-              "4 0 obj\n<</Length " + (totalBytes - 600) + ">>\nstream\n" +
-              pdfTextStream;
+        "%PDF-1.4\n" +
+        "%âãÏÓ\n" +
+        "1 0 obj\n<</Type/Catalog/Pages 2 0 R>>\nendobj\n" +
+        "2 0 obj\n<</Type/Pages/Count 1/Kids[3 0 R]>>\nendobj\n" +
+        "3 0 obj\n<</Type/Page/Parent 2 0 R/MediaBox[0 0 612 792]/Contents 4 0 R/Resources 5 0 R>>\nendobj\n" +
+        fontDefinition +
+        "4 0 obj\n<</Length " + (totalBytes - 600) + ">>\nstream\n" +
+        pdfTextStream;
 
     const footer = "\nendstream\nendobj\nxref\n0 6\n0000000000 65535 f\n0000000018 00000 n\n0000000077 00000 n\n0000000124 00000 n\n0000000227 00000 n\n0000000318 00000 n\ntrailer\n<</Size 6/Root 1 0 R>>\nstartxref\n400\n%%EOF";
 
@@ -52,65 +52,16 @@ export const generatePdfBlob = async (sizeMB: number, customText = "e-CODEX test
     return new Blob([headerArray, filler, footerArray], { type: 'application/pdf' });
 };
 
-/**
- * Generates XML content as a Blob or uses the provided XML Blob
- * and returns it as a Base64-encoded string.
- *
- * @returns A promise resolving to a Base64-encoded XML string.
- */
-export const getXmlContentAsBase64String = async (
-): Promise<string> => {
-    const businessXmlContent = '<?xml version="1.0" encoding="UTF-8"?><testMessage>Test</testMessage>';
-    return stringToBase64Utf8(businessXmlContent);
-};
 
 /**
  * Generates XML content blob form data and returns it as a `Blob`.
  *
  */
-export const getXmlContentAsBlob = async (
-): Promise<Blob> => {
+export const getXmlContentAsBlob = async (): Promise<Blob> => {
     const businessXmlContent = '<?xml version="1.0" encoding="UTF-8"?><testMessage>Test</testMessage>';
     return new Blob([businessXmlContent], { type: "application/xml" });
 };
 
-
-/**
- * Encodes a UTF-8 string into a Base64 string.
- *
- * This implementation is safe for Unicode characters (e.g. accents, emojis),
- * unlike `btoa`, which only supports Latin1/ASCII input.
- *
- */
-export const stringToBase64Utf8 = (input: string): string => {
-    return Buffer.from(input, "utf-8").toString("base64");
-}
-
-/**
- * Converts a Blob into a Base64-encoded string.
- *
- * @param blob The Blob to convert.
- * @returns A Promise containing the Base64-encoded representation of the Blob.
- *
- * @throws {Error} If the Blob cannot be read or the conversion fails.
- */
-export const blobToBase64 = (blob: Blob): Promise<string> => {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-
-        reader.onload = () => {
-            const result = reader.result;
-            if (typeof result === 'string') {
-                resolve(result.split(',')[1] ?? '');
-            } else {
-                reject(new Error('Failed to convert blob to Base64'));
-            }
-        };
-
-        reader.onerror = () => reject(reader.error);
-        reader.readAsDataURL(blob);
-    });
-};
 
 /**
  * Converts a Base64-encoded string into a Blob object.

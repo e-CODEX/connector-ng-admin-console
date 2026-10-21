@@ -9,10 +9,10 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
-import { SendMessageFormData } from "@/types/send-message-form";
-import { blobToBase64, getXmlContentAsBase64String } from "@/utils/file-utils";
-import { SoapOutboundMessageDetails, SoapOutboundMessageRequest } from "@/types/request/message";
-import { readFixtureAsBlob } from "@/actions/fixture-actions";
+import { SendMessageFormData, SendParameters } from "@/types/send-message-form";
+import { generatePdfBlob } from "@/utils/file-utils";
+import { SoapOutboundMessageRequest } from "@/types/request/message";
+import { appendBusinessContentToFormData, appendFormData } from "@/lib/rest/message-outbound/message-builder";
 
 
 /**
@@ -29,59 +29,55 @@ import { readFixtureAsBlob } from "@/actions/fixture-actions";
  * - XML content (`xmlContent`)
  *
  * @param messageFormData - Main form data containing business and AS4-related properties.
+ * @param parameters - Parameters concerning request mode or request repetitions
  */
-export const createSoapOutboundMessagePayload = async (messageFormData: SendMessageFormData) => {
-    const businessContent = messageFormData.businessContent;
-    const xmlBusinessContent = businessContent.xmlContent !== undefined
-        ? await blobToBase64(businessContent.xmlContent)
-        : await getXmlContentAsBase64String();
+export const createSoapOutboundMessagePayload = async (messageFormData: SendMessageFormData, parameters: SendParameters) => {
+    const dataToSubmit = new FormData();
+    const metadata = createMessageDetails(messageFormData);
+    appendFormData(dataToSubmit, metadata);
+    await appendBusinessContentToFormData(dataToSubmit, messageFormData);
 
-    const businessDocument = businessContent.businessDocument?.document !== undefined
-        ? await blobToBase64(businessContent.businessDocument.document)
-        : await blobToBase64(await readFixtureAsBlob(
-            "businessDocument.pdf",
-            "application/pdf"
-        ));
-
-    const submitMessageRequest: SoapOutboundMessageRequest = {
-        messageDetails: createMessageDetails(messageFormData),
-        messageContent: {
-            xmlContent: xmlBusinessContent,
-            document: {
-                document: businessDocument,
-                documentName: 'business.pdf',
-                aesType: "SIGNATURE_BASED"
-            }
-        }
-    };
-
-    return submitMessageRequest;
+    const attachment = await generatePdfBlob(parameters.attachmentSizeMB);
+    for (let i = 0; i < parameters.repeatCount; i++) {
+        dataToSubmit.append("attachments", attachment, "message-attachment-" + i + ".pdf");
+    }
+    return dataToSubmit;
 };
 
-const createMessageDetails = (formData: SendMessageFormData) => {
+const createMessageDetails = (messageFormData: SendMessageFormData) => {
     return {
-        backendMessageIdentifier: formData.backendMessageIdentifier || uuidv4(),
-        as4Properties: {
-            conversationIdentifier: formData.as4Properties?.conversationIdentifier || uuidv4(),
-            originalSender: formData.as4Properties?.originalSender,
-            finalRecipient: formData.as4Properties?.finalRecipient,
-            service: {
-                name: formData.as4Properties?.service?.name,
-                type: formData.as4Properties.service?.type
-            },
-            action: {
-                name: formData.as4Properties?.action?.name
-            },
-            fromParty: {
-                identifier: formData.as4Properties?.fromParty?.identifier,
-                identifierType: formData.as4Properties?.fromParty?.identifierType,
-                role: formData.as4Properties?.fromParty?.role
-            },
-            toParty: {
-                identifier: formData.as4Properties?.toParty?.identifier,
-                identifierType: formData.as4Properties?.toParty?.identifierType,
-                role: formData.as4Properties?.toParty?.role
+        messageDetails: {
+            backendMessageIdentifier: messageFormData.backendMessageIdentifier || uuidv4(),
+            businessDomainIdentifier: messageFormData.businessDomainIdentifier || 'default_business_domain',
+            as4Properties: {
+                ebmsIdentifier: messageFormData.as4Properties?.ebmsIdentifier || undefined,
+                conversationIdentifier: messageFormData.as4Properties?.conversationIdentifier || uuidv4(),
+                originalSender: messageFormData.as4Properties?.originalSender,
+                finalRecipient: messageFormData.as4Properties?.finalRecipient,
+                service: {
+                    name: messageFormData.as4Properties?.service?.name,
+                    type: messageFormData.as4Properties.service?.type
+                },
+                action: {
+                    name: messageFormData.as4Properties?.action?.name
+                },
+                fromParty: {
+                    identifier: messageFormData.as4Properties?.fromParty?.identifier,
+                    identifierType: messageFormData.as4Properties?.fromParty?.identifierType,
+                    role: messageFormData.as4Properties?.fromParty?.role
+                },
+                toParty: {
+                    identifier: messageFormData.as4Properties?.toParty?.identifier,
+                    identifierType: messageFormData.as4Properties?.toParty?.identifierType,
+                    role: messageFormData.as4Properties?.toParty?.role
+                }
+            }
+        },
+        businessContent: {
+            businessDocument: {
+                aesType: messageFormData.businessContent.businessDocument?.aesType,
             }
         }
-    } as SoapOutboundMessageDetails;
+        ,
+    } as SoapOutboundMessageRequest;
 }

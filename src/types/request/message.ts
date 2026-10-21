@@ -16,15 +16,17 @@ export interface RestOutboundMessageRequest {
     backendName?: string;
     attachments: string[];
     as4Properties: As4PropertiesRequest;
-    businessContent: RestOutboundMessageContent
+    businessContent: OutboundMessageContent
 }
 
 export interface SoapOutboundMessageRequest {
     messageDetails: SoapOutboundMessageDetails;
-    messageContent: SoapOutboundMessageContent;
+    businessContent: OutboundMessageContent;
+    attachments?: File[];
 }
 
 export interface SoapOutboundMessageDetails {
+    businessDomainIdentifier: string;
     backendMessageIdentifier: string;
     as4Properties: As4PropertiesRequest;
 }
@@ -41,17 +43,7 @@ export interface As4PropertiesRequest {
     toParty: PartyInfoRequest;
 }
 
-interface SoapOutboundMessageContent {
-    xmlContent: string;
-    document: {
-        document?: string; // TODO une multipart for the document and its name
-        documentName?: string;
-        detachedSignature?: DetachedSignature;
-        aesType: BusinessDocumentAesType;
-    };
-}
-
-export interface RestOutboundMessageContent {
+export interface OutboundMessageContent {
     xmlContent?: File
     businessDocument?: BusinessDocumentInfo;
 }

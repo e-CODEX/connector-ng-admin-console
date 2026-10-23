@@ -8,40 +8,66 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { CheckCircle, Download, HelpCircle, Inbox, Send, X, } from "lucide-react";
-import { Chip } from "@heroui/react";
-import type { ComponentType } from "react";
+import { CheckCircle2, Download, HelpCircle, Inbox, Send, XCircle, } from "lucide-react";
+import { Chip, Tooltip } from "@heroui/react";
+import type { ComponentProps, ComponentType } from "react";
 import { TransportStepStatus } from "@/types/global";
-import { cn } from "@heroui/styles";
 
 interface TransportDeliveryPresentation {
     label: string;
     description: string;
     icon: ComponentType<{ className?: string }>;
-    chipClass: string;
+    color: "default" | "accent" | "success" | "warning" | "danger";
+    variant: ComponentProps<typeof Chip>["variant"];
 }
 
 const UNKNOWN: TransportDeliveryPresentation = {
     label: "Unknown",
     description: "Unrecognised transport delivery status",
     icon: HelpCircle,
-    chipClass: "chip--unknown",
+    color: "default",
+    variant: "soft",
 };
 
 export const TRANSPORT_DELIVERY_STATUS: Record<TransportStepStatus, TransportDeliveryPresentation> = {
-    SUBMITTED: { label: "Submitted", description: "Handed over for transport", icon: Send, chipClass: "chip--submitted" },
+    SUBMITTED: {
+        label: "Submitted",
+        description: "Handed over for transport",
+        icon: Send,
+        color: "accent", // same as message "submitted"
+        variant: "soft",
+    },
     READY_FOR_DOWNLOAD: {
         label: "Ready for download",
         description: "Awaiting retrieval by the recipient",
         icon: Inbox,
-        chipClass: "chip--ready-for-download"
+        color: "warning", // waiting, like message "pending"
+        variant: "soft",
     },
-    DOWNLOADED: { label: "Downloaded", description: "Retrieved by the recipient", icon: Download, chipClass: "chip--downloaded" },
-    DELIVERED: { label: "Delivered", description: "Delivery confirmed", icon: CheckCircle, chipClass: "chip--delivered" },
-    FAILED: { label: "Failed", description: "Transport failed", icon: X, chipClass: "chip--failed" },
+    DOWNLOADED: {
+        label: "Downloaded",
+        description: "Retrieved by the recipient",
+        icon: Download,
+        color: "accent", // in progress, not yet confirmed
+        variant: "soft",
+    },
+    DELIVERED: {
+        label: "Delivered",
+        description: "Delivery confirmed",
+        icon: CheckCircle2, // same as message "confirmed"
+        color: "success",
+        variant: "soft",
+    },
+    FAILED: {
+        label: "Failed",
+        description: "Transport failed",
+        icon: XCircle, // same as message "rejected"
+        color: "danger",
+        variant: "soft",
+    },
 };
 
-export const getTransportDeliveryPresentation = (status: string,): TransportDeliveryPresentation =>
+export const getTransportDeliveryPresentation = (status: string): TransportDeliveryPresentation =>
     TRANSPORT_DELIVERY_STATUS[status as TransportStepStatus] ?? UNKNOWN;
 
 interface TransportDeliveryStatusChipProps {
@@ -49,13 +75,23 @@ interface TransportDeliveryStatusChipProps {
     showLabel?: boolean;
 }
 
-export function TransportDeliveryStatusChip({ status, showLabel = true, }: TransportDeliveryStatusChipProps) {
-    const { label, description, icon: Icon, chipClass } = getTransportDeliveryPresentation(status);
+export function TransportDeliveryStatusChip({ status, showLabel = true }: TransportDeliveryStatusChipProps) {
+    const { label, description, icon: Icon, color, variant } = getTransportDeliveryPresentation(status);
 
     return (
-        <Chip className={cn("chip--transport", chipClass)} size="md" aria-label={description}>
-            <Icon className="size-3.5 shrink-0" aria-hidden="true"/>
-            {showLabel && <Chip.Label>{label}</Chip.Label>}
-        </Chip>
+        <Tooltip delay={200}>
+            <Tooltip.Trigger>
+                <span className="inline-flex" tabIndex={0}>
+                    <Chip className="px-2" color={color} variant={variant} size="md" aria-label={description}>
+                        <Icon className="size-3.5 shrink-0" aria-hidden="true" />
+                        {showLabel && <Chip.Label>{label}</Chip.Label>}
+                    </Chip>
+                </span>
+            </Tooltip.Trigger>
+            <Tooltip.Content>
+                <Tooltip.Arrow />
+                <p>{description}</p>
+            </Tooltip.Content>
+        </Tooltip>
     );
 }

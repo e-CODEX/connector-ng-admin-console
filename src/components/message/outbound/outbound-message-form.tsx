@@ -19,7 +19,7 @@ import { actionKeyOf, ProcessingModeActionSelector } from "@/components/form/sel
 import { useLinkPartners } from "@/hooks/use-link-partners";
 import { LinkPartnerSelector } from "@/components/form/selector/link-partner-selector";
 import { ConnectorLinkPartner } from "@/types/response/link-partner";
-import { As4PropertiesRequest, BusinessDocumentInfo, PartyInfoRequest, RestOutboundMessageContent } from "@/types/request/message";
+import { As4PropertiesRequest, BusinessDocumentInfo, PartyInfoRequest, OutboundMessageContent } from "@/types/request/message";
 import { emptyAction, emptyParty, emptyService } from "@/components/message/outbound/outbound-message-defaults";
 import { FileSelectField } from "@/components/form/file-select-field";
 import React from "react";
@@ -102,7 +102,7 @@ export function OutboundMessageForm({
     const updateAs4 = (patch: Partial<As4PropertiesRequest>) =>
         onChange((prev) => ({ ...prev, as4Properties: { ...prev.as4Properties, ...patch } }));
 
-    const updateBusinessContent = (patch: Partial<RestOutboundMessageContent>) =>
+    const updateBusinessContent = (patch: Partial<OutboundMessageContent>) =>
         onChange((prev) => ({
             ...prev,
             businessContent: { ...prev.businessContent, ...patch },

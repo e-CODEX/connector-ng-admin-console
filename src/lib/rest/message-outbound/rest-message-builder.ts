@@ -11,9 +11,9 @@
 import { v4 as uuidv4 } from 'uuid';
 import { SendMessageFormData, SendParameters } from "@/types/send-message-form";
 import { RestOutboundMessageRequest } from "@/types/request/message";
-import { generatePdfBlob, getXmlContentAsBlob } from "@/utils/file-utils";
+import { generatePdfBlob } from "@/utils/file-utils";
 import { AttachmentService } from "@/services/attachment";
-import { readFixtureAsBlob } from "@/actions/fixture-actions";
+import { appendBusinessContentToFormData, appendFormData } from "@/lib/rest/message-outbound/message-builder";
 
 /**
  * Creates the payload for sending a REST outbound message.
@@ -41,44 +41,14 @@ export const createRestOutboundMessagePayLoad = async (
     parameters: SendParameters
 ) => {
     const attachment = await generatePdfBlob(parameters.attachmentSizeMB);
-    const attachmentIds = await attachmentService.uploadMessageAttachment(attachment)
+    const attachmentIds = await attachmentService.uploadMessageAttachment(attachment, parameters.repeatCount)
     const metadata = createMessageMetadata(messageFormData, attachmentIds, asTestMessage);
-
 
     const dataToSubmit = new FormData();
     appendFormData(dataToSubmit, metadata);
     await appendBusinessContentToFormData(dataToSubmit, messageFormData);
     return dataToSubmit;
 };
-
-async function appendBusinessContentToFormData(httpFormData: FormData, messageFormData: SendMessageFormData) {
-    const businessContent = messageFormData.businessContent;
-
-    const xmlBusinessContent = {
-        data: businessContent.xmlContent ? businessContent.xmlContent : await getXmlContentAsBlob(),
-        fileName: businessContent.xmlContent ? businessContent.xmlContent.name : "businessContent.xml"
-    }
-    httpFormData.append("businessContent.xmlContent", xmlBusinessContent.data, xmlBusinessContent.fileName);
-
-    const businessDocument = {
-        data: businessContent.businessDocument?.document ? businessContent.businessDocument.document : await readFixtureAsBlob("businessDocument.pdf", "application/pdf"),
-        fileName: businessContent.businessDocument?.document ?  businessContent.businessDocument.document.name : "businessDocument.pdf",
-    }
-    httpFormData.append("businessContent.businessDocument.document", businessDocument.data, businessDocument.fileName);
-
-    if (!businessContent.businessDocument?.aesType) {
-        httpFormData.append("businessContent.businessDocument.aesType", "SIGNATURE_BASED");
-    }
-
-    const detachedSignature = businessContent.businessDocument?.detachedSignature ? businessContent.businessDocument.detachedSignature.signature : undefined;
-
-    if (detachedSignature) {
-        // add detached signature file as blob
-        const signature = businessContent.businessDocument?.detachedSignature;
-        httpFormData.append("businessContent.businessDocument.detachedSignature.signature", detachedSignature, detachedSignature.name);
-        httpFormData.append("businessContent.businessDocument.detachedSignature.mimeType", signature!.mimeType);
-    }
-}
 
 function createMessageMetadata(messageFormData: SendMessageFormData, attachmentIds: string[], asTestMessage: boolean = false) {
     const metadata = {
@@ -120,66 +90,4 @@ function createMessageMetadata(messageFormData: SendMessageFormData, attachmentI
     }
 
     return metadata;
-}
-
-/**
- * Helps flattens nested objects inside a value object using dot notation for keys and supports
- * primitive values, arrays, `File`/`Blob` instances, and nested objects.
- *
- * Example:
- * ```ts
- * const data = {
- *   subject: "Hello",
- *   recipients: ["alice@example.com", "bob@example.com"],
- *   metadata: {
- *     priority: "high",
- *     sender: {
- *       id: 123
- *     }
- *   }
- * };
- *
- * appendFormData(formData, data);
- * ```
- *
- * Produces the following `FormData` entries:
- * ```
- * subject = "Hello"
- * recipients = "alice@example.com"
- * recipients = "bob@example.com"
- * metadata.priority = "high"
- * metadata.sender.id = "123"
- * ```
- * @param formData
- * @param value
- * @param key
- */
-function appendFormData(formData: FormData, value: RestOutboundMessageRequest, key = "") {
-    if (value == null) {
-        return;
-    }
-
-    if (Array.isArray(value)) {
-        value.forEach((item) => {
-            formData.append(key, item);
-        });
-        return;
-    }
-
-    if (value instanceof File || value instanceof Blob) {
-        formData.append(key, value);
-        return;
-    }
-
-    if (typeof value === "object") {
-        Object.entries(value).forEach(([childKey, childValue]) => {
-            appendFormData(
-                formData,
-                childValue,
-                key ? `${key}.${childKey}` : childKey
-            );
-        });
-        return;
-    }
-    formData.append(key, value);
 }

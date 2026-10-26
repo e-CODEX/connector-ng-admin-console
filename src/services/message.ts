@@ -18,6 +18,9 @@ import { ConnectorMessageStats } from "@/types/response/stats";
 import { ConnectorMessageReportResponse } from "@/types/response/reporting";
 import { DownloadedFile, RestApiCall, restApiCall, RestApiDownloadCall } from "@/lib/rest";
 import { createAttachmentService } from "@/services/attachment";
+import { MessageEvidenceTriggerRequest } from "@/types/request/evidence-trigger";
+import { OutboundMessageRequestMode } from "@/types/global";
+import { MessageEvidenceTriggerResponse } from "@/types/response/evidence-trigger";
 
 const MESSAGE_REPORT_EXPORT_FORMATS = {
     CSV: "csv",
@@ -61,6 +64,11 @@ interface SendMessageArgs {
     asTestMessage: boolean;
 }
 
+export interface SendEvidenceTriggerRequest {
+    payload: MessageEvidenceTriggerRequest,
+    mode: OutboundMessageRequestMode;
+}
+
 export function createMessageService(baseUrl: string, bffUrl: string, call: RestApiCall, download: RestApiDownloadCall) {
     return {
         async listMessages(params?: ListMessageParams):
@@ -91,7 +99,7 @@ export function createMessageService(baseUrl: string, bffUrl: string, call: Rest
                 { params }
             );
         },
-        async sendMessage({ messageFormData, parameters, asTestMessage}: SendMessageArgs): Promise<SendMessageResponse> {
+        async sendMessage({ messageFormData, parameters, asTestMessage }: SendMessageArgs): Promise<SendMessageResponse> {
             const repeatCount = Math.max(1, parameters.repeatCount || 1);
             let lastResponse: SendMessageResponse = {};
 
@@ -105,6 +113,17 @@ export function createMessageService(baseUrl: string, bffUrl: string, call: Rest
             }
 
             return lastResponse;
+        },
+        async sendEvidenceTrigger({ payload, mode }: SendEvidenceTriggerRequest): Promise<MessageEvidenceTriggerResponse> {
+            let response: MessageEvidenceTriggerResponse;
+
+            if (mode === "REST") {
+                response = await sendRestEvidenceTriggerPayload(baseUrl, call, payload)
+            } else {
+                response = await sendSoapEvidenceTriggerPayload(bffUrl, call, payload);
+            }
+
+            return response;
         },
         async exportMessageReports(params: ExportMessageReportsParams): Promise<DownloadedFile> {
             return download(
@@ -154,6 +173,36 @@ async function sendSoapMessage(bffUrl: string, call: RestApiCall, { messageFormD
         bffUrl,
         "bff/api/v1/submit-message",
         { method: "POST", body: payload, }
+    )
+}
+
+async function sendRestEvidenceTriggerPayload(baseUrl: string, call: RestApiCall, request: MessageEvidenceTriggerRequest)
+    : Promise<MessageEvidenceTriggerResponse> {
+    return call<MessageEvidenceTriggerResponse>(
+        baseUrl,
+        "api/v1/messages/evidence-trigger",
+        {
+            headers: {
+                "Content-Type": "application/json"
+            },
+            method: "POST",
+            body: JSON.stringify(request)
+        }
+    )
+}
+
+async function sendSoapEvidenceTriggerPayload(bffUrl: string, call: RestApiCall, request: MessageEvidenceTriggerRequest)
+    : Promise<MessageEvidenceTriggerResponse> {
+    return call<MessageEvidenceTriggerResponse>(
+        bffUrl,
+        "bff/api/v1/submit-evidence",
+        {
+            headers: {
+                "Content-Type": "application/json"
+            },
+            method: "POST",
+            body: JSON.stringify(request)
+        }
     )
 }
 

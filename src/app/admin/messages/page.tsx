@@ -24,7 +24,7 @@ import { PageHeaderButton } from "@/components/common/header/page-header-button"
 import { MessageReportingView } from "@/components/message/report/message-reporting-view";
 import { MessageDirectionChip } from "@/components/message/chip/message-direction-chip";
 import { MessageDeliveryStatusChip } from "@/components/message/chip/message-delivery-status-chip";
-import { ChartPie, Mail, Route } from "lucide-react";
+import { ChartPie, Mail, MailCheck, Route } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { useBusinessDomainIdentifiers } from "@/hooks/use-business-domain-identifiers";
@@ -37,12 +37,15 @@ import { useMessageService } from "@/hooks/use-http-service";
 import { CopyableIdentifier } from "@/components/common/copyable-identifier";
 import { ActionButton } from "@/components/common/action-button/action-button";
 import { DetailActionButton } from "@/components/common/action-button/detail-action-button";
-import { asFilter } from "@/utils";
+import { asFilter, toastError, toastSuccess } from "@/utils";
 import { ALL_SELECTOR } from "@/types/global";
 import type { RangeValue } from "react-aria-components";
 import { ZonedDateTime } from "@internationalized/date";
 import { buildDefaultRange, toDateRange } from "@/types/period";
 import { DateTimeRangeGranularity } from "@/components/form/selector/date-time-range-selector";
+import { useAppConfig } from "@/hooks/use-app-config";
+import { MessageEvidenceTriggerModeView } from "@/components/message/evidence-trigger/message-evidence-trigger-mode-view";
+import { MessageEvidenceTriggerResponse } from "@/types/response/evidence-trigger";
 
 const IDENTIFIER_LENGTH = 8;
 
@@ -58,6 +61,7 @@ export default function MessagesAdminPage() {
     const [dateRange, setDateRange] = useState<RangeValue<ZonedDateTime> | null>(buildDefaultRange);
     const debouncedIdentifier = useDebouncedValue(identifierQuery);
     const debouncedBackendName = useDebouncedValue(backendNameQuery);
+    const { appMode } = useAppConfig();
 
     const businessDomainIdentifiers = useBusinessDomainIdentifiers(ALL_SELECTOR);
     const processingModeServices = useProcessingModeServices(businessDomainIdentifierQuery, ALL_SELECTOR);
@@ -115,6 +119,7 @@ export default function MessagesAdminPage() {
     const detailsModal = useOverlayState();
     const transportModal = useOverlayState();
     const reportModal = useOverlayState();
+    const evidenceTriggerModal = useOverlayState();
 
     const onDetailsClick = (message: ConnectorMessage) => {
         setSelectedMessage(message);
@@ -124,6 +129,11 @@ export default function MessagesAdminPage() {
     const onTransportStepsClick = (message: ConnectorMessage) => {
         setSelectedMessage(message);
         transportModal.open();
+    };
+
+    const onDeliveryAckClick = (message: ConnectorMessage) => {
+        setSelectedMessage(message);
+        evidenceTriggerModal.open();
     };
 
     const onReportClicked = () => {
@@ -231,6 +241,12 @@ export default function MessagesAdminPage() {
                                                     <DetailActionButton onPress={() => onDetailsClick(message)}/>
                                                     <ActionButton label="Transport steps" icon={Route}
                                                                   onPress={() => onTransportStepsClick(message)}/>
+                                                    {appMode && message.direction == "GATEWAY_TO_BACKEND" && message.confirmedAt == null &&
+                                                        <ActionButton label="Confirm delivery"
+                                                                      icon={MailCheck}
+                                                                      iconAccent="text-success"
+                                                                      onPress={() => onDeliveryAckClick(message)}/>
+                                                    }
                                                 </div>
                                             </Table.Cell>
                                         </Table.Row>
@@ -271,6 +287,27 @@ export default function MessagesAdminPage() {
             />
 
             <MessageReportingView state={reportModal}/>
+
+            <MessageEvidenceTriggerModeView
+                message={selectedMessage}
+                state={evidenceTriggerModal}
+                evidenceType={"DELIVERY"}
+                onSubmit={async (payload) => {
+                    let response:  MessageEvidenceTriggerResponse;
+                    try {
+                        response = await messageService.sendEvidenceTrigger(payload);
+                    } catch (error) {
+                        toastError(error);
+                        return;
+                    }
+
+                    toastSuccess(`Evidence trigger sent successfully with ${response.identifier} identifier.`);
+                    evidenceTriggerModal.close();
+                    pagedList.refresh();
+
+                    return response;
+                }}
+            />
         </div>
     )
 }

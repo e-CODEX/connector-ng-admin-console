@@ -301,7 +301,7 @@ export default function MessagesAdminPage() {
                         return;
                     }
 
-                    toastSuccess(`Evidence trigger sent successfully with ${response.identifier} identifier.`);
+                    toastSuccess(`Evidence trigger sent successfully with ${response.identifier} as created message identifier.`);
                     evidenceTriggerModal.close();
                     pagedList.refresh();
 

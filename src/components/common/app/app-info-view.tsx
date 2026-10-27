@@ -105,7 +105,7 @@ export function AppInfoView({ variant = "footer", className = "", }: AppInfoProp
             size={size}
             title="Non-release build — not intended for production"
         >
-            snapshot
+            SNAPSHOT
         </Chip>
     ) : null;
 
@@ -120,16 +120,10 @@ export function AppInfoView({ variant = "footer", className = "", }: AppInfoProp
 
     return (
         <div className={`text-default-500 flex flex-wrap items-center gap-x-10 gap-y-1 text-xs ${className}`}>
-            <span className="text-default-700 truncate text-sm font-semibold">
-                e-CODEX Connector
-            </span>
+            <span className="text-default-700 truncate text-sm font-semibold">e-CODEX Connector</span>
             {versionChip}
             {snapshotChip}
             <AppHealthIndicatorView pollIntervalMs={30_000}/>
-            <span
-                aria-hidden="true"
-                className="bg-divider hidden h-4 w-px sm:block"
-            />
             <time dateTime={appBuildInfo.time} title={appBuildInfo.time} className="font-semibold">
                 Built {buildTime} UTC
             </time>

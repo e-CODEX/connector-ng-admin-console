@@ -24,7 +24,7 @@ import { PageHeaderButton } from "@/components/common/header/page-header-button"
 import { MessageReportingView } from "@/components/message/report/message-reporting-view";
 import { MessageDirectionChip } from "@/components/message/chip/message-direction-chip";
 import { MessageDeliveryStatusChip } from "@/components/message/chip/message-delivery-status-chip";
-import { ChartPie, Mail, MailCheck, MailClock, Route } from "lucide-react";
+import { ChartPie, CheckCheck, Mail, MailCheck, MailClock, Route } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { useBusinessDomainIdentifiers } from "@/hooks/use-business-domain-identifiers";
@@ -119,11 +119,19 @@ export default function MessagesAdminPage() {
         pagedList.setPage(1);
     };
 
-    const detailsModal = useOverlayState();
-    const transportModal = useOverlayState();
-    const reportModal = useOverlayState();
-    const evidenceTriggerModal = useOverlayState();
-    const pendingMessagesModal = useOverlayState();
+    const useRefreshOnClose = (refresh: () => void)=> {
+        return useOverlayState({
+            onOpenChange: (isOpen) => {
+                if (!isOpen) refresh();
+            },
+        });
+    }
+
+    const detailsModal = useRefreshOnClose(pagedList.refresh);
+    const transportModal = useRefreshOnClose(pagedList.refresh);
+    const reportModal = useRefreshOnClose(pagedList.refresh);
+    const evidenceTriggerModal = useRefreshOnClose(pagedList.refresh);
+    const pendingMessagesModal = useRefreshOnClose(pagedList.refresh);
 
     const onDetailsClick = (message: ConnectorMessage) => {
         setSelectedMessage(message);
@@ -148,16 +156,30 @@ export default function MessagesAdminPage() {
         pendingMessagesModal.open();
     }
 
+    const canAcknowledgeReception = (message: ConnectorMessage): boolean => {
+        return isTestingMode
+            && message.direction == "GATEWAY_TO_BACKEND"
+            && message.deliveredToLinkPartnerAt == null
+            && message.confirmedAt != null
+    }
+
+    const canTriggerDeliveryEvidence = (message: ConnectorMessage): boolean => {
+        return isTestingMode
+            && message.direction == "GATEWAY_TO_BACKEND"
+            && message.confirmedAt == null
+            && message.deliveredToLinkPartnerAt != null
+    }
+
     return (
         <div>
             <PageHeader
                 icon={Mail}
                 title="Business Messages"
-                subtitle="Connector eDelivery inbox"
+                subtitle="The connector processed business messages"
             >
                 <PageHeaderButton
                     variant="primary"
-                    tooltip="See reporting"
+                    tooltip="Show reporting"
                     icon={ChartPie}
                     onPress={onReportClicked}
                 />
@@ -165,7 +187,7 @@ export default function MessagesAdminPage() {
                 {isTestingMode && (
                     <PageHeaderButton
                         variant="primary"
-                        tooltip="See pending messages"
+                        tooltip="Show pending messages"
                         icon={MailClock}
                         onPress={onPendingMessagesClicked}
                     />
@@ -258,7 +280,13 @@ export default function MessagesAdminPage() {
                                                     <DetailActionButton onPress={() => onDetailsClick(message)}/>
                                                     <ActionButton label="Transport steps" icon={Route}
                                                                   onPress={() => onTransportStepsClick(message)}/>
-                                                    {isTestingMode && message.direction == "GATEWAY_TO_BACKEND" && message.confirmedAt == null &&
+                                                    {canAcknowledgeReception(message) &&
+                                                        <ActionButton label="Acknowledge reception"
+                                                                      icon={CheckCheck}
+                                                                      iconAccent="text-warning"
+                                                                      onPress={() => onDeliveryAckClick(message)}/>
+                                                    }
+                                                    {canTriggerDeliveryEvidence(message) &&
                                                         <ActionButton label="Confirm delivery"
                                                                       icon={MailCheck}
                                                                       iconAccent="text-success"
@@ -310,7 +338,7 @@ export default function MessagesAdminPage() {
                 state={evidenceTriggerModal}
                 evidenceType={"DELIVERY"}
                 onSubmit={async (payload) => {
-                    let response:  MessageEvidenceTriggerResponse;
+                    let response: MessageEvidenceTriggerResponse;
                     try {
                         response = await messageService.sendEvidenceTrigger(payload);
                     } catch (error) {
@@ -326,7 +354,7 @@ export default function MessagesAdminPage() {
                 }}
             />
 
-            <MessagePendingView state={pendingMessagesModal}/>
+            <MessagePendingView state={pendingMessagesModal} onDownloaded={pagedList.refresh}/>
         </div>
     )
 }

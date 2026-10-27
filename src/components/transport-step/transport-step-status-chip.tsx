@@ -46,7 +46,7 @@ export const TRANSPORT_DELIVERY_STATUS: Record<TransportStepStatus, TransportDel
     },
     DOWNLOADED: {
         label: "Downloaded",
-        description: "Retrieved by the recipient",
+        description: "Retrieved by the backend but not yet acknowledged",
         icon: Download,
         color: "accent", // in progress, not yet confirmed
         variant: "soft",

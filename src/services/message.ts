@@ -86,6 +86,12 @@ export function createMessageService(baseUrl: string, bffUrl: string, call: Rest
         async retrieveMessage(identifier: string): Promise<ConnectorMessageDetailsResponse> {
             return call<ConnectorMessageDetailsResponse>(baseUrl, `api/v1/admin/messages/${identifier}`);
         },
+        async downloadPendingMessage(transportIdentifier: string): Promise<void> {
+            return sendSoapDownloadPendingMessageRequest(bffUrl, call, transportIdentifier);
+        },
+        async downloadAllPendingMessages(): Promise<void> {
+            return sendSoapDownloadAllPendingMessagesRequest(bffUrl, call);
+        },
         async getMessageTransportStep(identifier: string): Promise<ConnectorTransportStep> {
             return call<ConnectorTransportStep>(baseUrl, `api/v1/admin/messages/${identifier}/transport-steps`);
         },
@@ -215,6 +221,34 @@ async function sendSoapPendingMessagesRequest(bffUrl: string, call: RestApiCall)
     return call<ConnectorPendingMessagesResponse>(
         bffUrl,
         "bff/api/v1/messages/pending/ids",
+        {
+            headers: {
+                "Content-Type": "application/json"
+            },
+            method: "GET"
+        }
+    )
+}
+
+async function sendSoapDownloadPendingMessageRequest(bffUrl: string, call: RestApiCall, transportIdentifier: string)
+    : Promise<void> {
+    return call<void>(
+        bffUrl,
+        `bff/api/v1/messages/pending/download/${transportIdentifier}`,
+        {
+            headers: {
+                "Content-Type": "application/json"
+            },
+            method: "GET"
+        }
+    )
+}
+
+async function sendSoapDownloadAllPendingMessagesRequest(bffUrl: string, call: RestApiCall)
+    : Promise<void> {
+    return call<void>(
+        bffUrl,
+        `bff/api/v1/messages/pending/download`,
         {
             headers: {
                 "Content-Type": "application/json"

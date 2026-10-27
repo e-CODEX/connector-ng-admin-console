@@ -45,12 +45,12 @@ export function TransportStepFiltersPanel({
         <SearchCriteriaBox className={className}>
             <SearchField className="w-full sm:max-w-xs" value={messageOrRemoteSystemIdentifier}
                          onChange={onMessageOrRemoteSystemIdentifierChange}>
-                <Label className="text-sm font-medium">Message or remote system
+                <Label className="text-sm font-medium">Step or message or remote system
                     identifier</Label>
                 <SearchField.Group>
                     <SearchField.SearchIcon/>
                     <SearchField.Input
-                        placeholder="Search by message or remote system identifier"/>
+                        placeholder="Search by step or message or remote system identifier"/>
                     <SearchField.ClearButton/>
                 </SearchField.Group>
             </SearchField>

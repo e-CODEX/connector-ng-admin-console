@@ -63,6 +63,8 @@ export default function MessagesAdminPage() {
     const debouncedBackendName = useDebouncedValue(backendNameQuery);
     const { appMode } = useAppConfig();
 
+    const isTestingMode = appMode === "TESTING_CONSOLE";
+
     const businessDomainIdentifiers = useBusinessDomainIdentifiers(ALL_SELECTOR);
     const processingModeServices = useProcessingModeServices(businessDomainIdentifierQuery, ALL_SELECTOR);
 
@@ -241,7 +243,7 @@ export default function MessagesAdminPage() {
                                                     <DetailActionButton onPress={() => onDetailsClick(message)}/>
                                                     <ActionButton label="Transport steps" icon={Route}
                                                                   onPress={() => onTransportStepsClick(message)}/>
-                                                    {appMode && message.direction == "GATEWAY_TO_BACKEND" && message.confirmedAt == null &&
+                                                    {isTestingMode && message.direction == "GATEWAY_TO_BACKEND" && message.confirmedAt == null &&
                                                         <ActionButton label="Confirm delivery"
                                                                       icon={MailCheck}
                                                                       iconAccent="text-success"

@@ -162,12 +162,14 @@ export default function MessagesAdminPage() {
                     onPress={onReportClicked}
                 />
 
-                <PageHeaderButton
-                    variant="primary"
-                    tooltip="See pending messages"
-                    icon={MailClock}
-                    onPress={onPendingMessagesClicked}
-                />
+                {isTestingMode && (
+                    <PageHeaderButton
+                        variant="primary"
+                        tooltip="See pending messages"
+                        icon={MailClock}
+                        onPress={onPendingMessagesClicked}
+                    />
+                )}
 
                 <PageHeaderButton
                     variant="secondary"

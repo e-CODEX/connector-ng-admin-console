@@ -24,7 +24,7 @@ import { PageHeaderButton } from "@/components/common/header/page-header-button"
 import { MessageReportingView } from "@/components/message/report/message-reporting-view";
 import { MessageDirectionChip } from "@/components/message/chip/message-direction-chip";
 import { MessageDeliveryStatusChip } from "@/components/message/chip/message-delivery-status-chip";
-import { ChartPie, Mail, MailCheck, Route } from "lucide-react";
+import { ChartPie, Mail, MailCheck, MailClock, Route } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { useBusinessDomainIdentifiers } from "@/hooks/use-business-domain-identifiers";
@@ -46,6 +46,7 @@ import { DateTimeRangeGranularity } from "@/components/form/selector/date-time-r
 import { useAppConfig } from "@/hooks/use-app-config";
 import { MessageEvidenceTriggerModeView } from "@/components/message/evidence-trigger/message-evidence-trigger-mode-view";
 import { MessageEvidenceTriggerResponse } from "@/types/response/evidence-trigger";
+import { MessagePendingView } from "@/components/message/pending/message-pending-view";
 
 const IDENTIFIER_LENGTH = 8;
 
@@ -122,6 +123,7 @@ export default function MessagesAdminPage() {
     const transportModal = useOverlayState();
     const reportModal = useOverlayState();
     const evidenceTriggerModal = useOverlayState();
+    const pendingMessagesModal = useOverlayState();
 
     const onDetailsClick = (message: ConnectorMessage) => {
         setSelectedMessage(message);
@@ -142,6 +144,10 @@ export default function MessagesAdminPage() {
         reportModal.open();
     }
 
+    const onPendingMessagesClicked = () => {
+        pendingMessagesModal.open();
+    }
+
     return (
         <div>
             <PageHeader
@@ -154,6 +160,13 @@ export default function MessagesAdminPage() {
                     tooltip="See reporting"
                     icon={ChartPie}
                     onPress={onReportClicked}
+                />
+
+                <PageHeaderButton
+                    variant="primary"
+                    tooltip="See pending messages"
+                    icon={MailClock}
+                    onPress={onPendingMessagesClicked}
                 />
 
                 <PageHeaderButton
@@ -310,6 +323,8 @@ export default function MessagesAdminPage() {
                     return response;
                 }}
             />
+
+            <MessagePendingView state={pendingMessagesModal}/>
         </div>
     )
 }

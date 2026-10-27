@@ -9,7 +9,7 @@
  */
 
 import { PaginatedResponse } from "@/types/response/paginated-response";
-import { ConnectorMessage, ConnectorMessageDetailsResponse } from "@/types/response/message";
+import { ConnectorMessage, ConnectorMessageDetailsResponse, ConnectorPendingMessagesResponse } from "@/types/response/message";
 import { ConnectorTransportStep } from "@/types/response/transport-step";
 import { SendMessageFormData, SendMessageResponse, SendParameters, } from "@/types/send-message-form";
 import { createSoapOutboundMessagePayload } from "@/lib/rest/message-outbound/soap-message-builder";
@@ -78,6 +78,10 @@ export function createMessageService(baseUrl: string, bffUrl: string, call: Rest
                 "api/v1/admin/messages",
                 { params }
             );
+        },
+        async listPendingMessages():
+            Promise<ConnectorPendingMessagesResponse> {
+            return sendSoapPendingMessagesRequest(bffUrl, call);
         },
         async retrieveMessage(identifier: string): Promise<ConnectorMessageDetailsResponse> {
             return call<ConnectorMessageDetailsResponse>(baseUrl, `api/v1/admin/messages/${identifier}`);
@@ -202,6 +206,20 @@ async function sendSoapEvidenceTriggerPayload(bffUrl: string, call: RestApiCall,
             },
             method: "POST",
             body: JSON.stringify(request)
+        }
+    )
+}
+
+async function sendSoapPendingMessagesRequest(bffUrl: string, call: RestApiCall)
+    : Promise<ConnectorPendingMessagesResponse> {
+    return call<ConnectorPendingMessagesResponse>(
+        bffUrl,
+        "bff/api/v1/messages/pending/ids",
+        {
+            headers: {
+                "Content-Type": "application/json"
+            },
+            method: "GET"
         }
     )
 }

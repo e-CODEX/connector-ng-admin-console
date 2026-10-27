@@ -30,6 +30,10 @@ export interface ConnectorMessage {
     deliveredToLinkPartnerAt: string;
 }
 
+export interface ConnectorPendingMessagesResponse {
+    messageIds: string[];
+}
+
 export interface ConnectorMessageDetailsResponse extends ConnectorMessage {
     businessContent?: ConnectorMessageBusinessContent;
     attachments?: ConnectorAttachmentResponse[];

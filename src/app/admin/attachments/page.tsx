@@ -70,7 +70,15 @@ export default function AttachmentsAdminPage() {
         [debouncedMessageIdentifier, debouncedFilename, typesQuery, storagesQuery, dateRange],
     );
 
-    const detailsModal = useOverlayState();
+    const useRefreshOnClose = (refresh: () => void) => {
+        return useOverlayState({
+            onOpenChange: (isOpen) => {
+                if (!isOpen) refresh();
+            },
+        });
+    }
+
+    const detailsModal = useRefreshOnClose(pagedList.refresh);
 
     const onMessageIdentifierChange = (value: string) => {
         setMessageIdentifierQuery(value);

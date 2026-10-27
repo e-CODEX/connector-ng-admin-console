@@ -22,7 +22,7 @@ import { ArrowsRotateRight } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/header/page-header-button";
 import { TransportStepMessageTypeChip } from "@/components/message/chip/message-type-chip";
 import { TransportDeliveryStatusChip } from "@/components/transport-step/transport-step-status-chip";
-import { Mail, Route } from "lucide-react";
+import { Mail, MailClock, Route } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { usePagedList } from "@/hooks/use-paged-list";
@@ -39,6 +39,8 @@ import { ZonedDateTime } from "@internationalized/date";
 import { buildDefaultRange, toDateRange } from "@/types/period";
 import { TransportedStepMessageDetailsView } from "@/components/transport-step/transported-step-message-details-view";
 import { ActionButton } from "@/components/common/action-button/action-button";
+import { useAppConfig } from "@/hooks/use-app-config";
+import { MessagePendingView } from "@/components/message/pending/message-pending-view";
 
 const IDENTIFIER_LENGTH = 30;
 
@@ -54,6 +56,9 @@ export default function TransportStepsAdminPage() {
     const [dateRange, setDateRange] = useState<RangeValue<ZonedDateTime> | null>(buildDefaultRange);
     const debouncedMessageOrRemoteSystemIdentifier = useDebouncedValue(messageOrRemoteSystemIdentifierQuery);
     const debouncedLinkPartnerName = useDebouncedValue(linkPartnerNameQuery);
+    const { appMode } = useAppConfig();
+
+    const isTestingMode = appMode === "TESTING_CONSOLE";
 
     const transportStepService = useTransportStepService();
 
@@ -88,8 +93,17 @@ export default function TransportStepsAdminPage() {
         }
     };
 
-    const detailsModal = useOverlayState();
-    const transportedMessageDetailsModal = useOverlayState();
+    const useRefreshOnClose = (refresh: () => void)=> {
+        return useOverlayState({
+            onOpenChange: (isOpen) => {
+                if (!isOpen) refresh();
+            },
+        });
+    }
+
+    const detailsModal = useRefreshOnClose(pagedList.refresh);
+    const transportedMessageDetailsModal = useRefreshOnClose(pagedList.refresh);
+    const pendingMessagesModal = useRefreshOnClose(pagedList.refresh);
 
     const onDetailsClick = (step: ConnectorTransportStep) => {
         setSelectedTransportStep(step);
@@ -101,6 +115,10 @@ export default function TransportStepsAdminPage() {
         transportedMessageDetailsModal.open();
     };
 
+    const onPendingMessagesClicked = () => {
+        pendingMessagesModal.open();
+    }
+
     return (
         <div>
             <PageHeader
@@ -108,6 +126,15 @@ export default function TransportStepsAdminPage() {
                 title="Message Transport Steps"
                 subtitle="Track message transport steps"
             >
+                {isTestingMode && (
+                    <PageHeaderButton
+                        variant="primary"
+                        tooltip="See pending messages"
+                        icon={MailClock}
+                        onPress={onPendingMessagesClicked}
+                    />
+                )}
+
                 <PageHeaderButton
                     variant="secondary"
                     tooltip="Refresh"
@@ -209,6 +236,8 @@ export default function TransportStepsAdminPage() {
                     <TransportStepDetailsView transportStep={selectedTransportStep} state={detailsModal}/>
 
                     <TransportedStepMessageDetailsView transportStep={selectedTransportStep} state={transportedMessageDetailsModal}/>
+
+                    <MessagePendingView state={pendingMessagesModal} onDownloaded={pagedList.refresh}/>
                 </>
             )}
         </div>

@@ -16,7 +16,7 @@ import { ConnectorMessageDetailsResponse } from "@/types/response/message";
 export type ListTransportStepsParams = {
     page?: number;
     size?: number;
-    messageOrRemoteSystemIdentifier?: string;
+    stepOrMessageOrRemoteSystemIdentifier?: string;
     linkPartnerName?: string;
     statuses?: string[];
     from?: string;

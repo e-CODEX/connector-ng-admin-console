@@ -62,7 +62,7 @@ export default function TransportStepsAdminPage() {
             transportStepService.listTransportSteps({
                 page,
                 size,
-                messageOrRemoteSystemIdentifier: asFilter(debouncedMessageOrRemoteSystemIdentifier),
+                stepOrMessageOrRemoteSystemIdentifier: asFilter(debouncedMessageOrRemoteSystemIdentifier),
                 linkPartnerName: asFilter(debouncedLinkPartnerName),
                 statuses: asStatusesFilter(statusesQuery.statuses),
                 ...toDateRange(dateRange, granularity),

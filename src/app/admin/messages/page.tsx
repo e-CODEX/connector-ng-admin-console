@@ -24,7 +24,7 @@ import { PageHeaderButton } from "@/components/common/header/page-header-button"
 import { MessageReportingView } from "@/components/message/report/message-reporting-view";
 import { MessageDirectionChip } from "@/components/message/chip/message-direction-chip";
 import { MessageDeliveryStatusChip } from "@/components/message/chip/message-delivery-status-chip";
-import { ChartPie, CheckCheck, Mail, MailCheck, MailClock, Route } from "lucide-react";
+import { ChartPie, Mail, MailCheck, MailClock, Route } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { useBusinessDomainIdentifiers } from "@/hooks/use-business-domain-identifiers";
@@ -156,13 +156,6 @@ export default function MessagesAdminPage() {
         pendingMessagesModal.open();
     }
 
-    const canAcknowledgeReception = (message: ConnectorMessage): boolean => {
-        return isTestingMode
-            && message.direction == "GATEWAY_TO_BACKEND"
-            && message.deliveredToLinkPartnerAt == null
-            && message.confirmedAt != null
-    }
-
     const canTriggerDeliveryEvidence = (message: ConnectorMessage): boolean => {
         return isTestingMode
             && message.direction == "GATEWAY_TO_BACKEND"
@@ -280,14 +273,8 @@ export default function MessagesAdminPage() {
                                                     <DetailActionButton onPress={() => onDetailsClick(message)}/>
                                                     <ActionButton label="Transport steps" icon={Route}
                                                                   onPress={() => onTransportStepsClick(message)}/>
-                                                    {canAcknowledgeReception(message) &&
-                                                        <ActionButton label="Acknowledge reception"
-                                                                      icon={CheckCheck}
-                                                                      iconAccent="text-warning"
-                                                                      onPress={() => onDeliveryAckClick(message)}/>
-                                                    }
                                                     {canTriggerDeliveryEvidence(message) &&
-                                                        <ActionButton label="Confirm delivery"
+                                                        <ActionButton label="Send delivery evidence"
                                                                       icon={MailCheck}
                                                                       iconAccent="text-success"
                                                                       onPress={() => onDeliveryAckClick(message)}/>

@@ -92,6 +92,9 @@ export function createMessageService(baseUrl: string, bffUrl: string, call: Rest
         async downloadAllPendingMessages(): Promise<void> {
             return sendSoapDownloadAllPendingMessagesRequest(bffUrl, call);
         },
+        async acknowledgePendingMessage(transportIdentifier: string): Promise<void> {
+            return sendSoapAcknowledgePendingMessageRequest(bffUrl, call, transportIdentifier);
+        },
         async getMessageTransportStep(identifier: string): Promise<ConnectorTransportStep> {
             return call<ConnectorTransportStep>(baseUrl, `api/v1/admin/messages/${identifier}/transport-steps`);
         },
@@ -240,6 +243,20 @@ async function sendSoapDownloadPendingMessageRequest(bffUrl: string, call: RestA
                 "Content-Type": "application/json"
             },
             method: "GET"
+        }
+    )
+}
+
+async function sendSoapAcknowledgePendingMessageRequest(bffUrl: string, call: RestApiCall, transportIdentifier: string)
+    : Promise<void> {
+    return call<void>(
+        bffUrl,
+        `bff/api/v1/messages/pending/acknowledge/${transportIdentifier}`,
+        {
+            headers: {
+                "Content-Type": "application/json"
+            },
+            method: "POST"
         }
     )
 }

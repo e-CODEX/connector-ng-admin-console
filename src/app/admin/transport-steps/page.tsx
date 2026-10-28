@@ -22,15 +22,15 @@ import { ArrowsRotateRight } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/header/page-header-button";
 import { TransportStepMessageTypeChip } from "@/components/message/chip/message-type-chip";
 import { TransportDeliveryStatusChip } from "@/components/transport-step/transport-step-status-chip";
-import { Mail, MailClock, Route } from "lucide-react";
+import { CheckCheck, Mail, MailClock, Route } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { usePagedList } from "@/hooks/use-paged-list";
 import { DateTime } from "@/components/common/date-time";
-import { useTransportStepService } from "@/hooks/use-http-service";
+import { useMessageService, useTransportStepService } from "@/hooks/use-http-service";
 import { CopyableIdentifier } from "@/components/common/copyable-identifier";
 import { DetailActionButton } from "@/components/common/action-button/detail-action-button";
-import { asFilter } from "@/utils";
+import { asFilter, toastError, toastSuccess } from "@/utils";
 import { ALL_SELECTOR } from "@/types/global";
 import { TransportStepStatusesFilter } from "@/components/form/selector/transport-step-status-multi-selector";
 import { DateTimeRangeGranularity } from "@/components/form/selector/date-time-range-selector";
@@ -48,12 +48,22 @@ const granularity: DateTimeRangeGranularity = "minute";
 
 const asStatusesFilter = (values: TransportStepStatusesFilter[]) => values.length === 0 || values.includes(ALL_SELECTOR) ? undefined : values;
 
+const useRefreshOnClose = (refresh: () => void)=> {
+    return useOverlayState({
+        onOpenChange: (isOpen) => {
+            if (!isOpen) refresh();
+        },
+    });
+}
+
 export default function TransportStepsAdminPage() {
     const [selectedTransportStep, setSelectedTransportStep] = useState<ConnectorTransportStep | null>(null);
     const [messageOrRemoteSystemIdentifierQuery, setMessageOrRemoteSystemIdentifierQuery] = useState("");
     const [linkPartnerNameQuery, setLinkPartnerNameQuery] = useState("");
     const [statusesQuery, setStatusesQuery] = useState({ statuses: [] as TransportStepStatusesFilter[] });
     const [dateRange, setDateRange] = useState<RangeValue<ZonedDateTime> | null>(buildDefaultRange);
+    const [acknowledging, setAcknowledging] = useState(false);
+
     const debouncedMessageOrRemoteSystemIdentifier = useDebouncedValue(messageOrRemoteSystemIdentifierQuery);
     const debouncedLinkPartnerName = useDebouncedValue(linkPartnerNameQuery);
     const { appMode } = useAppConfig();
@@ -61,6 +71,7 @@ export default function TransportStepsAdminPage() {
     const isTestingMode = appMode === "TESTING_CONSOLE";
 
     const transportStepService = useTransportStepService();
+    const messageService = useMessageService();
 
     const pagedList = usePagedList<ConnectorTransportStep>(
         ({ page, size }) =>
@@ -93,14 +104,6 @@ export default function TransportStepsAdminPage() {
         }
     };
 
-    const useRefreshOnClose = (refresh: () => void)=> {
-        return useOverlayState({
-            onOpenChange: (isOpen) => {
-                if (!isOpen) refresh();
-            },
-        });
-    }
-
     const detailsModal = useRefreshOnClose(pagedList.refresh);
     const transportedMessageDetailsModal = useRefreshOnClose(pagedList.refresh);
     const pendingMessagesModal = useRefreshOnClose(pagedList.refresh);
@@ -117,6 +120,24 @@ export default function TransportStepsAdminPage() {
 
     const onPendingMessagesClicked = () => {
         pendingMessagesModal.open();
+    }
+
+    const onAcknowledgeClick = async (step: ConnectorTransportStep) => {
+        if (acknowledging) return;
+        setAcknowledging(true);
+        try {
+            await messageService.acknowledgePendingMessage(step.identifier);
+            toastSuccess(`Message related to transport ID [${step.identifier}] acknowledged successfully.`);
+            pagedList.refresh();
+        } catch (error) {
+            toastError(error);
+        } finally {
+            setAcknowledging(false);
+        }
+    };
+
+    const canAcknowledgeReception = (step: ConnectorTransportStep): boolean => {
+        return isTestingMode && step.status == "DOWNLOADED"
     }
 
     return (
@@ -206,6 +227,12 @@ export default function TransportStepsAdminPage() {
                                                         label="Transported message details"
                                                         icon={Mail}
                                                         onPress={() => onTransportedMessageDetailsClick(transportStep)}/>
+                                                    {canAcknowledgeReception(transportStep) &&
+                                                        <ActionButton label="Acknowledge reception"
+                                                                      icon={CheckCheck}
+                                                                      iconAccent="text-warning"
+                                                                      onPress={() => onAcknowledgeClick(transportStep)}/>
+                                                    }
                                                 </div>
                                             </Table.Cell>
                                         </Table.Row>
@@ -239,6 +266,11 @@ export default function TransportStepsAdminPage() {
 
                     <MessagePendingView state={pendingMessagesModal} onDownloaded={pagedList.refresh}/>
                 </>
+            )}
+            {acknowledging && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/60">
+                    <SpinnerView/>
+                </div>
             )}
         </div>
     )

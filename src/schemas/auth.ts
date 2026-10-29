@@ -10,14 +10,24 @@
 
 import { z } from "zod";
 
+export const passwordSchema = z
+    .string()
+    .min(12, { error: "Password must be at least 12 characters" })
+    .regex(/[a-z]/, { error: "Password must have at least one lowercase letter" })
+    .regex(/[A-Z]/, { error: "Password must have at least one uppercase letter" })
+    .regex(/[0-9]/, { error: "Password must have at least one digit" })
+    .regex(/[^A-Za-z0-9]/, { error: "Password must have at least one special character" })
+    .regex(/^\S+$/, { error: "No spaces allowed" });
+
 export const userCreationSchema = z.object({
     username: z.string().trim().min(1, "Username is required"),
-    password: z.string().min(6, "Password must be at least 6 characters"),
+    password: passwordSchema,
     email: z
         .email()
         .trim()
         .min(1, "Email is required"),
     enabled: z.boolean(),
+    roles: z.array(z.string()).min(1, "Select at least one role"),
 });
 
 export const loginSchema = z.object({
@@ -28,7 +38,7 @@ export const loginSchema = z.object({
 export const changePasswordSchema = z
     .object({
         currentPassword: z.string().min(1, { error: "Current password is required" }),
-        newPassword: z.string().min(12, { error: "Password must be at least 12 characters" }),
+        newPassword: passwordSchema,
         confirmPassword: z.string().min(1, { error: "Please confirm your new password" }),
     })
     .refine((data) => data.newPassword !== data.currentPassword, {

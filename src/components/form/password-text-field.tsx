@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { Button, FieldError, InputGroup, Label, TextField } from "@heroui/react";
 
@@ -13,6 +13,7 @@ interface PasswordFieldProps {
     errorMessage?: string;
     isRequired?: boolean;
     name?: string;
+    placeholder?: string;
 }
 
 export function PasswordField({
@@ -24,6 +25,7 @@ export function PasswordField({
                                   errorMessage,
                                   isRequired,
                                   name,
+                                  placeholder
                               }: PasswordFieldProps) {
     const [isVisible, setIsVisible] = useState(false);
 
@@ -38,7 +40,7 @@ export function PasswordField({
         >
             <Label>{label}</Label>
             <InputGroup>
-                <InputGroup.Input type={isVisible ? "text" : "password"} />
+                <InputGroup.Input type={isVisible ? "text" : "password"} placeholder={placeholder}/>
                 <InputGroup.Suffix className="pr-0">
                     <Button
                         isIconOnly
@@ -47,7 +49,7 @@ export function PasswordField({
                         aria-label={isVisible ? "Hide password" : "Show password"}
                         onPress={() => setIsVisible((v) => !v)}
                     >
-                        {isVisible ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                        {isVisible ? <EyeOff className="size-4"/> : <Eye className="size-4"/>}
                     </Button>
                 </InputGroup.Suffix>
             </InputGroup>

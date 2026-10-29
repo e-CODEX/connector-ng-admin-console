@@ -20,6 +20,13 @@ export interface ConnectorUser {
     updatedAt: string;
 }
 
+export interface ConnectorUserRole {
+    uuid: string;
+    name: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
 export interface LoginResponse {
     accessToken: string;
     expiresIn: number;

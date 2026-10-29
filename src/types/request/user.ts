@@ -13,6 +13,7 @@ export interface UserCreationRequest {
     password: string;
     email: string;
     enabled: boolean;
+    roles: string[];
 }
 
 export interface LoginRequest {

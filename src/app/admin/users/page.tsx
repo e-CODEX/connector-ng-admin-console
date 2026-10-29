@@ -24,7 +24,7 @@ import { CopyableIdentifier } from "@/components/common/copyable-identifier";
 import { EmptyState } from "@/components/common/empty-state";
 import { BooleanChip } from "@/components/common/boolean-chip";
 import { UserCreationView } from "@/components/user/creation/user-creation-view";
-import { toastError, toastSuccess } from "@/utils";
+import { toastError, toastErrorMessage, toastSuccess } from "@/utils";
 import { DateTime } from "@/components/common/date-time";
 import { ActionButton } from "@/components/common/action-button/action-button";
 import { ConfirmModal } from "@/components/common/confirmation-modal";
@@ -47,6 +47,9 @@ export default function UserAdminPage() {
         setSelectedUser(user);
         deleteConfirmationModal.open()
     }
+
+    const formatRole = (role: string) =>
+        role.replace(/^ROLE_/, "").replace(/_/g, " ");
 
     return (
         <div>
@@ -78,11 +81,12 @@ export default function UserAdminPage() {
                 <>
                     <Table variant="secondary">
                         <Table.ScrollContainer>
-                            <Table.Content aria-label="Connector processing modes">
+                            <Table.Content aria-label="Connector users">
                                 <Table.Header>
                                     <Table.Column isRowHeader>Identifier</Table.Column>
                                     <Table.Column>Username</Table.Column>
                                     <Table.Column>Email</Table.Column>
+                                    <Table.Column>Roles</Table.Column>
                                     <Table.Column>Enabled</Table.Column>
                                     <Table.Column>Created at</Table.Column>
                                     <Table.Column>Updated at</Table.Column>
@@ -96,6 +100,16 @@ export default function UserAdminPage() {
                                             </Table.Cell>
                                             <Table.Cell>{user.username}</Table.Cell>
                                             <Table.Cell>{user.email}</Table.Cell>
+                                            <Table.Cell>
+                                                <div className="flex flex-wrap gap-1">
+                                                    {user.roles?.map((role) => (
+                                                        <span key={role}
+                                                              className="rounded-full bg-amber-700 px-2 py-0.5 text-xs">
+                                                            {formatRole(role)}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            </Table.Cell>
                                             <Table.Cell>
                                                 <BooleanChip value={user.enabled}/>
                                             </Table.Cell>
@@ -131,9 +145,25 @@ export default function UserAdminPage() {
                 state={addModal}
                 onSubmit={async (payload) => {
                     try {
-                        await userService.createUser(payload);
+                        const created = await userService.createUser(payload);
+                        const userId = created?.uuid;
+                        if (!created || !userId) {
+                            throw new Error('Created user has no identifier');
+                        }
+                        const failedRoles: string[] = [];
+                        for (const role of payload.roles) {
+                            try {
+                                await userService.assignRole(userId, role);
+                            } catch {
+                                failedRoles.push(role);
+                            }
+                        }
                         await list.refresh();
-                        toastSuccess("User created successfully");
+                        if (failedRoles.length > 0) {
+                            toastErrorMessage('User created successfully but failed to assign role:${failedRoles.join(", ")}.');
+                        } else {
+                            toastSuccess('User created successfully');
+                        }
                         addModal.close();
                     } catch (error) {
                         toastError(error);
@@ -150,6 +180,8 @@ export default function UserAdminPage() {
                 confirmVariant="danger-soft"
                 onConfirm={async () => {
                     await userService.blockUser(selectedUser!.uuid)
+                    await list.refresh();
+                    blockConfirmationModal.close();
                 }}
                 onCancel={() => blockConfirmationModal.close()}
             />
@@ -166,7 +198,9 @@ export default function UserAdminPage() {
                 confirmLabel="Delete"
                 confirmVariant="danger"
                 onConfirm={async () => {
-                    await userService.deleteUser(selectedUser!.uuid)
+                    await userService.deleteUser(selectedUser!.uuid);
+                    await list.refresh();
+                    deleteConfirmationModal.close();
                 }}
                 onCancel={() => deleteConfirmationModal.close()}
             />

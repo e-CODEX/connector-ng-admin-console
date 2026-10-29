@@ -13,7 +13,7 @@
 import { useUserService } from "@/hooks/use-http-service";
 import { useList } from "@/hooks/use-list";
 import { ConnectorUser } from "@/types/response/user";
-import { User, UserLock, UserMinus } from "lucide-react";
+import { Pen, User, UserLock, UserMinus } from "lucide-react";
 import { PageHeaderButton } from "@/components/common/header/page-header-button";
 import { ArrowsRotateRight, Plus } from "@gravity-ui/icons";
 import { PageHeader } from "@/components/common/header/page-header";
@@ -28,6 +28,8 @@ import { toastError, toastErrorMessage, toastSuccess } from "@/utils";
 import { DateTime } from "@/components/common/date-time";
 import { ActionButton } from "@/components/common/action-button/action-button";
 import { ConfirmModal } from "@/components/common/confirmation-modal";
+import { UserCreationRequest } from "@/types/request/user";
+import { applyRoleChanges, diffRoles } from "@/app/admin/users/user-role-change";
 
 export default function UserAdminPage() {
     const [selectedUser, setSelectedUser] = useState<ConnectorUser | null>(null);
@@ -48,8 +50,60 @@ export default function UserAdminPage() {
         deleteConfirmationModal.open()
     }
 
+    const onCreateClicked = () => {
+        setSelectedUser(null);        // null = create mode
+        addModal.open();
+    };
+    const onEditClicked =  (user: ConnectorUser) => {
+        setSelectedUser(user);
+        addModal.open();
+    }
     const formatRole = (role: string) =>
         role.replace(/^ROLE_/, "").replace(/_/g, " ");
+
+
+    const handleSubmit = async (payload: UserCreationRequest): Promise<boolean> => {
+        try {
+            let userId: string;
+            let changes: { toAdd: string[]; toRemove: string[] };
+
+            if (selectedUser) {
+                userId = selectedUser.uuid;
+                await userService.updateUser(userId, {
+                    username: payload.username,
+                    password: payload.password,
+                    email: payload.email,
+                    enabled: payload.enabled,
+                    roles: payload.roles,
+                });
+                changes = diffRoles(selectedUser.roles, payload.roles);
+            } else {
+                const created = await userService.createUser(payload as UserCreationRequest);
+                if (!created?.uuid) {
+                    throw new Error("Created user has no identifier");
+                }
+                userId = created.uuid;
+                changes = { toAdd: payload.roles, toRemove: [] };
+            }
+
+            const { failedToAdd, failedToRemove } = await applyRoleChanges(userService, userId, changes);
+            await list.refresh();
+
+            if (failedToAdd.length > 0 || failedToRemove.length > 0) {
+                const parts: string[] = [];
+                if (failedToAdd.length) parts.push(`could not assign: ${failedToAdd.join(", ")}`);
+                if (failedToRemove.length) parts.push(`could not remove: ${failedToRemove.join(", ")}`);
+                toastErrorMessage(`User saved, but ${parts.join("; ")}.`);
+            } else {
+                toastSuccess(selectedUser ? "User updated successfully" : "User created successfully");
+            }
+            addModal.close();
+            return true;
+        } catch (error) {
+            toastError(error);
+            return false;
+        }
+    };
 
     return (
         <div>
@@ -62,7 +116,7 @@ export default function UserAdminPage() {
                     variant="primary"
                     tooltip="Create a new user"
                     icon={Plus}
-                    onPress={addModal.open}
+                    onPress={onCreateClicked}
                 />
 
                 <PageHeaderButton
@@ -126,6 +180,11 @@ export default function UserAdminPage() {
                                                         onPress={() => onDeleteClicked(user)}
                                                         icon={UserMinus} label="Delete"
                                                         iconAccent="text-danger"/>
+
+                                                    <ActionButton
+                                                        label="Edit user"
+                                                        icon={Pen}
+                                                        onPress={() => onEditClicked(user)}/>
                                                 </div>
                                             </Table.Cell>
                                         </Table.Row>
@@ -142,33 +201,10 @@ export default function UserAdminPage() {
             )}
 
             <UserCreationView
+                key={selectedUser?.uuid ?? "new"}
                 state={addModal}
-                onSubmit={async (payload) => {
-                    try {
-                        const created = await userService.createUser(payload);
-                        const userId = created?.uuid;
-                        if (!created || !userId) {
-                            throw new Error('Created user has no identifier');
-                        }
-                        const failedRoles: string[] = [];
-                        for (const role of payload.roles) {
-                            try {
-                                await userService.assignRole(userId, role);
-                            } catch {
-                                failedRoles.push(role);
-                            }
-                        }
-                        await list.refresh();
-                        if (failedRoles.length > 0) {
-                            toastErrorMessage('User created successfully but failed to assign role:${failedRoles.join(", ")}.');
-                        } else {
-                            toastSuccess('User created successfully');
-                        }
-                        addModal.close();
-                    } catch (error) {
-                        toastError(error);
-                    }
-                }}
+                user={selectedUser}
+                onSubmit={handleSubmit}
             />
 
             <ConfirmModal
@@ -179,7 +215,7 @@ export default function UserAdminPage() {
                 confirmLabel="Block"
                 confirmVariant="danger-soft"
                 onConfirm={async () => {
-                    await userService.blockUser(selectedUser!.uuid)
+                    await userService.blockUser(selectedUser!.uuid, selectedUser!.username)
                     await list.refresh();
                     blockConfirmationModal.close();
                 }}

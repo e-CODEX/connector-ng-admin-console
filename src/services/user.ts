@@ -42,13 +42,13 @@ export function createUserService(baseUrl: string, call: RestApiCall) {
         async listAllUserRoles(): Promise<ConnectorUserRole[]> {
             return call<ConnectorUserRole[]>(baseUrl, "api/v1/admin/users/roles");
         },
-        async blockUser(identifier: string): Promise<ConnectorUser> {
+        async blockUser(identifier: string, username: string): Promise<ConnectorUser> {
             return call<ConnectorUser>(baseUrl, `api/v1/admin/users/${identifier}`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ enabled: false })
+                body: JSON.stringify({ username, enabled: false })
             })
         },
         async deleteUser(identifier: string): Promise<void> {

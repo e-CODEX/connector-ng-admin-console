@@ -14,13 +14,15 @@ import { Modal, useOverlayState } from "@heroui/react";
 import { UserCreationRequest } from "@/types/request/user";
 import React from "react";
 import { UserCreationForm } from "@/components/user/creation/user-creation-form";
+import { ConnectorUser } from "@/types/response/user";
 
 interface UserCreationViewProps {
     state: ReturnType<typeof useOverlayState>;
-    onSubmit?: (domain: UserCreationRequest) => Promise<void> | void;
+    user?: ConnectorUser | null;
+    onSubmit?: (payload: UserCreationRequest) => Promise<boolean | void> | boolean | void;
 }
 
-export function UserCreationView({ state, onSubmit }: UserCreationViewProps) {
+export function UserCreationView({ state, user, onSubmit }: UserCreationViewProps) {
     return (
         <Modal state={state}>
             <Modal.Backdrop isDismissable={false} isKeyboardDismissDisabled>
@@ -29,6 +31,7 @@ export function UserCreationView({ state, onSubmit }: UserCreationViewProps) {
                         <UserCreationForm
                             key={String(state.isOpen)}
                             state={state}
+                            user={user}
                             onSubmit={onSubmit}
                             close={state.close}
                         />

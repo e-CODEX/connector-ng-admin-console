@@ -28,6 +28,7 @@ import { useAttachmentService, useEvidenceService } from "@/hooks/use-http-servi
 import { EvidenceTypeChip } from "@/components/common/evidence-chip";
 import { CopyableIdentifier } from "@/components/common/copyable-identifier";
 import { ActionButton } from "@/components/common/action-button/action-button";
+import { AttachmentStatusChip } from "@/components/attachment/attachment-status-chip";
 
 interface MessageDetailsContentProps {
     message: ConnectorMessageDetailsResponse | null;
@@ -187,6 +188,7 @@ export function MessageDetailsContent({ message, loading }: MessageDetailsConten
                                         <Table.Column>Size</Table.Column>
                                         <Table.Column>Storage</Table.Column>
                                         <Table.Column>Type</Table.Column>
+                                        <Table.Column>Status</Table.Column>
                                         <Table.Column>Created at</Table.Column>
                                         <Table.Column>Action</Table.Column>
                                     </Table.Header>
@@ -203,11 +205,16 @@ export function MessageDetailsContent({ message, loading }: MessageDetailsConten
                                                 </Table.Cell>
                                                 <Table.Cell>{attachment.storage}</Table.Cell>
                                                 <Table.Cell>{attachment.type}</Table.Cell>
-                                                <Table.Cell><DateTime value={attachment.createdAt} precision="millis"/></Table.Cell>
                                                 <Table.Cell>
-                                                    <ActionButton label="Download"
-                                                                  icon={ArrowDownToLine}
-                                                                  onPress={() => onDownloadAttachmentClicked(attachment)}
+                                                    <AttachmentStatusChip deletedAt={attachment.deletedAt} showDeletedAt/>
+                                                </Table.Cell>
+                                                <Table.Cell><DateTime value={attachment.createdAt} precision="second"/></Table.Cell>
+                                                <Table.Cell>
+                                                    <ActionButton
+                                                        label="Download"
+                                                        icon={ArrowDownToLine}
+                                                        isDisabled={attachment.deletedAt !== null}
+                                                        onPress={() => onDownloadAttachmentClicked(attachment)}
                                                     />
                                                 </Table.Cell>
                                             </Table.Row>

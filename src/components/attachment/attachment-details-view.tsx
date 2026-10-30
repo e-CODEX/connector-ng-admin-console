@@ -73,7 +73,11 @@ export function AttachmentDetailsView({ attachment, state }: AttachmentDetailsVi
                             )}
                         </Modal.Body>
                         <Modal.Footer>
-                            <Button variant="secondary" className="w-full" onPress={() => onDownloadClicked()}>
+                            <Button
+                                variant="secondary"
+                                className="w-full"
+                                isDisabled={attachment !== null && attachment!.deletedAt !== null}
+                                onPress={() => onDownloadClicked()}>
                                 <ArrowDownToLine />
                                 Download
                             </Button>

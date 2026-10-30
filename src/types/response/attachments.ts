@@ -20,4 +20,5 @@ export interface ConnectorAttachmentResponse {
     type: AttachmentType;
     createdAt: string;
     updatedAt: string;
+    deletedAt: string;
 }

@@ -38,6 +38,7 @@ import { DateTimeRangeGranularity } from "@/components/form/selector/date-time-r
 import type { RangeValue } from "react-aria-components";
 import { ZonedDateTime } from "@internationalized/date";
 import { buildDefaultRange, toDateRange } from "@/types/period";
+import { AttachmentStatusChip } from "@/components/attachment/attachment-status-chip";
 
 const granularity: DateTimeRangeGranularity = "minute";
 
@@ -166,6 +167,7 @@ export default function AttachmentsAdminPage() {
                                     <Table.Column>Size</Table.Column>
                                     <Table.Column>Storage</Table.Column>
                                     <Table.Column>Type</Table.Column>
+                                    <Table.Column>Status</Table.Column>
                                     <Table.Column>Created at</Table.Column>
                                     <Table.Column>Action.s</Table.Column>
                                 </Table.Header>
@@ -184,12 +186,17 @@ export default function AttachmentsAdminPage() {
                                             </Table.Cell>
                                             <Table.Cell>{attachment.type}</Table.Cell>
                                             <Table.Cell>
+                                                <AttachmentStatusChip deletedAt={attachment.deletedAt} showDeletedAt />
+                                            </Table.Cell>
+                                            <Table.Cell>
                                                 <DateTime value={attachment.createdAt} precision="second"/>
                                             </Table.Cell>
                                             <Table.Cell>
                                                 <div className="flex items-center gap-1">
                                                     <DetailActionButton onPress={() => onDetailsClick(attachment)}/>
-                                                    <DownloadActionButton onPress={() => onDownloadClicked(attachment)}/>
+                                                    <DownloadActionButton
+                                                        isDisabled={attachment.deletedAt !== null}
+                                                        onPress={() => onDownloadClicked(attachment)}/>
                                                 </div>
                                             </Table.Cell>
                                         </Table.Row>

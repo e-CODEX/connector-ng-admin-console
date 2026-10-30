@@ -175,7 +175,7 @@ export default function AttachmentsAdminPage() {
                                     {pagedList.items.map((attachment) => (
                                         <Table.Row key={attachment.identifier}>
                                             <Table.Cell>
-                                                <CopyableIdentifier identifier={attachment.identifier}/>
+                                                <CopyableIdentifier identifier={attachment.identifier} visibleChars={15}/>
                                             </Table.Cell>
                                             <Table.Cell>{attachment.name}</Table.Cell>
                                             <Table.Cell>{attachment.contentType}</Table.Cell>

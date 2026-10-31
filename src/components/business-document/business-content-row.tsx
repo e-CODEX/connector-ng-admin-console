@@ -13,19 +13,36 @@
 import { Button, Tooltip } from "@heroui/react";
 import { Download, type LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
+import { AttachmentStatusChip } from "@/components/attachment/attachment-status-chip";
 
 export interface BusinessArtifactRowProps {
     icon: LucideIcon;
     name: string;
     meta: string;
     badge?: ReactNode;
+    /** When provided (even null), the attachment status chip is shown. Omit to hide it. */
+    deletedAt?: string | null;
+    /** Show the deletion datetime inline in the chip (always in tooltip). */
+    showDeletedAt?: boolean;
     isNested?: boolean;
     onDetailsPress?: () => void;
     onDownloadPress?: () => void;
 }
 
-export function BusinessContentRow({ icon: Icon, name, meta, badge, isNested = false, onDetailsPress, onDownloadPress, }
-                                   : BusinessArtifactRowProps) {
+export function BusinessContentRow({
+                                       icon: Icon,
+                                       name,
+                                       meta,
+                                       badge,
+                                       deletedAt,
+                                       showDeletedAt = false,
+                                       isNested = false,
+                                       onDetailsPress,
+                                       onDownloadPress,
+                                   }: BusinessArtifactRowProps) {
+    // `undefined` = not an attachment row; `null` or a string = attachment with known status
+    const showAttachmentStatus = deletedAt !== undefined;
+
     return (
         <div
             className={[
@@ -39,6 +56,9 @@ export function BusinessContentRow({ icon: Icon, name, meta, badge, isNested = f
                 <div className="flex items-center gap-2">
                     <span className="truncate text-sm">{name}</span>
                     {badge}
+                    {showAttachmentStatus && (
+                        <AttachmentStatusChip deletedAt={deletedAt} showDeletedAt={showDeletedAt}/>
+                    )}
                 </div>
                 <p className="truncate text-xs text-default-500">{meta}</p>
             </div>

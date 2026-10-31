@@ -33,7 +33,7 @@ interface DeliveryPresentation {
 export const DELIVERY_STATUS: Record<DeliveryState, DeliveryPresentation> = {
     deleted: {
         label: "Deleted",
-        description: "The message has been deleted",
+        description: "The message files have been deleted",
         icon: Trash2,
         color: "danger",
         variant: "primary",

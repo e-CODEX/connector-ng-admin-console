@@ -21,6 +21,7 @@ import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";
 import { DateTime } from "@/components/common/date-time";
 import { CopyableIdentifier } from "@/components/common/copyable-identifier";
 import { useAttachmentService } from "@/hooks/use-http-service";
+import { AttachmentStatusChip } from "@/components/attachment/attachment-status-chip";
 
 interface AttachmentDetailsViewProps {
     attachment: ConnectorAttachmentResponse | null;
@@ -63,6 +64,9 @@ export function AttachmentDetailsView({ attachment, state }: AttachmentDetailsVi
                                         <AttachmentStorageChip type={attachment.storage}/>
                                     }/>
                                     <DetailRow label="Type" value={attachment.type}/>
+                                    <DetailRow label="Status" value={
+                                        <AttachmentStatusChip deletedAt={attachment.deletedAt} showDeletedAt />
+                                    }/>
                                     <DetailRow label="Created at" value={
                                         <DateTime value={attachment.createdAt} precision="millis"/>
                                     }/>

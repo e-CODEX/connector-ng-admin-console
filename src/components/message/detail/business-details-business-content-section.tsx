@@ -34,6 +34,8 @@ export function BusinessDetailsBusinessContentSection({ businessContent, onAttac
                 icon={FileCode}
                 name={xmlContent.name}
                 meta={`${xmlContent.contentType} · ${formatBytes(xmlContent.size)} · structured payload`}
+                deletedAt={xmlContent.deletedAt}
+                showDeletedAt={true}
                 onDetailsPress={() => onAttachmentDetailsClick(xmlContent)}
             />
 
@@ -42,6 +44,8 @@ export function BusinessDetailsBusinessContentSection({ businessContent, onAttac
                 name={attachment.name}
                 meta={`${attachment.contentType} · ${formatBytes(attachment.size)} · business document`}
                 badge={<BusinessDocumentAesTypeChip aesType={aesType} size="sm"/>}
+                deletedAt={attachment.deletedAt}
+                showDeletedAt={true}
                 onDetailsPress={() => onAttachmentDetailsClick(attachment)}
             />
 

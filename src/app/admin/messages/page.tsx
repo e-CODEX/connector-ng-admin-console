@@ -24,7 +24,7 @@ import { PageHeaderButton } from "@/components/common/header/page-header-button"
 import { MessageReportingView } from "@/components/message/report/message-reporting-view";
 import { MessageDirectionChip } from "@/components/message/chip/message-direction-chip";
 import { MessageDeliveryStatusChip } from "@/components/message/chip/message-delivery-status-chip";
-import { ChartPie, Mail, MailCheck, MailClock, Route } from "lucide-react";
+import { ChartPie, Info, Mail, MailCheck, MailClock, Route } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { useBusinessDomainIdentifiers } from "@/hooks/use-business-domain-identifiers";
@@ -47,6 +47,7 @@ import { useAppConfig } from "@/hooks/use-app-config";
 import { MessageEvidenceTriggerModeView } from "@/components/message/evidence-trigger/message-evidence-trigger-mode-view";
 import { MessageEvidenceTriggerResponse } from "@/types/response/evidence-trigger";
 import { MessagePendingView } from "@/components/message/pending/message-pending-view";
+import { MessageDeliveryLifecycleView } from "@/components/message/message-lifecycle-view";
 
 const IDENTIFIER_LENGTH = 8;
 
@@ -132,6 +133,7 @@ export default function MessagesAdminPage() {
     const reportModal = useRefreshOnClose(pagedList.refresh);
     const evidenceTriggerModal = useRefreshOnClose(pagedList.refresh);
     const pendingMessagesModal = useRefreshOnClose(pagedList.refresh);
+    const helpModal = useRefreshOnClose(pagedList.refresh);
 
     const onDetailsClick = (message: ConnectorMessage) => {
         setSelectedMessage(message);
@@ -156,6 +158,10 @@ export default function MessagesAdminPage() {
         pendingMessagesModal.open();
     }
 
+    const onHelpClicked = () => {
+        helpModal.open();
+    }
+
     const canTriggerDeliveryEvidence = (message: ConnectorMessage): boolean => {
         return isTestingMode
             && message.direction == "GATEWAY_TO_BACKEND"
@@ -170,6 +176,13 @@ export default function MessagesAdminPage() {
                 title="Business Messages"
                 subtitle="The connector processed business messages"
             >
+                <PageHeaderButton
+                    variant="tertiary"
+                    tooltip="Messages lifecycle explanation"
+                    icon={Info}
+                    onPress={onHelpClicked}
+                />
+
                 <PageHeaderButton
                     variant="primary"
                     tooltip="Show reporting"
@@ -195,6 +208,7 @@ export default function MessagesAdminPage() {
                     isSpinning={pagedList.refreshing || pagedList.loading}
                 />
             </PageHeader>
+
             <MessageFiltersPanel
                 identifier={identifierQuery}
                 backendName={backendNameQuery}
@@ -307,6 +321,8 @@ export default function MessagesAdminPage() {
                     }
                 </>
             )}
+
+            <MessageDeliveryLifecycleView state={helpModal}/>
 
             <MessageDetailsView
                 message={selectedMessage}

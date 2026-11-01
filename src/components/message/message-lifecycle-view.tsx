@@ -18,9 +18,6 @@ import type { ReactNode } from "react";
 import { DELIVERY_STATUS, DeliveryState } from "@/components/message/chip/message-delivery-status-chip";
 import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";
 
-// Adjust these import paths to your project
-
-
 const RETENTION_DAYS = 7;
 
 function StatusChip({ state }: { state: DeliveryState }) {
@@ -164,11 +161,11 @@ const INBOUND_STEPS: TimelineStep[] = [
     },
 ];
 
-interface MessageDeliveryLifecycleViewProps {
+interface MessageLifecycleViewProps {
     state: ReturnType<typeof useOverlayState>;
 }
 
-export function MessageDeliveryLifecycleView({ state }: MessageDeliveryLifecycleViewProps) {
+export function MessageLifecycleView({ state }: MessageLifecycleViewProps) {
     return (
         <Modal state={state}>
             <Modal.Backdrop isDismissable={false} isKeyboardDismissDisabled>

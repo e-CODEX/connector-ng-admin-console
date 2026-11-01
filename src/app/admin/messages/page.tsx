@@ -47,7 +47,7 @@ import { useAppConfig } from "@/hooks/use-app-config";
 import { MessageEvidenceTriggerModeView } from "@/components/message/evidence-trigger/message-evidence-trigger-mode-view";
 import { MessageEvidenceTriggerResponse } from "@/types/response/evidence-trigger";
 import { MessagePendingView } from "@/components/message/pending/message-pending-view";
-import { MessageDeliveryLifecycleView } from "@/components/message/message-lifecycle-view";
+import { MessageLifecycleView } from "@/components/message/message-lifecycle-view";
 
 const IDENTIFIER_LENGTH = 8;
 
@@ -322,7 +322,7 @@ export default function MessagesAdminPage() {
                 </>
             )}
 
-            <MessageDeliveryLifecycleView state={helpModal}/>
+            <MessageLifecycleView state={helpModal}/>
 
             <MessageDetailsView
                 message={selectedMessage}

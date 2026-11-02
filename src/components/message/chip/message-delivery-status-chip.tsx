@@ -14,7 +14,7 @@ import type { ComponentProps, ComponentType } from "react";
 import { ConnectorMessage } from "@/types/response/message";
 import { DateTime, formatDateTime } from "@/components/common/date-time";
 
-type DeliveryState =
+export type DeliveryState =
     | "deleted"
     | "rejected"
     | "deliveredToBackend"

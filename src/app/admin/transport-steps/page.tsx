@@ -137,7 +137,7 @@ export default function TransportStepsAdminPage() {
     };
 
     const canAcknowledgeReception = (step: ConnectorTransportStep): boolean => {
-        return isTestingMode && step.status == "DOWNLOADED"
+        return isTestingMode && step.status == "PULLED"
     }
 
     return (

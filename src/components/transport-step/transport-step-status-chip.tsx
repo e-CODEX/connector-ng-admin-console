@@ -34,34 +34,34 @@ export const TRANSPORT_DELIVERY_STATUS: Record<TransportStepStatus, TransportDel
         label: "Submitted",
         description: "Handed over for transport",
         icon: Send,
-        color: "accent", // same as message "submitted"
+        color: "accent",
         variant: "soft",
     },
-    READY_FOR_DOWNLOAD: {
-        label: "Ready for download",
+    READY_FOR_PULL: {
+        label: "Ready for pull",
         description: "Awaiting retrieval by the recipient",
         icon: Inbox,
-        color: "warning", // waiting, like message "pending"
+        color: "warning",
         variant: "soft",
     },
-    DOWNLOADED: {
-        label: "Downloaded",
+    PULLED: {
+        label: "Pulled",
         description: "Retrieved by the backend but not yet acknowledged",
         icon: Download,
-        color: "accent", // in progress, not yet confirmed
+        color: "accent",
         variant: "soft",
     },
     DELIVERED: {
         label: "Delivered",
         description: "Delivery confirmed",
-        icon: CheckCircle2, // same as message "confirmed"
+        icon: CheckCircle2,
         color: "success",
         variant: "soft",
     },
     FAILED: {
         label: "Failed",
         description: "Transport failed",
-        icon: XCircle, // same as message "rejected"
+        icon: XCircle,
         color: "danger",
         variant: "soft",
     },

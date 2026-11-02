@@ -28,7 +28,7 @@ export type KeystoreType = "JKS" | "PKCS12";
 
 export type TransportStepMessageType = "BUSINESS" | "EVIDENCE";
 
-export type TransportStepStatus = "DELIVERED" | "FAILED" | "SUBMITTED" | "DOWNLOADED" | "READY_FOR_DOWNLOAD";
+export type TransportStepStatus = "DELIVERED" | "FAILED" | "SUBMITTED" | "PULLED" | "READY_FOR_PULL";
 
 export type BusinessDocumentAesType = "SIGNATURE_BASED" | "AUTHENTICATION_BASED";
 

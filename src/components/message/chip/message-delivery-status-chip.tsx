@@ -68,7 +68,7 @@ export const DELIVERY_STATUS: Record<DeliveryState, DeliveryPresentation> = {
     },
     pending: {
         label: "Pending",
-        description: "The message has not been delivered yet",
+        description: "The message has not been delivered yet. See its transport steps",
         icon: Clock,
         color: "warning",
         variant: "soft",

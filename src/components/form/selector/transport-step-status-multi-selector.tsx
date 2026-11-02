@@ -25,8 +25,8 @@ const STORAGE_OPTIONS: readonly TypeOption[] = [
     { id: "DELIVERED", label: "Delivered" },
     { id: "FAILED", label: "Failed" },
     { id: "SUBMITTED", label: "Submitted" },
-    { id: "DOWNLOADED", label: "Downloaded" },
-    { id: "READY_FOR_DOWNLOAD", label: "Reading download" },
+    { id: "PULLED", label: "Pulled" },
+    { id: "READY_FOR_PULL", label: "Reading for pull" },
 ];
 
 const ALL_OPTION: TypeOption = { id: ALL_TYPES, label: "All" };

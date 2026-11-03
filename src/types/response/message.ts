@@ -10,7 +10,7 @@
 
 import { ConnectorAttachmentResponse } from "@/types/response/attachments";
 import { ConnectorProcessingModeAction, ConnectorProcessingModeParty, ConnectorProcessingModeService } from "@/types/response/processing-mode";
-import { BusinessDocumentAesType, ConnectorEvidenceType, DetachedSignatureMimeType, MessageDirection } from "@/types/global";
+import { BusinessDocumentAesType, ConnectorEvidenceType, MessageDirection } from "@/types/global";
 
 
 export interface ConnectorMessage {
@@ -47,15 +47,9 @@ export interface ConnectorMessageBusinessContent {
 }
 
 interface ConnectorMessageBusinessDocument {
-    attachment: ConnectorAttachmentResponse;
+    content: ConnectorAttachmentResponse;
     aesType: BusinessDocumentAesType;
-    detachedSignature: ConnectorMessageBusinessDocumentDetachedSignature;
-}
-
-interface ConnectorMessageBusinessDocumentDetachedSignature {
-    signature: string;
-    name: string;
-    mimeType: DetachedSignatureMimeType;
+    detachedSignature: ConnectorAttachmentResponse;
 }
 
 interface ConnectorAS4Properties {

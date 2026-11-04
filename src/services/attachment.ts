@@ -32,11 +32,9 @@ export function createAttachmentService(baseUrl: string, call: RestApiCall, down
                 { params }
             );
         },
-        async uploadMessageAttachment(file: Blob, repeat: number) {
+        async uploadMessageAttachment(file: Blob) {
             const data = new FormData();
-            for (let i = 0; i < repeat; i++) {
-                data.append("attachments", file, "message-attachment-"+ i +".pdf" );
-            }
+            data.append("attachments", file, "message-attachment.pdf" );
             return call<string[]>(
                 baseUrl,
                 "api/v1/attachments/upload",

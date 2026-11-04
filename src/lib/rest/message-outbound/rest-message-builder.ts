@@ -41,7 +41,7 @@ export const createRestOutboundMessagePayLoad = async (
     parameters: SendParameters
 ) => {
     const attachment = await generatePdfBlob(parameters.attachmentSizeMB);
-    const attachmentIds = await attachmentService.uploadMessageAttachment(attachment, parameters.repeatCount)
+    const attachmentIds = await attachmentService.uploadMessageAttachment(attachment)
     const metadata = createMessageMetadata(messageFormData, attachmentIds, asTestMessage);
 
     const dataToSubmit = new FormData();

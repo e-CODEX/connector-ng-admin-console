@@ -38,9 +38,7 @@ export const createSoapOutboundMessagePayload = async (messageFormData: SendMess
     await appendBusinessContentToFormData(dataToSubmit, messageFormData);
 
     const attachment = await generatePdfBlob(parameters.attachmentSizeMB);
-    for (let i = 0; i < parameters.repeatCount; i++) {
-        dataToSubmit.append("attachments", attachment, "message-attachment-" + i + ".pdf");
-    }
+    dataToSubmit.append("attachments", attachment, "message-attachment.pdf");
     return dataToSubmit;
 };
 

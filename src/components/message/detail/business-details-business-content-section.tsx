@@ -26,7 +26,7 @@ export function BusinessDetailsBusinessContentSection({ businessContent, onAttac
     }
 
     const { xmlContent, businessDocument } = businessContent;
-    const { attachment, aesType, detachedSignature } = businessDocument;
+    const { content, aesType, detachedSignature } = businessDocument;
 
     return (
         <div className="overflow-hidden rounded-xl border">
@@ -41,12 +41,12 @@ export function BusinessDetailsBusinessContentSection({ businessContent, onAttac
 
             <BusinessContentRow
                 icon={FileText}
-                name={attachment.name}
-                meta={`${attachment.contentType} · ${formatBytes(attachment.size)} · business document`}
+                name={content.name}
+                meta={`${content.contentType} · ${formatBytes(content.size)} · business document`}
                 badge={<BusinessDocumentAesTypeChip aesType={aesType} size="sm"/>}
-                deletedAt={attachment.deletedAt}
+                deletedAt={content.deletedAt}
                 showDeletedAt={true}
-                onDetailsPress={() => onAttachmentDetailsClick(attachment)}
+                onDetailsPress={() => onAttachmentDetailsClick(content)}
             />
 
             {detachedSignature ? (
@@ -54,7 +54,10 @@ export function BusinessDetailsBusinessContentSection({ businessContent, onAttac
                     isNested
                     icon={Signature}
                     name={detachedSignature.name}
-                    meta={`${detachedSignature.mimeType} · detached signature of ${attachment.name}`}
+                    meta={`${detachedSignature.contentType} · detached signature of ${content.name}`}
+                    deletedAt={detachedSignature.deletedAt}
+                    showDeletedAt={true}
+                    onDetailsPress={() => onAttachmentDetailsClick(detachedSignature)}
                 />
             ) : null}
         </div>

@@ -266,6 +266,7 @@ export default function UserAdminPage() {
                         key={`edit-${selectedUser.uuid}-${selectedUser.updatedAt}`}
                         state={editModal}
                         user={selectedUser}
+                        isAdminContext={true}
                         onSubmit={handleEditionSubmission}
                     />
                     <UserRoleEditionView

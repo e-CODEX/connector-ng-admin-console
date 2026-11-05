@@ -19,10 +19,11 @@ import { UserEditionForm } from "@/components/user/edition/user-edition-form";
 interface UserEditionViewProps {
     state: ReturnType<typeof useOverlayState>;
     user: ConnectorUser;
+    isAdminContext?: boolean;
     onSubmit?: (payload: UserEditionRequest) => Promise<void> | void;
 }
 
-export function UserEditionView({ state, user, onSubmit }: UserEditionViewProps) {
+export function UserEditionView({ state, user, onSubmit, isAdminContext=false }: UserEditionViewProps) {
     return (
         <Modal state={state}>
             <Modal.Backdrop isDismissable={false} isKeyboardDismissDisabled>
@@ -32,6 +33,7 @@ export function UserEditionView({ state, user, onSubmit }: UserEditionViewProps)
                             key={String(state.isOpen)}
                             state={state}
                             user={user}
+                            isAdminContext={isAdminContext}
                             onSubmit={onSubmit}
                             close={state.close}
                         />

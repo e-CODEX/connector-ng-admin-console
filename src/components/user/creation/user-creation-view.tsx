@@ -17,7 +17,7 @@ import { UserCreationForm } from "@/components/user/creation/user-creation-form"
 
 interface UserCreationViewProps {
     state: ReturnType<typeof useOverlayState>;
-    onSubmit?: (domain: UserCreationRequest) => Promise<void> | void;
+    onSubmit?: (payload: UserCreationRequest) => Promise<void> | void;
 }
 
 export function UserCreationView({ state, onSubmit }: UserCreationViewProps) {

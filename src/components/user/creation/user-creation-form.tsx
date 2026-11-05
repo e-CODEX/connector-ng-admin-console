@@ -12,22 +12,27 @@
 
 import { Button, FieldError, Form, Input, Label, Modal, Spinner, Switch, TextField, useOverlayState } from "@heroui/react";
 import { UserCreationRequest } from "@/types/request/user";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";
 import { Plus } from "lucide-react";
 import { userCreationSchema } from "@/schemas/auth";
+import { UserRoleSelector } from "@/components/form/selector/user-role-selector";
+import { useUserRoles } from "@/hooks/use-user-roles";
+import { PasswordField } from "@/components/form/password-text-field";
+import { USER_ROLE } from "@/types/global";
+
 
 const FORM_ID = "add-user-form";
 
 type FieldErrors = Partial<Record<keyof UserCreationRequest, string>>;
 
 interface UserCreationFormProps {
-    onSubmit?: (domain: UserCreationRequest) => Promise<void> | void;
+    onSubmit?: (payload: UserCreationRequest) => Promise<void> | void;
     state: ReturnType<typeof useOverlayState>;
     close: () => void;
 }
 
-export function UserCreationForm({ onSubmit, state }: UserCreationFormProps) {
+export function UserCreationForm({ onSubmit }: UserCreationFormProps) {
     const [username, setUsername] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [enabled, setEnabled] = useState<boolean>(true);
@@ -35,12 +40,15 @@ export function UserCreationForm({ onSubmit, state }: UserCreationFormProps) {
 
     const [submitting, setSubmitting] = useState<boolean>(false);
     const [errors, setErrors] = useState<FieldErrors>({});
+    const { userRoles: userRoles, isLoading, error } = useUserRoles();
+    const [roles, setRoles] = useState<USER_ROLE[]>(["ROLE_USER"]);
 
     const resetForm = () => {
         setUsername("");
         setPassword("");
         setEmail("");
         setEnabled(true);
+        setRoles([]);
         setErrors({});
     };
 
@@ -52,6 +60,7 @@ export function UserCreationForm({ onSubmit, state }: UserCreationFormProps) {
             password,
             email,
             enabled,
+            roles,
         });
 
         if (!result.success) {
@@ -77,13 +86,6 @@ export function UserCreationForm({ onSubmit, state }: UserCreationFormProps) {
             setSubmitting(false);
         }
     };
-
-    // Reset when the modal closes
-    useEffect(() => {
-        (async () => {
-            resetForm()
-        })()
-    }, [state.isOpen]);
 
     return (
         <>
@@ -124,20 +126,29 @@ export function UserCreationForm({ onSubmit, state }: UserCreationFormProps) {
                         <FieldError>{errors.email}</FieldError>
                     </TextField>
 
-                    <TextField
+                    <PasswordField
+                        label="Password"
+                        placeholder="At least 12 characters"
                         isRequired
-                        name="password"
                         value={password}
                         onChange={(v) => {
                             setPassword(v);
                             setErrors((e) => ({ ...e, password: undefined }));
                         }}
                         isInvalid={!!errors.password}
-                    >
-                        <Label>Password</Label>
-                        <Input type="password" placeholder="At least 8 characters"/>
-                        <FieldError>{errors.password}</FieldError>
-                    </TextField>
+                        errorMessage={errors.password}
+                    />
+
+                    <UserRoleSelector
+                        roles={userRoles ?? []}
+                        isLoading={isLoading}
+                        loadError={!!error}
+                        value={roles}
+                        onValueChange={setRoles}
+                        isRequired
+                        isInvalid={!!errors.roles}
+                        errorMessage="Select at least one role"
+                    />
 
                     <Switch isSelected={enabled} onChange={setEnabled} defaultSelected>
                         <Switch.Content>

@@ -13,6 +13,17 @@ export interface UserCreationRequest {
     password: string;
     email: string;
     enabled: boolean;
+    roles: string[];
+}
+
+export interface UserEditionRequest {
+    username: string;
+    email: string;
+    enabled: boolean;
+}
+
+export interface UserRoleEditionRequest {
+    roles: string[];
 }
 
 export interface LoginRequest {
@@ -20,7 +31,7 @@ export interface LoginRequest {
     password: string;
 }
 
-export type ChangePasswordRequest = {
+export interface ChangePasswordRequest {
     currentPassword: string;
     newPassword: string;
     confirmPassword: string;

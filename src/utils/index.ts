@@ -11,7 +11,8 @@
 import { toast } from "@heroui/react";
 import { ConnectorMessageStatsItem } from "@/types/response/stats";
 import { DownloadedFile } from "@/lib/rest";
-import { ALL_SELECTOR } from "@/types/global";
+import { ALL_SELECTOR, USER_ROLE } from "@/types/global";
+import { ConnectorUser } from "@/types/response/user";
 
 export const truncate = (value: string, visibleChars = 36): string => {
     if (value == null) return "";
@@ -93,3 +94,11 @@ export const cookieOptions = (maxAge?: number) => ({
 });
 
 export const asFilter = (value: string) => value === ALL_SELECTOR || value === "*" || value === "" ? undefined : value;
+
+export function hasRole(user: ConnectorUser | null | undefined, role: USER_ROLE): boolean {
+    return user?.roles?.includes(role) ?? false;
+}
+
+export function isAdmin(user: ConnectorUser | null | undefined): boolean {
+    return hasRole(user, "ROLE_ADMIN");
+}

@@ -13,7 +13,6 @@
 import { Button, FieldError, Form, Input, Label, Modal, Spinner, Switch, TextField, useOverlayState } from "@heroui/react";
 import { UserCreationRequest } from "@/types/request/user";
 import React, { useState } from "react";
-import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";
 import { Plus } from "lucide-react";
 import { userCreationSchema } from "@/schemas/auth";
 import { UserRoleSelector } from "@/components/form/selector/user-role-selector";
@@ -89,11 +88,6 @@ export function UserCreationForm({ onSubmit }: UserCreationFormProps) {
 
     return (
         <>
-            <Modal.CloseTrigger/>
-            <Modal.Header>
-                <ModalHeaderIcon icon={Plus} tone="accent"/>
-                <Modal.Heading className="font-semibold">Create A User</Modal.Heading>
-            </Modal.Header>
             <Modal.Body>
                 <Form
                     id={FORM_ID}
@@ -160,6 +154,7 @@ export function UserCreationForm({ onSubmit }: UserCreationFormProps) {
                     </Switch>
                 </Form>
             </Modal.Body>
+
             <Modal.Footer>
                 <Button
                     type="submit"

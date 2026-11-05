@@ -19,12 +19,11 @@ import { PageHeader } from "@/components/common/header/page-header";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { MessageFiltersPanel } from "@/components/message/message-filters-panel";
 import { MessageDetailsView } from "@/components/message/detail/message-details-view";
-import { ArrowsRotateRight } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/header/page-header-button";
 import { MessageReportingView } from "@/components/message/report/message-reporting-view";
 import { MessageDirectionChip } from "@/components/message/chip/message-direction-chip";
 import { MessageDeliveryStatusChip } from "@/components/message/chip/message-delivery-status-chip";
-import { ChartPie, Info, Mail, MailCheck, MailClock, Route } from "lucide-react";
+import { ChartPie, Info, Mail, MailCheck, MailClock, RefreshCw, Route } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { useBusinessDomainIdentifiers } from "@/hooks/use-business-domain-identifiers";
@@ -120,7 +119,7 @@ export default function MessagesAdminPage() {
         pagedList.setPage(1);
     };
 
-    const useRefreshOnClose = (refresh: () => void)=> {
+    const useRefreshOnClose = (refresh: () => void) => {
         return useOverlayState({
             onOpenChange: (isOpen) => {
                 if (!isOpen) refresh();
@@ -176,19 +175,6 @@ export default function MessagesAdminPage() {
                 title="Business Messages"
                 subtitle="The connector processed business messages"
             >
-                <PageHeaderButton
-                    variant="tertiary"
-                    tooltip="Messages lifecycle explanation"
-                    icon={Info}
-                    onPress={onHelpClicked}
-                />
-
-                <PageHeaderButton
-                    variant="primary"
-                    tooltip="Show reporting"
-                    icon={ChartPie}
-                    onPress={onReportClicked}
-                />
 
                 {isTestingMode && (
                     <PageHeaderButton
@@ -200,9 +186,23 @@ export default function MessagesAdminPage() {
                 )}
 
                 <PageHeaderButton
+                    variant="tertiary"
+                    tooltip="Messages lifecycle explanation"
+                    icon={Info}
+                    onPress={onHelpClicked}
+                />
+
+                <PageHeaderButton
+                    variant="outline"
+                    tooltip="Show reporting"
+                    icon={ChartPie}
+                    onPress={onReportClicked}
+                />
+
+                <PageHeaderButton
                     variant="secondary"
                     tooltip="Refresh"
-                    icon={ArrowsRotateRight}
+                    icon={RefreshCw}
                     onPress={pagedList.refresh}
                     isDisabled={pagedList.refreshing}
                     isSpinning={pagedList.refreshing || pagedList.loading}

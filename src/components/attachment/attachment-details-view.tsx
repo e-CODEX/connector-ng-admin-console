@@ -46,10 +46,12 @@ export function AttachmentDetailsView({ attachment, state }: AttachmentDetailsVi
                 <Modal.Container size="lg">
                     <Modal.Dialog className="sm:max-w-200">
                         <Modal.CloseTrigger/>
+
                         <Modal.Header>
                             <ModalHeaderIcon icon={Paperclip} tone="accent"/>
                             <Modal.Heading className="font-semibold">Attachments Details</Modal.Heading>
                         </Modal.Header>
+
                         <Modal.Body>
                             {attachment && (
                                 <div className="flex flex-col">
@@ -76,6 +78,7 @@ export function AttachmentDetailsView({ attachment, state }: AttachmentDetailsVi
                                 </div>
                             )}
                         </Modal.Body>
+
                         <Modal.Footer>
                             <Button
                                 variant="secondary"

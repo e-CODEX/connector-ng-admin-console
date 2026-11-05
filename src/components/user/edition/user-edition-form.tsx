@@ -13,8 +13,7 @@
 import { Button, FieldError, Form, Input, Label, Modal, Spinner, Switch, TextField, useOverlayState } from "@heroui/react";
 import { UserCreationRequest, UserEditionRequest } from "@/types/request/user";
 import React, { useState } from "react";
-import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";
-import { Pen, Pencil } from "lucide-react";
+import { Pen } from "lucide-react";
 import { userEditionSchema } from "@/schemas/auth";
 import { ConnectorUser } from "@/types/response/user";
 import { isAdmin } from "@/utils";
@@ -32,7 +31,7 @@ interface UserEditionFormProps {
     close: () => void;
 }
 
-export function UserEditionForm({ onSubmit, user, isAdminContext=false }: UserEditionFormProps) {
+export function UserEditionForm({ onSubmit, user, isAdminContext = false }: UserEditionFormProps) {
     const [username, setUsername] = useState<string>(user.username);
     const [enabled, setEnabled] = useState<boolean>(user.enabled ?? true);
     const [email, setEmail] = useState<string>(user.email ?? "");
@@ -84,11 +83,6 @@ export function UserEditionForm({ onSubmit, user, isAdminContext=false }: UserEd
 
     return (
         <>
-            <Modal.CloseTrigger/>
-            <Modal.Header>
-                <ModalHeaderIcon icon={Pencil} tone="accent"/>
-                <Modal.Heading className="font-semibold">Edit User</Modal.Heading>
-            </Modal.Header>
             <Modal.Body>
                 <Form
                     id={FORM_ID}
@@ -136,6 +130,7 @@ export function UserEditionForm({ onSubmit, user, isAdminContext=false }: UserEd
                     )}
                 </Form>
             </Modal.Body>
+
             <Modal.Footer>
                 <Button
                     type="submit"

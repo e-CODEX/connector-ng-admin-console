@@ -17,10 +17,9 @@ import { Table, useOverlayState } from "@heroui/react";
 import { asFilter, formatBytes, saveFile, toastError, truncate } from "@/utils";
 import { PaginationControls } from "@/components/paging/pagination-controls";
 import { AttachmentDetailsView } from "@/components/attachment/attachment-details-view";
-import { ArrowsRotateRight } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/header/page-header-button";
 import { AttachmentStorageChip } from "@/components/attachment/attachment-storage-chip";
-import { Paperclip } from "lucide-react";
+import { Paperclip, RefreshCw } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { usePagedList } from "@/hooks/use-paged-list";
@@ -131,7 +130,7 @@ export default function AttachmentsAdminPage() {
                 <PageHeaderButton
                     variant="secondary"
                     tooltip="Refresh"
-                    icon={ArrowsRotateRight}
+                    icon={RefreshCw}
                     onPress={pagedList.refresh}
                     isDisabled={pagedList.refreshing}
                     isSpinning={pagedList.refreshing || pagedList.loading}
@@ -186,7 +185,7 @@ export default function AttachmentsAdminPage() {
                                             </Table.Cell>
                                             <Table.Cell>{attachment.type}</Table.Cell>
                                             <Table.Cell>
-                                                <AttachmentStatusChip deletedAt={attachment.deletedAt} showDeletedAt />
+                                                <AttachmentStatusChip deletedAt={attachment.deletedAt} showDeletedAt/>
                                             </Table.Cell>
                                             <Table.Cell>
                                                 <DateTime value={attachment.createdAt} precision="second"/>

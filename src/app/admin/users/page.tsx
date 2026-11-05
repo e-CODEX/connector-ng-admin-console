@@ -13,9 +13,8 @@
 import { useAuthService, useUserService } from "@/hooks/use-http-service";
 import { useList } from "@/hooks/use-list";
 import { ConnectorUser } from "@/types/response/user";
-import { KeyRound, Pen, RotateCcwKey, User, UserLock, UserMinus } from "lucide-react";
+import { KeyRound, RefreshCw, RotateCcwKey, User, UserLock, UserMinus, UserPen, UserPlus } from "lucide-react";
 import { PageHeaderButton } from "@/components/common/header/page-header-button";
-import { ArrowsRotateRight, Plus } from "@gravity-ui/icons";
 import { PageHeader } from "@/components/common/header/page-header";
 import React, { useEffect, useState } from "react";
 import { SpinnerView } from "@/components/common/spinner-view";
@@ -150,14 +149,14 @@ export default function UserAdminPage() {
                 <PageHeaderButton
                     variant="primary"
                     tooltip="Create a new user"
-                    icon={Plus}
+                    icon={UserPlus}
                     onPress={onCreateClicked}
                 />
 
                 <PageHeaderButton
                     variant="secondary"
                     tooltip="Refresh"
-                    icon={ArrowsRotateRight}
+                    icon={RefreshCw}
                     onPress={list.refresh}
                     isDisabled={list.refreshing}
                     isSpinning={list.refreshing || list.loading}
@@ -211,7 +210,7 @@ export default function UserAdminPage() {
                                                     <div className="flex items-center gap-1">
                                                         <ActionButton
                                                             label="Edit user"
-                                                            icon={Pen}
+                                                            icon={UserPen}
                                                             onPress={() => openFor(editModal, user)}/>
 
                                                         <ActionButton

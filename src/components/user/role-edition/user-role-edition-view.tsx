@@ -15,6 +15,8 @@ import { UserRoleEditionRequest } from "@/types/request/user";
 import React from "react";
 import { ConnectorUser } from "@/types/response/user";
 import { UserRoleEditionForm } from "@/components/user/role-edition/user-role-edition-form";
+import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";
+import { KeyRound } from "lucide-react";
 
 interface UserRoleEditionViewProps {
     state: ReturnType<typeof useOverlayState>;
@@ -28,6 +30,13 @@ export function UserRoleEditionView({ state, user, onSubmit }: UserRoleEditionVi
             <Modal.Backdrop isDismissable={false} isKeyboardDismissDisabled>
                 <Modal.Container size="lg">
                     <Modal.Dialog className="sm:max-w-150">
+                        <Modal.CloseTrigger/>
+
+                        <Modal.Header>
+                            <ModalHeaderIcon icon={KeyRound} tone="accent"/>
+                            <Modal.Heading className="font-semibold">Edit User Roles</Modal.Heading>
+                        </Modal.Header>
+
                         <UserRoleEditionForm
                             key={String(state.isOpen)}
                             state={state}

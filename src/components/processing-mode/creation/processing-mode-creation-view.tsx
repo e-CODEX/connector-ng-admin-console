@@ -14,6 +14,8 @@ import { Modal, useOverlayState } from "@heroui/react";
 import React from "react";
 import { ProcessingModeCreationRequest } from "@/types/request/processing-mode";
 import { ProcessingModeCreationForm } from "@/components/processing-mode/creation/processing-mode-creation-form";
+import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";
+import { Plus } from "lucide-react";
 
 interface ProcessingModeCreationViewProps {
     state: ReturnType<typeof useOverlayState>;
@@ -26,6 +28,13 @@ export function ProcessingModeCreationView({ state, onSubmit }: ProcessingModeCr
             <Modal.Backdrop isDismissable={false} isKeyboardDismissDisabled>
                 <Modal.Container size="lg">
                     <Modal.Dialog className="sm:min-w-200">
+                        <Modal.CloseTrigger/>
+
+                        <Modal.Header>
+                            <ModalHeaderIcon icon={Plus} tone="accent"/>
+                            <Modal.Heading className="font-semibold">Load A Processing Mode</Modal.Heading>
+                        </Modal.Header>
+
                         <ProcessingModeCreationForm
                             key={String(state.isOpen)}
                             onSubmit={onSubmit}

@@ -76,10 +76,12 @@ export function MessageDetailsView({ message, state }: MessageDetailsViewProps) 
                 <Modal.Container>
                     <Modal.Dialog className="sm:max-w-300">
                         <Modal.CloseTrigger/>
+
                         <Modal.Header>
                             <ModalHeaderIcon icon={Mail} tone="accent"/>
                             <Modal.Heading className="font-semibold">Business Message Details</Modal.Heading>
                         </Modal.Header>
+
                         <Modal.Body>
                             <div className="flex flex-col">
                                 {loading ? (

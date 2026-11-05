@@ -13,10 +13,9 @@
 import React, { useState } from "react";
 import { ConnectorQueueStats } from "@/types/response/queue";
 import { PageHeaderButton } from "@/components/common/header/page-header-button";
-import { ArrowsRotateRight } from "@gravity-ui/icons";
 import { PageHeader } from "@/components/common/header/page-header";
 import { QueueCard } from "@/components/queue/QueueCard";
-import { Layers } from "lucide-react";
+import { Layers, RefreshCw } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { useList } from "@/hooks/use-list";
@@ -40,7 +39,7 @@ export default function QueueAdminPage() {
                 <PageHeaderButton
                     variant="secondary"
                     tooltip="Refresh"
-                    icon={ArrowsRotateRight}
+                    icon={RefreshCw}
                     onPress={list.refresh}
                     isDisabled={list.refreshing}
                     isSpinning={list.refreshing || list.loading}

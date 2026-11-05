@@ -14,6 +14,8 @@ import { Modal, useOverlayState } from "@heroui/react";
 import { ChangePasswordRequest } from "@/types/request/user";
 import React from "react";
 import { UserPasswordEditionForm } from "@/components/user/password-edition/user-password-edition-form";
+import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";
+import { RectangleEllipsis } from "lucide-react";
 
 interface UserPasswordEditionProps {
     state: ReturnType<typeof useOverlayState>;
@@ -26,6 +28,13 @@ export function UserPasswordEditionView({ state, onSubmit }: UserPasswordEdition
             <Modal.Backdrop isDismissable={false} isKeyboardDismissDisabled>
                 <Modal.Container size="lg">
                     <Modal.Dialog className="sm:max-w-150">
+                        <Modal.CloseTrigger/>
+
+                        <Modal.Header>
+                            <ModalHeaderIcon icon={RectangleEllipsis} tone="accent"/>
+                            <Modal.Heading className="font-semibold">Edit User Password</Modal.Heading>
+                        </Modal.Header>
+
                         <UserPasswordEditionForm
                             key={String(state.isOpen)}
                             state={state}

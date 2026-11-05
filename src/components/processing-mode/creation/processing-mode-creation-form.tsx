@@ -16,8 +16,7 @@ import { Button, Description, FieldError, Fieldset, Form, Input, Label, Modal, S
 import { BusinessDomainSelector } from "@/components/form/selector/business-domain-selector";
 import { FileSelectField } from "@/components/form/file-select-field";
 import { processingModeCreationSchema, ProcessingModeCreationValues, toFieldErrors } from "@/schemas/processing-mode-creation";
-import { Plus, ArrowUpToLine } from "lucide-react";
-import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";
+import { ArrowUpToLine } from "lucide-react";
 import { ACCEPTED_XMLS } from "@/types/global";
 
 
@@ -124,13 +123,6 @@ export function ProcessingModeCreationForm({ onSubmit }: ProcessingModeCreationF
 
     return (
         <>
-            <Modal.CloseTrigger/>
-
-            <Modal.Header>
-                <ModalHeaderIcon icon={Plus} tone="accent"/>
-                <Modal.Heading className="font-semibold">Load A Processing Mode</Modal.Heading>
-            </Modal.Header>
-
             <Modal.Body>
                 <Form
                     id="add-processing-mode-form"

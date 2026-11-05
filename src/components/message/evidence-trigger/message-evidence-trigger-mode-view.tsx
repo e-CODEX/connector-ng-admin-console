@@ -31,10 +31,12 @@ export function MessageEvidenceTriggerModeView({ message, onSubmit, evidenceType
                 <Modal.Container>
                     <Modal.Dialog className="sm:max-w-130">
                         <Modal.CloseTrigger/>
+
                         <Modal.Header>
                             <ModalHeaderIcon icon={MailCheck} tone="accent"/>
                             <Modal.Heading className="font-semibold">Send Delivery Evidence</Modal.Heading>
                         </Modal.Header>
+
                         <Modal.Body>
                             <div className="flex flex-col">
                                 {message ? (

@@ -13,8 +13,7 @@
 import { Button, Form, Modal, Spinner, useOverlayState } from "@heroui/react";
 import { UserCreationRequest, UserRoleEditionRequest } from "@/types/request/user";
 import React, { useState } from "react";
-import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";
-import { Pen, Pencil } from "lucide-react";
+import { Pen } from "lucide-react";
 import { userRoleEditionSchema } from "@/schemas/auth";
 import { ConnectorUser } from "@/types/response/user";
 import { UserRoleSelector } from "@/components/form/selector/user-role-selector";
@@ -77,11 +76,6 @@ export function UserRoleEditionForm({ onSubmit, user }: UserRoleEditionFormProps
 
     return (
         <>
-            <Modal.CloseTrigger/>
-            <Modal.Header>
-                <ModalHeaderIcon icon={Pencil} tone="accent"/>
-                <Modal.Heading className="font-semibold">Edit User Roles</Modal.Heading>
-            </Modal.Header>
             <Modal.Body>
                 <Form
                     id={FORM_ID}
@@ -103,6 +97,7 @@ export function UserRoleEditionForm({ onSubmit, user }: UserRoleEditionFormProps
                     />
                 </Form>
             </Modal.Body>
+
             <Modal.Footer>
                 <Button
                     type="submit"

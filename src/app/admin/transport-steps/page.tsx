@@ -18,11 +18,10 @@ import { TransportStepFiltersPanel } from "@/components/transport-step/transport
 import { PaginationControls } from "@/components/paging/pagination-controls";
 import { ConnectorTransportStep } from "@/types/response/transport-step";
 import { TransportStepDetailsView } from "@/components/transport-step/transport-step-details-view";
-import { ArrowsRotateRight } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/header/page-header-button";
 import { TransportStepMessageTypeChip } from "@/components/message/chip/message-type-chip";
 import { TransportDeliveryStatusChip } from "@/components/transport-step/transport-step-status-chip";
-import { CheckCheck, Mail, MailClock, Route } from "lucide-react";
+import { CheckCheck, Mail, MailClock, RefreshCw, Route } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { usePagedList } from "@/hooks/use-paged-list";
@@ -48,7 +47,7 @@ const granularity: DateTimeRangeGranularity = "minute";
 
 const asStatusesFilter = (values: TransportStepStatusesFilter[]) => values.length === 0 || values.includes(ALL_SELECTOR) ? undefined : values;
 
-const useRefreshOnClose = (refresh: () => void)=> {
+const useRefreshOnClose = (refresh: () => void) => {
     return useOverlayState({
         onOpenChange: (isOpen) => {
             if (!isOpen) refresh();
@@ -159,7 +158,7 @@ export default function TransportStepsAdminPage() {
                 <PageHeaderButton
                     variant="secondary"
                     tooltip="Refresh"
-                    icon={ArrowsRotateRight}
+                    icon={RefreshCw}
                     onPress={pagedList.refresh}
                     isDisabled={pagedList.refreshing}
                     isSpinning={pagedList.refreshing || pagedList.loading}

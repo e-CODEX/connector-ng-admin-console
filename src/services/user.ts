@@ -10,7 +10,7 @@
 
 import { ConnectorUser, ConnectorUserRole } from "@/types/response/user";
 import { RestApiCall } from "@/lib/rest";
-import { UserCreationRequest } from "@/types/request/user";
+import { UserCreationRequest, UserEditionRequest, UserRoleEditionRequest } from "@/types/request/user";
 
 export function createUserService(baseUrl: string, call: RestApiCall) {
     return {
@@ -26,9 +26,29 @@ export function createUserService(baseUrl: string, call: RestApiCall) {
                 }
             )
         },
-        async updateUser(identifier: string, request: UserCreationRequest): Promise<ConnectorUser> {
+        async editUser(identifier: string, request: UserEditionRequest): Promise<ConnectorUser> {
             return call<ConnectorUser>(baseUrl, `api/v1/admin/users/${identifier}`, {
-                    method: "PUT",
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(request)
+                }
+            )
+        },
+        async askUserPasswordReset(identifier: string, username: string): Promise<ConnectorUser> {
+            return call<ConnectorUser>(baseUrl, `api/v1/admin/users/${identifier}`, {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({username, mustChangePassword: true})
+                }
+            )
+        },
+        async editUserRoles(identifier: string, request: UserRoleEditionRequest): Promise<ConnectorUser> {
+            return call<ConnectorUser>(baseUrl, `api/v1/admin/users/${encodeURIComponent(identifier)}/roles`, {
+                    method: "PATCH",
                     headers: {
                         "Content-Type": "application/json"
                     },
@@ -58,20 +78,6 @@ export function createUserService(baseUrl: string, call: RestApiCall) {
                     "Content-Type": "application/json"
                 }
             })
-        },
-        async assignRole(userId: string, role: string): Promise<void> {
-            return call<void>(baseUrl, `api/v1/admin/users/${encodeURIComponent(userId)}/roles`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: role,
-            });
-        },
-        async unassignRole(userId: string, role: string): Promise<void> {
-            return call<void>(baseUrl, `api/v1/admin/users/${encodeURIComponent(userId)}/roles`, {
-                method: "DELETE",
-                headers: { "Content-Type": "application/json" },
-                body: role,
-            });
-        },
+        }
     }
 }

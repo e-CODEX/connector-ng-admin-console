@@ -30,6 +30,19 @@ export const userCreationSchema = z.object({
     roles: z.array(z.string()).min(1, "Select at least one role"),
 });
 
+export const userEditionSchema = z.object({
+    username: z.string().trim().min(1, "Username is required"),
+    email: z
+        .email()
+        .trim()
+        .min(1, "Email is required"),
+    enabled: z.boolean(),
+});
+
+export const userRoleEditionSchema = z.object({
+    roles: z.array(z.string()).min(1, "Select at least one role")
+});
+
 export const loginSchema = z.object({
     username: z.string().trim().min(1, "Username is required"),
     password: z.string().min(6, "Password must be at least 6 characters"),

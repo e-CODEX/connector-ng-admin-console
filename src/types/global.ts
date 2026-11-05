@@ -49,7 +49,7 @@ export type ConnectorEvidenceType =
     | "RETRIEVAL"
     | "NON_RETRIEVAL";
 
-export type USER_ROLE = "ROLE_ADMIN";
+export type USER_ROLE = "ROLE_ADMIN" | "ROLE_USER" | "LOAD_TESTER" ;
 
 export const APP_MODES = ["ADMIN_CONSOLE", "TESTING_CONSOLE"] as const;
 

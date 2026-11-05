@@ -15,6 +15,7 @@ export interface ConnectorUser {
     username: string;
     email: string;
     enabled: boolean;
+    mustChangePassword: boolean;
     roles: USER_ROLE[];
     createdAt: string;
     updatedAt: string;

@@ -10,13 +10,14 @@
 
 import { FieldError, Label, ListBox, Select } from "@heroui/react";
 import { ConnectorUserRole } from "@/types/response/user";
+import { USER_ROLE } from "@/types/global";
 
 interface UserRoleSelectorProps {
     roles: ConnectorUserRole[];
     isLoading?: boolean;
     loadError?: boolean;
     value: string[];
-    onValueChange: (roles: string[]) => void;
+    onValueChange: (roles: USER_ROLE[]) => void;
     label?: string;
     isRequired?: boolean;
     isInvalid?: boolean;
@@ -43,7 +44,7 @@ export function UserRoleSelector({
             aria-label={label}
             selectionMode="multiple"
             value={value}
-            onChange={(keys) => onValueChange(keys as string[])}
+            onChange={(keys) => onValueChange(keys as USER_ROLE[])}
             isRequired={isRequired}
             isInvalid={isInvalid}
             isDisabled={isDisabled || isLoading}

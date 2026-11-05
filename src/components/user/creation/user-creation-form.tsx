@@ -14,12 +14,12 @@ import { Button, FieldError, Form, Input, Label, Modal, Spinner, Switch, TextFie
 import { UserCreationRequest } from "@/types/request/user";
 import React, { useState } from "react";
 import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";
-import { Pencil, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { userCreationSchema } from "@/schemas/auth";
 import { UserRoleSelector } from "@/components/form/selector/user-role-selector";
 import { useUserRoles } from "@/hooks/use-user-roles";
 import { PasswordField } from "@/components/form/password-text-field";
-import { ConnectorUser } from "@/types/response/user";
+import { USER_ROLE } from "@/types/global";
 
 
 const FORM_ID = "add-user-form";
@@ -27,23 +27,21 @@ const FORM_ID = "add-user-form";
 type FieldErrors = Partial<Record<keyof UserCreationRequest, string>>;
 
 interface UserCreationFormProps {
-    onSubmit?: (payload: UserCreationRequest) => Promise<boolean | void> | boolean | void;
+    onSubmit?: (payload: UserCreationRequest) => Promise<void> | void;
     state: ReturnType<typeof useOverlayState>;
-    user?: ConnectorUser | null;
     close: () => void;
 }
 
-export function UserCreationForm({ onSubmit, user }: UserCreationFormProps) {
-    const isEdit = !!user;
-    const [username, setUsername] = useState<string>(user?.username ?? "");
+export function UserCreationForm({ onSubmit }: UserCreationFormProps) {
+    const [username, setUsername] = useState<string>("");
     const [password, setPassword] = useState<string>("");
-    const [enabled, setEnabled] = useState<boolean>(user?.enabled ?? true);
-    const [email, setEmail] = useState<string>(user?.email ?? "");
+    const [enabled, setEnabled] = useState<boolean>(true);
+    const [email, setEmail] = useState<string>("");
 
     const [submitting, setSubmitting] = useState<boolean>(false);
     const [errors, setErrors] = useState<FieldErrors>({});
     const { userRoles: userRoles, isLoading, error } = useUserRoles();
-    const [roles, setRoles] = useState<string[]>(user?.roles ?? []);
+    const [roles, setRoles] = useState<USER_ROLE[]>(["ROLE_USER"]);
 
     const resetForm = () => {
         setUsername("");
@@ -82,8 +80,8 @@ export function UserCreationForm({ onSubmit, user }: UserCreationFormProps) {
         setSubmitting(true);
 
         try {
-            const ok = await onSubmit?.(result.data);
-            if (ok !== false && !isEdit) resetForm();
+            await onSubmit?.(result.data);
+            resetForm();
         } finally {
             setSubmitting(false);
         }
@@ -93,8 +91,8 @@ export function UserCreationForm({ onSubmit, user }: UserCreationFormProps) {
         <>
             <Modal.CloseTrigger/>
             <Modal.Header>
-                <ModalHeaderIcon icon={isEdit ? Pencil : Plus} tone="accent"/>
-                <Modal.Heading className="font-semibold">{isEdit ? "Edit User" : "Create A User"}</Modal.Heading>
+                <ModalHeaderIcon icon={Plus} tone="accent"/>
+                <Modal.Heading className="font-semibold">Create A User</Modal.Heading>
             </Modal.Header>
             <Modal.Body>
                 <Form
@@ -172,7 +170,7 @@ export function UserCreationForm({ onSubmit, user }: UserCreationFormProps) {
                     isDisabled={!username.trim() || !email.trim() || !password}
                 >
                     {submitting ? <Spinner color="current" size="sm"/> : <Plus className="mr-2 size-4"/>}
-                    {isEdit ? "Update" : "Add"}
+                    Add
                 </Button>
             </Modal.Footer>
         </>

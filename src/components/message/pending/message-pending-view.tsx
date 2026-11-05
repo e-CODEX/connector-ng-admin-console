@@ -26,10 +26,12 @@ export function MessagePendingView({ state, onDownloaded }: MessagePendingViewPr
                 <Modal.Container>
                     <Modal.Dialog className="sm:max-w-210 sm:min-h-100">
                         <Modal.CloseTrigger/>
+
                         <Modal.Header>
                             <ModalHeaderIcon icon={MailClock} tone="accent"/>
                             <Modal.Heading className="font-semibold">Pending Messages For Download</Modal.Heading>
                         </Modal.Header>
+
                         {state.isOpen && <MessagePendingContent onDownloaded={onDownloaded} />}
                     </Modal.Dialog>
                 </Modal.Container>

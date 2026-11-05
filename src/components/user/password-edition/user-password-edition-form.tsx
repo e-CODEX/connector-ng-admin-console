@@ -13,8 +13,7 @@
 import { Button, Form, Modal, Spinner, useOverlayState } from "@heroui/react";
 import { ChangePasswordRequest } from "@/types/request/user";
 import React, { useState } from "react";
-import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";
-import { Pen, Pencil } from "lucide-react";
+import { Pen } from "lucide-react";
 import { changePasswordSchema } from "@/schemas/auth";
 import { PasswordField } from "@/components/form/password-text-field";
 
@@ -74,11 +73,6 @@ export function UserPasswordEditionForm({ onSubmit }: UserPasswordEditionFormPro
 
     return (
         <>
-            <Modal.CloseTrigger/>
-            <Modal.Header>
-                <ModalHeaderIcon icon={Pencil} tone="accent"/>
-                <Modal.Heading className="font-semibold">Edit User Password</Modal.Heading>
-            </Modal.Header>
             <Modal.Body>
                 <Form
                     id={FORM_ID}
@@ -115,6 +109,7 @@ export function UserPasswordEditionForm({ onSubmit }: UserPasswordEditionFormPro
                     />
                 </Form>
             </Modal.Body>
+
             <Modal.Footer>
                 <Button
                     type="submit"

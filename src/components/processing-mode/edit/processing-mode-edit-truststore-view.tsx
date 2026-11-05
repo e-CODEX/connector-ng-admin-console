@@ -15,6 +15,8 @@ import React from "react";
 import { ConnectorProcessingMode } from "@/types/response/processing-mode";
 import { ProcessingModeEditTruststoreRequest } from "@/types/request/processing-mode";
 import { ProcessingModeTruststoreEditionForm } from "@/components/processing-mode/edit/processing-mode-truststore-edition-form";
+import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";
+import { Pen } from "lucide-react";
 
 interface ProcessingModEditTruststoreViewProps {
     state: ReturnType<typeof useOverlayState>;
@@ -28,6 +30,13 @@ export function ProcessingModeEditTruststoreView({ processingMode, state, onSubm
             <Modal.Backdrop isDismissable={false} isKeyboardDismissDisabled>
                 <Modal.Container size="lg">
                     <Modal.Dialog className="sm:min-w-250">
+                        <Modal.CloseTrigger/>
+
+                        <Modal.Header>
+                            <ModalHeaderIcon icon={Pen} tone="accent"/>
+                            <Modal.Heading className="font-semibold">Edit Processing Mode Truststore</Modal.Heading>
+                        </Modal.Header>
+
                         <ProcessingModeTruststoreEditionForm
                             key={String(state.isOpen)}
                             onSubmit={onSubmit}

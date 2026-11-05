@@ -67,10 +67,12 @@ export function MessageTransportStepsDetailView({ message, state }: MessageTrans
                 <Modal.Container>
                     <Modal.Dialog className="sm:max-w-200">
                         <Modal.CloseTrigger/>
+
                         <Modal.Header>
                             <ModalHeaderIcon icon={Route} tone="accent"/>
                             <Modal.Heading className="font-semibold">Message Transport Steps Details</Modal.Heading>
                         </Modal.Header>
+
                         <Modal.Body>
                             {loading ? (
                                 <SpinnerView className="mt-60"/>

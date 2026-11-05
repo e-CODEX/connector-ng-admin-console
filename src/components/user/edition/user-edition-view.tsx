@@ -15,6 +15,8 @@ import { UserEditionRequest } from "@/types/request/user";
 import React from "react";
 import { ConnectorUser } from "@/types/response/user";
 import { UserEditionForm } from "@/components/user/edition/user-edition-form";
+import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";
+import { UserPen } from "lucide-react";
 
 interface UserEditionViewProps {
     state: ReturnType<typeof useOverlayState>;
@@ -23,12 +25,19 @@ interface UserEditionViewProps {
     onSubmit?: (payload: UserEditionRequest) => Promise<void> | void;
 }
 
-export function UserEditionView({ state, user, onSubmit, isAdminContext=false }: UserEditionViewProps) {
+export function UserEditionView({ state, user, onSubmit, isAdminContext = false }: UserEditionViewProps) {
     return (
         <Modal state={state}>
             <Modal.Backdrop isDismissable={false} isKeyboardDismissDisabled>
                 <Modal.Container size="lg">
                     <Modal.Dialog className="sm:max-w-150">
+                        <Modal.CloseTrigger/>
+
+                        <Modal.Header>
+                            <ModalHeaderIcon icon={UserPen} tone="accent"/>
+                            <Modal.Heading className="font-semibold">Edit User</Modal.Heading>
+                        </Modal.Header>
+
                         <UserEditionForm
                             key={String(state.isOpen)}
                             state={state}

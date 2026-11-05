@@ -84,10 +84,12 @@ export function ProcessingModeDetailsView({ processingMode, state }: ProcessingM
                 <Modal.Container size="lg">
                     <Modal.Dialog className="sm:max-w-300">
                         <Modal.CloseTrigger/>
+
                         <Modal.Header>
                             <ModalHeaderIcon icon={Workflow} tone="accent"/>
                             <Modal.Heading className="font-semibold">Processing Mode Details</Modal.Heading>
                         </Modal.Header>
+
                         <Modal.Body>
                             <div className="flex flex-col">
                                 {loading ? (
@@ -97,12 +99,14 @@ export function ProcessingModeDetailsView({ processingMode, state }: ProcessingM
                                 )}
                             </div>
                         </Modal.Body>
+
                         <Modal.Footer>
                             <Button variant="secondary" className="w-full" onPress={() => onDownloadClicked()}>
                                 <ArrowDownToLine/>
                                 Download
                             </Button>
                         </Modal.Footer>
+
                     </Modal.Dialog>
                 </Modal.Container>
             </Modal.Backdrop>

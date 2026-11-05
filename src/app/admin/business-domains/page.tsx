@@ -15,11 +15,10 @@ import React from "react";
 import { ConnectorBusinessDomain } from "@/types/response/business-domain";
 import { Table, useOverlayState } from "@heroui/react";
 import { toastError, toastSuccess, truncate } from "@/utils";
-import { ArrowsRotateRight, Plus } from "@gravity-ui/icons";
 import { BusinessDomainCreationView } from "@/components/business-domain/business-domain-creation-view";
 import { PageHeaderButton } from "@/components/common/header/page-header-button";
 import { BooleanChip } from "@/components/common/boolean-chip";
-import { Building2 } from "lucide-react";
+import { Building2, BuildingComplexPlus, RefreshCw } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { useList } from "@/hooks/use-list";
@@ -43,13 +42,13 @@ export default function BusinessDomainsAdminPage() {
                 <PageHeaderButton
                     variant="primary"
                     tooltip="Create a new business domain"
-                    icon={Plus}
+                    icon={BuildingComplexPlus}
                     onPress={addModal.open}
                 />
                 <PageHeaderButton
                     variant="secondary"
                     tooltip="Refresh"
-                    icon={ArrowsRotateRight}
+                    icon={RefreshCw}
                     onPress={list.refresh}
                     isDisabled={list.refreshing}
                     isSpinning={list.refreshing || list.loading}

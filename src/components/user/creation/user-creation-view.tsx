@@ -14,6 +14,8 @@ import { Modal, useOverlayState } from "@heroui/react";
 import { UserCreationRequest } from "@/types/request/user";
 import React from "react";
 import { UserCreationForm } from "@/components/user/creation/user-creation-form";
+import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";
+import { UserPlus } from "lucide-react";
 
 interface UserCreationViewProps {
     state: ReturnType<typeof useOverlayState>;
@@ -26,6 +28,13 @@ export function UserCreationView({ state, onSubmit }: UserCreationViewProps) {
             <Modal.Backdrop isDismissable={false} isKeyboardDismissDisabled>
                 <Modal.Container size="lg">
                     <Modal.Dialog className="sm:max-w-150">
+                        <Modal.CloseTrigger/>
+
+                        <Modal.Header>
+                            <ModalHeaderIcon icon={UserPlus} tone="accent"/>
+                            <Modal.Heading className="font-semibold">Create A User</Modal.Heading>
+                        </Modal.Header>
+
                         <UserCreationForm
                             key={String(state.isOpen)}
                             state={state}

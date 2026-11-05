@@ -134,6 +134,7 @@ export function MessageEvidenceTriggerModeForm({ message, evidenceType, onSubmit
                     </RadioGroup>
                 </Form>
             </Modal.Body>
+
             <Modal.Footer>
                 <Button
                     type="submit"

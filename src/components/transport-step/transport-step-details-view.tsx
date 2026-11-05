@@ -29,13 +29,16 @@ export function TransportStepDetailsView({ transportStep, state }: TransportStep
                 <Modal.Container size="lg">
                     <Modal.Dialog className="sm:max-w-200">
                         <Modal.CloseTrigger/>
+
                         <Modal.Header>
                             <ModalHeaderIcon icon={Route} tone="accent"/>
                             <Modal.Heading className="font-semibold">Transport Step Details</Modal.Heading>
                         </Modal.Header>
+
                         <Modal.Body>
                             {transportStep && <TransportStepDetailsContent transportStep={transportStep}/>}
                         </Modal.Body>
+
                     </Modal.Dialog>
                 </Modal.Container>
             </Modal.Backdrop>

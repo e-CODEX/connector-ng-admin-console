@@ -79,10 +79,12 @@ export function TransportedStepMessageDetailsView({ transportStep, state }: Tran
                 <Modal.Container>
                     <Modal.Dialog className="sm:max-w-300">
                         <Modal.CloseTrigger/>
+
                         <Modal.Header>
                             <ModalHeaderIcon icon={Mail} tone="accent"/>
                             <Modal.Heading className="font-semibold">{modalTitle}</Modal.Heading>
                         </Modal.Header>
+
                         <Modal.Body>
                             <div className="flex flex-col">
                                 {loading ? (

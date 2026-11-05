@@ -12,7 +12,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Button, useOverlayState } from "@heroui/react";
-import { KeyRound, Pencil, User } from "lucide-react";
+import { RectangleEllipsis, User, UserPen } from "lucide-react";
 import { ConnectorUser } from "@/types/response/user";
 import { useAuthService } from "@/hooks/use-http-service";
 import { toastError, toastErrorMessage, toastSuccess } from "@/utils";
@@ -181,11 +181,11 @@ export default function AccountPage() {
 
                             <div className="ml-auto flex gap-2">
                                 <Button variant="secondary" onPress={editModal.open}>
-                                    <Pencil size={16}/>
+                                    <UserPen size={16}/>
                                     Edit info
                                 </Button>
                                 <Button variant="secondary" onPress={editPasswordModal.open}>
-                                    <KeyRound size={16}/>
+                                    <RectangleEllipsis size={16}/>
                                     Change password
                                 </Button>
                             </div>

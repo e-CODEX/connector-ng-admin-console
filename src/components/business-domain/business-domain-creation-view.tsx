@@ -90,10 +90,12 @@ export function BusinessDomainCreationView({ state, onSubmit }: BusinessDomainCr
                 <Modal.Container size="lg">
                     <Modal.Dialog className="sm:max-w-150">
                         <Modal.CloseTrigger/>
+
                         <Modal.Header>
                             <ModalHeaderIcon icon={Plus} tone="accent"/>
                             <Modal.Heading className="font-semibold">Create A Business Domain</Modal.Heading>
                         </Modal.Header>
+
                         <Modal.Body>
                             <Form id="add-business-domain-form" onSubmit={handleSubmit} className="space-y-6">
                                 <TextField

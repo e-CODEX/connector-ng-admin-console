@@ -14,8 +14,7 @@ import { toastError } from "@/utils";
 import { Button, Description, FieldError, Fieldset, Form, Input, Label, Modal, Spinner, TextField } from "@heroui/react";
 import { FileSelectField } from "@/components/form/file-select-field";
 import { toFieldErrors } from "@/schemas/processing-mode-creation";
-import { ArrowUpToLine, Pen } from "lucide-react";
-import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";
+import { ArrowUpToLine } from "lucide-react";
 import { processingModeTruststoreEditionSchema, ProcessingModeTruststoreEditionValues } from "@/schemas/processing-mode-truststore-edition";
 import { ConnectorProcessingMode } from "@/types/response/processing-mode";
 import { ProcessingModeDetailHeaderSection } from "@/components/processing-mode/detail/processing-mode-detail-header-section";
@@ -98,13 +97,6 @@ export function ProcessingModeTruststoreEditionForm({ onSubmit, processingMode }
 
     return (
         <>
-            <Modal.CloseTrigger/>
-
-            <Modal.Header>
-                <ModalHeaderIcon icon={Pen} tone="accent"/>
-                <Modal.Heading className="font-semibold">Edit Processing Mode Truststore</Modal.Heading>
-            </Modal.Header>
-
             <Modal.Body>
                 <Form
                     id="add-processing-mode-form"
@@ -117,7 +109,7 @@ export function ProcessingModeTruststoreEditionForm({ onSubmit, processingMode }
                         <Fieldset.Legend>Processing mode info</Fieldset.Legend>
 
                         <Fieldset.Group className="space-y-4">
-                            <ProcessingModeDetailHeaderSection processingMode={processingMode} />
+                            <ProcessingModeDetailHeaderSection processingMode={processingMode}/>
                         </Fieldset.Group>
                     </Fieldset>
 

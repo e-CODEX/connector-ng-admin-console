@@ -28,10 +28,11 @@ interface UserEditionFormProps {
     onSubmit?: (payload: UserEditionRequest) => Promise<void> | void;
     state: ReturnType<typeof useOverlayState>;
     user: ConnectorUser;
+    isAdminContext: boolean;
     close: () => void;
 }
 
-export function UserEditionForm({ onSubmit, user }: UserEditionFormProps) {
+export function UserEditionForm({ onSubmit, user, isAdminContext=false }: UserEditionFormProps) {
     const [username, setUsername] = useState<string>(user.username);
     const [enabled, setEnabled] = useState<boolean>(user.enabled ?? true);
     const [email, setEmail] = useState<string>(user.email ?? "");
@@ -96,7 +97,7 @@ export function UserEditionForm({ onSubmit, user }: UserEditionFormProps) {
                     validationErrors={errors}
                     className="space-y-6"
                 >
-                    {userIsAdmin && (
+                    {!userIsAdmin && isAdminContext && (
                         <TextField
                             autoFocus
                             isRequired
@@ -123,7 +124,7 @@ export function UserEditionForm({ onSubmit, user }: UserEditionFormProps) {
                         <FieldError>{errors.email}</FieldError>
                     </TextField>
 
-                    {userIsAdmin && (
+                    {!userIsAdmin && isAdminContext && (
                         <Switch isSelected={enabled} onChange={setEnabled} defaultSelected>
                             <Switch.Content>
                                 <Switch.Control>

@@ -47,7 +47,16 @@ export function createAuthService(baseUrl: string, call: RestApiCall) {
                 }
             })
         },
-        async updatePasswordAfterLogin(currentPassword: string, newPassword: string, refreshToken?: string ): Promise<void> {
+        async editMe(username: string, email: string): Promise<ConnectorUser> {
+            return call<ConnectorUser>(baseUrl, "api/v1/auth/me", {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ username, email }),
+            })
+        },
+        async updatePasswordAfterLogin(currentPassword: string, newPassword: string, refreshToken?: string): Promise<void> {
             return call<void>(baseUrl, "api/v1/auth/change-password", {
                 method: "POST",
                 headers: {

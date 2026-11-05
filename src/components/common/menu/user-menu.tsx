@@ -11,10 +11,14 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { Avatar, Description, Dropdown, Label, Separator } from "@heroui/react";
-import { LogOut, User } from "lucide-react";
+import { LogOut, User, Users } from "lucide-react";
 import { useOptionalUser } from "@/hooks/useUser";
 import React from "react";
 import { toastErrorMessage } from "@/utils";
+
+const MANAGE_USERS_LABEL = "Manage users accounts";
+const MANAGE_MY_ACCOUNT_LABEL = "Manage my account";
+const LOGOUT_LABEL = "Sign out";
 
 function getInitials(name: string): string {
     return name
@@ -34,6 +38,9 @@ export function UserMenu() {
         switch (key) {
             case "users":
                 router.push("/admin/users");
+                break;
+            case "account":
+                router.push("/account");
                 break;
             case "logout":
                 const res = await fetch("/api/auth/logout", { method: "POST" });
@@ -71,26 +78,34 @@ export function UserMenu() {
                     </div>
                 </div>
 
-                <Separator/>
-
                 <Dropdown.Menu onAction={onAction}>
+                    <Dropdown.Item id="account" textValue={MANAGE_MY_ACCOUNT_LABEL} variant="default">
+                        <User className="size-4 shrink-0"/>
+                        <div className="flex flex-col">
+                            <Label>{MANAGE_MY_ACCOUNT_LABEL}</Label>
+                            <Description>{MANAGE_MY_ACCOUNT_LABEL}</Description>
+                        </div>
+                    </Dropdown.Item>
+
+                    <Separator/>
+
                     {user.roles.includes("ROLE_ADMIN") && (
-                        <Dropdown.Item id="users" textValue="Users" variant="default">
+                        <Dropdown.Item id="users" textValue={MANAGE_USERS_LABEL} variant="default">
                             <div className="flex h-8 items-start justify-center pt-px">
-                                <User className="size-4 shrink-0 text-blue-900"/>
+                                <Users className="size-4 shrink-0"/>
                             </div>
                             <div className="flex flex-col">
-                                <Label>Users Admin</Label>
-                                <Description>Manage users</Description>
+                                <Label>{MANAGE_USERS_LABEL}</Label>
+                                <Description>{MANAGE_USERS_LABEL}</Description>
                             </div>
                         </Dropdown.Item>
                     )}
 
                     <Separator/>
 
-                    <Dropdown.Item id="logout" textValue="Sign out" variant="danger">
+                    <Dropdown.Item id="logout" textValue={LOGOUT_LABEL} variant="danger">
                         <LogOut className="size-4 shrink-0 text-danger"/>
-                        <Label>Sign out</Label>
+                        <Label>{LOGOUT_LABEL}</Label>
                     </Dropdown.Item>
                 </Dropdown.Menu>
             </Dropdown.Popover>

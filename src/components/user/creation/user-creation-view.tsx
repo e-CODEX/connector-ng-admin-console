@@ -37,9 +37,7 @@ export function UserCreationView({ state, onSubmit }: UserCreationViewProps) {
 
                         <UserCreationForm
                             key={String(state.isOpen)}
-                            state={state}
                             onSubmit={onSubmit}
-                            close={state.close}
                         />
                     </Modal.Dialog>
                 </Modal.Container>

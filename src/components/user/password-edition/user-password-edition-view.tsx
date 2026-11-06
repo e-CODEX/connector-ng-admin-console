@@ -37,9 +37,7 @@ export function UserPasswordEditionView({ state, onSubmit }: UserPasswordEdition
 
                         <UserPasswordEditionForm
                             key={String(state.isOpen)}
-                            state={state}
                             onSubmit={onSubmit}
-                            close={state.close}
                         />
                     </Modal.Dialog>
                 </Modal.Container>

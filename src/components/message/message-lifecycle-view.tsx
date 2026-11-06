@@ -97,18 +97,14 @@ const OUTBOUND_STEPS: TimelineStep[] = [
                 <StatusChip state="rejected"/>
             </>
         ),
-        text: "The receiving connector answers with a confirmation or a rejection.",
-    },
-    {
-        key: "deleted",
-        chips: <StatusChip state="deleted"/>,
         text: (
             <>
-                The message is then deleted, including its attachments, business content,
-                business documents, and any detached signatures, while its metadata is retained.
+                The message is marked as confirmed or rejected, depending on the delivery outcome.<br/>
+                All of its files (attachments, ASiC-S container, business documents, signatures, etc.)
+                are deleted. Only its metadata is retained.
             </>
-        ),
-    },
+        )
+    }
 ];
 
 const INBOUND_STEPS: TimelineStep[] = [
@@ -147,18 +143,14 @@ const INBOUND_STEPS: TimelineStep[] = [
                 <StatusChip state="rejected"/>
             </>
         ),
-        text: "The message is confirmed or rejected following the delivery outcome.",
-    },
-    {
-        key: "deleted",
-        chips: <StatusChip state="deleted"/>,
         text: (
             <>
-                The message is considered deleted once its files are removed: attachments,
-                business content, business document and any detached signature.
+                The message is marked as confirmed or rejected, depending on the delivery outcome.<br/>
+                All of its files (attachments, ASiC-S container, business documents, signatures, etc.)
+                are deleted. Only its metadata is retained.
             </>
-        ),
-    },
+        )
+    }
 ];
 
 interface MessageLifecycleViewProps {

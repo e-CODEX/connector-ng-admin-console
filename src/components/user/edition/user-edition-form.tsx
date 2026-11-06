@@ -10,72 +10,68 @@
 
 "use client";
 
-import { Button, FieldError, Form, Input, Label, Modal, Spinner, Switch, TextField, useOverlayState } from "@heroui/react";
-import { UserCreationRequest, UserEditionRequest } from "@/types/request/user";
+import { Button, FieldError, Form, Input, Label, Modal, Spinner, Switch, TextField } from "@heroui/react";
+import { UserEditionRequest } from "@/types/request/user";
 import React, { useState } from "react";
 import { Pen } from "lucide-react";
 import { userEditionSchema } from "@/schemas/auth";
 import { ConnectorUser } from "@/types/response/user";
 import { isAdmin } from "@/utils";
 
-
 const FORM_ID = "edit-user-form";
 
-type FieldErrors = Partial<Record<keyof UserCreationRequest, string>>;
+type FieldErrors = Partial<Record<keyof UserEditionRequest, string>>;
 
 interface UserEditionFormProps {
     onSubmit?: (payload: UserEditionRequest) => Promise<void> | void;
-    state: ReturnType<typeof useOverlayState>;
     user: ConnectorUser;
-    isAdminContext: boolean;
-    close: () => void;
+    isAdminContext?: boolean;
 }
 
 export function UserEditionForm({ onSubmit, user, isAdminContext = false }: UserEditionFormProps) {
-    const [username, setUsername] = useState<string>(user.username);
-    const [enabled, setEnabled] = useState<boolean>(user.enabled ?? true);
-    const [email, setEmail] = useState<string>(user.email ?? "");
+    const [username, setUsername] = useState(user.username);
+    const [email, setEmail] = useState(user.email ?? "");
+    const [enabled, setEnabled] = useState(user.enabled ?? true);
 
-    const [submitting, setSubmitting] = useState<boolean>(false);
+    const [submitting, setSubmitting] = useState(false);
     const [errors, setErrors] = useState<FieldErrors>({});
+    const [submitError, setSubmitError] = useState<string | null>(null);
 
-    const userIsAdmin = isAdmin(user);
+    const canEditPrivileged = !isAdmin(user) && isAdminContext;
 
-    const resetForm = () => {
-        setUsername("");
-        setEmail("");
-        setEnabled(true);
-        setErrors({});
-    };
+    const isDirty =
+              email !== (user.email ?? "") ||
+              (canEditPrivileged && (username !== user.username || enabled !== (user.enabled ?? true)));
+
+    const canSubmit = isDirty && !!email.trim() && (!canEditPrivileged || !!username.trim());
+
+    const clearError = (key: keyof UserEditionRequest) =>
+        setErrors((prev) => (prev[key] ? { ...prev, [key]: undefined } : prev));
 
     const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
+        if (submitting) return; // Enter key can re-submit while pending
 
-        const result = userEditionSchema.safeParse({
-            username,
-            email,
-            enabled,
-        });
+        const result = userEditionSchema.safeParse({ username, email, enabled });
 
         if (!result.success) {
             const fieldErrors: FieldErrors = {};
-
             for (const issue of result.error.issues) {
                 const key = issue.path[0] as keyof UserEditionRequest | undefined;
-                if (key && !fieldErrors[key]) {
-                    fieldErrors[key] = issue.message;
-                }
+                if (key && !fieldErrors[key]) fieldErrors[key] = issue.message;
             }
             setErrors(fieldErrors);
             return;
         }
 
         setErrors({});
+        setSubmitError(null);
         setSubmitting(true);
 
         try {
             await onSubmit?.(result.data);
-            resetForm();
+        } catch (err) {
+            setSubmitError(err instanceof Error ? err.message : "Could not update the user. Please try again.");
         } finally {
             setSubmitting(false);
         }
@@ -91,14 +87,14 @@ export function UserEditionForm({ onSubmit, user, isAdminContext = false }: User
                     validationErrors={errors}
                     className="space-y-6"
                 >
-                    {!userIsAdmin && isAdminContext && (
+                    {canEditPrivileged && (
                         <TextField
                             autoFocus
                             isRequired
                             name="username"
+                            isDisabled={submitting}
                             value={username}
-                            onChange={setUsername}
-                            isInvalid={!!errors.username}
+                            onChange={(v) => { setUsername(v); clearError("username"); }}
                         >
                             <Label>Username</Label>
                             <Input placeholder="e.g. j.doe"/>
@@ -107,19 +103,20 @@ export function UserEditionForm({ onSubmit, user, isAdminContext = false }: User
                     )}
 
                     <TextField
+                        autoFocus={!canEditPrivileged}
                         isRequired
                         name="email"
+                        isDisabled={submitting}
                         value={email}
-                        onChange={setEmail}
-                        isInvalid={!!errors.email}
+                        onChange={(v) => { setEmail(v); clearError("email"); }}
                     >
                         <Label>Email</Label>
                         <Input type="email" placeholder="e.g. j.doe@example.com"/>
                         <FieldError>{errors.email}</FieldError>
                     </TextField>
 
-                    {!userIsAdmin && isAdminContext && (
-                        <Switch isSelected={enabled} onChange={setEnabled} defaultSelected>
+                    {canEditPrivileged && (
+                        <Switch isSelected={enabled} onChange={setEnabled} isDisabled={submitting}>
                             <Switch.Content>
                                 <Switch.Control>
                                     <Switch.Thumb/>
@@ -127,6 +124,10 @@ export function UserEditionForm({ onSubmit, user, isAdminContext = false }: User
                                 Enabled
                             </Switch.Content>
                         </Switch>
+                    )}
+
+                    {submitError && (
+                        <p role="alert" className="text-sm text-danger">{submitError}</p>
                     )}
                 </Form>
             </Modal.Body>
@@ -138,12 +139,16 @@ export function UserEditionForm({ onSubmit, user, isAdminContext = false }: User
                     className="w-full"
                     variant="primary"
                     isPending={submitting}
-                    isDisabled={!username.trim() || !email.trim()}
+                    isDisabled={!canSubmit}
                 >
-                    {submitting ? <Spinner color="current" size="sm"/> : <Pen className="mr-2 size-4"/>}
-                    Edit
+                    {({ isPending }) => (
+                        <>
+                            {isPending ? <Spinner color="current" size="sm"/> : <Pen className="size-4"/>}
+                            {isPending ? "Saving…" : "Edit"}
+                        </>
+                    )}
                 </Button>
             </Modal.Footer>
         </>
-    )
+    );
 }

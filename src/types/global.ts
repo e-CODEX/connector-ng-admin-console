@@ -49,6 +49,17 @@ export type ConnectorEvidenceType =
     | "RETRIEVAL"
     | "NON_RETRIEVAL";
 
+export const ACCEPTED_TRUSTSTORES = [
+    "application/x-pkcs12",
+    "application/pkcs12",
+    "application/octet-stream",
+    "application/x-java-keystore",
+    ".jks",
+    ".keystore",
+    ".p12",
+    ".pfx",
+];
+
 export type USER_ROLE = "ROLE_ADMIN" | "ROLE_USER" | "LOAD_TESTER" ;
 
 export const APP_MODES = ["ADMIN_CONSOLE", "TESTING_CONSOLE"] as const;

@@ -7,11 +7,13 @@ import { Button, FieldError, InputGroup, Label, TextField } from "@heroui/react"
 interface PasswordFieldProps {
     label: string;
     value: string;
+    autoComplete?: string;
     onChange: (value: string) => void;
     onBlur?: () => void;
     isInvalid?: boolean;
     errorMessage?: string;
     isRequired?: boolean;
+    isDisabled?: boolean;
     name?: string;
     placeholder?: string;
 }
@@ -19,11 +21,13 @@ interface PasswordFieldProps {
 export function PasswordField({
                                   label,
                                   value,
+                                  autoComplete,
                                   onChange,
                                   onBlur,
                                   isInvalid,
                                   errorMessage,
                                   isRequired,
+                                  isDisabled = false,
                                   name,
                                   placeholder
                               }: PasswordFieldProps) {
@@ -33,9 +37,11 @@ export function PasswordField({
         <TextField
             name={name}
             value={value}
+            autoComplete={autoComplete}
             onChange={onChange}
             onBlur={onBlur}
             isInvalid={isInvalid}
+            isDisabled={isDisabled}
             isRequired={isRequired}
         >
             <Label>{label}</Label>

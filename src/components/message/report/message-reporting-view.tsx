@@ -18,14 +18,6 @@ interface MessageReportingViewProps {
     state: ReturnType<typeof useOverlayState>;
 }
 
-/**
- * Modal shell: owns nothing but the chrome.
- *
- * The stateful body is mounted only while the modal is open, so closing the
- * modal unmounts it and resets all of its state. That removes the need for a
- * reset-on-close effect (and the `react-hooks/set-state-in-effect` violation
- * that came with it).
- */
 export function MessageReportingView({ state }: MessageReportingViewProps) {
     return (
         <Modal state={state}>

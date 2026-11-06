@@ -10,7 +10,7 @@
 
 "use client";
 
-import { Button, FieldError, Form, Input, Label, Modal, Spinner, Switch, TextField, useOverlayState } from "@heroui/react";
+import { Button, FieldError, Form, Input, Label, Modal, Spinner, Switch, TextField } from "@heroui/react";
 import { UserCreationRequest } from "@/types/request/user";
 import React, { useState } from "react";
 import { Plus } from "lucide-react";
@@ -20,71 +20,72 @@ import { useUserRoles } from "@/hooks/use-user-roles";
 import { PasswordField } from "@/components/form/password-text-field";
 import { USER_ROLE } from "@/types/global";
 
-
 const FORM_ID = "add-user-form";
+const DEFAULT_ROLES: USER_ROLE[] = ["ROLE_USER"];
 
 type FieldErrors = Partial<Record<keyof UserCreationRequest, string>>;
 
 interface UserCreationFormProps {
     onSubmit?: (payload: UserCreationRequest) => Promise<void> | void;
-    state: ReturnType<typeof useOverlayState>;
-    close: () => void;
 }
 
 export function UserCreationForm({ onSubmit }: UserCreationFormProps) {
-    const [username, setUsername] = useState<string>("");
-    const [password, setPassword] = useState<string>("");
-    const [enabled, setEnabled] = useState<boolean>(true);
-    const [email, setEmail] = useState<string>("");
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [email, setEmail] = useState("");
+    const [enabled, setEnabled] = useState(true);
+    const [roles, setRoles] = useState<USER_ROLE[]>(DEFAULT_ROLES);
 
-    const [submitting, setSubmitting] = useState<boolean>(false);
+    const [submitting, setSubmitting] = useState(false);
     const [errors, setErrors] = useState<FieldErrors>({});
-    const { userRoles: userRoles, isLoading, error } = useUserRoles();
-    const [roles, setRoles] = useState<USER_ROLE[]>(["ROLE_USER"]);
+    const [submitError, setSubmitError] = useState<string | null>(null);
+
+    const { userRoles, isLoading, error } = useUserRoles();
+
+    const clearError = (key: keyof UserCreationRequest) =>
+        setErrors((prev) => (prev[key] ? { ...prev, [key]: undefined } : prev));
 
     const resetForm = () => {
         setUsername("");
         setPassword("");
         setEmail("");
         setEnabled(true);
-        setRoles([]);
+        setRoles(DEFAULT_ROLES);
         setErrors({});
+        setSubmitError(null);
     };
 
     const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
+        if (submitting) return; // Enter key can re-submit while pending
 
-        const result = userCreationSchema.safeParse({
-            username,
-            password,
-            email,
-            enabled,
-            roles,
-        });
+        const result = userCreationSchema.safeParse({ username, password, email, enabled, roles });
 
         if (!result.success) {
             const fieldErrors: FieldErrors = {};
-
             for (const issue of result.error.issues) {
                 const key = issue.path[0] as keyof UserCreationRequest | undefined;
-                if (key && !fieldErrors[key]) {
-                    fieldErrors[key] = issue.message;
-                }
+                if (key && !fieldErrors[key]) fieldErrors[key] = issue.message;
             }
             setErrors(fieldErrors);
             return;
         }
 
         setErrors({});
+        setSubmitError(null);
         setSubmitting(true);
 
         try {
             await onSubmit?.(result.data);
             resetForm();
+        } catch (err) {
+            setSubmitError(err instanceof Error ? err.message : "Could not create the user. Please try again.");
         } finally {
             setSubmitting(false);
         }
     };
+
+    const canSubmit = !!username.trim() && !!email.trim() && !!password && roles.length > 0 && !isLoading;
 
     return (
         <>
@@ -100,8 +101,12 @@ export function UserCreationForm({ onSubmit }: UserCreationFormProps) {
                         autoFocus
                         isRequired
                         name="username"
-                        value={username} onChange={setUsername}
-                        isInvalid={!!errors.username}
+                        isDisabled={submitting}
+                        value={username}
+                        onChange={(v) => {
+                            setUsername(v);
+                            clearError("username");
+                        }}
                     >
                         <Label>Username</Label>
                         <Input placeholder="e.g. j.doe"/>
@@ -111,9 +116,12 @@ export function UserCreationForm({ onSubmit }: UserCreationFormProps) {
                     <TextField
                         isRequired
                         name="email"
+                        isDisabled={submitting}
                         value={email}
-                        onChange={setEmail}
-                        isInvalid={!!errors.email}
+                        onChange={(v) => {
+                            setEmail(v);
+                            clearError("email");
+                        }}
                     >
                         <Label>Email</Label>
                         <Input type="email" placeholder="e.g. j.doe@example.com"/>
@@ -124,10 +132,11 @@ export function UserCreationForm({ onSubmit }: UserCreationFormProps) {
                         label="Password"
                         placeholder="At least 12 characters"
                         isRequired
+                        isDisabled={submitting}
                         value={password}
                         onChange={(v) => {
                             setPassword(v);
-                            setErrors((e) => ({ ...e, password: undefined }));
+                            clearError("password");
                         }}
                         isInvalid={!!errors.password}
                         errorMessage={errors.password}
@@ -136,15 +145,19 @@ export function UserCreationForm({ onSubmit }: UserCreationFormProps) {
                     <UserRoleSelector
                         roles={userRoles ?? []}
                         isLoading={isLoading}
+                        isDisabled={submitting}
                         loadError={!!error}
                         value={roles}
-                        onValueChange={setRoles}
+                        onValueChange={(v) => {
+                            setRoles(v);
+                            clearError("roles");
+                        }}
                         isRequired
                         isInvalid={!!errors.roles}
                         errorMessage="Select at least one role"
                     />
 
-                    <Switch isSelected={enabled} onChange={setEnabled} defaultSelected>
+                    <Switch isSelected={enabled} onChange={setEnabled} isDisabled={submitting}>
                         <Switch.Content>
                             <Switch.Control>
                                 <Switch.Thumb/>
@@ -152,6 +165,10 @@ export function UserCreationForm({ onSubmit }: UserCreationFormProps) {
                             Enabled
                         </Switch.Content>
                     </Switch>
+
+                    {submitError && (
+                        <p role="alert" className="text-sm text-danger">{submitError}</p>
+                    )}
                 </Form>
             </Modal.Body>
 
@@ -162,12 +179,16 @@ export function UserCreationForm({ onSubmit }: UserCreationFormProps) {
                     className="w-full"
                     variant="primary"
                     isPending={submitting}
-                    isDisabled={!username.trim() || !email.trim() || !password}
+                    isDisabled={!canSubmit}
                 >
-                    {submitting ? <Spinner color="current" size="sm"/> : <Plus className="mr-2 size-4"/>}
-                    Add
+                    {({ isPending }) => (
+                        <>
+                            {isPending ? <Spinner color="current" size="sm"/> : <Plus className="size-4"/>}
+                            {isPending ? "Adding…" : "Add"}
+                        </>
+                    )}
                 </Button>
             </Modal.Footer>
         </>
-    )
+    );
 }

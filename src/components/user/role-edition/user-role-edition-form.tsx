@@ -10,65 +10,65 @@
 
 "use client";
 
-import { Button, Form, Modal, Spinner, useOverlayState } from "@heroui/react";
-import { UserCreationRequest, UserRoleEditionRequest } from "@/types/request/user";
+import { Button, Form, Modal, Spinner } from "@heroui/react";
+import { UserRoleEditionRequest } from "@/types/request/user";
 import React, { useState } from "react";
 import { Pen } from "lucide-react";
 import { userRoleEditionSchema } from "@/schemas/auth";
 import { ConnectorUser } from "@/types/response/user";
 import { UserRoleSelector } from "@/components/form/selector/user-role-selector";
 import { useUserRoles } from "@/hooks/use-user-roles";
-
+import { USER_ROLE } from "@/types/global";
 
 const FORM_ID = "edit-user-roles-form";
 
-type FieldErrors = Partial<Record<keyof UserCreationRequest, string>>;
+type FieldErrors = Partial<Record<keyof UserRoleEditionRequest, string>>;
 
 interface UserRoleEditionFormProps {
     onSubmit?: (payload: UserRoleEditionRequest) => Promise<void> | void;
-    state: ReturnType<typeof useOverlayState>;
     user: ConnectorUser;
-    close: () => void;
 }
 
+const sameRoles = (a: readonly string[], b: readonly string[]) =>
+    a.length === b.length && a.every((r) => b.includes(r));
+
 export function UserRoleEditionForm({ onSubmit, user }: UserRoleEditionFormProps) {
-    const [roles, setRoles] = useState<string[]>(user.roles || []);
-    const [submitting, setSubmitting] = useState<boolean>(false);
+    const [roles, setRoles] = useState<USER_ROLE[]>((user.roles ?? []) as USER_ROLE[]);
+
+    const [submitting, setSubmitting] = useState(false);
     const [errors, setErrors] = useState<FieldErrors>({});
+    const [submitError, setSubmitError] = useState<string | null>(null);
 
-    const { userRoles: userRoles, isLoading, error } = useUserRoles();
+    const { userRoles, isLoading, error } = useUserRoles();
 
-    const resetForm = () => {
-        setRoles([]);
-        setErrors({});
-    };
+    const isDirty = !sameRoles(roles, user.roles ?? []);
+    const canSubmit =
+              !isLoading && !error && (userRoles?.length ?? 0) > 0 && roles.length > 0 && isDirty;
 
     const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
+        if (submitting) return; // Enter key can re-submit while pending
 
-        const result = userRoleEditionSchema.safeParse({
-            roles
-        });
+        const result = userRoleEditionSchema.safeParse({ roles });
 
         if (!result.success) {
             const fieldErrors: FieldErrors = {};
-
             for (const issue of result.error.issues) {
                 const key = issue.path[0] as keyof UserRoleEditionRequest | undefined;
-                if (key && !fieldErrors[key]) {
-                    fieldErrors[key] = issue.message;
-                }
+                if (key && !fieldErrors[key]) fieldErrors[key] = issue.message;
             }
             setErrors(fieldErrors);
             return;
         }
 
         setErrors({});
+        setSubmitError(null);
         setSubmitting(true);
 
         try {
             await onSubmit?.(result.data);
-            resetForm();
+        } catch (err) {
+            setSubmitError(err instanceof Error ? err.message : "Could not update the roles. Please try again.");
         } finally {
             setSubmitting(false);
         }
@@ -87,14 +87,22 @@ export function UserRoleEditionForm({ onSubmit, user }: UserRoleEditionFormProps
                     <UserRoleSelector
                         roles={userRoles ?? []}
                         isLoading={isLoading}
+                        isDisabled={submitting}
                         loadError={!!error}
                         value={roles}
                         label="Roles"
-                        onValueChange={setRoles}
+                        onValueChange={(v) => {
+                            setRoles(v);
+                            setErrors((prev) => (prev.roles ? { ...prev, roles: undefined } : prev));
+                        }}
                         isRequired
                         isInvalid={!!errors.roles}
                         errorMessage="Select at least one role"
                     />
+
+                    {submitError && (
+                        <p role="alert" className="text-sm text-danger">{submitError}</p>
+                    )}
                 </Form>
             </Modal.Body>
 
@@ -105,12 +113,16 @@ export function UserRoleEditionForm({ onSubmit, user }: UserRoleEditionFormProps
                     className="w-full"
                     variant="primary"
                     isPending={submitting}
-                    isDisabled={userRoles.length === 0 || roles.length === 0}
+                    isDisabled={!canSubmit}
                 >
-                    {submitting ? <Spinner color="current" size="sm"/> : <Pen className="mr-2 size-4"/>}
-                    Edit
+                    {({ isPending }) => (
+                        <>
+                            {isPending ? <Spinner color="current" size="sm"/> : <Pen className="size-4"/>}
+                            {isPending ? "Saving…" : "Edit"}
+                        </>
+                    )}
                 </Button>
             </Modal.Footer>
         </>
-    )
+    );
 }

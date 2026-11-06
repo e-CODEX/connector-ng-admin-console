@@ -9,6 +9,8 @@
  */
 
 import type { ReactNode } from "react";
+import { Card } from "@heroui/react";
+import clsx from "clsx";
 
 interface SearchCriteriaProps {
     children: ReactNode;
@@ -18,11 +20,13 @@ interface SearchCriteriaProps {
 
 export function SearchCriteriaBox({ children, title = "Search criteria", className }: SearchCriteriaProps) {
     return (
-        <section className={`mt-6 mb-4 rounded-xl border border-border bg-surface p-4 ${className ?? ""}`}>
-            <h2 className="text-sm font-semibold text-foreground mb-3">{title}</h2>
-            <div className="flex flex-col sm:flex-row gap-3 sm:items-end">
+        <Card variant="default" className={clsx("mt-6 mb-4", className)}>
+            <Card.Header>
+                <Card.Title className="text-sm font-semibold">{title}</Card.Title>
+            </Card.Header>
+            <Card.Content className="flex flex-col gap-3 sm:flex-row sm:items-end">
                 {children}
-            </div>
-        </section>
+            </Card.Content>
+        </Card>
     );
 }

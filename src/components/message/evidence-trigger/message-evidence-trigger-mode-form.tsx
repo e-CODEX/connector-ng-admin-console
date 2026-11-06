@@ -8,6 +8,8 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
+"use client";
+
 import { ConnectorMessage } from "@/types/response/message";
 import { Button, Description, FieldError, Form, Label, Modal, Radio, RadioGroup, Spinner } from "@heroui/react";
 import React, { useState } from "react";
@@ -20,7 +22,7 @@ import { ConnectorEvidenceType, OutboundMessageRequestMode } from "@/types/globa
 interface MessageEvidenceTriggerModeFormProps {
     message: ConnectorMessage;
     evidenceType: ConnectorEvidenceType;
-    onSubmit?: (triggerRequest: SendEvidenceTriggerRequest) => Promise<unknown> | void;
+    onSubmit?: (triggerRequest: SendEvidenceTriggerRequest) => Promise<void> | void;
 }
 
 const FORM_ID = "trigger-message-evidence-form";
@@ -42,23 +44,22 @@ const isSubmissionMode = (value: string): value is OutboundMessageRequestMode =>
 
 export function MessageEvidenceTriggerModeForm({ message, evidenceType, onSubmit }: MessageEvidenceTriggerModeFormProps) {
     const [mode, setMode] = useState<OutboundMessageRequestMode>(DEFAULT_MODE);
-    const [submitting, setSubmitting] = useState<boolean>(false);
+    const [submitting, setSubmitting] = useState(false);
     const [errors, setErrors] = useState<FieldErrors>({});
-
-    const resetForm = () => {
-        setMode(DEFAULT_MODE);
-        setErrors({});
-    };
+    const [submitError, setSubmitError] = useState<string | null>(null);
 
     const handleModeChange = (value: string) => {
-        if (isSubmissionMode(value)) {
-            setMode(value);
-            setErrors((prev) => ({ ...prev, mode: undefined }));
-        }
+        if (!isSubmissionMode(value)) return;
+        setMode(value);
+        setErrors((prev) => (prev.mode ? { ...prev, mode: undefined } : prev));
     };
 
     const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        if (submitting) {
+            return;
+        }
 
         const result = messageEvidenceTriggerSchema.safeParse({
             payload: {
@@ -70,23 +71,22 @@ export function MessageEvidenceTriggerModeForm({ message, evidenceType, onSubmit
 
         if (!result.success) {
             const fieldErrors: FieldErrors = {};
-
             for (const issue of result.error.issues) {
                 const key = issue.path[0] as keyof SendEvidenceTriggerRequest | undefined;
-                if (key && !fieldErrors[key]) {
-                    fieldErrors[key] = issue.message;
-                }
+                if (key && !fieldErrors[key]) fieldErrors[key] = issue.message;
             }
             setErrors(fieldErrors);
             return;
         }
 
         setErrors({});
+        setSubmitError(null);
         setSubmitting(true);
 
         try {
             await onSubmit?.(result.data);
-            resetForm();
+        } catch (err) {
+            setSubmitError(err instanceof Error ? err.message : "Could not send the evidence trigger. Please try again.");
         } finally {
             setSubmitting(false);
         }
@@ -98,9 +98,8 @@ export function MessageEvidenceTriggerModeForm({ message, evidenceType, onSubmit
                 <Form
                     id={FORM_ID}
                     onSubmit={handleSubmit}
-                    validationErrors={errors}
-                    className="space-y-6"
                     validationBehavior="aria"
+                    className="space-y-6"
                 >
                     <RadioGroup
                         name="mode"
@@ -108,6 +107,7 @@ export function MessageEvidenceTriggerModeForm({ message, evidenceType, onSubmit
                         value={mode}
                         onChange={handleModeChange}
                         isDisabled={submitting}
+                        isInvalid={!!errors.mode}
                     >
                         <Label>Delivery method</Label>
                         <div className="grid gap-3 md:grid-cols-2">
@@ -130,8 +130,15 @@ export function MessageEvidenceTriggerModeForm({ message, evidenceType, onSubmit
                                 </Radio>
                             ))}
                         </div>
-                        <FieldError/>
+                        <FieldError>{errors.mode}</FieldError>
                     </RadioGroup>
+
+                    {errors.payload && (
+                        <p role="alert" className="text-sm text-danger">{errors.payload}</p>
+                    )}
+                    {submitError && (
+                        <p role="alert" className="text-sm text-danger">{submitError}</p>
+                    )}
                 </Form>
             </Modal.Body>
 
@@ -142,9 +149,14 @@ export function MessageEvidenceTriggerModeForm({ message, evidenceType, onSubmit
                     className="w-full"
                     variant="primary"
                     isPending={submitting}
+                    isDisabled={!message.backendMessageIdentifier}
                 >
-                    {submitting ? <Spinner color="current" size="sm"/> : <MailCheck className="mr-2 size-4"/>}
-                    Send
+                    {({ isPending }) => (
+                        <>
+                            {isPending ? <Spinner color="current" size="sm"/> : <MailCheck className="size-4"/>}
+                            {isPending ? "Sending…" : "Send"}
+                        </>
+                    )}
                 </Button>
             </Modal.Footer>
         </>

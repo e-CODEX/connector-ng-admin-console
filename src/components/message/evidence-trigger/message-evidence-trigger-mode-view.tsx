@@ -20,7 +20,7 @@ import { ConnectorEvidenceType } from "@/types/global";
 interface MessageEvidenceTriggerModeViewProps {
     message: ConnectorMessage | null;
     evidenceType: ConnectorEvidenceType,
-    onSubmit?: (triggerRequest: SendEvidenceTriggerRequest) => Promise<unknown> | void;
+    onSubmit?: (triggerRequest: SendEvidenceTriggerRequest) => Promise<void> | void;
     state: ReturnType<typeof useOverlayState>;
 }
 

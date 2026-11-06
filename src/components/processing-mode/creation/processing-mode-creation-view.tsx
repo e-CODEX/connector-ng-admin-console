@@ -38,7 +38,6 @@ export function ProcessingModeCreationView({ state, onSubmit }: ProcessingModeCr
                         <ProcessingModeCreationForm
                             key={String(state.isOpen)}
                             onSubmit={onSubmit}
-                            close={state.close}
                         />
                     </Modal.Dialog>
                 </Modal.Container>

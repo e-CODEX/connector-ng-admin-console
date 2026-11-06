@@ -10,15 +10,14 @@
 
 "use client";
 
-import { Button, TimeValue } from "@heroui/react";
-import { DateField, DateRangePicker, Label, RangeCalendar, TimeField, useLocale, } from "@heroui/react";
-import { DateFormatter, DateValue, getLocalTimeZone, now, ZonedDateTime } from "@internationalized/date";
+import { Button, DateField, DateRangePicker, Label, RangeCalendar, TimeField, TimeValue, useLocale } from "@heroui/react";
+import { DateFormatter, DateValue, getLocalTimeZone, isSameDay, now, Time, toCalendarDate, ZonedDateTime } from "@internationalized/date";
 
 export type DateTimeRangeGranularity = "day" | "hour" | "minute" | "second";
 
 type HourCycle = 12 | 24;
 
-const ClearIcon = ()=> {
+const ClearIcon = () => {
     return (
         <svg aria-hidden="true" fill="none" height="14" viewBox="0 0 24 24" width="14"
              stroke="currentColor" strokeLinecap="round" strokeWidth="2">
@@ -73,6 +72,8 @@ export function DateTimeRangeSelector({
             ? now(tz)
             : now(tz).set({ hour: 23, minute: 59, second: 59, millisecond: 999 }));
 
+    const maxDate = toCalendarDate(resolvedMax);
+
     const dateFormatter = new DateFormatter(locale, {
         day: "numeric",
         month: "short",
@@ -97,8 +98,6 @@ export function DateTimeRangeSelector({
     return (
         <div className="">
             <DateRangePicker
-                // Remount when granularity flips between date-only and date+time so the
-                // segment layout rebuilds cleanly.
                 key={granularity}
                 className={className}
                 defaultValue={defaultValue ?? undefined}
@@ -145,7 +144,7 @@ export function DateTimeRangeSelector({
                         </DateField.Group>
 
                         <DateRangePicker.Popover className="flex w-full max-w-63 flex-col gap-3">
-                            <RangeCalendar aria-label={label} className="w-full">
+                            <RangeCalendar aria-label={label} className="w-full" maxValue={maxDate}>
                                 <RangeCalendar.Header>
                                     <RangeCalendar.YearPickerTrigger>
                                         <RangeCalendar.YearPickerTriggerHeading/>
@@ -169,58 +168,66 @@ export function DateTimeRangeSelector({
                                 </RangeCalendar.YearPickerGrid>
                             </RangeCalendar>
 
-                            {showTimeField && (
-                                <div className="flex flex-col gap-3">
-                                    <div className="flex items-center justify-between">
-                                        <Label>Start Time</Label>
-                                        <TimeField
-                                            aria-label="Start Time"
-                                            granularity={timeGranularity}
-                                            hideTimeZone={hideTimeZone}
-                                            hourCycle={hourCycle}
-                                            name="startTime"
-                                            shouldForceLeadingZeros={shouldForceLeadingZeros}
-                                            value={state.timeRange?.start ?? null}
-                                            onChange={(v) =>
-                                                state.setTimeRange({
-                                                    end: state.timeRange?.end as TimeValue,
-                                                    start: v as TimeValue,
-                                                })
-                                            }
-                                        >
-                                            <TimeField.Group variant="secondary">
-                                                <TimeField.Input>
-                                                    {(segment) => <TimeField.Segment segment={segment}/>}
-                                                </TimeField.Input>
-                                            </TimeField.Group>
-                                        </TimeField>
+                            {showTimeField && (() => {
+                                const maxTime = new Time(resolvedMax.hour, resolvedMax.minute, resolvedMax.second);
+                                const startIsMaxDay = !!state.dateRange?.start && isSameDay(state.dateRange.start, maxDate);
+                                const endIsMaxDay = !!state.dateRange?.end && isSameDay(state.dateRange.end, maxDate);
+
+                                return (
+                                    <div className="flex flex-col gap-3">
+                                        <div className="flex items-center justify-between">
+                                            <Label>Start Time</Label>
+                                            <TimeField
+                                                aria-label="Start Time"
+                                                granularity={timeGranularity}
+                                                hideTimeZone={hideTimeZone}
+                                                hourCycle={hourCycle}
+                                                name="startTime"
+                                                maxValue={startIsMaxDay ? maxTime : undefined}
+                                                shouldForceLeadingZeros={shouldForceLeadingZeros}
+                                                value={state.timeRange?.start ?? null}
+                                                onChange={(v) =>
+                                                    state.setTimeRange({
+                                                        end: state.timeRange?.end as TimeValue,
+                                                        start: v as TimeValue,
+                                                    })
+                                                }
+                                            >
+                                                <TimeField.Group variant="secondary">
+                                                    <TimeField.Input>
+                                                        {(segment) => <TimeField.Segment segment={segment}/>}
+                                                    </TimeField.Input>
+                                                </TimeField.Group>
+                                            </TimeField>
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                            <Label>End Time</Label>
+                                            <TimeField
+                                                aria-label="End Time"
+                                                granularity={timeGranularity}
+                                                hideTimeZone={hideTimeZone}
+                                                hourCycle={hourCycle}
+                                                name="endTime"
+                                                maxValue={endIsMaxDay ? maxTime : undefined}
+                                                shouldForceLeadingZeros={shouldForceLeadingZeros}
+                                                value={state.timeRange?.end ?? null}
+                                                onChange={(v) =>
+                                                    state.setTimeRange({
+                                                        end: v as TimeValue,
+                                                        start: state.timeRange?.start as TimeValue,
+                                                    })
+                                                }
+                                            >
+                                                <TimeField.Group variant="secondary">
+                                                    <TimeField.Input>
+                                                        {(segment) => <TimeField.Segment segment={segment}/>}
+                                                    </TimeField.Input>
+                                                </TimeField.Group>
+                                            </TimeField>
+                                        </div>
                                     </div>
-                                    <div className="flex items-center justify-between">
-                                        <Label>End Time</Label>
-                                        <TimeField
-                                            aria-label="End Time"
-                                            granularity={timeGranularity}
-                                            hideTimeZone={hideTimeZone}
-                                            hourCycle={hourCycle}
-                                            name="endTime"
-                                            shouldForceLeadingZeros={shouldForceLeadingZeros}
-                                            value={state.timeRange?.end ?? null}
-                                            onChange={(v) =>
-                                                state.setTimeRange({
-                                                    end: v as TimeValue,
-                                                    start: state.timeRange?.start as TimeValue,
-                                                })
-                                            }
-                                        >
-                                            <TimeField.Group variant="secondary">
-                                                <TimeField.Input>
-                                                    {(segment) => <TimeField.Segment segment={segment}/>}
-                                                </TimeField.Input>
-                                            </TimeField.Group>
-                                        </TimeField>
-                                    </div>
-                                </div>
-                            )}
+                                );
+                            })()}
 
                             {showSelectedSummary && (
                                 <span className="mt-1 text-xs text-muted">

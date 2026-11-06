@@ -12,9 +12,9 @@
 
 import { Modal, useOverlayState } from "@heroui/react";
 import { ConnectorMessageDetailsResponse } from "@/types/response/message";
-import { toastError } from "@/utils";
 import React, { useEffect, useState } from "react";
 import { SpinnerView } from "@/components/common/spinner-view";
+import { LoadErrorState } from "@/components/common/load-error-state";
 import { MessageDetailsContent } from "@/components/message/detail/message-details-content";
 import { Mail } from "lucide-react";
 import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";
@@ -26,52 +26,62 @@ interface TransportedStepMessageDetailsViewProps {
     state: ReturnType<typeof useOverlayState>;
 }
 
-export function TransportedStepMessageDetailsView({ transportStep, state }: TransportedStepMessageDetailsViewProps) {
-    const [details, setDetails] = useState<ConnectorMessageDetailsResponse | null>(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const identifier = transportStep?.identifier;
+type LoadResult =
+    | { key: string; data: ConnectorMessageDetailsResponse; failed?: false }
+    | { key: string; data?: undefined; failed: true };
 
+export function TransportedStepMessageDetailsView({ transportStep, state }: TransportedStepMessageDetailsViewProps) {
     const transportStepService = useTransportStepService();
-    const modalTitle = transportStep?.messageType == "BUSINESS"
-        ? "Business Message Details" : "Evidence Message Details"
+
+    const [result, setResult] = useState<LoadResult | null>(null);
+    const [reloadToken, setReloadToken] = useState(0);
+
+    const identifier = transportStep?.identifier;
+    const requestKey = identifier ? `${identifier}:${reloadToken}` : null;
+
+    const isCurrent = !!requestKey && result?.key === requestKey;
+    const loading = state.isOpen && !!requestKey && !isCurrent;
+    const loadFailed = isCurrent && !!result?.failed;
+    const details = isCurrent ? (result?.data ?? null) : null;
+
+    const modalTitle =
+              transportStep?.messageType === "BUSINESS" ? "Business Message Details" : "Evidence Message Details";
 
     useEffect(() => {
-        if (!state.isOpen || !identifier) {
-            return;
-        }
+        if (!state.isOpen || !identifier || !requestKey) return;
 
         let active = true;
 
-        (async () => {
-            setLoading(true);
-            setError(null);
-            setDetails(null);
-            try {
-                const data = await transportStepService.retrieveTransportedMessage(identifier);
-
-                if (!active) {
-                    return;
-                }
-
-                setDetails(data);
-            } catch (e) {
-                if (!active) {
-                    return;
-                }
-
-                toastError(e)
-            } finally {
-                if (active) {
-                    setLoading(false);
-                }
-            }
-        })();
+        transportStepService
+            .retrieveTransportedMessage(identifier)
+            .then((data) => {
+                if (active) setResult({ key: requestKey, data });
+            })
+            .catch(() => {
+                if (active) setResult({ key: requestKey, failed: true });
+            });
 
         return () => {
             active = false;
+            setResult(null);
         };
-    }, [state.isOpen, identifier, transportStepService]);
+    }, [state.isOpen, identifier, requestKey, transportStepService]);
+
+    const retry = () => setReloadToken((t) => t + 1);
+
+    const renderBody = () => {
+        if (loading) return <SpinnerView className="min-h-80"/>;
+        if (loadFailed) {
+            return (
+                <LoadErrorState
+                    className="min-h-80"
+                    title="Could not load message details"
+                    onRetry={retry}
+                />
+            );
+        }
+        return <MessageDetailsContent message={details} loading={loading}/>;
+    };
 
     return (
         <Modal state={state}>
@@ -86,19 +96,7 @@ export function TransportedStepMessageDetailsView({ transportStep, state }: Tran
                         </Modal.Header>
 
                         <Modal.Body>
-                            <div className="flex flex-col">
-                                {loading ? (
-                                    <SpinnerView className="mt-60"/>
-                                ) : (
-                                    <MessageDetailsContent message={details} loading={loading}/>
-                                )}
-
-                                {error && (
-                                    <div className="flex justify-center py-6">
-                                        <div className="text-destructive">{error}</div>
-                                    </div>
-                                )}
-                            </div>
+                            <div className="flex flex-col">{renderBody()}</div>
                         </Modal.Body>
                     </Modal.Dialog>
                 </Modal.Container>

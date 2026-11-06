@@ -10,9 +10,9 @@
 
 "use client";
 
-import { Button, Modal, useOverlayState } from "@heroui/react";
+import { Button, Modal, Spinner, useOverlayState } from "@heroui/react";
 import { formatBytes, saveFile, toastError } from "@/utils";
-import React from "react";
+import React, { useState } from "react";
 import { ConnectorAttachmentResponse } from "@/types/response/attachments";
 import { DetailRow } from "@/components/common/detail-row";
 import { AttachmentStorageChip } from "@/components/attachment/attachment-storage-chip";
@@ -30,15 +30,23 @@ interface AttachmentDetailsViewProps {
 
 export function AttachmentDetailsView({ attachment, state }: AttachmentDetailsViewProps) {
     const attachmentService = useAttachmentService();
+    const [downloading, setDownloading] = useState(false);
+
+    const isDeleted = !!attachment?.deletedAt;
 
     const onDownloadClicked = async () => {
+        if (!attachment || downloading) return;
+
+        setDownloading(true);
         try {
-            const file = await attachmentService.downloadAttachment(attachment!.identifier, attachment!.name);
+            const file = await attachmentService.downloadAttachment(attachment.identifier, attachment.name);
             saveFile(file);
         } catch (error) {
             toastError(error);
+        } finally {
+            setDownloading(false);
         }
-    }
+    };
 
     return (
         <Modal state={state}>
@@ -49,32 +57,41 @@ export function AttachmentDetailsView({ attachment, state }: AttachmentDetailsVi
 
                         <Modal.Header>
                             <ModalHeaderIcon icon={Paperclip} tone="accent"/>
-                            <Modal.Heading className="font-semibold">Attachments Details</Modal.Heading>
+                            <Modal.Heading className="font-semibold">Attachment Details</Modal.Heading>
                         </Modal.Header>
 
                         <Modal.Body>
                             {attachment && (
                                 <div className="flex flex-col">
                                     <DetailRow label="Identifier" value={
-                                        <CopyableIdentifier identifier={attachment.identifier} iconPosition="right" visibleChars={100}/>
-                                    }/>
+                                                                       <CopyableIdentifier identifier={attachment.identifier} iconPosition="right"
+                                                                                           visibleChars={100}/>
+                                                                  }/>
                                     <DetailRow label="Name" value={attachment.name}/>
                                     <DetailRow label="Content type" value={attachment.contentType}/>
-                                    <DetailRow label="Description" value={attachment.description}/>
+                                    <DetailRow label="Description" value={attachment.description || "—"}/>
                                     <DetailRow label="Size" value={formatBytes(attachment.size)}/>
-                                    <DetailRow label="Storage" value={
-                                        <AttachmentStorageChip type={attachment.storage}/>
-                                    }/>
+                                    <DetailRow
+                                        label="Storage"
+                                        value={
+                                            <AttachmentStorageChip type={attachment.storage}/>
+                                        }/>
                                     <DetailRow label="Type" value={attachment.type}/>
-                                    <DetailRow label="Status" value={
-                                        <AttachmentStatusChip deletedAt={attachment.deletedAt} showDeletedAt />
-                                    }/>
-                                    <DetailRow label="Created at" value={
-                                        <DateTime value={attachment.createdAt} precision="millis"/>
-                                    }/>
-                                    <DetailRow label="Updated at" value={
-                                        <DateTime value={attachment.updatedAt} precision="millis"/>
-                                    }/>
+                                    <DetailRow
+                                        label="Status"
+                                        value={
+                                            <AttachmentStatusChip deletedAt={attachment.deletedAt} showDeletedAt/>
+                                        }/>
+                                    <DetailRow
+                                        label="Created at"
+                                        value={
+                                            <DateTime value={attachment.createdAt} precision="millis"/>
+                                        }/>
+                                    <DetailRow
+                                        label="Updated at"
+                                        value={
+                                            <DateTime value={attachment.updatedAt} precision="millis"/>
+                                        }/>
                                 </div>
                             )}
                         </Modal.Body>
@@ -83,10 +100,16 @@ export function AttachmentDetailsView({ attachment, state }: AttachmentDetailsVi
                             <Button
                                 variant="secondary"
                                 className="w-full"
-                                isDisabled={attachment !== null && attachment!.deletedAt !== null}
-                                onPress={() => onDownloadClicked()}>
-                                <ArrowDownToLine/>
-                                Download
+                                isPending={downloading}
+                                isDisabled={!attachment || isDeleted}
+                                onPress={onDownloadClicked}
+                            >
+                                {({ isPending }) => (
+                                    <>
+                                        {isPending ? <Spinner color="current" size="sm"/> : <ArrowDownToLine className="size-4"/>}
+                                        {isPending ? "Downloading…" : "Download"}
+                                    </>
+                                )}
                             </Button>
                         </Modal.Footer>
                     </Modal.Dialog>

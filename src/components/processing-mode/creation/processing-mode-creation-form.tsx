@@ -8,6 +8,8 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
+"use client";
+
 import { ProcessingModeCreationRequest } from "@/types/request/processing-mode";
 import { useBusinessDomainIdentifiers } from "@/hooks/use-business-domain-identifiers";
 import React, { useState } from "react";
@@ -15,14 +17,17 @@ import { toastError } from "@/utils";
 import { Button, Description, FieldError, Fieldset, Form, Input, Label, Modal, Spinner, TextField } from "@heroui/react";
 import { BusinessDomainSelector } from "@/components/form/selector/business-domain-selector";
 import { FileSelectField } from "@/components/form/file-select-field";
+import { PasswordField } from "@/components/form/password-text-field";
 import { processingModeCreationSchema, ProcessingModeCreationValues, toFieldErrors } from "@/schemas/processing-mode-creation";
 import { ArrowUpToLine } from "lucide-react";
-import { ACCEPTED_XMLS } from "@/types/global";
+import { ACCEPTED_TRUSTSTORES, ACCEPTED_XMLS } from "@/types/global";
 
+const FORM_ID = "add-processing-mode-form";
+
+type FieldErrors = Partial<Record<keyof ProcessingModeCreationValues, string>>;
 
 interface ProcessingModeCreationFormProps {
     onSubmit?: (request: ProcessingModeCreationRequest) => Promise<void> | void;
-    close: () => void;
 }
 
 export function ProcessingModeCreationForm({ onSubmit }: ProcessingModeCreationFormProps) {
@@ -33,7 +38,7 @@ export function ProcessingModeCreationForm({ onSubmit }: ProcessingModeCreationF
     const [description, setDescription] = useState("");
     const [businessDomainIdentifier, setBusinessDomainIdentifier] = useState<string | undefined>(undefined);
     const [truststorePassword, setTruststorePassword] = useState("");
-    const [errors, setErrors] = useState<Record<string, string>>({});
+    const [errors, setErrors] = useState<FieldErrors>({});
     const [submitting, setSubmitting] = useState(false);
 
     const validateField = <K extends keyof ProcessingModeCreationValues>(field: K, value: unknown) => {
@@ -41,51 +46,50 @@ export function ProcessingModeCreationForm({ onSubmit }: ProcessingModeCreationF
 
         setErrors((prev) => {
             if (result.success) {
-                if (!(field in prev)) {
-                    return prev;
-                }
+                if (!(field in prev)) return prev;
                 const next = { ...prev };
                 delete next[field];
                 return next;
             }
 
             const message = result.error.issues[0].message;
-
-            if (prev[field] === message) {
-                return prev;
-            }
-
-            return { ...prev, [field]: message };
+            return prev[field] === message ? prev : { ...prev, [field]: message };
         });
+    };
+
+    // Only re-validate fields that already show an error; the rest is validated on submit
+    const revalidate = <K extends keyof ProcessingModeCreationValues>(field: K, value: unknown) => {
+        if (errors[field]) validateField(field, value);
     };
 
     const handlePmodeFileSelect = (selected: File | null) => {
         setPmodeFile(selected);
-        validateField("pmodeFile", selected ?? undefined);
+        revalidate("pmodeFile", selected ?? undefined);
     };
 
     const handleTruststoreFileSelect = (selected: File | null) => {
         setTruststoreFile(selected);
-        validateField("truststoreFile", selected ?? undefined);
+        revalidate("truststoreFile", selected ?? undefined);
     };
 
     const handleDomainChange = (identifier: string | null) => {
         setBusinessDomainIdentifier(identifier ?? undefined);
-        validateField("businessDomainIdentifier", identifier ?? undefined);
+        revalidate("businessDomainIdentifier", identifier ?? undefined);
     };
 
     const handleDescriptionChange = (value: string) => {
         setDescription(value);
-        validateField("description", value);
+        revalidate("description", value);
     };
 
     const handleTruststorePasswordChange = (value: string) => {
         setTruststorePassword(value);
-        validateField("truststorePassword", value);
+        revalidate("truststorePassword", value);
     };
 
     const handleSubmit = async (event: React.SyntheticEvent<HTMLFormElement>) => {
         event.preventDefault();
+        if (submitting) return; // Enter key can re-submit while pending
 
         const result = processingModeCreationSchema.safeParse({
             businessDomainIdentifier,
@@ -121,17 +125,24 @@ export function ProcessingModeCreationForm({ onSubmit }: ProcessingModeCreationF
         }
     };
 
+    const canSubmit =
+              !!businessDomainIdentifier &&
+              !!pmodeFile &&
+              !!truststoreFile &&
+              !!description.trim() &&
+              !!truststorePassword;
+
     return (
         <>
             <Modal.Body>
                 <Form
-                    id="add-processing-mode-form"
+                    id={FORM_ID}
                     onSubmit={handleSubmit}
                     validationErrors={errors}
                     className="space-y-6"
                     validationBehavior="aria"
                 >
-                    <Fieldset className="rounded-xl border border-border bg-surface p-6 shadow-sm">
+                    <Fieldset className="rounded-xl border border-border bg-surface p-6 shadow-sm" disabled={submitting}>
                         <Fieldset.Legend>Processing mode</Fieldset.Legend>
                         <Description>
                             The processing mode definition and the domain it applies to.
@@ -144,6 +155,7 @@ export function ProcessingModeCreationForm({ onSubmit }: ProcessingModeCreationF
                                 value={businessDomainIdentifier}
                                 onValueChange={handleDomainChange}
                                 isRequired
+                                isDisabled={submitting}
                             />
 
                             <FileSelectField
@@ -160,7 +172,7 @@ export function ProcessingModeCreationForm({ onSubmit }: ProcessingModeCreationF
                                 value={description}
                                 onChange={handleDescriptionChange}
                                 isRequired
-                                isInvalid={!!errors.description}
+                                isDisabled={submitting}
                             >
                                 <Label className="font-semibold">Description</Label>
                                 <Input placeholder="e.g. default processing mode for domain"/>
@@ -169,10 +181,10 @@ export function ProcessingModeCreationForm({ onSubmit }: ProcessingModeCreationF
                         </Fieldset.Group>
                     </Fieldset>
 
-                    <Fieldset className="rounded-xl border border-border bg-surface p-6 shadow-sm">
+                    <Fieldset className="rounded-xl border border-border bg-surface p-6 shadow-sm" disabled={submitting}>
                         <Fieldset.Legend>Truststore</Fieldset.Legend>
                         <Description>
-                            Certificate store used to validate ASICS container.
+                            Certificate store used to validate the ASiC container.
                         </Description>
 
                         <Fieldset.Group className="space-y-4">
@@ -180,31 +192,21 @@ export function ProcessingModeCreationForm({ onSubmit }: ProcessingModeCreationF
                                 label="Truststore file"
                                 file={truststoreFile}
                                 onFileChange={handleTruststoreFileSelect}
-                                acceptedFileTypes={[
-                                    "application/x-pkcs12",
-                                    "application/pkcs12",
-                                    "application/octet-stream",
-                                    "application/x-java-keystore",
-                                    ".jks",
-                                    ".keystore",
-                                    ".p12",
-                                    ".pfx",
-                                ]}
+                                acceptedFileTypes={ACCEPTED_TRUSTSTORES}
                                 buttonLabel="Choose truststore file ..."
                                 error={errors.truststoreFile}
                             />
 
-                            <TextField
-                                name="truststorePassword"
+                            <PasswordField
+                                label="Password"
+                                placeholder="Truststore password"
+                                isRequired
+                                isDisabled={submitting}
                                 value={truststorePassword}
                                 onChange={handleTruststorePasswordChange}
-                                isRequired
                                 isInvalid={!!errors.truststorePassword}
-                            >
-                                <Label className="font-semibold">Password</Label>
-                                <Input placeholder="Truststore password" type="password"/>
-                                <FieldError>{errors.truststorePassword}</FieldError>
-                            </TextField>
+                                errorMessage={errors.truststorePassword}
+                            />
                         </Fieldset.Group>
                     </Fieldset>
                 </Form>
@@ -213,18 +215,18 @@ export function ProcessingModeCreationForm({ onSubmit }: ProcessingModeCreationF
             <Modal.Footer>
                 <Button
                     type="submit"
-                    form="add-processing-mode-form"
+                    form={FORM_ID}
                     className="w-full"
                     variant="primary"
                     isPending={submitting}
-                    isDisabled={submitting}
+                    isDisabled={!canSubmit}
                 >
-                    {submitting ? (
-                        <Spinner color="current" size="sm"/>
-                    ) : (
-                        <ArrowUpToLine className="mr-2 size-4"/>
+                    {({ isPending }) => (
+                        <>
+                            {isPending ? <Spinner color="current" size="sm"/> : <ArrowUpToLine className="size-4"/>}
+                            {isPending ? "Loading…" : "Load"}
+                        </>
                     )}
-                    Load
                 </Button>
             </Modal.Footer>
         </>

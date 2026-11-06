@@ -10,13 +10,12 @@
 
 "use client";
 
-import { Button, Form, Modal, Spinner, useOverlayState } from "@heroui/react";
+import { Button, Form, Modal, Spinner } from "@heroui/react";
 import { ChangePasswordRequest } from "@/types/request/user";
 import React, { useState } from "react";
-import { Pen } from "lucide-react";
+import { KeyRound } from "lucide-react";
 import { changePasswordSchema } from "@/schemas/auth";
 import { PasswordField } from "@/components/form/password-text-field";
-
 
 const FORM_ID = "edit-user-password-form";
 
@@ -24,52 +23,64 @@ type FieldErrors = Partial<Record<keyof ChangePasswordRequest, string>>;
 
 interface UserPasswordEditionFormProps {
     onSubmit?: (payload: ChangePasswordRequest) => Promise<void> | void;
-    state: ReturnType<typeof useOverlayState>;
-    close: () => void;
 }
 
 export function UserPasswordEditionForm({ onSubmit }: UserPasswordEditionFormProps) {
     const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+
     const [submitting, setSubmitting] = useState(false);
     const [errors, setErrors] = useState<FieldErrors>({});
+    const [submitError, setSubmitError] = useState<string | null>(null);
+
+    const clearError = (...keys: (keyof ChangePasswordRequest)[]) =>
+        setErrors((prev) => {
+            if (!keys.some((k) => prev[k])) return prev;
+            const next = { ...prev };
+            keys.forEach((k) => delete next[k]);
+            return next;
+        });
 
     const resetForm = () => {
         setCurrentPassword("");
         setNewPassword("");
         setConfirmPassword("");
         setErrors({});
+        setSubmitError(null);
     };
 
     const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
+        if (submitting) return; // Enter key can re-submit while pending
 
         const result = changePasswordSchema.safeParse({ currentPassword, newPassword, confirmPassword });
 
         if (!result.success) {
             const fieldErrors: FieldErrors = {};
-
             for (const issue of result.error.issues) {
                 const key = issue.path[0] as keyof ChangePasswordRequest | undefined;
-                if (key && !fieldErrors[key]) {
-                    fieldErrors[key] = issue.message;
-                }
+                if (key && !fieldErrors[key]) fieldErrors[key] = issue.message;
             }
-
             setErrors(fieldErrors);
             return;
         }
 
+        setErrors({});
+        setSubmitError(null);
         setSubmitting(true);
 
         try {
             await onSubmit?.(result.data);
             resetForm();
+        } catch (err) {
+            setSubmitError(err instanceof Error ? err.message : "Could not change the password. Please try again.");
         } finally {
             setSubmitting(false);
         }
     };
+
+    const canSubmit = !!currentPassword && !!newPassword && !!confirmPassword;
 
     return (
         <>
@@ -83,30 +94,49 @@ export function UserPasswordEditionForm({ onSubmit }: UserPasswordEditionFormPro
                 >
                     <PasswordField
                         label="Current password"
+                        autoComplete="current-password"
                         isRequired
+                        isDisabled={submitting}
                         value={currentPassword}
-                        onChange={setCurrentPassword}
+                        onChange={(v) => {
+                            setCurrentPassword(v);
+                            clearError("currentPassword");
+                        }}
                         isInvalid={!!errors.currentPassword}
                         errorMessage={errors.currentPassword}
                     />
 
                     <PasswordField
                         label="New password"
+                        autoComplete="new-password"
                         isRequired
+                        isDisabled={submitting}
                         value={newPassword}
-                        onChange={setNewPassword}
+                        onChange={(v) => {
+                            setNewPassword(v);
+                            clearError("newPassword", "confirmPassword");
+                        }}
                         isInvalid={!!errors.newPassword}
                         errorMessage={errors.newPassword}
                     />
 
                     <PasswordField
                         label="Confirm new password"
+                        autoComplete="new-password"
                         isRequired
+                        isDisabled={submitting}
                         value={confirmPassword}
-                        onChange={setConfirmPassword}
+                        onChange={(v) => {
+                            setConfirmPassword(v);
+                            clearError("confirmPassword");
+                        }}
                         isInvalid={!!errors.confirmPassword}
                         errorMessage={errors.confirmPassword}
                     />
+
+                    {submitError && (
+                        <p role="alert" className="text-sm text-danger">{submitError}</p>
+                    )}
                 </Form>
             </Modal.Body>
 
@@ -117,12 +147,16 @@ export function UserPasswordEditionForm({ onSubmit }: UserPasswordEditionFormPro
                     className="w-full"
                     variant="primary"
                     isPending={submitting}
-                    isDisabled={!currentPassword.trim() || !newPassword.trim() || !confirmPassword.trim()}
+                    isDisabled={!canSubmit}
                 >
-                    {submitting ? <Spinner color="current" size="sm"/> : <Pen className="mr-2 size-4"/>}
-                    Change
+                    {({ isPending }) => (
+                        <>
+                            {isPending ? <Spinner color="current" size="sm"/> : <KeyRound className="size-4"/>}
+                            {isPending ? "Changing…" : "Change"}
+                        </>
+                    )}
                 </Button>
             </Modal.Footer>
         </>
-    )
+    );
 }

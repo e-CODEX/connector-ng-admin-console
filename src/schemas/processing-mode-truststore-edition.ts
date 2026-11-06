@@ -30,20 +30,3 @@ export const processingModeTruststoreEditionSchema = z.object({
 });
 
 export type ProcessingModeTruststoreEditionValues = z.infer<typeof processingModeTruststoreEditionSchema>;
-
-/**
- * Flattens a ZodError into the `Record<string, string>` shape expected by
- * HeroUI's `validationErrors` prop. Keeps the first message per field.
- */
-export function toFieldErrors(error: z.ZodError): Record<string, string> {
-    const fieldErrors: Record<string, string> = {};
-
-    for (const issue of error.issues) {
-        const field = issue.path[0];
-        if (typeof field === "string" && !(field in fieldErrors)) {
-            fieldErrors[field] = issue.message;
-        }
-    }
-
-    return fieldErrors;
-}

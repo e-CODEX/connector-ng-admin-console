@@ -10,7 +10,7 @@
 
 "use client";
 
-import { Button, Modal, useOverlayState } from "@heroui/react";
+import { Button, Modal, Spinner, useOverlayState } from "@heroui/react";
 import { saveFile, toastError } from "@/utils";
 import React, { useEffect, useState } from "react";
 import { ConnectorProcessingMode, ConnectorProcessingModeDetail } from "@/types/response/processing-mode";
@@ -18,7 +18,6 @@ import { ProcessingModeDetailsSection } from "@/components/processing-mode/detai
 import { ArrowDownToLine, Workflow } from "lucide-react";
 import { useProcessingModeService } from "@/hooks/use-http-service";
 import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";
-import path from "path";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { LoadErrorState } from "@/components/common/load-error-state";
 
@@ -27,55 +26,76 @@ interface ProcessingModeDetailsViewProps {
     state: ReturnType<typeof useOverlayState>;
 }
 
-export function ProcessingModeDetailsView({ processingMode, state }: ProcessingModeDetailsViewProps) {
-    const [details, setDetails] = useState<ConnectorProcessingModeDetail | null>(null);
-    const [loading, setLoading] = useState(false);
-    const [loadFailed, setLoadFailed] = useState(false);
-    const [reloadToken, setReloadToken] = useState(0);
+type LoadResult =
+    | { key: string; data: ConnectorProcessingModeDetail; failed?: false }
+    | { key: string; data?: undefined; failed: true };
 
+const basename = (p: string) => p.split(/[\\/]/).pop() ?? p;
+
+export function ProcessingModeDetailsView({ processingMode, state }: ProcessingModeDetailsViewProps) {
     const processingModeService = useProcessingModeService();
 
-    const identifier = processingMode?.uuid;
+    const [result, setResult] = useState<LoadResult | null>(null);
+    const [reloadToken, setReloadToken] = useState(0);
+    const [downloading, setDownloading] = useState(false);
 
-    const onDownloadClicked = async () => {
-        if (!details) return;
-        try {
-            const file = await processingModeService.downloadProcessingMode(details.uuid, path.basename(details.filename));
-            saveFile(file);
-        } catch (error) {
-            toastError(error);
-        }
-    };
+    const identifier = processingMode?.uuid;
+    const requestKey = identifier ? `${identifier}:${reloadToken}` : null;
+
+    const isCurrent = !!requestKey && result?.key === requestKey;
+    const loading = state.isOpen && !!requestKey && !isCurrent;
+    const loadFailed = isCurrent && !!result?.failed;
+    const details = isCurrent ? (result?.data ?? null) : null;
 
     useEffect(() => {
-        if (!state.isOpen || !identifier) {
-            return;
-        }
+        if (!state.isOpen || !identifier || !requestKey) return;
 
         let active = true;
 
-        (async () => {
-            setLoading(true);
-            setLoadFailed(false);
-            setDetails(null);
-            try {
-                const data = await processingModeService.retrieveProcessingMode(identifier);
-                if (!active) return;
-                setDetails(data);
-            } catch {
-                if (!active) return;
-                setLoadFailed(true);
-            } finally {
-                if (active) setLoading(false);
-            }
-        })();
+        processingModeService
+            .retrieveProcessingMode(identifier)
+            .then((data) => {
+                if (active) setResult({ key: requestKey, data });
+            })
+            .catch(() => {
+                if (active) setResult({ key: requestKey, failed: true });
+            });
 
         return () => {
             active = false;
+            setResult(null); // forces a fresh fetch on the next open
         };
-    }, [state.isOpen, identifier, processingModeService, reloadToken]);
+    }, [state.isOpen, identifier, requestKey, processingModeService]);
 
     const retry = () => setReloadToken((t) => t + 1);
+
+    const onDownloadClicked = async () => {
+        if (!details || downloading) return;
+
+        setDownloading(true);
+        try {
+            const file = await processingModeService.downloadProcessingMode(details.uuid, basename(details.filename));
+            saveFile(file);
+        } catch (error) {
+            toastError(error);
+        } finally {
+            setDownloading(false);
+        }
+    };
+
+    const renderBody = () => {
+        if (loading) return <SpinnerView className="min-h-80"/>;
+        if (loadFailed) {
+            return (
+                <LoadErrorState
+                    className="min-h-80"
+                    title="Could not load processing mode details"
+                    onRetry={retry}
+                />
+            );
+        }
+        return <ProcessingModeDetailsSection processingMode={details} loading={loading} />;
+    };
 
     return (
         <Modal state={state}>
@@ -90,30 +110,23 @@ export function ProcessingModeDetailsView({ processingMode, state }: ProcessingM
                         </Modal.Header>
 
                         <Modal.Body>
-                            <div className="flex flex-col">
-                                {loading ? (
-                                    <SpinnerView className="mt-60"/>
-                                ) : loadFailed ? (
-                                    <LoadErrorState
-                                        className="min-h-80"
-                                        title="Could not load processing mode details"
-                                        onRetry={retry}
-                                    />
-                                ) : (
-                                    <ProcessingModeDetailsSection processingMode={details} loading={loading}/>
-                                )}
-                            </div>
+                            <div className="flex flex-col">{renderBody()}</div>
                         </Modal.Body>
 
                         <Modal.Footer>
                             <Button
                                 variant="secondary"
                                 className="w-full"
+                                isPending={downloading}
                                 isDisabled={loading || !details}
                                 onPress={onDownloadClicked}
                             >
-                                <ArrowDownToLine/>
-                                Download
+                                {({ isPending }) => (
+                                    <>
+                                        {isPending ? <Spinner color="current" size="sm"/> : <ArrowDownToLine className="size-4"/>}
+                                        {isPending ? "Downloading…" : "Download"}
+                                    </>
+                                )}
                             </Button>
                         </Modal.Footer>
                     </Modal.Dialog>

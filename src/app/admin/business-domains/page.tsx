@@ -56,15 +56,18 @@ export default function BusinessDomainsAdminPage() {
                 />
             </PageHeader>
 
-            {list.loading ? (
-                <SpinnerView className="mt-60"/>
-            ) : list.loadError ? (
+            {list.loadError ? (
                 <LoadErrorState
                     title="Could not load business domains"
                     onRetry={list.retry}
                 />
             ) : (
-                <>
+                <div
+                    aria-busy={list.loading}
+                    className={`transition-opacity ${
+                        list.loading && list.items.length > 0 ? "pointer-events-none opacity-50" : ""
+                    }`}
+                >
                     <Table variant="secondary">
                         <Table.ScrollContainer>
                             <Table.Content aria-label="Connector business domains">
@@ -76,11 +79,19 @@ export default function BusinessDomainsAdminPage() {
                                     <Table.Column>Created at</Table.Column>
                                     <Table.Column>Updated at</Table.Column>
                                 </Table.Header>
-                                <Table.Body>
+                                <Table.Body
+                                    renderEmptyState={() =>
+                                        list.loading || list.refreshing ? (
+                                            <SpinnerView className="py-16"/>
+                                        ) : (
+                                            <EmptyState text="No business domain available" className="py-16"/>
+                                        )
+                                    }
+                                >
                                     {list.items.map((businessDomain) => (
                                         <Table.Row key={businessDomain.identifier}>
                                             <Table.Cell>
-                                                <span className="font-semibold truncate inline-block">
+                                                <span className="inline-block truncate font-semibold">
                                                     {truncate(businessDomain.identifier)}
                                                 </span>
                                             </Table.Cell>
@@ -101,11 +112,7 @@ export default function BusinessDomainsAdminPage() {
                             </Table.Content>
                         </Table.ScrollContainer>
                     </Table>
-
-                    {list.items.length === 0 && !list.refreshing && (
-                        <EmptyState text="No business domain available" className="mt-70"/>
-                    )}
-                </>
+                </div>
             )}
 
             <BusinessDomainCreationView
@@ -113,12 +120,13 @@ export default function BusinessDomainsAdminPage() {
                 onSubmit={async (payload) => {
                     try {
                         await businessDomainService.createBusinessDomain(payload);
-                        await list.refresh();
-                        toastSuccess("Business domain created successfully");
-                        addModal.close();
                     } catch (error) {
                         toastError(error);
+                        return;
                     }
+                    addModal.close();
+                    toastSuccess("Business domain created successfully");
+                    await list.refresh();
                 }}
             />
         </div>

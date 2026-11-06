@@ -152,86 +152,93 @@ export default function AttachmentsAdminPage() {
                 onDateRangeChange={(next) => setDateRange(next as RangeValue<ZonedDateTime> | null)}
             />
 
-            {pagedList.loading ? (
-                <SpinnerView className="mt-60"/>
-            ) : pagedList.loadError ? (
+            {pagedList.loadError ? (
                 <LoadErrorState
                     title="Could not load attachments"
                     onRetry={pagedList.retry}
                 />
             ) : (
                 <>
-                    <Table variant="secondary">
-                        <Table.ScrollContainer>
-                            <Table.Content aria-label="Connector messages attachments">
-                                <Table.Header>
-                                    <Table.Column isRowHeader>Identifier</Table.Column>
-                                    <Table.Column>Name</Table.Column>
-                                    <Table.Column>Content Type</Table.Column>
-                                    <Table.Column>Description</Table.Column>
-                                    <Table.Column>Size</Table.Column>
-                                    <Table.Column>Storage</Table.Column>
-                                    <Table.Column>Type</Table.Column>
-                                    <Table.Column>Status</Table.Column>
-                                    <Table.Column>Created at</Table.Column>
-                                    <Table.Column>Action.s</Table.Column>
-                                </Table.Header>
-                                <Table.Body>
-                                    {pagedList.items.map((attachment) => (
-                                        <Table.Row key={attachment.identifier}>
-                                            <Table.Cell>
-                                                <CopyableIdentifier identifier={attachment.identifier} visibleChars={15}/>
-                                            </Table.Cell>
-                                            <Table.Cell>{attachment.name}</Table.Cell>
-                                            <Table.Cell>{attachment.contentType}</Table.Cell>
-                                            <Table.Cell>{truncate(attachment.description)}</Table.Cell>
-                                            <Table.Cell>{formatBytes(attachment.size)}</Table.Cell>
-                                            <Table.Cell>
-                                                <AttachmentStorageChip type={attachment.storage}/>
-                                            </Table.Cell>
-                                            <Table.Cell>{attachment.type}</Table.Cell>
-                                            <Table.Cell>
-                                                <AttachmentStatusChip deletedAt={attachment.deletedAt} showDeletedAt/>
-                                            </Table.Cell>
-                                            <Table.Cell>
-                                                <DateTime value={attachment.createdAt} precision="second"/>
-                                            </Table.Cell>
-                                            <Table.Cell>
-                                                <div className="flex items-center gap-1">
-                                                    <DetailActionButton onPress={() => onDetailsClick(attachment)}/>
-                                                    <DownloadActionButton
-                                                        isDisabled={attachment.deletedAt !== null}
-                                                        onPress={() => onDownloadClicked(attachment)}/>
-                                                </div>
-                                            </Table.Cell>
-                                        </Table.Row>
-                                    ))}
-                                </Table.Body>
-                            </Table.Content>
-                        </Table.ScrollContainer>
-                    </Table>
+                    <div
+                        aria-busy={pagedList.loading}
+                        className={`transition-opacity ${pagedList.loading && pagedList.items.length > 0 ? "pointer-events-none opacity-50" : ""}`}
+                    >
+                        <Table variant="secondary">
+                            <Table.ScrollContainer>
+                                <Table.Content aria-label="Connector messages attachments">
+                                    <Table.Header>
+                                        <Table.Header>
+                                            <Table.Column isRowHeader>Identifier</Table.Column>
+                                            <Table.Column>Name</Table.Column>
+                                            <Table.Column>Content Type</Table.Column>
+                                            <Table.Column>Description</Table.Column>
+                                            <Table.Column>Size</Table.Column>
+                                            <Table.Column>Storage</Table.Column>
+                                            <Table.Column>Type</Table.Column>
+                                            <Table.Column>Status</Table.Column>
+                                            <Table.Column>Created at</Table.Column>
+                                            <Table.Column>Action.s</Table.Column>
+                                        </Table.Header>
+                                    </Table.Header>
+                                    <Table.Body
+                                        renderEmptyState={() =>
+                                            pagedList.loading ? (
+                                                <SpinnerView className="py-16"/>
+                                            ) : (
+                                                <EmptyState text="No attachment available" className="py-16"/>
+                                            )
+                                        }
+                                    >
+                                        {pagedList.items.map((attachment) => (
+                                            <Table.Row key={attachment.identifier}>
+                                                <Table.Cell>
+                                                    <CopyableIdentifier identifier={attachment.identifier} visibleChars={15}/>
+                                                </Table.Cell>
+                                                <Table.Cell>{attachment.name}</Table.Cell>
+                                                <Table.Cell>{attachment.contentType}</Table.Cell>
+                                                <Table.Cell>{truncate(attachment.description)}</Table.Cell>
+                                                <Table.Cell>{formatBytes(attachment.size)}</Table.Cell>
+                                                <Table.Cell>
+                                                    <AttachmentStorageChip type={attachment.storage}/>
+                                                </Table.Cell>
+                                                <Table.Cell>{attachment.type}</Table.Cell>
+                                                <Table.Cell>
+                                                    <AttachmentStatusChip deletedAt={attachment.deletedAt} showDeletedAt/>
+                                                </Table.Cell>
+                                                <Table.Cell>
+                                                    <DateTime value={attachment.createdAt} precision="second"/>
+                                                </Table.Cell>
+                                                <Table.Cell>
+                                                    <div className="flex items-center gap-1">
+                                                        <DetailActionButton onPress={() => onDetailsClick(attachment)}/>
+                                                        <DownloadActionButton
+                                                            isDisabled={attachment.deletedAt !== null}
+                                                            onPress={() => onDownloadClicked(attachment)}/>
+                                                    </div>
+                                                </Table.Cell>
+                                            </Table.Row>
+                                        ))}
+                                    </Table.Body>
+                                </Table.Content>
+                            </Table.ScrollContainer>
+                        </Table>
+                    </div>
 
-                    {pagedList.items.length === 0 && !pagedList.refreshing && (
-                        <EmptyState text="No attachment available" className="mt-50"/>
+                    {pagedList.totalElements > 0 && (
+                        <div className="mt-4 flex justify-center">
+                            <PaginationControls
+                                page={pagedList.page}
+                                pageSize={pagedList.pageSize}
+                                totalElements={pagedList.totalElements}
+                                onPageChange={pagedList.setPage}
+                                onPageSizeChange={pagedList.setPageSize}
+                            />
+                        </div>
                     )}
-
-                    {
-                        pagedList.totalElements > 0 && (
-                            <div className="flex justify-center mt-4">
-                                <PaginationControls
-                                    page={pagedList.page}
-                                    pageSize={pagedList.pageSize}
-                                    totalElements={pagedList.totalElements}
-                                    onPageChange={pagedList.setPage}
-                                    onPageSizeChange={pagedList.setPageSize}
-                                />
-                            </div>
-                        )
-                    }
-
-                    <AttachmentDetailsView attachment={selectedAttachment} state={detailsModal}/>
                 </>
             )}
+
+            <AttachmentDetailsView attachment={selectedAttachment} state={detailsModal}/>
         </div>
     )
 }

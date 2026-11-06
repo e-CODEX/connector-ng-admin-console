@@ -46,15 +46,8 @@ const IDENTIFIER_LENGTH = 30;
 
 const granularity: DateTimeRangeGranularity = "minute";
 
-const asStatusesFilter = (values: TransportStepStatusesFilter[]) => values.length === 0 || values.includes(ALL_SELECTOR) ? undefined : values;
-
-const useRefreshOnClose = (refresh: () => void) => {
-    return useOverlayState({
-        onOpenChange: (isOpen) => {
-            if (!isOpen) refresh();
-        },
-    });
-}
+const asStatusesFilter = (values: TransportStepStatusesFilter[]) =>
+    values.length === 0 || values.includes(ALL_SELECTOR) ? undefined : values;
 
 export default function TransportStepsAdminPage() {
     const [selectedTransportStep, setSelectedTransportStep] = useState<ConnectorTransportStep | null>(null);
@@ -86,6 +79,10 @@ export default function TransportStepsAdminPage() {
         [debouncedMessageOrRemoteSystemIdentifier, debouncedLinkPartnerName, statusesQuery, dateRange],
     );
 
+    const detailsModal = useOverlayState();
+    const transportedMessageDetailsModal = useOverlayState();
+    const pendingMessagesModal = useOverlayState();
+
     const onMessageOrRemoteSystemIdentifierChange = (value: string) => {
         setMessageOrRemoteSystemIdentifierQuery(value);
         pagedList.setPage(1);
@@ -102,11 +99,13 @@ export default function TransportStepsAdminPage() {
         } else {
             setStatusesQuery((prev) => ({ ...prev, statuses }));
         }
+        pagedList.setPage(1);
     };
 
-    const detailsModal = useRefreshOnClose(pagedList.refresh);
-    const transportedMessageDetailsModal = useRefreshOnClose(pagedList.refresh);
-    const pendingMessagesModal = useRefreshOnClose(pagedList.refresh);
+    const onDateRangeChange = (next: unknown) => {
+        setDateRange(next as RangeValue<ZonedDateTime> | null);
+        pagedList.setPage(1);
+    };
 
     const onDetailsClick = (step: ConnectorTransportStep) => {
         setSelectedTransportStep(step);
@@ -117,10 +116,6 @@ export default function TransportStepsAdminPage() {
         setSelectedTransportStep(step);
         transportedMessageDetailsModal.open();
     };
-
-    const onPendingMessagesClicked = () => {
-        pendingMessagesModal.open();
-    }
 
     const onAcknowledgeClick = async (step: ConnectorTransportStep) => {
         if (acknowledging) return;
@@ -136,9 +131,8 @@ export default function TransportStepsAdminPage() {
         }
     };
 
-    const canAcknowledgeReception = (step: ConnectorTransportStep): boolean => {
-        return isTestingMode && step.status == "PULLED"
-    }
+    const canAcknowledgeReception = (step: ConnectorTransportStep): boolean =>
+        isTestingMode && step.status === "PULLED";
 
     return (
         <div>
@@ -152,7 +146,7 @@ export default function TransportStepsAdminPage() {
                         variant="primary"
                         tooltip="See pending messages"
                         icon={MailClock}
-                        onPress={onPendingMessagesClicked}
+                        onPress={pendingMessagesModal.open}
                     />
                 )}
 
@@ -165,6 +159,7 @@ export default function TransportStepsAdminPage() {
                     isSpinning={pagedList.refreshing || pagedList.loading}
                 />
             </PageHeader>
+
             <TransportStepFiltersPanel
                 messageOrRemoteSystemIdentifier={messageOrRemoteSystemIdentifierQuery}
                 linkPartnerName={linkPartnerNameQuery}
@@ -174,109 +169,125 @@ export default function TransportStepsAdminPage() {
                 onMessageOrRemoteSystemIdentifierChange={onMessageOrRemoteSystemIdentifierChange}
                 onLinkPartnerNameChange={onLinkPartnerNameChange}
                 onStatusesChange={onStatusesChange}
-                onDateRangeChange={(next) => setDateRange(next as RangeValue<ZonedDateTime> | null)}
+                onDateRangeChange={onDateRangeChange}
             />
 
-            {pagedList.loading ? (
-                <SpinnerView className="mt-60"/>
-            ) : pagedList.loadError ? (
+            {pagedList.loadError ? (
                 <LoadErrorState
                     title="Could not load messages transport steps"
                     onRetry={pagedList.retry}
                 />
             ) : (
                 <>
-                    <Table variant="secondary">
-                        <Table.ScrollContainer>
-                            <Table.Content aria-label="Connector messages transport steps">
-                                <Table.Header>
-                                    <Table.Column isRowHeader>Identifier</Table.Column>
-                                    <Table.Column>Transported Message ID</Table.Column>
-                                    <Table.Column>Link Partner Name</Table.Column>
-                                    <Table.Column>Remote System Identifier</Table.Column>
-                                    <Table.Column>Message Type</Table.Column>
-                                    <Table.Column>Attempts</Table.Column>
-                                    <Table.Column>Status</Table.Column>
-                                    <Table.Column>Created at</Table.Column>
-                                    <Table.Column>Actions</Table.Column>
-                                </Table.Header>
-                                <Table.Body>
-                                    {pagedList.items.map((transportStep) => (
-                                        <Table.Row key={transportStep.identifier}>
-                                            <Table.Cell>
-                                                <CopyableIdentifier identifier={transportStep.identifier} visibleChars={IDENTIFIER_LENGTH}/>
-                                            </Table.Cell>
-                                            <Table.Cell>
-                                                <CopyableIdentifier identifier={transportStep.transportedMessageIdentifier}
-                                                                    visibleChars={IDENTIFIER_LENGTH}/>
-                                            </Table.Cell>
-                                            <Table.Cell>{transportStep.linkPartnerName}</Table.Cell>
-                                            <Table.Cell>
-                                                <CopyableIdentifier identifier={transportStep.remoteSystemIdentifier}
-                                                                    visibleChars={IDENTIFIER_LENGTH}/>
-                                            </Table.Cell>
-                                            <Table.Cell>{
-                                                <TransportStepMessageTypeChip messageType={transportStep.messageType}/>
-                                            }</Table.Cell>
-                                            <Table.Cell>{transportStep.numberOfAttempts}</Table.Cell>
-                                            <Table.Cell>
-                                                <TransportDeliveryStatusChip status={transportStep.status}/>
-                                            </Table.Cell>
-                                            <Table.Cell>
-                                                <DateTime value={transportStep.createdAt} precision="millis"/>
-                                            </Table.Cell>
-                                            <Table.Cell>
-                                                <div className="flex items-center gap-1">
-                                                    <DetailActionButton onPress={() => onDetailsClick(transportStep)}/>
-                                                    <ActionButton
-                                                        label="Transported message details"
-                                                        icon={Mail}
-                                                        onPress={() => onTransportedMessageDetailsClick(transportStep)}/>
-                                                    {canAcknowledgeReception(transportStep) &&
-                                                        <ActionButton label="Acknowledge reception"
-                                                                      icon={CheckCheck}
-                                                                      iconAccent="text-warning"
-                                                                      onPress={() => onAcknowledgeClick(transportStep)}/>
-                                                    }
-                                                </div>
-                                            </Table.Cell>
-                                        </Table.Row>
-                                    ))}
-                                </Table.Body>
-                            </Table.Content>
-                        </Table.ScrollContainer>
-                    </Table>
+                    <div
+                        aria-busy={pagedList.loading}
+                        className={`transition-opacity ${
+                            pagedList.loading && pagedList.items.length > 0 ? "pointer-events-none opacity-50" : ""
+                        }`}
+                    >
+                        <Table variant="secondary">
+                            <Table.ScrollContainer>
+                                <Table.Content aria-label="Connector messages transport steps">
+                                    <Table.Header>
+                                        <Table.Column isRowHeader>Identifier</Table.Column>
+                                        <Table.Column>Transported Message ID</Table.Column>
+                                        <Table.Column>Link Partner Name</Table.Column>
+                                        <Table.Column>Remote System Identifier</Table.Column>
+                                        <Table.Column>Message Type</Table.Column>
+                                        <Table.Column>Attempts</Table.Column>
+                                        <Table.Column>Status</Table.Column>
+                                        <Table.Column>Created at</Table.Column>
+                                        <Table.Column>Actions</Table.Column>
+                                    </Table.Header>
+                                    <Table.Body
+                                        renderEmptyState={() =>
+                                            pagedList.loading ? (
+                                                <SpinnerView className="py-16"/>
+                                            ) : (
+                                                <EmptyState text="No transport step available" className="py-16"/>
+                                            )
+                                        }
+                                    >
+                                        {pagedList.items.map((transportStep) => (
+                                            <Table.Row key={transportStep.identifier}>
+                                                <Table.Cell>
+                                                    <CopyableIdentifier
+                                                        identifier={transportStep.identifier}
+                                                        visibleChars={IDENTIFIER_LENGTH}/>
+                                                </Table.Cell>
+                                                <Table.Cell>
+                                                    <CopyableIdentifier
+                                                        identifier={transportStep.transportedMessageIdentifier}
+                                                        visibleChars={IDENTIFIER_LENGTH}/>
+                                                </Table.Cell>
+                                                <Table.Cell>{transportStep.linkPartnerName}</Table.Cell>
+                                                <Table.Cell>
+                                                    <CopyableIdentifier
+                                                        identifier={transportStep.remoteSystemIdentifier}
+                                                        visibleChars={IDENTIFIER_LENGTH}/>
+                                                </Table.Cell>
+                                                <Table.Cell>
+                                                    <TransportStepMessageTypeChip messageType={transportStep.messageType}/>
+                                                </Table.Cell>
+                                                <Table.Cell>{transportStep.numberOfAttempts}</Table.Cell>
+                                                <Table.Cell>
+                                                    <TransportDeliveryStatusChip status={transportStep.status}/>
+                                                </Table.Cell>
+                                                <Table.Cell>
+                                                    <DateTime value={transportStep.createdAt} precision="millis"/>
+                                                </Table.Cell>
+                                                <Table.Cell>
+                                                    <div className="flex items-center gap-1">
+                                                        <DetailActionButton onPress={() => onDetailsClick(transportStep)}/>
+                                                        <ActionButton
+                                                            label="Transported message details"
+                                                            icon={Mail}
+                                                            onPress={() => onTransportedMessageDetailsClick(transportStep)}/>
+                                                        {canAcknowledgeReception(transportStep) && (
+                                                            <ActionButton
+                                                                label="Acknowledge reception"
+                                                                icon={CheckCheck}
+                                                                iconAccent="text-warning"
+                                                                onPress={() => onAcknowledgeClick(transportStep)}/>
+                                                        )}
+                                                    </div>
+                                                </Table.Cell>
+                                            </Table.Row>
+                                        ))}
+                                    </Table.Body>
+                                </Table.Content>
+                            </Table.ScrollContainer>
+                        </Table>
+                    </div>
 
-                    {pagedList.items.length === 0 && !pagedList.refreshing && (
-                        <EmptyState text="No transport step available" className="mt-50"/>
+                    {pagedList.totalElements > 0 && (
+                        <div className="mt-4 flex justify-center">
+                            <PaginationControls
+                                page={pagedList.page}
+                                pageSize={pagedList.pageSize}
+                                totalElements={pagedList.totalElements}
+                                onPageChange={pagedList.setPage}
+                                onPageSizeChange={pagedList.setPageSize}
+                            />
+                        </div>
                     )}
-
-                    {
-                        pagedList.totalElements > 0 && (
-                            <div className="flex justify-center mt-4">
-                                <PaginationControls
-                                    page={pagedList.page}
-                                    pageSize={pagedList.pageSize}
-                                    totalElements={pagedList.totalElements}
-                                    onPageChange={pagedList.setPage}
-                                    onPageSizeChange={pagedList.setPageSize}
-                                />
-                            </div>
-                        )
-                    }
-
-                    <TransportStepDetailsView transportStep={selectedTransportStep} state={detailsModal}/>
-
-                    <TransportedStepMessageDetailsView transportStep={selectedTransportStep} state={transportedMessageDetailsModal}/>
-
-                    <MessagePendingView state={pendingMessagesModal} onDownloaded={pagedList.refresh}/>
                 </>
             )}
+
+            <TransportStepDetailsView transportStep={selectedTransportStep} state={detailsModal}/>
+
+            <TransportedStepMessageDetailsView
+                transportStep={selectedTransportStep}
+                state={transportedMessageDetailsModal}
+            />
+
+            <MessagePendingView state={pendingMessagesModal} onDownloaded={pagedList.refresh}/>
+
             {acknowledging && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/60">
                     <SpinnerView/>
                 </div>
             )}
         </div>
-    )
+    );
 }

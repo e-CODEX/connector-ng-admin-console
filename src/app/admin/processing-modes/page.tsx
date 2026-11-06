@@ -10,7 +10,6 @@
 
 "use client";
 
-import path from "path";
 import { PageHeader } from "@/components/common/header/page-header";
 import React, { useState } from "react";
 import { Table, useOverlayState } from "@heroui/react";
@@ -32,6 +31,8 @@ import { ActionButton } from "@/components/common/action-button/action-button";
 import { ProcessingModeEditTruststoreView } from "@/components/processing-mode/edit/processing-mode-edit-truststore-view";
 import { LoadErrorState } from "@/components/common/load-error-state";
 
+const basename = (p: string) => p.split(/[\\/]/).pop() ?? p;
+
 export default function ProcessingModesAdminPage() {
     const [selectedProcessingMode, setSelectedProcessingMode] = useState<ConnectorProcessingMode | null>(null);
 
@@ -42,10 +43,6 @@ export default function ProcessingModesAdminPage() {
     const processingModeService = useProcessingModeService();
 
     const list = useList<ConnectorProcessingMode>(processingModeService.listProcessingModes);
-
-    const onAddClick = () => {
-        addModal.open();
-    }
 
     const onDetailsClick = (processingMode: ConnectorProcessingMode) => {
         setSelectedProcessingMode(processingMode);
@@ -59,12 +56,12 @@ export default function ProcessingModesAdminPage() {
 
     const onDownloadClicked = async (pMode: ConnectorProcessingMode) => {
         try {
-            const file = await processingModeService.downloadProcessingMode(pMode.uuid, path.basename(pMode.filename));
+            const file = await processingModeService.downloadProcessingMode(pMode.uuid, basename(pMode.filename));
             saveFile(file);
         } catch (error) {
             toastError(error);
         }
-    }
+    };
 
     return (
         <div>
@@ -77,7 +74,7 @@ export default function ProcessingModesAdminPage() {
                     variant="primary"
                     tooltip="Create a new processing mode"
                     icon={Plus}
-                    onPress={onAddClick}
+                    onPress={addModal.open}
                 />
 
                 <PageHeaderButton
@@ -90,15 +87,18 @@ export default function ProcessingModesAdminPage() {
                 />
             </PageHeader>
 
-            {list.loading ? (
-                <SpinnerView className="mt-60"/>
-            ) : list.loadError ? (
+            {list.loadError ? (
                 <LoadErrorState
                     title="Could not load processing modes"
                     onRetry={list.retry}
                 />
             ) : (
-                <>
+                <div
+                    aria-busy={list.loading}
+                    className={`transition-opacity ${
+                        list.loading && list.items.length > 0 ? "pointer-events-none opacity-50" : ""
+                    }`}
+                >
                     <Table variant="secondary">
                         <Table.ScrollContainer>
                             <Table.Content aria-label="Connector processing modes">
@@ -108,9 +108,17 @@ export default function ProcessingModesAdminPage() {
                                     <Table.Column>Description</Table.Column>
                                     <Table.Column>Filename</Table.Column>
                                     <Table.Column>Created at</Table.Column>
-                                    <Table.Column>Action.s</Table.Column>
+                                    <Table.Column>Actions</Table.Column>
                                 </Table.Header>
-                                <Table.Body>
+                                <Table.Body
+                                    renderEmptyState={() =>
+                                        list.loading || list.refreshing ? (
+                                            <SpinnerView className="py-16"/>
+                                        ) : (
+                                            <EmptyState text="No processing mode available" className="py-16"/>
+                                        )
+                                    }
+                                >
                                     {list.items.map((pMode) => (
                                         <Table.Row key={pMode.uuid}>
                                             <Table.Cell>
@@ -138,45 +146,46 @@ export default function ProcessingModesAdminPage() {
                             </Table.Content>
                         </Table.ScrollContainer>
                     </Table>
-
-                    {list.items.length === 0 && !list.refreshing && (
-                        <EmptyState text="No processing mode available" className="mt-70"/>
-                    )}
-
-                    <ProcessingModeCreationView
-                        state={addModal}
-                        onSubmit={async (payload) => {
-                            try {
-                                await processingModeService.createProcessingMode(payload);
-                                await list.refresh();
-                                toastSuccess("Processing mode created successfully");
-                                addModal.close();
-                            } catch (error) {
-                                toastError(error);
-                            }
-                        }}
-                    />
-
-                    <ProcessingModeEditTruststoreView
-                        processingMode={selectedProcessingMode!}
-                        state={updateTruststoreModal}
-                        onSubmit={async (uuid, payload) => {
-                            try {
-                                await processingModeService.editTruststore(uuid, payload);
-                                toastSuccess("Processing mode truststore updated successfully");
-                                updateTruststoreModal.close();
-                            } catch (error) {
-                                toastError(error);
-                            }
-                        }}
-                    />
-
-                    <ProcessingModeDetailsView
-                        processingMode={selectedProcessingMode}
-                        state={detailsModal}
-                    />
-                </>
+                </div>
             )}
+
+            <ProcessingModeCreationView
+                state={addModal}
+                onSubmit={async (payload) => {
+                    try {
+                        await processingModeService.createProcessingMode(payload);
+                    } catch (error) {
+                        toastError(error);
+                        return;
+                    }
+                    addModal.close();
+                    toastSuccess("Processing mode created successfully");
+                    await list.refresh();
+                }}
+            />
+
+            {selectedProcessingMode && (
+                <ProcessingModeEditTruststoreView
+                    key={selectedProcessingMode.uuid}
+                    processingMode={selectedProcessingMode}
+                    state={updateTruststoreModal}
+                    onSubmit={async (uuid, payload) => {
+                        try {
+                            await processingModeService.editTruststore(uuid, payload);
+                        } catch (error) {
+                            toastError(error);
+                            return;
+                        }
+                        updateTruststoreModal.close();
+                        toastSuccess("Processing mode truststore updated successfully");
+                    }}
+                />
+            )}
+
+            <ProcessingModeDetailsView
+                processingMode={selectedProcessingMode}
+                state={detailsModal}
+            />
         </div>
-    )
+    );
 }

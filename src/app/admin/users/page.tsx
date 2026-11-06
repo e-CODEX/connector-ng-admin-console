@@ -10,13 +10,14 @@
 
 "use client";
 
-import { useAuthService, useUserService } from "@/hooks/use-http-service";
+import { useUserService } from "@/hooks/use-http-service";
 import { useList } from "@/hooks/use-list";
+import { useOptionalUser } from "@/hooks/useUser";
 import { ConnectorUser } from "@/types/response/user";
 import { KeyRound, RefreshCw, RotateCcwKey, User, UserLock, UserMinus, UserPen, UserPlus } from "lucide-react";
 import { PageHeaderButton } from "@/components/common/header/page-header-button";
 import { PageHeader } from "@/components/common/header/page-header";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { Table, useOverlayState } from "@heroui/react";
 import { CopyableIdentifier } from "@/components/common/copyable-identifier";
@@ -35,11 +36,10 @@ import { LoadErrorState } from "@/components/common/load-error-state";
 
 export default function UserAdminPage() {
     const [selectedUser, setSelectedUser] = useState<ConnectorUser | null>(null);
-    const [currentUser, setCurrentUser] = useState<ConnectorUser | null>(null);
     const [busy, setBusy] = useState(false);
 
+    const currentUser = useOptionalUser();
     const userService = useUserService();
-    const authService = useAuthService();
     const list = useList<ConnectorUser>(userService.listAllUsers);
 
     const addModal = useOverlayState();
@@ -48,23 +48,6 @@ export default function UserAdminPage() {
     const blockConfirmationModal = useOverlayState();
     const deleteConfirmationModal = useOverlayState();
     const mustChangePasswordModal = useOverlayState();
-
-    useEffect(() => {
-        let cancelled = false;
-
-        authService
-            .me()
-            .then((me) => {
-                if (!cancelled) setCurrentUser(me);
-            })
-            .catch((error) => {
-                if (!cancelled) toastError(error);
-            });
-
-        return () => {
-            cancelled = true;
-        };
-    }, [authService]);
 
     const isSelf = (user: ConnectorUser) => currentUser?.uuid === user.uuid;
 
@@ -83,8 +66,6 @@ export default function UserAdminPage() {
         setSelectedUser(user);
         modal.open();
     };
-
-    const onCreateClicked = () => addModal.open();
 
     const handleCreationSubmission = (payload: UserCreationRequest) =>
         perform(async () => {
@@ -112,7 +93,7 @@ export default function UserAdminPage() {
         perform(async () => {
             if (!selectedUser) return;
             const updated = await userService.editUserRoles(selectedUser.uuid, { roles: payload.roles });
-            editRolesModal.close(); // was editModal.close()
+            editRolesModal.close();
             toastSuccess(`Roles of user [${updated.username}] updated successfully`);
             await list.refresh();
         });
@@ -122,7 +103,7 @@ export default function UserAdminPage() {
             if (!selectedUser) return;
             await userService.blockUser(selectedUser.uuid, selectedUser.username);
             blockConfirmationModal.close();
-            toastSuccess(`User [${selectedUser.username}] blocked`);
+            toastSuccess(`User [${selectedUser.username}] disabled`);
             await list.refresh();
         });
 
@@ -140,7 +121,7 @@ export default function UserAdminPage() {
             if (!selectedUser) return;
             await userService.askUserPasswordReset(selectedUser.uuid, selectedUser.username);
             mustChangePasswordModal.close();
-            toastSuccess(`User [${selectedUser.username}] password reset asked`);
+            toastSuccess(`A password change will be required from [${selectedUser.username}] at the next sign-in`);
             await list.refresh();
         });
 
@@ -151,7 +132,7 @@ export default function UserAdminPage() {
                     variant="primary"
                     tooltip="Create a new user"
                     icon={UserPlus}
-                    onPress={onCreateClicked}
+                    onPress={addModal.open}
                 />
 
                 <PageHeaderButton
@@ -164,15 +145,18 @@ export default function UserAdminPage() {
                 />
             </PageHeader>
 
-            {list.loading ? (
-                <SpinnerView className="mt-60"/>
-            ) : list.loadError ? (
+            {list.loadError ? (
                 <LoadErrorState
                     title="Could not load users"
                     onRetry={list.retry}
                 />
             ) : (
-                <>
+                <div
+                    aria-busy={list.loading}
+                    className={`transition-opacity ${
+                        list.loading && list.items.length > 0 ? "pointer-events-none opacity-50" : ""
+                    }`}
+                >
                     <Table variant="secondary">
                         <Table.ScrollContainer>
                             <Table.Content aria-label="Connector users">
@@ -187,7 +171,15 @@ export default function UserAdminPage() {
                                     <Table.Column>Updated at</Table.Column>
                                     <Table.Column>Actions</Table.Column>
                                 </Table.Header>
-                                <Table.Body>
+                                <Table.Body
+                                    renderEmptyState={() =>
+                                        list.loading || list.refreshing ? (
+                                            <SpinnerView className="py-16"/>
+                                        ) : (
+                                            <EmptyState text="No user available" className="py-16"/>
+                                        )
+                                    }
+                                >
                                     {list.items.map((user) => {
                                         const self = isSelf(user);
                                         return (
@@ -219,10 +211,12 @@ export default function UserAdminPage() {
                                                             icon={UserPen}
                                                             onPress={() => openFor(editModal, user)}/>
 
-                                                        <ActionButton
-                                                            label="Edit user role"
-                                                            icon={KeyRound}
-                                                            onPress={() => openFor(editRolesModal, user)}/>
+                                                        {!self && (
+                                                            <ActionButton
+                                                                label="Edit user role"
+                                                                icon={KeyRound}
+                                                                onPress={() => openFor(editRolesModal, user)}/>
+                                                        )}
 
                                                         {!self && user.enabled && (
                                                             <ActionButton
@@ -242,7 +236,7 @@ export default function UserAdminPage() {
 
                                                         {!self && !user.mustChangePassword && (
                                                             <ActionButton
-                                                                label="Ask Password reset"
+                                                                label="Require password change"
                                                                 icon={RotateCcwKey}
                                                                 iconAccent="text-muted"
                                                                 onPress={() => openFor(mustChangePasswordModal, user)}/>
@@ -256,11 +250,7 @@ export default function UserAdminPage() {
                             </Table.Content>
                         </Table.ScrollContainer>
                     </Table>
-
-                    {list.items.length === 0 && !list.refreshing && (
-                        <EmptyState text="No user available" className="mt-50"/>
-                    )}
-                </>
+                </div>
             )}
 
             <UserCreationView state={addModal} onSubmit={handleCreationSubmission}/>
@@ -286,9 +276,9 @@ export default function UserAdminPage() {
             <ConfirmModal
                 isDismissable={false}
                 state={blockConfirmationModal}
-                title="Block User"
-                message="Warning: Once this user is blocked, it will no longer be able to log in. Continue?"
-                confirmLabel="Block"
+                title="Disable User"
+                message="Once this user is disabled, they will no longer be able to sign in. Continue?"
+                confirmLabel="Disable"
                 confirmVariant="danger-soft"
                 onConfirm={handleBlockConfirmed}
                 onCancel={blockConfirmationModal.close}
@@ -298,7 +288,7 @@ export default function UserAdminPage() {
                 isDismissable={false}
                 state={deleteConfirmationModal}
                 title="Delete User"
-                message="Are you sure you want to delete this user? This action is permanent, cannot be undone, and the user will no longer be able to log in. Continue?"
+                message="Are you sure you want to delete this user? This action is permanent, cannot be undone, and the user will no longer be able to sign in. Continue?"
                 confirmLabel="Delete"
                 confirmVariant="danger"
                 onConfirm={handleDeleteConfirmed}

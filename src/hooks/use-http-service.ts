@@ -12,70 +12,70 @@
 
 import { useMemo } from "react";
 import { useAppConfig } from "@/hooks/use-app-config";
-import { createActuatorService } from "@/services/actuator";
-import { createAttachmentService } from "@/services/attachment";
-import { createBusinessDomainService } from "@/services/business-domain";
-import { createConfigurationService } from "@/services/configuration";
-import { createEvidenceService } from "@/services/evidence";
-import { createLinkPartnersService } from "@/services/link-partner";
-import { createMessageService } from "@/services/message";
-import { createProcessingModeService } from "@/services/processing-mode";
-import { createQueueService } from "@/services/queue";
-import { createTransportStepsService } from "@/services/transport-step";
-import { createUserService } from "@/services/user";
+import { ActuatorService, createActuatorService } from "@/services/actuator";
+import { AttachmentService, createAttachmentService } from "@/services/attachment";
+import { BusinessDomainService, createBusinessDomainService } from "@/services/business-domain";
+import { ConfigurationService, createConfigurationService } from "@/services/configuration";
+import { createEvidenceService, EvidenceService } from "@/services/evidence";
+import { createLinkPartnersService, LinkPartnersService } from "@/services/link-partner";
+import { createMessageService, MessageService } from "@/services/message";
+import { createProcessingModeService, ProcessingModeService } from "@/services/processing-mode";
+import { createQueueService, QueueService } from "@/services/queue";
+import { createTransportStepsService, TransportStepsService } from "@/services/transport-step";
+import { createUserService, UserService } from "@/services/user";
 import { restApiCall, restApiDownload } from "@/lib/rest";
-import { createAuthService } from "@/services/auth";
+import { AuthService, createAuthService } from "@/services/auth";
 
 const PROXY_BACKEND_API = "/api/backend"
 
-export function useActuatorService() {
+export function useActuatorService(): ActuatorService {
     const { apiUrl } = useAppConfig();
 
     return useMemo(() => createActuatorService(apiUrl), [apiUrl]);
 }
 
-export function useAttachmentService() {
+export function useAttachmentService(): AttachmentService {
     return useMemo(() => createAttachmentService(PROXY_BACKEND_API, restApiCall, restApiDownload), []);
 }
 
-export function useBusinessDomainService() {
+export function useBusinessDomainService(): BusinessDomainService {
     return useMemo(() => createBusinessDomainService(PROXY_BACKEND_API, restApiCall), []);
 }
 
-export function useConfigurationService() {
+export function useConfigurationService(): ConfigurationService {
     return useMemo(() => createConfigurationService(PROXY_BACKEND_API, restApiCall), []);
 }
 
-export function useEvidenceService() {
+export function useEvidenceService(): EvidenceService {
     return useMemo(() => createEvidenceService(PROXY_BACKEND_API, restApiDownload), []);
 }
 
-export function useLinkPartnerService() {
+export function useLinkPartnerService(): LinkPartnersService {
     return useMemo(() => createLinkPartnersService(PROXY_BACKEND_API, restApiCall), []);
 }
 
-export function useMessageService() {
+export function useMessageService(): MessageService {
     const { bffUrl } = useAppConfig();
 
     return useMemo(() => createMessageService(PROXY_BACKEND_API, bffUrl, restApiCall, restApiDownload), [bffUrl]);
 }
 
-export function useProcessingModeService() {
+export function useProcessingModeService(): ProcessingModeService {
     return useMemo(() => createProcessingModeService(PROXY_BACKEND_API, restApiCall, restApiDownload), []);
 }
 
-export function useQueueService() {
+export function useQueueService(): QueueService {
     return useMemo(() => createQueueService(PROXY_BACKEND_API, restApiCall), []);
 }
 
-export function useTransportStepService() {
+export function useTransportStepService(): TransportStepsService {
     return useMemo(() => createTransportStepsService(PROXY_BACKEND_API, restApiCall), []);
 }
 
-export function useUserService() {
+export function useUserService(): UserService {
     return useMemo(() => createUserService(PROXY_BACKEND_API, restApiCall), []);
 }
 
-export function useAuthService() {
+export function useAuthService(): AuthService {
     return useMemo(() => createAuthService(PROXY_BACKEND_API, restApiCall), []);
 }

@@ -44,7 +44,7 @@ export function createAttachmentService(baseUrl: string, call: RestApiCall, down
         async downloadAttachment(identifier: string, name: string): Promise<DownloadedFile> {
             return download(
                 baseUrl,
-                `api/v1/admin/attachments/${identifier}/download`,
+                `api/v1/admin/attachments/${encodeURIComponent(identifier)}/download`,
                 { defaultFilename: name }
             );
         }

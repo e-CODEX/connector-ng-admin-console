@@ -25,16 +25,16 @@ export function createProcessingModeService(baseUrl: string, call: RestApiCall, 
             return call<ConnectorProcessingMode[]>(baseUrl, "api/v1/admin/processing-modes");
         },
         async retrieveProcessingMode(identifier: string): Promise<ConnectorProcessingModeDetail> {
-            return call<ConnectorProcessingModeDetail>(baseUrl, `api/v1/admin/processing-modes/${identifier}`);
+            return call<ConnectorProcessingModeDetail>(baseUrl, `api/v1/admin/processing-modes/${encodeURIComponent(identifier)}`);
         },
         async listProcessingModeServices(businessDomain: string): Promise<ConnectorProcessingModeService[]> {
-            return call<ConnectorProcessingModeService[]>(baseUrl, `api/v1/processing-modes/${businessDomain}/services`);
+            return call<ConnectorProcessingModeService[]>(baseUrl, `api/v1/processing-modes/${encodeURIComponent(businessDomain)}/services`);
         },
         async listProcessingModeActions(businessDomain: string): Promise<ConnectorProcessingModeAction[]> {
-            return call<ConnectorProcessingModeAction[]>(baseUrl, `api/v1/processing-modes/${businessDomain}/actions`);
+            return call<ConnectorProcessingModeAction[]>(baseUrl, `api/v1/processing-modes/${encodeURIComponent(businessDomain)}/actions`);
         },
         async listProcessingModeParties(businessDomain: string): Promise<ConnectorProcessingModeParty[]> {
-            return call<ConnectorProcessingModeParty[]>(baseUrl, `api/v1/processing-modes/${businessDomain}/parties`);
+            return call<ConnectorProcessingModeParty[]>(baseUrl, `api/v1/processing-modes/${encodeURIComponent(businessDomain)}/parties`);
         },
         async createProcessingMode(payload: ProcessingModeCreationRequest): Promise<ConnectorProcessingMode> {
             const formData = new FormData();
@@ -57,7 +57,7 @@ export function createProcessingModeService(baseUrl: string, call: RestApiCall, 
             formData.append("password", password);
             formData.append("truststoreFile", truststoreFile);
 
-            return call<ConnectorProcessingModeTruststore>(baseUrl, `api/v1/admin/processing-modes/${uuid}/truststore`, {
+            return call<ConnectorProcessingModeTruststore>(baseUrl, `api/v1/admin/processing-modes/${encodeURIComponent(uuid)}/truststore`, {
                     method: "PATCH",
                     body: formData
                 }
@@ -66,7 +66,7 @@ export function createProcessingModeService(baseUrl: string, call: RestApiCall, 
         async downloadProcessingMode(uuid: string, name: string): Promise<DownloadedFile> {
             return download(
                 baseUrl,
-                `api/v1/admin/processing-modes/${uuid}/download`,
+                `api/v1/admin/processing-modes/${encodeURIComponent(uuid)}/download`,
                 { defaultFilename: name }
             );
         }

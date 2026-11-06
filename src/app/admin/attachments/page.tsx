@@ -212,7 +212,7 @@ export default function AttachmentsAdminPage() {
                     </Table>
 
                     {pagedList.items.length === 0 && !pagedList.refreshing && (
-                        <EmptyState text="No attachment available" className="mt-70"/>
+                        <EmptyState text="No attachment available" className="mt-50"/>
                     )}
 
                     {

@@ -13,12 +13,28 @@ import React from "react";
 
 type SpinnerViewProps = {
     className?: string;
+    label?: string;
+    showLabel?: boolean;
 };
 
-export function SpinnerView({ className }: SpinnerViewProps) {
+export function SpinnerView({ className = "", label = "Loading…", showLabel = true }: SpinnerViewProps) {
     return (
-        <div className={`flex flex-col justify-center items-center min-h-600] ${className ?? ""}`}>
-            <Spinner size="xl"/>
+        <div
+            role="status"
+            aria-live="polite"
+            aria-busy="true"
+            className={`mx-auto flex max-w-md flex-col items-center justify-center gap-5 text-center ${className}`}
+        >
+            <div className="relative">
+                <div className="absolute inset-0 animate-pulse rounded-full bg-accent/25 blur-xl" aria-hidden/>
+                <div className="relative flex h-16 w-16 items-center justify-center rounded-full border border-accent/30 bg-accent/10 text-accent">
+                    <Spinner color="current" size="lg"/>
+                </div>
+            </div>
+
+            <p className={showLabel ? "text-sm font-medium text-neutral-500" : "sr-only"}>
+                {label}
+            </p>
         </div>
     );
 }

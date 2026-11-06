@@ -23,11 +23,14 @@ import { useQueueService } from "@/hooks/use-http-service";
 import { LoadErrorState } from "@/components/common/load-error-state";
 
 export default function QueueAdminPage() {
-    const [selectedQueue, setSelectedQueue] = useState<string | null>(null)
+    const [selectedQueue, setSelectedQueue] = useState<string | null>(null);
 
     const queueService = useQueueService();
 
     const list = useList<ConnectorQueueStats>(queueService.loadQueueStats);
+
+    // Nothing to show yet: first load, or a refresh of an empty list.
+    const showSpinner = list.loading || (list.refreshing && list.items.length === 0);
 
     return (
         <div>
@@ -36,7 +39,6 @@ export default function QueueAdminPage() {
                 title="JMS Queues Statuses"
                 subtitle="Manage JMS Queues"
             >
-
                 <PageHeaderButton
                     variant="secondary"
                     tooltip="Refresh"
@@ -47,13 +49,15 @@ export default function QueueAdminPage() {
                 />
             </PageHeader>
 
-            {list.loading ? (
+            {showSpinner ? (
                 <SpinnerView className="mt-60"/>
             ) : list.loadError ? (
                 <LoadErrorState
                     title="Could not load JMS queues statuses"
                     onRetry={list.retry}
                 />
+            ) : list.items.length === 0 ? (
+                <EmptyState text="No queue stats available" className="mt-70"/>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-4 gap-x-5 gap-y-2">
                     {list.items.map((queueStats) => (
@@ -66,10 +70,6 @@ export default function QueueAdminPage() {
                     ))}
                 </div>
             )}
-
-            {list.items.length === 0 && !list.refreshing && (
-                <EmptyState text="No queue stats available" className="mt-70"/>
-            )}
         </div>
-    )
+    );
 }

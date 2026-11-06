@@ -248,7 +248,7 @@ export default function TransportStepsAdminPage() {
                     </Table>
 
                     {pagedList.items.length === 0 && !pagedList.refreshing && (
-                        <EmptyState text="No transport step available" className="mt-70"/>
+                        <EmptyState text="No transport step available" className="mt-50"/>
                     )}
 
                     {

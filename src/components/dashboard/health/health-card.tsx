@@ -11,9 +11,9 @@
 
 import { ReactNode } from "react";
 import { Card, Chip } from "@heroui/react";
-import { Circle } from "@gravity-ui/icons";
 import { capitalize } from "@/utils";
 import { HealthStatus } from "@/types/global";
+import { Circle } from "lucide-react";
 
 export interface HealthCardProps {
     title: string;

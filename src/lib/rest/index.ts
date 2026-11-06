@@ -10,6 +10,8 @@
 
 import { RestApiError } from "@/lib/rest/rest-api-error";
 
+const REQUEST_TIMEOUT_MS = 15_000;
+
 interface ApiError {
     status: number;
     message: string;
@@ -44,7 +46,12 @@ async function restApiFetch(
     const { params, ...init } = options;
     const qs = params ? `?${toQuery(params)}` : "";
 
-    const response = await fetch(`${baseUrl}/${path}${qs}`, init);
+    const response = await fetch(`${baseUrl}/${path}${qs}`, {
+        ...init,
+        // Don't let a blackholed backend hang the page or the proxy. A caller-supplied signal wins.
+        signal: init.signal ?? AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+    });
+
     if (!response.ok) {
         throw new RestApiError(response.status, await extractErrorMessage(response));
     }

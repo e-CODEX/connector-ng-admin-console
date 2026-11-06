@@ -9,8 +9,8 @@
  */
 
 import { ListBox, Pagination, Select } from "@heroui/react";
-import { Icon } from "@iconify/react";
 import React from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface PaginationControlsProps {
     page: number;
@@ -108,10 +108,10 @@ export function PaginationControls({
                         isDisabled={page === 1}
                         onPress={() => onPageChange(page - 1)}
                     >
-                        <span>Back</span>
                         <Pagination.PreviousIcon>
-                            <Icon icon="gravity-ui:arrow-left"/>
+                            <ChevronLeft/>
                         </Pagination.PreviousIcon>
+                        <span>Back</span>
                     </Pagination.Previous>
                 </Pagination.Item>
 
@@ -136,7 +136,7 @@ export function PaginationControls({
                     >
                         <span>Forward</span>
                         <Pagination.NextIcon>
-                            <Icon icon="gravity-ui:arrow-right"/>
+                            <ChevronRight/>
                         </Pagination.NextIcon>
                     </Pagination.Next>
                 </Pagination.Item>

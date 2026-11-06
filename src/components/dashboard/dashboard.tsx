@@ -12,7 +12,6 @@
 
 import { PageHeader } from "@/components/common/header/page-header";
 import { MessageStatsSection } from "@/components/dashboard/message/stats/message-stats-section";
-import { ArrowsRotateRight } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/header/page-header-button";
 import { useState } from "react";
 import { PeriodFilterSelector } from "@/components/form/selector/period-filter-selector";
@@ -20,9 +19,10 @@ import { DEFAULT_PERIOD, Period } from "@/types/period";
 import { MessageReportingSection } from "@/components/dashboard/message/reporting/message-reporting-section";
 import { DashboardSectionBox } from "@/components/dashboard/dashboard-section-box";
 import { BackendHealthSection } from "@/components/dashboard/health/backend-health-section";
-import { Gauge } from "lucide-react";
+import { Gauge, RefreshCw } from "lucide-react";
 import { asBusinessDomainSelectorFilter, BusinessDomainSelector } from "@/components/form/selector/business-domain-selector";
-import { useBusinessDomainIdentifiers } from "@/hooks/use-business-domain-identifiers";
+import { useBusinessDomains } from "@/hooks/use-business-domain-identifiers";
+import { LoadErrorState } from "@/components/common/load-error-state";
 
 const REFRESH_INTERVAL = 60_000;
 const ALL_SELECTOR = "All Business domains";
@@ -32,67 +32,70 @@ export default function DashboardComponent() {
     const [period, setPeriod] = useState<Period>(DEFAULT_PERIOD);
     const [businessDomainIdentifierQuery, setBusinessDomainIdentifierQuery] = useState<string>(ALL_SELECTOR);
 
-    const businessDomainIdentifiers = useBusinessDomainIdentifiers(ALL_SELECTOR);
+    const {
+              identifiers: businessDomainIdentifiers,
+              loadFailed: businessDomainsFailed,
+              retry: retryBusinessDomains,
+          } = useBusinessDomains(ALL_SELECTOR);
+
+    const businessDomain = asBusinessDomainSelectorFilter(businessDomainIdentifierQuery, ALL_SELECTOR);
 
     const onRefreshClick = () => {
-        setRefreshToken((t) => t + 1)
-    }
-
-    const onBusinessDomainIdentifierChange = (value: string) => {
-        setBusinessDomainIdentifierQuery(value)
-    }
+        setRefreshToken((t) => t + 1);
+        if (businessDomainsFailed) retryBusinessDomains();
+    };
 
     return (
         <div className="flex flex-col gap-3">
-            <PageHeader
-                icon={Gauge}
-                title="Dashboard"
-                subtitle="App status, KPIs and Reporting"
-            >
+            <PageHeader icon={Gauge} title="Dashboard" subtitle="App status, KPIs and Reporting">
                 <PeriodFilterSelector value={period} onChange={setPeriod}/>
 
-                <BusinessDomainSelector
-                    label="Filter by business domain"
-                    identifiers={businessDomainIdentifiers}
-                    value={businessDomainIdentifierQuery}
-                    onValueChange={onBusinessDomainIdentifierChange}
-                    showLabel={false}
-                />
+                {!businessDomainsFailed && (
+                    <BusinessDomainSelector
+                        label="Filter by business domain"
+                        identifiers={businessDomainIdentifiers}
+                        value={businessDomainIdentifierQuery}
+                        onValueChange={setBusinessDomainIdentifierQuery}
+                        showLabel={false}
+                    />
+                )}
+
                 <PageHeaderButton
                     variant="secondary"
-                    icon={ArrowsRotateRight}
+                    icon={RefreshCw}
                     onPress={onRefreshClick}
                 />
             </PageHeader>
 
-            <DashboardSectionBox
-                title="Connector Health"
-                subtitle="Api, Db, JMS, Disk Space ..."
-            >
-                <BackendHealthSection refreshToken={refreshToken} refreshInterval={REFRESH_INTERVAL}/>
-            </DashboardSectionBox>
+            {businessDomainsFailed ? (
+                <LoadErrorState
+                    className="min-h-80"
+                    title="Could not load statistics"
+                    onRetry={retryBusinessDomains}
+                />
+            ) : (
+                <>
+                    <DashboardSectionBox title="Connector Health" subtitle="Api, Db, JMS, Disk Space ...">
+                        <BackendHealthSection refreshToken={refreshToken} refreshInterval={REFRESH_INTERVAL}/>
+                    </DashboardSectionBox>
 
-            <DashboardSectionBox
-                title="Overview"
-                subtitle="Message volume and status at a glance"
-            >
-                <MessageStatsSection
-                    refreshToken={refreshToken}
-                    period={period}
-                    businessDomain={asBusinessDomainSelectorFilter(businessDomainIdentifierQuery, ALL_SELECTOR)}
-                    refreshInterval={REFRESH_INTERVAL}/>
-            </DashboardSectionBox>
+                    <DashboardSectionBox title="Overview" subtitle="Message volume and status at a glance">
+                        <MessageStatsSection
+                            refreshToken={refreshToken}
+                            period={period}
+                            businessDomain={businessDomain}
+                            refreshInterval={REFRESH_INTERVAL}/>
+                    </DashboardSectionBox>
 
-            <DashboardSectionBox
-                title="Detailed Report"
-                subtitle="Breakdown by party and service"
-            >
-                <MessageReportingSection
-                    refreshToken={refreshToken}
-                    period={period}
-                    businessDomain={asBusinessDomainSelectorFilter(businessDomainIdentifierQuery, ALL_SELECTOR)}
-                    refreshInterval={REFRESH_INTERVAL}/>
-            </DashboardSectionBox>
+                    <DashboardSectionBox title="Detailed Report" subtitle="Breakdown by party and service">
+                        <MessageReportingSection
+                            refreshToken={refreshToken}
+                            period={period}
+                            businessDomain={businessDomain}
+                            refreshInterval={REFRESH_INTERVAL}/>
+                    </DashboardSectionBox>
+                </>
+            )}
         </div>
     );
 }

@@ -11,25 +11,41 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAppConfig } from "@/config/config.server";
 import { bearerHeader } from "@/lib/rest/bearer-header";
+import { isBackendDown } from "@/lib/rest/backend-down";
 
 async function proxy(req: NextRequest, path: string[]) {
-    const { apiUrl } = getAppConfig();          // <- where /api/backend actually goes
+    const { apiUrl } = getAppConfig();
     const authorization = await bearerHeader();
     const target = `${apiUrl}/${path.join("/")}${req.nextUrl.search}`;
 
-    const res = await fetch(target, {
-        method: req.method,
-        headers: {
-            ...(authorization),
-            ...(req.headers.get("content-type")
-                ? { "Content-Type": req.headers.get("content-type")! }
-                : {}),
-        },
-        body: ["GET", "HEAD"].includes(req.method) ? undefined : req.body,
-        // @ts-expect-error — duplex required when streaming a request body
-        duplex: "half",
-        cache: "no-store",
-    });
+    let res: Response;
+    try {
+        res = await fetch(target, {
+            method: req.method,
+            headers: {
+                ...authorization,
+                ...(req.headers.get("content-type")
+                    ? { "Content-Type": req.headers.get("content-type")! }
+                    : {}),
+            },
+            body: ["GET", "HEAD"].includes(req.method) ? undefined : req.body,
+            // @ts-expect-error — duplex required when streaming a request body
+            duplex: "half",
+            cache: "no-store",
+        });
+    } catch (error) {
+        if (!isBackendDown(error)) throw error;
+
+        const timedOut = error instanceof Error && error.name === "TimeoutError";
+        return NextResponse.json(
+            {
+                message: timedOut
+                    ? "The connector backend did not respond in time."
+                    : "The connector backend is unreachable.",
+            },
+            { status: timedOut ? 504 : 503 },
+        );
+    }
 
     return new NextResponse(res.body, {
         status: res.status,
@@ -38,7 +54,7 @@ async function proxy(req: NextRequest, path: string[]) {
             ...(res.headers.get("Content-Disposition")
                 ? { "Content-Disposition": res.headers.get("Content-Disposition")! }
                 : {}),
-        }
+        },
     });
 }
 

@@ -11,3 +11,6 @@
 export const ACCESS_TOKEN_KEY = "accessToken";
 export const REFRESH_TOKEN_KEY = "refreshToken";
 export const MUST_CHANGE_PASSWORD = "mustChangePassword";
+export const BACKEND_DOWN_TAG = "down";
+
+export type BACKEND_DOWN = "down";

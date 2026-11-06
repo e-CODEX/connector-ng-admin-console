@@ -8,10 +8,16 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { requireRole } from "@/lib/session";
+import { requireRoleOrDown } from "@/lib/session";
 import React from "react";
+import { BackendDownScreen } from "@/components/common/backend-down-screen";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode; }) {
-    await requireRole("ROLE_ADMIN");
+    const user = await requireRoleOrDown("ROLE_ADMIN");
+
+    if (user === "down") {
+        return <BackendDownScreen autoRetryMs={15_000}/>;
+    }
+
     return <>{children}</>;
 }

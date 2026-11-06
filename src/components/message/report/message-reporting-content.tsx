@@ -14,7 +14,6 @@ import React, { Fragment, useCallback, useEffect, useRef, useState } from "react
 import { MessageReportExportFormat } from "@/services/message";
 import { ZonedDateTime } from "@internationalized/date";
 import { saveFile, toastError } from "@/utils";
-import { ArrowUpFromSquare, Magnifier } from "@gravity-ui/icons";
 import { ConnectorMessageReportResponse } from "@/types/response/reporting";
 import { DateTimeRangeGranularity, DateTimeRangeSelector } from "@/components/form/selector/date-time-range-selector";
 import { EmptyState } from "@/components/common/empty-state";
@@ -24,6 +23,8 @@ import { asBusinessDomainSelectorFilter, BusinessDomainSelector } from "@/compon
 import { useBusinessDomainIdentifiers } from "@/hooks/use-business-domain-identifiers";
 import { useMessageService } from "@/hooks/use-http-service";
 import { buildDefaultRange, toDateRange } from "@/types/period";
+import { LoadErrorState } from "@/components/common/load-error-state";
+import { Search, Upload } from "lucide-react";
 
 const ALL_BUSINESS_DOMAIN_SELECTOR = "All Business domains";
 
@@ -49,6 +50,7 @@ export function MessageReportingContent() {
     const [businessDomainIdentifierQuery, setBusinessDomainIdentifierQuery] = useState<string>(ALL_BUSINESS_DOMAIN_SELECTOR);
     const [dateRange, setDateRange] = useState<RangeValue<ZonedDateTime> | null>(buildDefaultRange);
     const [hasLoaded, setHasLoaded] = useState(false);
+    const [loadFailed, setLoadFailed] = useState(false);
     const requestId = useRef(0);
 
     const messageService = useMessageService();
@@ -61,6 +63,7 @@ export function MessageReportingContent() {
             const isCurrent = () => id === requestId.current;
 
             return (async () => {
+                setLoadFailed(false);
                 try {
                     const data = await messageService.getMessageReports({
                         businessDomain: asBusinessDomainSelectorFilter(domain, ALL_BUSINESS_DOMAIN_SELECTOR),
@@ -69,8 +72,11 @@ export function MessageReportingContent() {
                     if (!isCurrent()) return;
                     setMessageReports(data);
                     setHasLoaded(true);
-                } catch (error) {
-                    if (isCurrent()) toastError(error);
+                } catch {
+                    if (isCurrent()) {
+                        setMessageReports(undefined);
+                        setLoadFailed(true);
+                    }
                 } finally {
                     if (isCurrent()) {
                         setLoading(false);
@@ -84,11 +90,18 @@ export function MessageReportingContent() {
 
     useEffect(() => {
         const idRef = requestId;
-        void loadReports(buildDefaultRange(), ALL_BUSINESS_DOMAIN_SELECTOR);
+        void loadReports(dateRange, businessDomainIdentifierQuery);
         return () => {
             idRef.current++;
         };
+        // Initial load only: later loads are triggered by Search / Retry.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [loadReports]);
+
+    const retry = () => {
+        setLoading(true);
+        void loadReports(dateRange, businessDomainIdentifierQuery);
+    };
 
     const onBusinessDomainIdentifierChange = (value: string) => {
         setBusinessDomainIdentifierQuery(value);
@@ -144,17 +157,25 @@ export function MessageReportingContent() {
                             isDisabled={!dateRange}
                             onPress={onApplyPress}
                         >
-                            <Magnifier/>
+                            <Search/>
                             Search
                         </Button>
                     </div>
                 </SearchCriteriaBox>
 
-                {loading && !messageReports && (
+                {(loading || refreshing) && !messageReports && (
                     <SpinnerView className="mt-60"/>
                 )}
 
-                {hasLoaded && !loading && !refreshing && messageReports && messageReports.years.length === 0 && (
+                {!loading && !refreshing && loadFailed && (
+                    <LoadErrorState
+                        className="min-h-80 flex-1"
+                        title="Could not load message reports"
+                        onRetry={retry}
+                    />
+                )}
+
+                {hasLoaded && !loading && !refreshing && !loadFailed && messageReports && messageReports.years.length === 0 && (
                     <EmptyState text="No report available" className="flex-1"/>
                 )}
 
@@ -226,20 +247,21 @@ export function MessageReportingContent() {
                     </div>
                 )}
             </Modal.Body>
+
             <Modal.Footer>
                 <Dropdown>
                     <Button
                         variant="secondary"
                         aria-label="Export report menu"
                         isDisabled={!hasReports || loading || refreshing}>
-                        <ArrowUpFromSquare/>
+                        <Upload/>
                         Export
                     </Button>
                     <Dropdown.Popover>
                         <Dropdown.Menu onAction={onExportClick}>
                             <Dropdown.Item id="export-excel" textValue="Excel">
                                 <div className="flex h-8 items-start justify-center pt-px">
-                                    <ArrowUpFromSquare className="size-4 shrink-0 text-muted"/>
+                                    <Upload className="size-4 shrink-0 text-muted"/>
                                 </div>
                                 <div className="flex flex-col">
                                     <Label>Excel</Label>
@@ -252,7 +274,7 @@ export function MessageReportingContent() {
                             </Dropdown.Item>
                             <Dropdown.Item id="export-json" textValue="JSON">
                                 <div className="flex h-8 items-start justify-center pt-px">
-                                    <ArrowUpFromSquare className="size-4 shrink-0 text-muted"/>
+                                    <Upload className="size-4 shrink-0 text-muted"/>
                                 </div>
                                 <div className="flex flex-col">
                                     <Label>JSON</Label>
@@ -265,7 +287,7 @@ export function MessageReportingContent() {
                             </Dropdown.Item>
                             <Dropdown.Item id="export-csv" textValue="CSV">
                                 <div className="flex h-8 items-start justify-center pt-px">
-                                    <ArrowUpFromSquare className="size-4 shrink-0 text-muted"/>
+                                    <Upload className="size-4 shrink-0 text-muted"/>
                                 </div>
                                 <div className="flex flex-col">
                                     <Label>CSV</Label>

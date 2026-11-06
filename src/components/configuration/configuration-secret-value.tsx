@@ -10,8 +10,7 @@
 
 import { useState } from "react";
 import { Button } from "@heroui/react";
-import { EyeOff } from "lucide-react";
-import { Eye } from "@gravity-ui/icons";
+import { Eye, EyeOff } from "lucide-react";
 
 interface ConfigurationSecretValueProps {
     value: string;

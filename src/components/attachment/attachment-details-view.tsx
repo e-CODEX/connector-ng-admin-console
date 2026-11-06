@@ -85,7 +85,7 @@ export function AttachmentDetailsView({ attachment, state }: AttachmentDetailsVi
                                 className="w-full"
                                 isDisabled={attachment !== null && attachment!.deletedAt !== null}
                                 onPress={() => onDownloadClicked()}>
-                                <ArrowDownToLine />
+                                <ArrowDownToLine/>
                                 Download
                             </Button>
                         </Modal.Footer>

@@ -20,6 +20,7 @@ import { useProcessingModeService } from "@/hooks/use-http-service";
 import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";
 import path from "path";
 import { SpinnerView } from "@/components/common/spinner-view";
+import { LoadErrorState } from "@/components/common/load-error-state";
 
 interface ProcessingModeDetailsViewProps {
     processingMode: ConnectorProcessingMode | null;
@@ -29,19 +30,22 @@ interface ProcessingModeDetailsViewProps {
 export function ProcessingModeDetailsView({ processingMode, state }: ProcessingModeDetailsViewProps) {
     const [details, setDetails] = useState<ConnectorProcessingModeDetail | null>(null);
     const [loading, setLoading] = useState(false);
+    const [loadFailed, setLoadFailed] = useState(false);
+    const [reloadToken, setReloadToken] = useState(0);
 
     const processingModeService = useProcessingModeService();
 
     const identifier = processingMode?.uuid;
 
     const onDownloadClicked = async () => {
+        if (!details) return;
         try {
-            const file = await processingModeService.downloadProcessingMode(details!.uuid, path.basename(details!.filename));
+            const file = await processingModeService.downloadProcessingMode(details.uuid, path.basename(details.filename));
             saveFile(file);
         } catch (error) {
             toastError(error);
         }
-    }
+    };
 
     useEffect(() => {
         if (!state.isOpen || !identifier) {
@@ -52,31 +56,26 @@ export function ProcessingModeDetailsView({ processingMode, state }: ProcessingM
 
         (async () => {
             setLoading(true);
+            setLoadFailed(false);
             setDetails(null);
             try {
                 const data = await processingModeService.retrieveProcessingMode(identifier);
-                if (!active) {
-                    return;
-                }
-
+                if (!active) return;
                 setDetails(data);
-            } catch (e) {
-                if (!active) {
-                    return;
-                }
-
-                toastError(e)
+            } catch {
+                if (!active) return;
+                setLoadFailed(true);
             } finally {
-                if (active) {
-                    setLoading(false);
-                }
+                if (active) setLoading(false);
             }
         })();
 
         return () => {
             active = false;
         };
-    }, [state.isOpen, identifier, processingModeService]);
+    }, [state.isOpen, identifier, processingModeService, reloadToken]);
+
+    const retry = () => setReloadToken((t) => t + 1);
 
     return (
         <Modal state={state}>
@@ -94,6 +93,12 @@ export function ProcessingModeDetailsView({ processingMode, state }: ProcessingM
                             <div className="flex flex-col">
                                 {loading ? (
                                     <SpinnerView className="mt-60"/>
+                                ) : loadFailed ? (
+                                    <LoadErrorState
+                                        className="min-h-80"
+                                        title="Could not load processing mode details"
+                                        onRetry={retry}
+                                    />
                                 ) : (
                                     <ProcessingModeDetailsSection processingMode={details} loading={loading}/>
                                 )}
@@ -101,12 +106,16 @@ export function ProcessingModeDetailsView({ processingMode, state }: ProcessingM
                         </Modal.Body>
 
                         <Modal.Footer>
-                            <Button variant="secondary" className="w-full" onPress={() => onDownloadClicked()}>
+                            <Button
+                                variant="secondary"
+                                className="w-full"
+                                isDisabled={loading || !details}
+                                onPress={onDownloadClicked}
+                            >
                                 <ArrowDownToLine/>
                                 Download
                             </Button>
                         </Modal.Footer>
-
                     </Modal.Dialog>
                 </Modal.Container>
             </Modal.Backdrop>

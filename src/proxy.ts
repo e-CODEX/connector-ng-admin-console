@@ -16,16 +16,12 @@ import { LoginResponse } from "@/types/response/user";
 import { cookies } from "next/headers";
 import { restApiCall } from "@/lib/rest";
 import { ACCESS_TOKEN_KEY, MUST_CHANGE_PASSWORD, REFRESH_TOKEN_KEY } from "@/utils/constants";
-
+import { isBackendDown } from "@/lib/rest/backend-down";
 
 const REFRESH_THRESHOLD_SECONDS = 10;
 const LOGIN_PATH = "/login";
 const CHANGE_PASSWORD_PATH = "/change-password";
 
-/**
- * Proactively checks access-token expiry: true when the token is within
- * REFRESH_THRESHOLD_SECONDS of expiring, has no exp, or can't be decoded.
- */
 function shouldRefreshToken(accessToken: string): boolean {
     try {
         const { exp } = decodeJwt(accessToken);
@@ -38,10 +34,6 @@ function shouldRefreshToken(accessToken: string): boolean {
     }
 }
 
-/**
- * Builds a response that carries the refreshed tokens back to the browser,
- * while forwarding the current (mutated) cookies to the downstream render.
- */
 function createRefreshedTokenResponse(request: NextRequest, refreshed: LoginResponse) {
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set("Cookie", request.cookies.toString());
@@ -67,12 +59,6 @@ async function updateRequestCookies(request: NextRequest, refreshed: LoginRespon
     cookieStore.set(REFRESH_TOKEN_KEY, refreshToken, cookieOptions(refreshExpiresIn));
 }
 
-/**
- * Proxy (Next.js request interception — formerly "middleware").
- *
- * @param request The incoming Next.js request.
- * @returns A response that continues the request, refreshes tokens, or redirects.
- */
 export async function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
@@ -88,7 +74,6 @@ export async function proxy(request: NextRequest) {
         return NextResponse.redirect(changePasswordUrl);
     }
 
-    // Restrict the change-password page to pending mandatory changes.
     // TODO - allow the user to reach change-password even when not pending.
     if (!mustChangePwd && pathname === CHANGE_PASSWORD_PATH) {
         return NextResponse.redirect(homeUrl);
@@ -111,14 +96,20 @@ export async function proxy(request: NextRequest) {
             await updateRequestCookies(request, refreshed);
 
             return createRefreshedTokenResponse(request, refreshed);
-        } catch {
+        } catch (error) {
+            // Backend outage: keep the session, the page will render its error state.
+            if (isBackendDown(error)) {
+                return NextResponse.next();
+            }
+
+            // The refresh token was rejected: really log out.
             const response = NextResponse.redirect(loginUrl);
             response.cookies.delete(ACCESS_TOKEN_KEY);
             response.cookies.delete(REFRESH_TOKEN_KEY);
 
             const cookieStore = await cookies();
-            cookieStore.delete(ACCESS_TOKEN_KEY)
-            cookieStore.delete(REFRESH_TOKEN_KEY)
+            cookieStore.delete(ACCESS_TOKEN_KEY);
+            cookieStore.delete(REFRESH_TOKEN_KEY);
 
             return response;
         }

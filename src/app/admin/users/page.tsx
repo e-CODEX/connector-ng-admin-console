@@ -31,6 +31,7 @@ import { UserCreationRequest, UserEditionRequest, UserRoleEditionRequest } from 
 import { RoleChip } from "@/components/user/user-role-chip";
 import { UserEditionView } from "@/components/user/edition/user-edition-view";
 import { UserRoleEditionView } from "@/components/user/role-edition/user-role-edition-view";
+import { LoadErrorState } from "@/components/common/load-error-state";
 
 export default function UserAdminPage() {
     const [selectedUser, setSelectedUser] = useState<ConnectorUser | null>(null);
@@ -164,7 +165,12 @@ export default function UserAdminPage() {
             </PageHeader>
 
             {list.loading ? (
-                <SpinnerView className="mt-80"/>
+                <SpinnerView className="mt-60"/>
+            ) : list.loadError ? (
+                <LoadErrorState
+                    title="Could not load users"
+                    onRetry={list.retry}
+                />
             ) : (
                 <>
                     <Table variant="secondary">

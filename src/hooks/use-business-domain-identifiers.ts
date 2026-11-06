@@ -14,10 +14,13 @@ import { useEffect, useState } from "react";
 import { toastError } from "@/utils";
 import { useBusinessDomainService } from "@/hooks/use-http-service";
 
-export function useBusinessDomainIdentifiers(allLabel?: string) {
+export function useBusinessDomains(allLabel?: string) {
     const businessDomainsService = useBusinessDomainService();
 
     const [identifiers, setIdentifiers] = useState<string[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [loadFailed, setLoadFailed] = useState(false);
+    const [reloadToken, setReloadToken] = useState(0);
 
     useEffect(() => {
         let cancelled = false;
@@ -27,16 +30,32 @@ export function useBusinessDomainIdentifiers(allLabel?: string) {
                 if (cancelled) return;
                 const names = domains.map((d) => d.identifier);
                 setIdentifiers(allLabel ? [allLabel, ...names] : names);
+                setLoadFailed(false);
             })
             .catch((error) => {
                 if (cancelled) return;
+                setIdentifiers([]);
+                setLoadFailed(true);
                 toastError(error);
+            })
+            .finally(() => {
+                if (!cancelled) setLoading(false);
             });
 
         return () => {
             cancelled = true;
         };
-    }, [allLabel, businessDomainsService]);
+    }, [allLabel, businessDomainsService, reloadToken]);
 
-    return identifiers;
+    const retry = () => {
+        setLoadFailed(false);
+        setLoading(true);
+        setReloadToken((t) => t + 1);
+    };
+
+    return { identifiers, loading, loadFailed, retry };
+}
+
+export function useBusinessDomainIdentifiers(allLabel?: string): string[] {
+    return useBusinessDomains(allLabel).identifiers;
 }

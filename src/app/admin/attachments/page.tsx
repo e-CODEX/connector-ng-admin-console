@@ -38,6 +38,7 @@ import type { RangeValue } from "react-aria-components";
 import { ZonedDateTime } from "@internationalized/date";
 import { buildDefaultRange, toDateRange } from "@/types/period";
 import { AttachmentStatusChip } from "@/components/attachment/attachment-status-chip";
+import { LoadErrorState } from "@/components/common/load-error-state";
 
 const granularity: DateTimeRangeGranularity = "minute";
 
@@ -153,6 +154,11 @@ export default function AttachmentsAdminPage() {
 
             {pagedList.loading ? (
                 <SpinnerView className="mt-60"/>
+            ) : pagedList.loadError ? (
+                <LoadErrorState
+                    title="Could not load attachments"
+                    onRetry={pagedList.retry}
+                />
             ) : (
                 <>
                     <Table variant="secondary">

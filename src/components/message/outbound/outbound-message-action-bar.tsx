@@ -11,7 +11,7 @@
 "use client";
 
 import { Button, Spinner } from "@heroui/react";
-import { PaperPlane } from "@gravity-ui/icons";
+import { Send } from "lucide-react";
 
 interface OutboundMessageActionBarProps {
     formId: string;
@@ -30,7 +30,7 @@ export function OutboundMessageActionBar({ isSending = false, onSubmit, formId }
                 isPending={isSending}
                 onPress={onSubmit}>
 
-                {isSending ? <Spinner color="current" size="sm"/> : <PaperPlane className="mr-2 size-4"/>}
+                {isSending ? <Spinner color="current" size="sm"/> : <Send className="mr-2 size-4"/>}
                 {isSending ? "Sending..." : "Send message"}
             </Button>
         </div>

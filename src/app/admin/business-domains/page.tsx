@@ -24,6 +24,7 @@ import { SpinnerView } from "@/components/common/spinner-view";
 import { useList } from "@/hooks/use-list";
 import { DateTime } from "@/components/common/date-time";
 import { useBusinessDomainService } from "@/hooks/use-http-service";
+import { LoadErrorState } from "@/components/common/load-error-state";
 
 export default function BusinessDomainsAdminPage() {
     const businessDomainService = useBusinessDomainService();
@@ -56,7 +57,12 @@ export default function BusinessDomainsAdminPage() {
             </PageHeader>
 
             {list.loading ? (
-                <SpinnerView className="mt-80"/>
+                <SpinnerView className="mt-60"/>
+            ) : list.loadError ? (
+                <LoadErrorState
+                    title="Could not load business domains"
+                    onRetry={list.retry}
+                />
             ) : (
                 <>
                     <Table variant="secondary">

@@ -11,11 +11,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { toastError } from "@/utils";
 import { PaginatedResponse } from "@/types/response/paginated-response";
 
 export interface PagedListParams {
-    page: number; // 0-based, ready for the API
+    page: number;
     size: number;
 }
 
@@ -24,11 +23,13 @@ export interface PagedList<T> {
     totalElements: number;
     loading: boolean;
     refreshing: boolean;
-    page: number;      // 1-based, ready for PaginationControls
+    loadError: boolean;
+    page: number;
     pageSize: number;
     setPage: (page: number) => void;
     setPageSize: (size: number) => void;
     refresh: () => void;
+    retry: () => void;
 }
 
 export function usePagedList<T>(
@@ -40,6 +41,7 @@ export function usePagedList<T>(
     const [totalElements, setTotalElements] = useState(0);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
+    const [loadError, setLoadError] = useState(false);
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(initialPageSize);
     const [reload, setReload] = useState({ token: 0, silent: false });
@@ -57,15 +59,21 @@ export function usePagedList<T>(
             if (!reload.silent) {
                 setLoading(true);
             }
+
+            setLoadError(false);
+
             try {
                 const data = await fetcherRef.current({ page: page - 1, size: pageSize });
                 if (cancelled) return;
 
                 setItems(data.content || []);
                 setTotalElements(data.totalElements || 0);
-            } catch (error) {
-                if (cancelled) return;
-                toastError(error);
+            } catch {
+                if (cancelled) {
+                    return;
+                }
+
+                setLoadError(true);
             } finally {
                 if (!cancelled) {
                     setLoading(false);
@@ -85,9 +93,15 @@ export function usePagedList<T>(
         setPage(1);
     };
 
+    // Silent: keeps the current rows visible while refetching.
     const refresh = () => {
         setRefreshing(true);
-        setReload((r) => ({ token: r.token + 1, silent: true }));
+        setReload((r) => ({ token: r.token + 1, silent: false }));
+    };
+
+    // Not silent: shows the spinner again, which is what you want after an error.
+    const retry = () => {
+        setReload((r) => ({ token: r.token + 1, silent: false }));
     };
 
     return {
@@ -95,10 +109,12 @@ export function usePagedList<T>(
         totalElements,
         loading,
         refreshing,
+        loadError,
         page,
         pageSize,
         setPage,
         setPageSize: changePageSize,
         refresh,
+        retry,
     };
 }

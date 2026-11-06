@@ -12,8 +12,8 @@
 
 import { useTheme } from "next-themes";
 import { Button } from "@heroui/react";
-import { Moon, Sun } from "@gravity-ui/icons";
 import { useIsHydrated } from "@/hooks/use-is-hydrated";
+import { Moon, Sun } from "lucide-react";
 
 export function ThemeSwitcher() {
     const hydrated = useIsHydrated();

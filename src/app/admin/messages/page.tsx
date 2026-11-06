@@ -47,6 +47,7 @@ import { MessageEvidenceTriggerModeView } from "@/components/message/evidence-tr
 import { MessageEvidenceTriggerResponse } from "@/types/response/evidence-trigger";
 import { MessagePendingView } from "@/components/message/pending/message-pending-view";
 import { MessageLifecycleView } from "@/components/message/message-lifecycle-view";
+import { LoadErrorState } from "@/components/common/load-error-state";
 
 const IDENTIFIER_LENGTH = 8;
 
@@ -229,6 +230,11 @@ export default function MessagesAdminPage() {
 
             {pagedList.loading ? (
                 <SpinnerView className="mt-60"/>
+            ) : pagedList.loadError ? (
+                <LoadErrorState
+                    title="Could not load messages"
+                    onRetry={pagedList.retry}
+                />
             ) : (
                 <>
                     <Table variant="secondary">

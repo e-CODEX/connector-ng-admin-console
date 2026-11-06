@@ -9,11 +9,8 @@
  */
 
 export class RestApiError extends Error {
-    readonly status: number;
-
-    constructor(status: number, message: string) {
+    constructor(public readonly status: number, message: string) {
         super(message);
         this.name = "RestApiError";
-        this.status = status;
     }
 }

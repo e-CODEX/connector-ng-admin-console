@@ -20,6 +20,7 @@ import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { useList } from "@/hooks/use-list";
 import { useQueueService } from "@/hooks/use-http-service";
+import { LoadErrorState } from "@/components/common/load-error-state";
 
 export default function QueueAdminPage() {
     const [selectedQueue, setSelectedQueue] = useState<string | null>(null)
@@ -47,7 +48,12 @@ export default function QueueAdminPage() {
             </PageHeader>
 
             {list.loading ? (
-                <SpinnerView className="mt-80"/>
+                <SpinnerView className="mt-60"/>
+            ) : list.loadError ? (
+                <LoadErrorState
+                    title="Could not load JMS queues statuses"
+                    onRetry={list.retry}
+                />
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-4 gap-x-5 gap-y-2">
                     {list.items.map((queueStats) => (

@@ -12,13 +12,13 @@
 
 import { Modal, useOverlayState } from "@heroui/react";
 import { ConnectorMessage, ConnectorMessageDetailsResponse } from "@/types/response/message";
-import { toastError } from "@/utils";
 import React, { useEffect, useState } from "react";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { MessageDetailsContent } from "@/components/message/detail/message-details-content";
 import { Mail } from "lucide-react";
 import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";
 import { useMessageService } from "@/hooks/use-http-service";
+import { LoadErrorState } from "@/components/common/load-error-state";
 
 interface MessageDetailsViewProps {
     message: ConnectorMessage | null;
@@ -28,7 +28,9 @@ interface MessageDetailsViewProps {
 export function MessageDetailsView({ message, state }: MessageDetailsViewProps) {
     const [details, setDetails] = useState<ConnectorMessageDetailsResponse | null>(null);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const [loadFailed, setLoadFailed] = useState(false);
+    const [reloadToken, setReloadToken] = useState(0);
+
     const identifier = message?.identifier;
 
     const messageService = useMessageService();
@@ -42,22 +44,15 @@ export function MessageDetailsView({ message, state }: MessageDetailsViewProps) 
 
         (async () => {
             setLoading(true);
-            setError(null);
+            setLoadFailed(false);
             setDetails(null);
             try {
                 const data = await messageService.retrieveMessage(identifier);
-
-                if (!active) {
-                    return;
-                }
-
+                if (!active) return;
                 setDetails(data);
-            } catch (e) {
-                if (!active) {
-                    return;
-                }
-
-                toastError(e)
+            } catch {
+                if (!active) return;
+                setLoadFailed(true);
             } finally {
                 if (active) {
                     setLoading(false);
@@ -68,7 +63,9 @@ export function MessageDetailsView({ message, state }: MessageDetailsViewProps) 
         return () => {
             active = false;
         };
-    }, [state.isOpen, identifier, messageService]);
+    }, [state.isOpen, identifier, messageService, reloadToken]);
+
+    const retry = () => setReloadToken((t) => t + 1);
 
     return (
         <Modal state={state}>
@@ -86,14 +83,14 @@ export function MessageDetailsView({ message, state }: MessageDetailsViewProps) 
                             <div className="flex flex-col">
                                 {loading ? (
                                     <SpinnerView className="mt-60"/>
+                                ) : loadFailed ? (
+                                    <LoadErrorState
+                                        className="min-h-100"
+                                        title="Could not load message details"
+                                        onRetry={retry}
+                                    />
                                 ) : (
                                     <MessageDetailsContent message={details} loading={loading}/>
-                                )}
-
-                                {error && (
-                                    <div className="flex justify-center py-6">
-                                        <div className="text-destructive">{error}</div>
-                                    </div>
                                 )}
                             </div>
                         </Modal.Body>

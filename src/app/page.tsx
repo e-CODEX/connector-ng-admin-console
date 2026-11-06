@@ -8,10 +8,16 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { requireUser } from "@/lib/session";
+import { requireUserOrDown } from "@/lib/session";
 import DashboardComponent from "@/components/dashboard/dashboard";
+import { BackendDownScreen } from "@/components/common/backend-down-screen";
 
 export default async function HomePage() {
-    await requireUser();
+    const user = await requireUserOrDown();
+
+    if (user === "down") {
+        return <BackendDownScreen autoRetryMs={15_000}/>;
+    }
+
     return <DashboardComponent/>;
 }

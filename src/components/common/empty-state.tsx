@@ -9,7 +9,7 @@
  */
 
 import type { ComponentType, ReactNode, SVGProps } from "react";
-import { Magnifier } from "@gravity-ui/icons";
+import { Search } from "lucide-react";
 
 type EmptyStateProps = {
     text: ReactNode;
@@ -17,7 +17,7 @@ type EmptyStateProps = {
     className?: string;
 };
 
-export function EmptyState({ text, icon: Icon = Magnifier, className }: EmptyStateProps) {
+export function EmptyState({ text, icon: Icon = Search, className }: EmptyStateProps) {
     return (
         <div className={`flex flex-col items-center justify-center gap-3 text-muted ${className ?? ""}`}>
             <Icon className="size-10"/>

@@ -198,6 +198,7 @@ export default function OutboundMessageComponent() {
                     showLabel={true}
                     className="flex flex-row items-center gap-3 min-w-70"
                 />
+
                 {errors.businessDomainIdentifier && (
                     <p role="alert" className="text-xs text-danger">
                         {errors.businessDomainIdentifier}

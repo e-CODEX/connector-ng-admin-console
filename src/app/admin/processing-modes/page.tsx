@@ -17,10 +17,9 @@ import { Table, useOverlayState } from "@heroui/react";
 import { ConnectorProcessingMode } from "@/types/response/processing-mode";
 import { saveFile, toastError, toastSuccess } from "@/utils";
 import { ProcessingModeDetailsView } from "@/components/processing-mode/detail/processing-mode-detail-view";
-import { Plus } from "@gravity-ui/icons";
 import { PageHeaderButton } from "@/components/common/header/page-header-button";
 import { ProcessingModeCreationView } from "@/components/processing-mode/creation/processing-mode-creation-view";
-import { Pen, RefreshCw, Workflow } from "lucide-react";
+import { Pen, Plus, RefreshCw, Workflow } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { useList } from "@/hooks/use-list";
@@ -31,6 +30,7 @@ import { DetailActionButton } from "@/components/common/action-button/detail-act
 import { DownloadActionButton } from "@/components/common/action-button/download-action-button";
 import { ActionButton } from "@/components/common/action-button/action-button";
 import { ProcessingModeEditTruststoreView } from "@/components/processing-mode/edit/processing-mode-edit-truststore-view";
+import { LoadErrorState } from "@/components/common/load-error-state";
 
 export default function ProcessingModesAdminPage() {
     const [selectedProcessingMode, setSelectedProcessingMode] = useState<ConnectorProcessingMode | null>(null);
@@ -91,7 +91,12 @@ export default function ProcessingModesAdminPage() {
             </PageHeader>
 
             {list.loading ? (
-                <SpinnerView className="mt-80"/>
+                <SpinnerView className="mt-60"/>
+            ) : list.loadError ? (
+                <LoadErrorState
+                    title="Could not load processing modes"
+                    onRetry={list.retry}
+                />
             ) : (
                 <>
                     <Table variant="secondary">

@@ -17,6 +17,7 @@ import { SpinnerView } from "@/components/common/spinner-view";
 import { useMessageService } from "@/hooks/use-http-service";
 import { CopyableIdentifier } from "@/components/common/copyable-identifier";
 import { DownloadActionButton } from "@/components/common/action-button/download-action-button";
+import { LoadErrorState } from "@/components/common/load-error-state";
 
 const EMPTY_SELECTION: Selection = new Set();
 
@@ -31,6 +32,7 @@ export function MessagePendingContent({ onDownloaded }: MessagePendingContentPro
     const [messageIds, setMessageIds] = useState<string[]>([]);
     const [reloadToken, setReloadToken] = useState(0);
     const [selectedKeys, setSelectedKeys] = useState<Selection>(EMPTY_SELECTION);
+    const [loadFailed, setLoadFailed] = useState(false);
 
     // "all" is what the header checkbox produces, so normalise it to a list of ids
     const selectedIds = selectedKeys === "all"
@@ -43,9 +45,17 @@ export function MessagePendingContent({ onDownloaded }: MessagePendingContentPro
         (async () => {
             try {
                 const data = await messageService.listPendingMessages();
-                if (!cancelled) setMessageIds(data.messageIds);
-            } catch (error) {
-                if (!cancelled) toastError(error);
+                if (cancelled) {
+                    return;
+                }
+                setMessageIds(data.messageIds);
+                setLoadFailed(false);
+            } catch {
+                if (cancelled) {
+                    return;
+                }
+                setMessageIds([]);
+                setLoadFailed(true);
             } finally {
                 if (!cancelled) setLoading(false);
             }
@@ -58,6 +68,7 @@ export function MessagePendingContent({ onDownloaded }: MessagePendingContentPro
 
     const onRefreshClicked = () => {
         setSelectedKeys(EMPTY_SELECTION);
+        setLoadFailed(false);
         setLoading(true);
         setReloadToken((token) => token + 1);
     };
@@ -126,6 +137,12 @@ export function MessagePendingContent({ onDownloaded }: MessagePendingContentPro
                     <div className="flex flex-1 items-center justify-center">
                         <SpinnerView/>
                     </div>
+                ) : loadFailed ? (
+                    <LoadErrorState
+                        className="min-h-64 flex-1"
+                        title="Could not load pending messages"
+                        onRetry={onRefreshClicked}
+                    />
                 ) : (
                     <Table variant="secondary">
                         <Table.ScrollContainer>
@@ -190,20 +207,22 @@ export function MessagePendingContent({ onDownloaded }: MessagePendingContentPro
                 )}
             </Modal.Body>
             <Modal.Footer>
-                <Button
-                    variant="secondary"
-                    aria-label="Refresh pending messages"
-                    isDisabled={loading || downloading}
-                    onPress={onRefreshClicked}
-                >
-                    <RefreshCw/>
-                    Refresh
-                </Button>
+                {!loadFailed && (
+                    <Button
+                        variant="secondary"
+                        aria-label="Refresh pending messages"
+                        isDisabled={loading || downloading}
+                        onPress={onRefreshClicked}
+                    >
+                        <RefreshCw/>
+                        Refresh
+                    </Button>
+                )}
 
                 <Button
                     variant="primary"
                     aria-label="Download selected messages"
-                    isDisabled={loading || downloading || messageIds.length === 0}
+                    isDisabled={loading || downloading || loadFailed || messageIds.length === 0}
                     onPress={onDownloadSelectedClicked}
                 >
                     <ArrowDownToLine/>

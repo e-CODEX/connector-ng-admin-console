@@ -11,13 +11,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { toastError } from "@/utils";
 
 export interface List<T> {
     items: T[];
     loading: boolean;
     refreshing: boolean;
+    loadError: boolean;
     refresh: () => Promise<void>;
+    retry: () => void;
 }
 
 export function useList<T>(fetcher: () => Promise<T[]>, deps: unknown[] = []): List<T> {
@@ -25,13 +26,13 @@ export function useList<T>(fetcher: () => Promise<T[]>, deps: unknown[] = []): L
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [reload, setReload] = useState({ token: 0, silent: false });
+    const [loadError, setLoadError] = useState(false);
 
     const fetcherRef = useRef(fetcher);
     useEffect(() => {
         fetcherRef.current = fetcher;
     });
 
-    // Lets refresh() await the reload that it triggered.
     const pendingRef = useRef<(() => void) | null>(null);
 
     useEffect(() => {
@@ -41,13 +42,19 @@ export function useList<T>(fetcher: () => Promise<T[]>, deps: unknown[] = []): L
             if (!reload.silent) {
                 setLoading(true);
             }
+
+            setLoadError(false);
+
             try {
                 const data = await fetcherRef.current();
                 if (cancelled) return;
                 setItems(data || []);
-            } catch (error) {
-                if (cancelled) return;
-                toastError(error);
+            } catch {
+                if (cancelled) {
+                    return;
+                }
+
+                setLoadError(true);
             } finally {
                 if (!cancelled) {
                     setLoading(false);
@@ -68,8 +75,12 @@ export function useList<T>(fetcher: () => Promise<T[]>, deps: unknown[] = []): L
         new Promise<void>((resolve) => {
             pendingRef.current = resolve;
             setRefreshing(true);
-            setReload((r) => ({ token: r.token + 1, silent: true }));
+            setReload((r) => ({ token: r.token + 1, silent: false }));
         });
 
-    return { items, loading, refreshing, refresh };
+    const retry = () => {
+        setReload((r) => ({ token: r.token + 1, silent: false }));
+    };
+
+    return { items, loading, refreshing, loadError, refresh, retry };
 }

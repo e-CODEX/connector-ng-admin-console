@@ -13,7 +13,7 @@ import { NextResponse } from "next/server";
 import { getAppConfig } from "@/config/config.server";
 import { authedRestApiCall } from "@/lib/rest/authed-rest-api";
 import { createAuthService } from "@/services/auth";
-import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from "@/utils/constants";
+import { ACCESS_TOKEN_KEY, MUST_CHANGE_PASSWORD, REFRESH_TOKEN_KEY } from "@/utils/constants";
 
 export async function POST() {
     const { apiUrl } = getAppConfig();
@@ -26,11 +26,13 @@ export async function POST() {
         try {
             await authService.logout();
         } catch {
-            // ignore — we clear the cookie regardless
+            // Backend down or token already invalid: we clear the local session regardless.
         }
     }
 
     cookieStore.delete(ACCESS_TOKEN_KEY);
     cookieStore.delete(REFRESH_TOKEN_KEY);
+    cookieStore.delete(MUST_CHANGE_PASSWORD);
+
     return NextResponse.json({ ok: true });
 }

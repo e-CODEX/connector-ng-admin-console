@@ -11,7 +11,6 @@
 "use client"
 
 import { Navbar as HeroNavbar, NavbarBrand, NavbarContent, NavbarItem } from "@heroui/navbar"
-import NextLink from "next/link"
 import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation";
@@ -20,6 +19,7 @@ import { Building2, Layers, LucideIcon, Mail, Paperclip, Route, Send, Settings, 
 import { useOptionalUser } from "@/hooks/useUser";
 import { UserMenu } from "@/components/common/menu/user-menu";
 import { USER_ROLE } from "@/types/global";
+import { useLastKnownUser } from "@/hooks/use-last-known-user";
 
 const AUTH_ROUTES = ["/login", "/change-password"];
 
@@ -41,16 +41,18 @@ const MENU: MenuEntry[] = [
     { label: "Processing mode", href: "/admin/processing-modes", icon: Workflow, roles: ["ROLE_ADMIN"] },
 ];
 
-export const AppMainNavbar = () => {
-    const user = useOptionalUser();
-    const pathname = usePathname();
+export const AppMainNavbar = ({ backendDown = false }: { backendDown?: boolean }) => {
+    const sessionUser = useOptionalUser();
+    const lastKnownUser = useLastKnownUser();
+    // The cache is only trusted during an outage, so a logged-out visitor never sees a stale menu.
+    const user = sessionUser ?? (backendDown ? lastKnownUser : null);
 
+    const pathname = usePathname();
     const onAuthPage = AUTH_ROUTES.some((p) => pathname === p || pathname.startsWith(p + "/"));
     const showUserChrome = !!user && !onAuthPage;
 
     const items = MENU.filter(
-        (item) =>
-            !item.roles || item.roles.some((itemRole) => user?.roles.includes(itemRole))
+        (item) => !item.roles || item.roles.some((role) => user?.roles?.includes(role)),
     );
 
     return (
@@ -60,7 +62,7 @@ export const AppMainNavbar = () => {
         >
             <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
                 <NavbarBrand className="gap-3 max-w-fit">
-                    <NextLink href="/" className="flex items-center">
+                    <Link href="/" className="flex items-center">
                         <Image
                             className="rounded-md"
                             src="/logo.png"
@@ -69,44 +71,41 @@ export const AppMainNavbar = () => {
                             width={400}
                             height={80}
                         />
-                    </NextLink>
+                    </Link>
                 </NavbarBrand>
             </NavbarContent>
 
             <NavbarContent className="hidden lg:flex gap-5" justify="end">
-                {showUserChrome && (
-                    <>
-                        {items.map(({ label, href, icon: Icon }) => {
-                            const isActive = href === "/"
-                                ? pathname === "/"
-                                : pathname === href || pathname.startsWith(href + "/");
-                            return (
-                                <NavbarItem key={href} isActive={isActive}>
-                                    <Link
-                                        className={`flex items-center gap-1.5 whitespace-nowrap transition-colors text-base font-medium pb-0.5 ${
-                                            isActive
-                                                ? "text-white font-semibold border-b-2 border-white"
-                                                : "text-white/80 hover:text-white"
-                                        }`}
-                                        href={href}
-                                    >
-                                        <Icon className="size-4 shrink-0" aria-hidden="true"/>
-                                        {label}
-                                    </Link>
-                                </NavbarItem>
-                            );
-                        })}
-                    </>
-                )}
+                {showUserChrome && items.map(({ label, href, icon: Icon }) => {
+                    const isActive = pathname === href || pathname.startsWith(href + "/");
+                    return (
+                        <NavbarItem key={href} isActive={isActive}>
+                            <Link
+                                href={href}
+                                aria-current={isActive ? "page" : undefined}
+                                className={`flex items-center gap-1.5 whitespace-nowrap transition-colors text-base font-medium pb-0.5 ${
+                                    isActive
+                                        ? "text-white font-semibold border-b-2 border-white"
+                                        : "text-white/80 hover:text-white"
+                                }`}
+                            >
+                                <Icon className="size-4 shrink-0" aria-hidden="true"/>
+                                {label}
+                            </Link>
+                        </NavbarItem>
+                    );
+                })}
 
                 <NavbarItem>
                     <ThemeSwitcher/>
                 </NavbarItem>
 
-                {showUserChrome && (
-                    <div className="ml-auto"><UserMenu /></div>
+                {showUserChrome && user && (
+                    <NavbarItem className="ml-auto">
+                        <UserMenu user={user}/>
+                    </NavbarItem>
                 )}
             </NavbarContent>
         </HeroNavbar>
-    )
-}
+    );
+};

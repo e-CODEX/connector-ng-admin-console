@@ -11,8 +11,7 @@
 import { usePolledFetch } from "@/hooks/pooled-fetch";
 import { Spinner } from "@heroui/react";
 import { HealthCard } from "@/components/dashboard/health/health-card";
-import { Database, MessagesSquare } from "lucide-react";
-import { CardHeart, HardDrive } from "@gravity-ui/icons";
+import { Database, HardDrive, HeartPulse, MessagesSquare } from "lucide-react";
 import { asNumber, formatBytes } from "@/utils";
 import { useActuatorService } from "@/hooks/use-http-service";
 
@@ -47,7 +46,7 @@ export function BackendHealthSection({ refreshToken, refreshInterval }: BackendH
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-x-5 gap-y-2">
             <HealthCard
                 title="Liveness Status"
-                icon={<CardHeart className="size-4"/>}
+                icon={<HeartPulse className="size-4"/>}
                 status={data.components["ping"].status}/>
 
             <HealthCard

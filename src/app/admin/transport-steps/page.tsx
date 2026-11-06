@@ -40,6 +40,7 @@ import { TransportedStepMessageDetailsView } from "@/components/transport-step/t
 import { ActionButton } from "@/components/common/action-button/action-button";
 import { useAppConfig } from "@/hooks/use-app-config";
 import { MessagePendingView } from "@/components/message/pending/message-pending-view";
+import { LoadErrorState } from "@/components/common/load-error-state";
 
 const IDENTIFIER_LENGTH = 30;
 
@@ -178,6 +179,11 @@ export default function TransportStepsAdminPage() {
 
             {pagedList.loading ? (
                 <SpinnerView className="mt-60"/>
+            ) : pagedList.loadError ? (
+                <LoadErrorState
+                    title="Could not load messages transport steps"
+                    onRetry={pagedList.retry}
+                />
             ) : (
                 <>
                     <Table variant="secondary">

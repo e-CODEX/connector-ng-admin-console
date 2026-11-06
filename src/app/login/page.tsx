@@ -9,39 +9,34 @@
  */
 
 "use client";
+
 import { Button, FieldError, Form, Input, Label, Spinner, TextField } from "@heroui/react";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { LoginRequest } from "@/types/request/user";
 import { loginSchema } from "@/schemas/auth";
 import { toastErrorMessage } from "@/utils";
 import { LockOpen } from "lucide-react";
 
-const FORM_ID = "login-form"
+const FORM_ID = "login-form";
 
-const FAILED_LOGIN_MESSAGE =  "Login failed. Please try again later."
+const FAILED_LOGIN_MESSAGE = "Login failed. Please try again later.";
+const BACKEND_UNREACHABLE_MESSAGE = "The connector backend is unreachable. Please try again in a moment.";
 
 type FieldErrors = Partial<Record<keyof LoginRequest, string>>;
 
 export default function LoginForm() {
     const [loading, setLoading] = useState(false);
-    const [username, setUsername] = useState<string>("");
-    const [password, setPassword] = useState<string>("");
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
     const [errors, setErrors] = useState<FieldErrors>({});
-
-    const resetForm = () => {
-        setUsername("");
-        setPassword("");
-        setErrors({})
-    }
 
     const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
+        if (loading) return;
 
         const result = loginSchema.safeParse({ username, password });
-
         if (!result.success) {
             const fieldErrors: FieldErrors = {};
-
             for (const issue of result.error.issues) {
                 const key = issue.path[0] as keyof LoginRequest | undefined;
                 if (key && !fieldErrors[key]) {
@@ -51,6 +46,7 @@ export default function LoginForm() {
             setErrors(fieldErrors);
             return;
         }
+        setErrors({});
 
         setLoading(true);
         try {
@@ -59,30 +55,26 @@ export default function LoginForm() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username, password }),
             });
+
             if (res.ok) {
                 const data = await res.json().catch(() => ({}));
                 window.location.assign(data.mustChangePassword ? "/change-password" : "/");
-                return;
+                return; // keep the spinner while the browser navigates
             }
+
             if (res.status === 401) {
                 toastErrorMessage("Invalid username or password.");
+            } else if (res.status === 502 || res.status === 503 || res.status === 504) {
+                toastErrorMessage(BACKEND_UNREACHABLE_MESSAGE);
             } else {
                 toastErrorMessage(FAILED_LOGIN_MESSAGE);
             }
         } catch {
+            // The app server itself could not be reached.
             toastErrorMessage(FAILED_LOGIN_MESSAGE);
-        } finally {
-            setLoading(false);
         }
-
-        setErrors({});
-    }
-
-    useEffect(() => {
-        (async () => {
-            resetForm()
-        })()
-    }, []);
+        setLoading(false);
+    };
 
     return (
         <div className="flex grow items-center justify-center">
@@ -95,36 +87,34 @@ export default function LoginForm() {
                     className="flex flex-col gap-4"
                 >
                     <TextField
+                        autoFocus
                         isRequired
                         value={username}
                         onChange={setUsername}
                         isInvalid={!!errors.username}
                     >
                         <Label>Username</Label>
-                        <Input placeholder="e.g. admin"/>
+                        <Input placeholder="e.g. admin" autoComplete="username"/>
                         <FieldError>{errors.username}</FieldError>
                     </TextField>
 
                     <TextField
-                        autoFocus
                         isRequired
                         value={password}
                         onChange={setPassword}
                         isInvalid={!!errors.password}
                     >
                         <Label>Password</Label>
-                        <Input placeholder="e.g. *****" type="password"/>
+                        <Input placeholder="e.g. *****" type="password" autoComplete="current-password"/>
                         <FieldError>{errors.password}</FieldError>
                     </TextField>
 
-                    <br/>
-
                     <Button
                         type="submit"
-                        className="w-full"
+                        className="mt-4 w-full"
                         form={FORM_ID}
                         variant="primary"
-                        isDisabled={!username.trim() || !password.trim() || loading}
+                        isDisabled={loading}
                     >
                         {loading ? <Spinner color="current" size="sm"/> : <LockOpen className="mr-2 size-4"/>}
                         Login

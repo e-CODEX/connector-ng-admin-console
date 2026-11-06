@@ -258,7 +258,7 @@ export default function UserAdminPage() {
                     </Table>
 
                     {list.items.length === 0 && !list.refreshing && (
-                        <EmptyState text="No user available" className="mt-70"/>
+                        <EmptyState text="No user available" className="mt-50"/>
                     )}
                 </>
             )}

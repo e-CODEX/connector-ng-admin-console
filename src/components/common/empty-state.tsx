@@ -14,14 +14,27 @@ import { Search } from "lucide-react";
 type EmptyStateProps = {
     text: ReactNode;
     icon?: ComponentType<SVGProps<SVGSVGElement>>;
+    description?: ReactNode;
+    action?: ReactNode;
     className?: string;
 };
 
-export function EmptyState({ text, icon: Icon = Search, className }: EmptyStateProps) {
+export function EmptyState({ text, icon: Icon = Search, description, action, className = "" }: EmptyStateProps) {
     return (
-        <div className={`flex flex-col items-center justify-center gap-3 text-muted ${className ?? ""}`}>
-            <Icon className="size-10"/>
-            <p className="text-sm font-medium">{text}</p>
+        <div className={`mx-auto flex max-w-md flex-col items-center justify-center gap-5 text-center ${className}`}>
+            <div className="relative">
+                <div className="absolute inset-0 rounded-full bg-neutral-500/15 blur-xl" aria-hidden/>
+                <div className="relative flex h-16 w-16 items-center justify-center rounded-full border border-neutral-200 bg-neutral-50 text-neutral-500 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-400">
+                    <Icon className="size-7" strokeWidth={1.75} aria-hidden="true"/>
+                </div>
+            </div>
+
+            <div className="space-y-1.5">
+                <p className="text-base font-semibold">{text}</p>
+                {description && <p className="text-sm text-neutral-500">{description}</p>}
+            </div>
+
+            {action}
         </div>
     );
 }

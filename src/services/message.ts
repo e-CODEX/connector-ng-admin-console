@@ -84,7 +84,7 @@ export function createMessageService(baseUrl: string, bffUrl: string, call: Rest
             return sendSoapPendingMessagesRequest(bffUrl, call);
         },
         async retrieveMessage(identifier: string): Promise<ConnectorMessageDetailsResponse> {
-            return call<ConnectorMessageDetailsResponse>(baseUrl, `api/v1/admin/messages/${identifier}`);
+            return call<ConnectorMessageDetailsResponse>(baseUrl, `api/v1/admin/messages/${encodeURIComponent(identifier)}`);
         },
         async downloadPendingMessage(transportIdentifier: string): Promise<void> {
             return sendSoapDownloadPendingMessageRequest(bffUrl, call, transportIdentifier);
@@ -96,7 +96,7 @@ export function createMessageService(baseUrl: string, bffUrl: string, call: Rest
             return sendSoapAcknowledgePendingMessageRequest(bffUrl, call, transportIdentifier);
         },
         async getMessageTransportStep(identifier: string): Promise<ConnectorTransportStep> {
-            return call<ConnectorTransportStep>(baseUrl, `api/v1/admin/messages/${identifier}/transport-steps`);
+            return call<ConnectorTransportStep>(baseUrl, `api/v1/admin/messages/${encodeURIComponent(identifier)}/transport-steps`);
         },
         async getMessageStats(params: { from?: string; to?: string; businessDomain?: string; }): Promise<ConnectorMessageStats> {
             return call<ConnectorMessageStats>(
@@ -237,7 +237,7 @@ async function sendSoapDownloadPendingMessageRequest(bffUrl: string, call: RestA
     : Promise<void> {
     return call<void>(
         bffUrl,
-        `bff/api/v1/messages/pending/download/${transportIdentifier}`,
+        `bff/api/v1/messages/pending/download/${encodeURIComponent(transportIdentifier)}`,
         {
             headers: {
                 "Content-Type": "application/json"
@@ -251,7 +251,7 @@ async function sendSoapAcknowledgePendingMessageRequest(bffUrl: string, call: Re
     : Promise<void> {
     return call<void>(
         bffUrl,
-        `bff/api/v1/messages/pending/acknowledge/${transportIdentifier}`,
+        `bff/api/v1/messages/pending/acknowledge/${encodeURIComponent(transportIdentifier)}`,
         {
             headers: {
                 "Content-Type": "application/json"

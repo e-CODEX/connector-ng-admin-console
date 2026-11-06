@@ -15,7 +15,7 @@ export function createEvidenceService(baseUrl: string, call: RestApiDownloadCall
         async downloadEvidence(uuid: string, evidenceType: string): Promise<DownloadedFile> {
             return call(
                 baseUrl,
-                `api/v1/evidences/${uuid}/download`,
+                `api/v1/evidences/${encodeURIComponent(uuid)}/download`,
                 { defaultFilename: `${evidenceType.toLowerCase()}.xml` }
             );
         }

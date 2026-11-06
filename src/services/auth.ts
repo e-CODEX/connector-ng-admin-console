@@ -67,3 +67,5 @@ export function createAuthService(baseUrl: string, call: RestApiCall) {
         },
     }
 }
+
+export type AuthService = ReturnType<typeof createAuthService>;

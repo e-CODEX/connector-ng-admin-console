@@ -27,7 +27,7 @@ export function createUserService(baseUrl: string, call: RestApiCall) {
             )
         },
         async editUser(identifier: string, request: UserEditionRequest): Promise<ConnectorUser> {
-            return call<ConnectorUser>(baseUrl, `api/v1/admin/users/${identifier}`, {
+            return call<ConnectorUser>(baseUrl, `api/v1/admin/users/${encodeURIComponent(identifier)}`, {
                     method: "PATCH",
                     headers: {
                         "Content-Type": "application/json"
@@ -37,12 +37,12 @@ export function createUserService(baseUrl: string, call: RestApiCall) {
             )
         },
         async askUserPasswordReset(identifier: string, username: string): Promise<ConnectorUser> {
-            return call<ConnectorUser>(baseUrl, `api/v1/admin/users/${identifier}`, {
+            return call<ConnectorUser>(baseUrl, `api/v1/admin/users/${encodeURIComponent(identifier)}`, {
                     method: "PATCH",
                     headers: {
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify({username, mustChangePassword: true})
+                    body: JSON.stringify({ username, mustChangePassword: true })
                 }
             )
         },
@@ -63,7 +63,7 @@ export function createUserService(baseUrl: string, call: RestApiCall) {
             return call<ConnectorUserRole[]>(baseUrl, "api/v1/admin/users/roles");
         },
         async blockUser(identifier: string, username: string): Promise<ConnectorUser> {
-            return call<ConnectorUser>(baseUrl, `api/v1/admin/users/${identifier}`, {
+            return call<ConnectorUser>(baseUrl, `api/v1/admin/users/${encodeURIComponent(identifier)}`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json"
@@ -72,7 +72,7 @@ export function createUserService(baseUrl: string, call: RestApiCall) {
             })
         },
         async deleteUser(identifier: string): Promise<void> {
-            return call<void>(baseUrl, `api/v1/admin/users/${identifier}`, {
+            return call<void>(baseUrl, `api/v1/admin/users/${encodeURIComponent(identifier)}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json"
@@ -81,3 +81,5 @@ export function createUserService(baseUrl: string, call: RestApiCall) {
         }
     }
 }
+
+export type UserService = ReturnType<typeof createUserService>;

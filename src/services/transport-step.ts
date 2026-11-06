@@ -32,8 +32,8 @@ export function createTransportStepsService(baseUrl: string, call: RestApiCall) 
                 { params }
             )
         },
-        async retrieveTransportedMessage(transportIdentifier: string): Promise<ConnectorMessageDetailsResponse> {
-            return call<ConnectorMessageDetailsResponse>(baseUrl, `api/v1/admin/transport-steps/${transportIdentifier}/message`);
+        async retrieveTransportedMessage(identifier: string): Promise<ConnectorMessageDetailsResponse> {
+            return call<ConnectorMessageDetailsResponse>(baseUrl, `api/v1/admin/transport-steps/${encodeURIComponent(identifier)}/message`);
         },
     }
 }

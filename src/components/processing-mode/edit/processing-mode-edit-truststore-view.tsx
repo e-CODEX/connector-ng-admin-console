@@ -41,7 +41,6 @@ export function ProcessingModeEditTruststoreView({ processingMode, state, onSubm
                             key={String(state.isOpen)}
                             onSubmit={onSubmit}
                             processingMode={processingMode}
-                            close={state.close}
                         />
                     </Modal.Dialog>
                 </Modal.Container>

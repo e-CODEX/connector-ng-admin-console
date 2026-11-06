@@ -18,11 +18,12 @@ import { MailCheck } from "lucide-react";
 import { messageEvidenceTriggerSchema } from "@/schemas/message";
 import { SendEvidenceTriggerRequest } from "@/services/message";
 import { ConnectorEvidenceType, OutboundMessageRequestMode } from "@/types/global";
+import { MessageEvidenceTriggerResponse } from "@/types/response/evidence-trigger";
 
 interface MessageEvidenceTriggerModeFormProps {
     message: ConnectorMessage;
     evidenceType: ConnectorEvidenceType;
-    onSubmit?: (triggerRequest: SendEvidenceTriggerRequest) => Promise<void> | void;
+    onSubmit?: (triggerRequest: SendEvidenceTriggerRequest) => Promise<MessageEvidenceTriggerResponse | undefined>;
 }
 
 const FORM_ID = "trigger-message-evidence-form";

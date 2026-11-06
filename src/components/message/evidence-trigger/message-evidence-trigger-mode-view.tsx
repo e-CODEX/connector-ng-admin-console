@@ -16,11 +16,12 @@ import React from "react";
 import { MessageEvidenceTriggerModeForm } from "@/components/message/evidence-trigger/message-evidence-trigger-mode-form";
 import { SendEvidenceTriggerRequest } from "@/services/message";
 import { ConnectorEvidenceType } from "@/types/global";
+import { MessageEvidenceTriggerResponse } from "@/types/response/evidence-trigger";
 
 interface MessageEvidenceTriggerModeViewProps {
     message: ConnectorMessage | null;
     evidenceType: ConnectorEvidenceType,
-    onSubmit?: (triggerRequest: SendEvidenceTriggerRequest) => Promise<void> | void;
+    onSubmit?: (triggerRequest: SendEvidenceTriggerRequest) => Promise<MessageEvidenceTriggerResponse | undefined>;
     state: ReturnType<typeof useOverlayState>;
 }
 

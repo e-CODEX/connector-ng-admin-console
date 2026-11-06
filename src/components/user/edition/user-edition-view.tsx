@@ -40,11 +40,9 @@ export function UserEditionView({ state, user, onSubmit, isAdminContext = false 
 
                         <UserEditionForm
                             key={String(state.isOpen)}
-                            state={state}
                             user={user}
                             isAdminContext={isAdminContext}
                             onSubmit={onSubmit}
-                            close={state.close}
                         />
                     </Modal.Dialog>
                 </Modal.Container>

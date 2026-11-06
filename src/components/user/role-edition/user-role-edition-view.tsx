@@ -39,10 +39,8 @@ export function UserRoleEditionView({ state, user, onSubmit }: UserRoleEditionVi
 
                         <UserRoleEditionForm
                             key={String(state.isOpen)}
-                            state={state}
                             user={user}
                             onSubmit={onSubmit}
-                            close={state.close}
                         />
                     </Modal.Dialog>
                 </Modal.Container>

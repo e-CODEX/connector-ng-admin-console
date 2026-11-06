@@ -48,10 +48,19 @@ import { MessageEvidenceTriggerResponse } from "@/types/response/evidence-trigge
 import { MessagePendingView } from "@/components/message/pending/message-pending-view";
 import { MessageLifecycleView } from "@/components/message/message-lifecycle-view";
 import { LoadErrorState } from "@/components/common/load-error-state";
+import { SendEvidenceTriggerRequest } from "@/services/message";
 
 const IDENTIFIER_LENGTH = 8;
 
 const granularity: DateTimeRangeGranularity = "minute";
+
+function useRefreshOnClose(refresh: () => void) {
+    return useOverlayState({
+        onOpenChange: (isOpen) => {
+            if (!isOpen) refresh();
+        },
+    });
+}
 
 export default function MessagesAdminPage() {
     const [selectedMessage, setSelectedMessage] = useState<ConnectorMessage | null>(null);
@@ -90,9 +99,16 @@ export default function MessagesAdminPage() {
             messageDirectionQuery,
             businessDomainIdentifierQuery,
             processingModeServiceQuery,
-            dateRange
+            dateRange,
         ],
     );
+
+    const detailsModal = useOverlayState();
+    const reportModal = useOverlayState();
+    const helpModal = useOverlayState();
+    const pendingMessagesModal = useOverlayState();
+    const evidenceTriggerModal = useOverlayState();
+    const transportModal = useRefreshOnClose(pagedList.refresh);
 
     const onIdentifierChange = (value: string) => {
         setIdentifierQuery(value);
@@ -105,7 +121,7 @@ export default function MessagesAdminPage() {
     };
 
     const onDirectionChange = (value: string | null) => {
-        setMessageDirectionQuery(value!);
+        setMessageDirectionQuery(value ?? ALL_SELECTOR);
         pagedList.setPage(1);
     };
 
@@ -116,24 +132,9 @@ export default function MessagesAdminPage() {
     };
 
     const onProcessingModeServiceChange = (service: ConnectorProcessingModeService | null) => {
-        setProcessingModeServiceQuery(service!.name);
+        setProcessingModeServiceQuery(service?.name ?? ALL_SELECTOR);
         pagedList.setPage(1);
     };
-
-    const useRefreshOnClose = (refresh: () => void) => {
-        return useOverlayState({
-            onOpenChange: (isOpen) => {
-                if (!isOpen) refresh();
-            },
-        });
-    }
-
-    const detailsModal = useRefreshOnClose(pagedList.refresh);
-    const transportModal = useRefreshOnClose(pagedList.refresh);
-    const reportModal = useRefreshOnClose(pagedList.refresh);
-    const evidenceTriggerModal = useRefreshOnClose(pagedList.refresh);
-    const pendingMessagesModal = useRefreshOnClose(pagedList.refresh);
-    const helpModal = useRefreshOnClose(pagedList.refresh);
 
     const onDetailsClick = (message: ConnectorMessage) => {
         setSelectedMessage(message);
@@ -150,24 +151,29 @@ export default function MessagesAdminPage() {
         evidenceTriggerModal.open();
     };
 
-    const onReportClicked = () => {
-        reportModal.open();
-    }
+    const canTriggerDeliveryEvidence = (message: ConnectorMessage): boolean =>
+        isTestingMode
+        && message.direction === "GATEWAY_TO_BACKEND"
+        && message.confirmedAt == null
+        && message.deliveredToLinkPartnerAt != null;
 
-    const onPendingMessagesClicked = () => {
-        pendingMessagesModal.open();
-    }
+    const handleEvidenceTriggerSubmit = async (
+        payload: SendEvidenceTriggerRequest,
+    ): Promise<MessageEvidenceTriggerResponse | undefined> => {
+        let response: MessageEvidenceTriggerResponse;
+        try {
+            response = await messageService.sendEvidenceTrigger(payload);
+        } catch (error) {
+            toastError(error);
+            return undefined;
+        }
 
-    const onHelpClicked = () => {
-        helpModal.open();
-    }
+        toastSuccess(`Evidence trigger sent successfully with ${response.identifier} as created message identifier.`);
+        evidenceTriggerModal.close();
+        pagedList.refresh();
 
-    const canTriggerDeliveryEvidence = (message: ConnectorMessage): boolean => {
-        return isTestingMode
-            && message.direction == "GATEWAY_TO_BACKEND"
-            && message.confirmedAt == null
-            && message.deliveredToLinkPartnerAt != null
-    }
+        return response;
+    };
 
     return (
         <div>
@@ -176,13 +182,12 @@ export default function MessagesAdminPage() {
                 title="Business Messages"
                 subtitle="The connector processed business messages"
             >
-
                 {isTestingMode && (
                     <PageHeaderButton
                         variant="primary"
                         tooltip="Show pending messages"
                         icon={MailClock}
-                        onPress={onPendingMessagesClicked}
+                        onPress={pendingMessagesModal.open}
                     />
                 )}
 
@@ -190,14 +195,14 @@ export default function MessagesAdminPage() {
                     variant="tertiary"
                     tooltip="Messages lifecycle explanation"
                     icon={Info}
-                    onPress={onHelpClicked}
+                    onPress={helpModal.open}
                 />
 
                 <PageHeaderButton
                     variant="outline"
                     tooltip="Show reporting"
                     icon={ChartPie}
-                    onPress={onReportClicked}
+                    onPress={reportModal.open}
                 />
 
                 <PageHeaderButton
@@ -228,142 +233,132 @@ export default function MessagesAdminPage() {
                 onDateRangeChange={(next) => setDateRange(next as RangeValue<ZonedDateTime> | null)}
             />
 
-            {pagedList.loading ? (
-                <SpinnerView className="mt-60"/>
-            ) : pagedList.loadError ? (
+            {pagedList.loadError ? (
                 <LoadErrorState
                     title="Could not load messages"
                     onRetry={pagedList.retry}
                 />
             ) : (
                 <>
-                    <Table variant="secondary">
-                        <Table.ScrollContainer>
-                            <Table.Content aria-label="Connector business messages">
-                                <Table.Header>
-                                    <Table.Column isRowHeader>Identifier</Table.Column>
-                                    <Table.Column>Conversation ID</Table.Column>
-                                    <Table.Column>Business domain</Table.Column>
-                                    <Table.Column>Backend ID</Table.Column>
-                                    <Table.Column>From</Table.Column>
-                                    <Table.Column>To</Table.Column>
-                                    <Table.Column>Backend</Table.Column>
-                                    <Table.Column>Gateway</Table.Column>
-                                    <Table.Column>Service</Table.Column>
-                                    <Table.Column>Action</Table.Column>
-                                    <Table.Column>Direction</Table.Column>
-                                    <Table.Column>Status</Table.Column>
-                                    <Table.Column>Created at</Table.Column>
-                                    <Table.Column>Action.s</Table.Column>
-                                </Table.Header>
-                                <Table.Body>
-                                    {pagedList.items.map((message) => (
-                                        <Table.Row key={message.identifier}>
-                                            <Table.Cell>
-                                                <CopyableIdentifier identifier={message.identifier} visibleChars={IDENTIFIER_LENGTH}/>
-                                            </Table.Cell>
-                                            <Table.Cell>
-                                                <CopyableIdentifier identifier={message.as4Properties.conversationIdentifier}
-                                                                    visibleChars={IDENTIFIER_LENGTH}/>
-                                            </Table.Cell>
-                                            <Table.Cell>{message.businessDomainIdentifier}</Table.Cell>
-                                            <Table.Cell>
-                                                <CopyableIdentifier identifier={message.backendMessageIdentifier} visibleChars={IDENTIFIER_LENGTH}/>
-                                            </Table.Cell>
-                                            <Table.Cell>{message.as4Properties.fromParty.identifier}</Table.Cell>
-                                            <Table.Cell>{message.as4Properties.toParty.identifier}</Table.Cell>
-                                            <Table.Cell>{message.backendName}</Table.Cell>
-                                            <Table.Cell>{message.gatewayName}</Table.Cell>
-                                            <Table.Cell>{message.as4Properties.service.name}</Table.Cell>
-                                            <Table.Cell>{message.as4Properties.action.name}</Table.Cell>
-                                            <Table.Cell>
-                                                <MessageDirectionChip
-                                                    labelVariant="short"
-                                                    direction={message.direction}
-                                                />
-                                            </Table.Cell>
-                                            <Table.Cell>
-                                                <MessageDeliveryStatusChip message={message}/>
-                                            </Table.Cell>
-                                            <Table.Cell>
-                                                <DateTime value={message.createdAt} precision="millis"/>
-                                            </Table.Cell>
-                                            <Table.Cell>
-                                                <div className="flex items-center gap-1">
-                                                    <DetailActionButton onPress={() => onDetailsClick(message)}/>
-                                                    <ActionButton label="Transport steps" icon={Route}
-                                                                  onPress={() => onTransportStepsClick(message)}/>
-                                                    {canTriggerDeliveryEvidence(message) &&
-                                                        <ActionButton label="Send delivery evidence"
-                                                                      icon={MailCheck}
-                                                                      iconAccent="text-success"
-                                                                      onPress={() => onDeliveryAckClick(message)}/>
-                                                    }
-                                                </div>
-                                            </Table.Cell>
-                                        </Table.Row>
-                                    ))}
-                                </Table.Body>
-                            </Table.Content>
-                        </Table.ScrollContainer>
-                    </Table>
+                    <div
+                        aria-busy={pagedList.loading}
+                        className={`transition-opacity ${
+                            pagedList.loading && pagedList.items.length > 0 ? "pointer-events-none opacity-50" : ""
+                        }`}
+                    >
+                        <Table variant="secondary">
+                            <Table.ScrollContainer>
+                                <Table.Content aria-label="Connector business messages">
+                                    <Table.Header>
+                                        <Table.Column isRowHeader>Identifier</Table.Column>
+                                        <Table.Column>Conversation ID</Table.Column>
+                                        <Table.Column>Business domain</Table.Column>
+                                        <Table.Column>Backend ID</Table.Column>
+                                        <Table.Column>From</Table.Column>
+                                        <Table.Column>To</Table.Column>
+                                        <Table.Column>Backend</Table.Column>
+                                        <Table.Column>Gateway</Table.Column>
+                                        <Table.Column>Service</Table.Column>
+                                        <Table.Column>Action</Table.Column>
+                                        <Table.Column>Direction</Table.Column>
+                                        <Table.Column>Status</Table.Column>
+                                        <Table.Column>Created at</Table.Column>
+                                        <Table.Column>Actions</Table.Column>
+                                    </Table.Header>
+                                    <Table.Body
+                                        renderEmptyState={() =>
+                                            pagedList.loading ? (
+                                                <SpinnerView className="py-16"/>
+                                            ) : (
+                                                <EmptyState text="No message available" className="py-16"/>
+                                            )
+                                        }
+                                    >
+                                        {pagedList.items.map((message) => (
+                                            <Table.Row key={message.identifier}>
+                                                <Table.Cell>
+                                                    <CopyableIdentifier identifier={message.identifier} visibleChars={IDENTIFIER_LENGTH}/>
+                                                </Table.Cell>
+                                                <Table.Cell>
+                                                    <CopyableIdentifier
+                                                        identifier={message.as4Properties.conversationIdentifier}
+                                                        visibleChars={IDENTIFIER_LENGTH}/>
+                                                </Table.Cell>
+                                                <Table.Cell>{message.businessDomainIdentifier}</Table.Cell>
+                                                <Table.Cell>
+                                                    <CopyableIdentifier
+                                                        identifier={message.backendMessageIdentifier}
+                                                        visibleChars={IDENTIFIER_LENGTH}/>
+                                                </Table.Cell>
+                                                <Table.Cell>{message.as4Properties.fromParty.identifier}</Table.Cell>
+                                                <Table.Cell>{message.as4Properties.toParty.identifier}</Table.Cell>
+                                                <Table.Cell>{message.backendName}</Table.Cell>
+                                                <Table.Cell>{message.gatewayName}</Table.Cell>
+                                                <Table.Cell>{message.as4Properties.service.name}</Table.Cell>
+                                                <Table.Cell>{message.as4Properties.action.name}</Table.Cell>
+                                                <Table.Cell>
+                                                    <MessageDirectionChip labelVariant="short" direction={message.direction}/>
+                                                </Table.Cell>
+                                                <Table.Cell>
+                                                    <MessageDeliveryStatusChip message={message}/>
+                                                </Table.Cell>
+                                                <Table.Cell>
+                                                    <DateTime value={message.createdAt} precision="millis"/>
+                                                </Table.Cell>
+                                                <Table.Cell>
+                                                    <div className="flex items-center gap-1">
+                                                        <DetailActionButton onPress={() => onDetailsClick(message)}/>
+                                                        <ActionButton
+                                                            label="Transport steps"
+                                                            icon={Route}
+                                                            onPress={() => onTransportStepsClick(message)}/>
+                                                        {canTriggerDeliveryEvidence(message) && (
+                                                            <ActionButton
+                                                                label="Send delivery evidence"
+                                                                icon={MailCheck}
+                                                                iconAccent="text-success"
+                                                                onPress={() => onDeliveryAckClick(message)}/>
+                                                        )}
+                                                    </div>
+                                                </Table.Cell>
+                                            </Table.Row>
+                                        ))}
+                                    </Table.Body>
+                                </Table.Content>
+                            </Table.ScrollContainer>
+                        </Table>
+                    </div>
 
-                    {pagedList.items.length === 0 && !pagedList.refreshing && (
-                        <EmptyState text="No message available" className="mt-50"/>
+                    {pagedList.totalElements > 0 && (
+                        <div className="mt-4 flex justify-center">
+                            <PaginationControls
+                                page={pagedList.page}
+                                pageSize={pagedList.pageSize}
+                                totalElements={pagedList.totalElements}
+                                onPageChange={pagedList.setPage}
+                                onPageSizeChange={pagedList.setPageSize}
+                            />
+                        </div>
                     )}
-
-                    {
-                        pagedList.totalElements > 0 && (
-                            <div className="flex justify-center mt-4">
-                                <PaginationControls
-                                    page={pagedList.page}
-                                    pageSize={pagedList.pageSize}
-                                    totalElements={pagedList.totalElements}
-                                    onPageChange={pagedList.setPage}
-                                    onPageSizeChange={pagedList.setPageSize}
-                                />
-                            </div>
-                        )
-                    }
                 </>
             )}
 
             <MessageLifecycleView state={helpModal}/>
 
-            <MessageDetailsView
-                message={selectedMessage}
-                state={detailsModal}
-            />
+            <MessageDetailsView message={selectedMessage} state={detailsModal}/>
 
-            <MessageTransportStepsDetailView
-                message={selectedMessage}
-                state={transportModal}
-            />
+            <MessageTransportStepsDetailView message={selectedMessage} state={transportModal}/>
 
             <MessageReportingView state={reportModal}/>
 
             <MessageEvidenceTriggerModeView
                 message={selectedMessage}
                 state={evidenceTriggerModal}
-                evidenceType={"DELIVERY"}
-                onSubmit={async (payload) => {
-                    let response: MessageEvidenceTriggerResponse;
-                    try {
-                        response = await messageService.sendEvidenceTrigger(payload);
-                    } catch (error) {
-                        toastError(error);
-                        return;
-                    }
-
-                    toastSuccess(`Evidence trigger sent successfully with ${response.identifier} as created message identifier.`);
-                    evidenceTriggerModal.close();
-                    pagedList.refresh();
-
-                    return response;
-                }}
+                evidenceType="DELIVERY"
+                onSubmit={handleEvidenceTriggerSubmit}
             />
 
             <MessagePendingView state={pendingMessagesModal} onDownloaded={pagedList.refresh}/>
         </div>
-    )
+    );
 }

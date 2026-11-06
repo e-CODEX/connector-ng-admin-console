@@ -59,7 +59,12 @@ export default function QueueAdminPage() {
             ) : list.items.length === 0 ? (
                 <EmptyState text="No queue stats available" className="mt-70"/>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-4 gap-x-5 gap-y-2">
+                <div
+                    aria-busy={list.refreshing}
+                    className={`grid grid-cols-1 gap-x-5 gap-y-2 transition-opacity sm:grid-cols-4 ${
+                        list.refreshing ? "pointer-events-none opacity-50" : ""
+                    }`}
+                >
                     {list.items.map((queueStats) => (
                         <QueueCard
                             key={queueStats.queueName}

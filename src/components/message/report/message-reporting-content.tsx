@@ -8,7 +8,9 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { Button, Description, Dropdown, Kbd, Key, Label, Modal, Table } from "@heroui/react";
+"use client";
+
+import { Button, Description, Dropdown, Key, Label, Modal, Table } from "@heroui/react";
 import { type RangeValue } from "react-aria-components";
 import React, { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { MessageReportExportFormat } from "@/services/message";
@@ -30,6 +32,11 @@ const ALL_BUSINESS_DOMAIN_SELECTOR = "All Business domains";
 
 const granularity: DateTimeRangeGranularity = "day";
 
+type AppliedCriteria = {
+    dateRange: RangeValue<ZonedDateTime> | null;
+    domain: string;
+};
+
 function toExportFormat(formatKey: Key): MessageReportExportFormat {
     switch (formatKey) {
         case "export-csv":
@@ -46,11 +53,13 @@ function toExportFormat(formatKey: Key): MessageReportExportFormat {
 export function MessageReportingContent() {
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
+    const [exporting, setExporting] = useState(false);
+    const [loadFailed, setLoadFailed] = useState(false);
     const [messageReports, setMessageReports] = useState<ConnectorMessageReportResponse | undefined>(undefined);
     const [businessDomainIdentifierQuery, setBusinessDomainIdentifierQuery] = useState<string>(ALL_BUSINESS_DOMAIN_SELECTOR);
     const [dateRange, setDateRange] = useState<RangeValue<ZonedDateTime> | null>(buildDefaultRange);
-    const [hasLoaded, setHasLoaded] = useState(false);
-    const [loadFailed, setLoadFailed] = useState(false);
+    // The criteria the report currently on screen was loaded with (what Export must use).
+    const [applied, setApplied] = useState<AppliedCriteria | null>(null);
     const requestId = useRef(0);
 
     const messageService = useMessageService();
@@ -71,7 +80,7 @@ export function MessageReportingContent() {
                     });
                     if (!isCurrent()) return;
                     setMessageReports(data);
-                    setHasLoaded(true);
+                    setApplied({ dateRange: selected, domain });
                 } catch {
                     if (isCurrent()) {
                         setMessageReports(undefined);
@@ -103,32 +112,39 @@ export function MessageReportingContent() {
         void loadReports(dateRange, businessDomainIdentifierQuery);
     };
 
-    const onBusinessDomainIdentifierChange = (value: string) => {
-        setBusinessDomainIdentifierQuery(value);
-        setMessageReports(undefined);
-    };
-
     const onApplyPress = () => {
         setRefreshing(true);
         void loadReports(dateRange, businessDomainIdentifierQuery);
     };
 
     const onExportClick = async (formatKey: Key) => {
-        const params = {
-            ...toDateRange(dateRange, granularity),
-            format: toExportFormat(formatKey),
-            businessDomain: asBusinessDomainSelectorFilter(businessDomainIdentifierQuery, ALL_BUSINESS_DOMAIN_SELECTOR),
-        };
+        if (!applied || exporting) {
+            return;
+        }
 
+        setExporting(true);
         try {
+            const params = {
+                ...toDateRange(dateRange, granularity),
+                format: toExportFormat(formatKey),
+                businessDomain: asBusinessDomainSelectorFilter(applied.domain, ALL_BUSINESS_DOMAIN_SELECTOR),
+            };
             const file = await messageService.exportMessageReports(params);
             saveFile(file);
         } catch (error) {
             toastError(error);
+        } finally {
+            setExporting(false);
         }
     };
 
-    const hasReports = !!messageReports && messageReports.years.length > 0;
+    const years = messageReports?.years ?? [];
+    const hasReports = years.length > 0;
+    const idle = !loading && !refreshing;
+
+    // The selectors changed since the report on screen was loaded.
+    const dirty = !!applied
+        && (applied.dateRange !== dateRange || applied.domain !== businessDomainIdentifierQuery);
 
     return (
         <>
@@ -144,7 +160,7 @@ export function MessageReportingContent() {
                     <BusinessDomainSelector
                         identifiers={businessDomainIdentifiers}
                         value={businessDomainIdentifierQuery}
-                        onValueChange={onBusinessDomainIdentifierChange}
+                        onValueChange={setBusinessDomainIdentifierQuery}
                     />
 
                     <div className="flex flex-col">
@@ -167,7 +183,7 @@ export function MessageReportingContent() {
                     <SpinnerView className="mt-60"/>
                 )}
 
-                {!loading && !refreshing && loadFailed && (
+                {idle && loadFailed && (
                     <LoadErrorState
                         className="min-h-80 flex-1"
                         title="Could not load message reports"
@@ -175,15 +191,26 @@ export function MessageReportingContent() {
                     />
                 )}
 
-                {hasLoaded && !loading && !refreshing && !loadFailed && messageReports && messageReports.years.length === 0 && (
+                {idle && !loadFailed && messageReports !== undefined && !hasReports && (
                     <EmptyState text="No report available" className="flex-1"/>
                 )}
 
+                {dirty && hasReports && (
+                    <p className="mt-2 text-xs text-muted">
+                        Filters changed. Press Search to update the report.
+                    </p>
+                )}
+
                 {hasReports && (
-                    <div className="flex flex-col">
-                        {messageReports!.years.map((content, i) => (
-                            <div key={i} className="flex flex-col gap-y-2">
-                                <div className="flex items-center gap-3 my-2">
+                    <div
+                        aria-busy={refreshing}
+                        className={`flex flex-col transition-opacity ${
+                            refreshing ? "pointer-events-none opacity-50" : ""
+                        }`}
+                    >
+                        {years.map((content) => (
+                            <div key={content.year} className="flex flex-col gap-y-2">
+                                <div className="my-2 flex items-center gap-3">
                                     <h2 className="text-lg font-semibold tracking-tight text-foreground">
                                         {content.year}
                                     </h2>
@@ -204,7 +231,7 @@ export function MessageReportingContent() {
                                             </Table.Header>
                                             <Table.Body>
                                                 {content.months.map((month) => (
-                                                    <Fragment key={content.year + month.label}>
+                                                    <Fragment key={`${content.year}-${month.label}`}>
                                                         {/* group header spanning all columns */}
                                                         <Table.Row>
                                                             <Table.Cell colSpan={5} className="bg-slate-400 text-center font-semibold">
@@ -214,7 +241,7 @@ export function MessageReportingContent() {
 
                                                         {/* normal data rows for that month */}
                                                         {month.reports.map((report) => (
-                                                            <Table.Row key={report.party + report.service}>
+                                                            <Table.Row key={`${report.party}|${report.service}`}>
                                                                 <Table.Cell>{report.party}</Table.Cell>
                                                                 <Table.Cell>{report.service}</Table.Cell>
                                                                 <Table.Cell>{report.inbound}</Table.Cell>
@@ -223,16 +250,16 @@ export function MessageReportingContent() {
                                                             </Table.Row>
                                                         ))}
                                                         <Table.Row>
-                                                            <Table.Cell colSpan={2} className="font-semibold bg-warning-soft">
+                                                            <Table.Cell colSpan={2} className="bg-warning-soft font-semibold">
                                                                 Total
                                                             </Table.Cell>
-                                                            <Table.Cell className="font-semibold bg-warning-soft">
+                                                            <Table.Cell className="bg-warning-soft font-semibold">
                                                                 {month.totalInbound}
                                                             </Table.Cell>
-                                                            <Table.Cell className="font-semibold bg-warning-soft">
+                                                            <Table.Cell className="bg-warning-soft font-semibold">
                                                                 {month.totalOutbound}
                                                             </Table.Cell>
-                                                            <Table.Cell className="font-semibold bg-warning-soft">
+                                                            <Table.Cell className="bg-warning-soft font-semibold">
                                                                 {month.total}
                                                             </Table.Cell>
                                                         </Table.Row>
@@ -253,7 +280,9 @@ export function MessageReportingContent() {
                     <Button
                         variant="secondary"
                         aria-label="Export report menu"
-                        isDisabled={!hasReports || loading || refreshing}>
+                        isPending={exporting}
+                        isDisabled={!hasReports || loading || refreshing || exporting}
+                    >
                         <Upload/>
                         Export
                     </Button>
@@ -267,10 +296,6 @@ export function MessageReportingContent() {
                                     <Label>Excel</Label>
                                     <Description>Export to Excel</Description>
                                 </div>
-                                <Kbd className="ms-auto" slot="keyboard" variant="light">
-                                    <Kbd.Abbr keyValue="command"/>
-                                    <Kbd.Content>E</Kbd.Content>
-                                </Kbd>
                             </Dropdown.Item>
                             <Dropdown.Item id="export-json" textValue="JSON">
                                 <div className="flex h-8 items-start justify-center pt-px">
@@ -280,10 +305,6 @@ export function MessageReportingContent() {
                                     <Label>JSON</Label>
                                     <Description>Export to JSON format</Description>
                                 </div>
-                                <Kbd className="ms-auto" slot="keyboard" variant="light">
-                                    <Kbd.Abbr keyValue="command"/>
-                                    <Kbd.Content>J</Kbd.Content>
-                                </Kbd>
                             </Dropdown.Item>
                             <Dropdown.Item id="export-csv" textValue="CSV">
                                 <div className="flex h-8 items-start justify-center pt-px">
@@ -293,10 +314,6 @@ export function MessageReportingContent() {
                                     <Label>CSV</Label>
                                     <Description>Export to CSV</Description>
                                 </div>
-                                <Kbd className="ms-auto" slot="keyboard" variant="light">
-                                    <Kbd.Abbr keyValue="command"/>
-                                    <Kbd.Content>C</Kbd.Content>
-                                </Kbd>
                             </Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown.Popover>

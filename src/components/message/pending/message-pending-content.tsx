@@ -34,7 +34,6 @@ export function MessagePendingContent({ onDownloaded }: MessagePendingContentPro
     const [selectedKeys, setSelectedKeys] = useState<Selection>(EMPTY_SELECTION);
     const [loadFailed, setLoadFailed] = useState(false);
 
-    // "all" is what the header checkbox produces, so normalise it to a list of ids
     const selectedIds = selectedKeys === "all"
         ? messageIds
         : messageIds.filter((id) => selectedKeys.has(id));
@@ -110,19 +109,21 @@ export function MessagePendingContent({ onDownloaded }: MessagePendingContentPro
             return;
         }
 
-        // Some messages selected: download them one by one
-        let succeeded = 0;
+        const succeededIds: string[] = [];
         try {
             for (const id of selectedIds) {
                 await messageService.downloadPendingMessage(id);
-                succeeded++;
+                succeededIds.push(id);
             }
-            toastSuccess(`${succeeded} message(s) downloaded successfully.`);
+            toastSuccess(`${succeededIds.length} message(s) downloaded successfully.`);
         } catch (error) {
             toastError(error);
+            if (succeededIds.length > 0) {
+                toastSuccess(`${succeededIds.length} of ${selectedIds.length} message(s) were downloaded before the error.`);
+            }
         } finally {
-            if (succeeded > 0) {
-                setSelectedKeys(EMPTY_SELECTION);
+            if (succeededIds.length > 0) {
+                setSelectedKeys(new Set(selectedIds.filter((id) => !succeededIds.includes(id))));
                 setReloadToken((token) => token + 1);
                 onDownloaded?.();
             }
@@ -133,71 +134,78 @@ export function MessagePendingContent({ onDownloaded }: MessagePendingContentPro
     return (
         <>
             <Modal.Body className="relative flex min-h-64 flex-1 flex-col">
-                {loading ? (
-                    <div className="flex flex-1 items-center justify-center">
-                        <SpinnerView/>
-                    </div>
-                ) : loadFailed ? (
+                {loadFailed ? (
                     <LoadErrorState
                         className="min-h-64 flex-1"
                         title="Could not load pending messages"
                         onRetry={onRefreshClicked}
                     />
                 ) : (
-                    <Table variant="secondary">
-                        <Table.ScrollContainer>
-                            <Table.Content
-                                aria-label="Pending messages"
-                                selectionMode="multiple"
-                                selectedKeys={selectedKeys}
-                                onSelectionChange={setSelectedKeys}
-                            >
-                                <Table.Header>
-                                    <Table.Column>
-                                        <Checkbox slot="selection" aria-label="Select all">
-                                            <Checkbox.Content>
-                                                <Checkbox.Control>
-                                                    <Checkbox.Indicator/>
-                                                </Checkbox.Control>
-                                            </Checkbox.Content>
-                                        </Checkbox>
-                                    </Table.Column>
-                                    <Table.Column>#</Table.Column>
-                                    <Table.Column isRowHeader>Message Transport Step Identifier</Table.Column>
-                                    <Table.Column>Action.s</Table.Column>
-                                </Table.Header>
-                                <Table.Body
-                                    renderEmptyState={() => (
-                                        <EmptyState text="No pending messages for download" className="py-10"/>
-                                    )}
+                    <div
+                        aria-busy={loading}
+                        className={`transition-opacity ${
+                            loading && messageIds.length > 0 ? "pointer-events-none opacity-50" : ""
+                        }`}
+                    >
+                        <Table variant="secondary">
+                            <Table.ScrollContainer>
+                                <Table.Content
+                                    aria-label="Pending messages"
+                                    selectionMode="multiple"
+                                    selectedKeys={selectedKeys}
+                                    onSelectionChange={setSelectedKeys}
                                 >
-                                    {messageIds.map((identifier, index) => (
-                                        <Table.Row key={identifier} id={identifier}>
-                                            <Table.Cell>
-                                                <Checkbox variant="secondary" slot="selection" aria-label={`Select ${identifier}`}>
-                                                    <Checkbox.Content>
-                                                        <Checkbox.Control>
-                                                            <Checkbox.Indicator/>
-                                                        </Checkbox.Control>
-                                                    </Checkbox.Content>
-                                                </Checkbox>
-                                            </Table.Cell>
-                                            <Table.Cell>{index + 1}</Table.Cell>
-                                            <Table.Cell>
-                                                <CopyableIdentifier identifier={identifier} visibleChars={100}/>
-                                            </Table.Cell>
-                                            <Table.Cell>
-                                                <DownloadActionButton
-                                                    isDisabled={downloading}
-                                                    onPress={() => onDownloadClicked(identifier)}
-                                                />
-                                            </Table.Cell>
-                                        </Table.Row>
-                                    ))}
-                                </Table.Body>
-                            </Table.Content>
-                        </Table.ScrollContainer>
-                    </Table>
+                                    <Table.Header>
+                                        <Table.Column>
+                                            <Checkbox slot="selection" aria-label="Select all">
+                                                <Checkbox.Content>
+                                                    <Checkbox.Control>
+                                                        <Checkbox.Indicator/>
+                                                    </Checkbox.Control>
+                                                </Checkbox.Content>
+                                            </Checkbox>
+                                        </Table.Column>
+                                        <Table.Column>#</Table.Column>
+                                        <Table.Column isRowHeader>Message Transport Step Identifier</Table.Column>
+                                        <Table.Column>Action.s</Table.Column>
+                                    </Table.Header>
+                                    <Table.Body
+                                        renderEmptyState={() =>
+                                            loading ? (
+                                                <SpinnerView className="py-16"/>
+                                            ) : (
+                                                <EmptyState text="No pending messages for pulling" className="py-16"/>
+                                            )
+                                        }
+                                    >
+                                        {messageIds.map((identifier, index) => (
+                                            <Table.Row key={identifier} id={identifier}>
+                                                <Table.Cell>
+                                                    <Checkbox variant="secondary" slot="selection" aria-label={`Select ${identifier}`}>
+                                                        <Checkbox.Content>
+                                                            <Checkbox.Control>
+                                                                <Checkbox.Indicator/>
+                                                            </Checkbox.Control>
+                                                        </Checkbox.Content>
+                                                    </Checkbox>
+                                                </Table.Cell>
+                                                <Table.Cell>{index + 1}</Table.Cell>
+                                                <Table.Cell>
+                                                    <CopyableIdentifier identifier={identifier} visibleChars={100}/>
+                                                </Table.Cell>
+                                                <Table.Cell>
+                                                    <DownloadActionButton
+                                                        isDisabled={downloading}
+                                                        onPress={() => onDownloadClicked(identifier)}
+                                                    />
+                                                </Table.Cell>
+                                            </Table.Row>
+                                        ))}
+                                    </Table.Body>
+                                </Table.Content>
+                            </Table.ScrollContainer>
+                        </Table>
+                    </div>
                 )}
 
                 {downloading && (

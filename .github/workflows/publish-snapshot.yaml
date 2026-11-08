@@ -9,5 +9,5 @@ jobs:
         name: Build and push the docker image
         uses: e-CODEX/workflows/.github/workflows/docker-build-push.yaml@main
         with:
-            image-name: connector-ng-admin-ui
+            image-name: connector-ng-admin-console
             registry: scm.ecodex.eu/ecodex-docker-snapshots

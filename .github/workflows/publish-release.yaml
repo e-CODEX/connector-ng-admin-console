@@ -23,21 +23,29 @@ jobs:
         with:
             node-version: "22"
             environment: ${{ inputs.environment }}
+    docs:
+        name: Generate the installation guide PDF
+        needs: tag-version
+        uses: e-CODEX/workflows/.github/workflows/asciidoc-pdf-release.yaml@e11c8f8c4b46fb8c75458c915f818d6b8e8bcfb9
+        with:
+            adoc-file: "docs/installation-guide.adoc"
+            tag: ${{ needs.tag-version.outputs.tag }}
     publish:
         name: Publish the current release version
-        needs: tag-version
-        uses: e-CODEX/workflows/.github/workflows/npm-publish-nextjs-release.yaml@51e5e37345807abb3be06b032dd77b4b02077b53
+        needs: [tag-version, docs]
+        uses: e-CODEX/workflows/.github/workflows/npm-publish-nextjs-release.yaml@e11c8f8c4b46fb8c75458c915f818d6b8e8bcfb9
         with:
             node-version: "22"
             app-folder: "connector-testor"
             tag: ${{ needs.tag-version.outputs.tag }}
             environment: ${{ inputs.environment }}
+            docs-artifact-name: ${{ needs.docs.outputs.artifact-name }}
 
     docker:
         name: Build and push the docker image
         needs: tag-version
         uses: e-CODEX/workflows/.github/workflows/docker-build-push.yaml@main
         with:
-            image-name: connector-ng-admin-ui
+            image-name: connector-ng-admin-console
             tag: ${{ needs.tag-version.outputs.tag }}
             environment: ${{ inputs.environment }}

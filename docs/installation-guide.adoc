@@ -1,0 +1,354 @@
+= Connector Admin Console {project-version} – Installation Guide
+
+:author: eu-LISA
+:project-version: X.Y.Z
+:revnumber: {project-version}
+:doctype: book
+:toc: left
+:toclevels: 3
+:sectnums:
+:icons: font
+:imagesdir: images
+ifdef::backend-pdf[]
+:title-page:
+:title-logo-image: image:logo.png[pdfwidth=50%,align=center]
+:source-highlighter: rouge
+endif::[]
+ifndef::backend-pdf[]
+:source-highlighter: highlight.js
+endif::[]
+
+[abstract]
+This guide describes how to deploy the e-CODEX connector Admin Console, and how to configure the connector backend (`connector-ng`) so that both components can communicate.
+
+== Overview
+
+The Admin Console is a Next.js application following a _Backend-For-Frontend_ (BFF) pattern:
+
+* The browser talks to the Next.js server (pages, route handlers, session cookie).
+* The Next.js server talks to the connector backend REST API.
+* Authentication relies on an `httpOnly` session cookie; the token is never exposed to client-side JavaScript.
+
+[source]
+----
++---------+   HTTPS   +--------------------+   HTTP(S)   +-------------------+
+| Browser | --------> | Admin Console      | ----------> | Connector backend |
+|         |           | (Next.js, :3000)   |             | (Spring Boot)     |
++---------+           +--------------------+             +-------------------+
+----
+
+The application is built with the Next.js `standalone` output. Each release provides two deliverables:
+
+[cols="1,2,2",options="header"]
+|===
+| Deliverable | Name | Use when
+
+| Docker image
+| `connector-ng-admin-console:{project-version}`
+| Container-based deployment (recommended)
+
+| Standalone bundle
+| `connector-testor-{project-version}.zip` (attached to the GitHub release)
+| Deployment on a host with Node.js, without Docker
+|===
+
+== Prerequisites
+
+[cols="1,2",options="header"]
+|===
+| Requirement | Details
+
+| Connector backend
+| Version 7.x, installed and reachable from the host running the Admin Console
+
+| Docker
+| Required for the Docker deployment
+
+| Node.js
+| Version *22* (LTS) – only required for the standalone bundle deployment
+
+| Reverse proxy
+| Recommended (nginx, Apache httpd, Traefik, …) to terminate TLS
+|===
+
+== Backend configuration
+
+=== CORS
+
+The connector backend must accept requests coming from the origin where the Admin Console is served. Add the following properties to the connector configuration:
+
+[source,properties]
+----
+##################################################################################
+################################### CORS CONFIGURATIONS ##########################
+##################################################################################
+connector.cors.allowed-origins=https://admin.example.org
+connector.cors.max-age=3600
+----
+
+[cols="1,3",options="header"]
+|===
+| Property | Description
+
+| `connector.cors.allowed-origins`
+| Comma-separated list of origins allowed to call the backend. An origin is `scheme://host[:port]`, *without* trailing slash and *without* path.
+
+| `connector.cors.max-age`
+| Duration in seconds during which browsers may cache the CORS pre-flight response (`3600` = 1 hour).
+|===
+
+[IMPORTANT]
+====
+* `http://localhost:3000` is only suitable for local development. In production, use the public URL of the Admin Console (for example `https://admin.example.org`).
+* Several origins can be declared, separated by commas.
+* The origin must match *exactly* what the browser displays (protocol, host and port).
+* Restart the connector after changing these properties.
+====
+
+=== Network access
+
+The host running the Admin Console must be able to reach the connector REST API. Open the corresponding firewall rules if the two components run on different machines.
+
+[#frontend-configuration]
+== Frontend configuration
+
+The Admin Console is configured through environment variables read at *runtime* by the Next.js server. The same image or bundle can therefore be promoted between environments by changing only these variables.
+
+NOTE: To expose the Admin Console on another port with Docker, either remap it (`-p 8080:3000`, simplest) or set `PORT` and publish the same port (`-e PORT=8080 -p 8080:8080`). For the standalone bundle, set the `PORT` environment variable.
+
+[cols="2,2,3",options="header"]
+|===
+| Variable | Example | Description
+
+| `CONNECTOR_API_URL`
+| `https://connector.example.org:30000`
+| Base URL of the connector REST API.
+
+| `DEFAULT_ORIGINAL_SENDER`
+| `alice`
+| Original sender used by default for test messages. Optional; defaults to `alice`.
+
+| `DEFAULT_FINAL_RECIPIENT`
+| `bob`
+| Final recipient used by default for test messages. Optional; defaults to `bob`.
+
+| `PORT`
+| `3000`
+| Port the server listens on. Optional; defaults to `3000` (already set in the Docker image).
+
+| `NODE_ENV`
+| `production`
+| Already set to `production` in the Docker image.
+|===
+
+TIP: Keep these values in an environment file or in your orchestrator's secrets/config. Never commit them to version control.
+
+== Installation with Docker (recommended)
+
+The image is published as `connector-ng-admin-console`, tagged with the release version. It is based on `node:22-alpine`, runs the Next.js standalone server (`node server.js`) and exposes port `3000`.
+
+=== Run with Docker
+
+[source,bash,subs="attributes+"]
+----
+docker pull scm.ecodex.eu/docker/connector-ng-admin-console:{project-version}
+
+docker run -d --name connector-admin-console \
+  -p 3000:3000 \
+  -e CONNECTOR_API_URL=https://connector.example.org:8443 \
+  --restart unless-stopped \
+  scm.ecodex.eu/docker/connector-ng-admin-console:{project-version}
+----
+
+NOTE: Images are hosted on the e-CODEX registry `scm.ecodex.eu/docker/`.
+
+=== Run with Docker Compose
+
+[source,yaml,subs="attributes+"]
+----
+services:
+  connector-admin-console:
+    image: scm.ecodex.eu/docker/connector-ng-admin-console:{project-version}
+    container_name: connector-admin-console
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      CONNECTOR_API_URL: https://connector.example.org:8443
+----
+
+[source,bash]
+----
+docker compose up -d
+docker compose logs -f connector-admin-console
+----
+
+=== Building the image yourself (optional)
+
+From the application folder (`connector-testor`):
+
+[source,bash,subs="attributes+"]
+----
+docker build -t connector-ng-admin-console:{project-version} .
+----
+
+The Node.js version can be overridden with the `NODE_VERSION` build argument (default `22-alpine`):
+
+[source,bash,subs="attributes+"]
+----
+docker build --build-arg NODE_VERSION=22-alpine -t connector-ng-admin-console:{project-version} .
+----
+
+== Installation from the standalone bundle
+
+Use this method when Docker is not available.
+
+=== Download and extract
+
+Download `connector-testor-{project-version}.zip` from the GitHub release page and extract it:
+
+[source,bash,subs="attributes+"]
+----
+sudo mkdir -p /opt/connector-admin-console
+sudo unzip connector-testor-{project-version}.zip -d /opt/connector-admin-console
+----
+
+The archive contains two folders:
+
+* `standalone/`: the self-contained application (`server.js`, `.next/`, `public/`, `node_modules/`). No `npm install` or build step is required.
+* `docs/`: this installation guide in PDF format.
+
+=== Start the application
+
+[source,bash]
+----
+cd /opt/connector-admin-console/standalone
+CONNECTOR_API_URL=https://connector.example.org:8443 \
+NODE_ENV=production \
+node server.js
+----
+
+=== Run as a system service (systemd)
+
+Create `/etc/connector-admin-console/env`:
+
+[source,properties]
+----
+CONNECTOR_API_URL=https://connector.example.org:8443
+NODE_ENV=production
+----
+
+Create `/etc/systemd/system/connector-admin-console.service`:
+
+[source,ini]
+----
+[Unit]
+Description=Connector Admin Console
+After=network.target
+
+[Service]
+Type=simple
+User=connector
+WorkingDirectory=/opt/connector-admin-console/standalone
+EnvironmentFile=/etc/connector-admin-console/env
+ExecStart=/usr/bin/node server.js
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+----
+
+Enable and start the service:
+
+[source,bash]
+----
+sudo systemctl daemon-reload
+sudo systemctl enable --now connector-admin-console
+sudo systemctl status connector-admin-console
+----
+
+== Reverse proxy and TLS
+
+It is strongly recommended to expose the Admin Console over HTTPS. Example with nginx:
+
+[source,nginx]
+----
+server {
+    listen 443 ssl;
+    server_name admin.example.org;
+
+    ssl_certificate     /etc/ssl/certs/admin.example.org.crt;
+    ssl_certificate_key /etc/ssl/private/admin.example.org.key;
+
+    location / {
+        proxy_pass         http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+    }
+}
+
+server {
+    listen 80;
+    server_name admin.example.org;
+    return 301 https://$host$request_uri;
+}
+----
+
+Make sure the backend CORS configuration matches the public URL:
+
+[source,properties]
+----
+connector.cors.allowed-origins=https://admin.example.org
+----
+
+== Verification
+
+. Open `https://admin.example.org`: the login page must be displayed.
+. Log in with a connector user account.
+. Check that the dashboard loads data coming from the backend.
+. In the browser developer tools (_Network_ tab), verify there is no CORS error (`blocked by CORS policy`).
+
+== Troubleshooting
+
+[cols="2,3",options="header"]
+|===
+| Symptom | Likely cause and fix
+
+| `blocked by CORS policy` in the browser console
+| `connector.cors.allowed-origins` does not exactly match the browser origin (protocol, host, port, trailing slash). Fix the value and restart the connector.
+
+| Login succeeds but the session is lost on every page
+| The application is served over plain HTTP while the session cookie is flagged `Secure`, or the proxy does not forward `X-Forwarded-Proto`. Use HTTPS and forward the header.
+
+| `502 Bad Gateway` from the reverse proxy
+| The Admin Console is not running or not listening on the expected port. Check `docker logs connector-admin-console` or `journalctl -u connector-admin-console`.
+
+| Container starts but is unreachable from outside
+| Port `3000` is not published (missing `-p 3000:3000` or `ports:` entry), or a firewall blocks it.
+
+| Container runs but health checks or connections to `localhost` inside the container fail (typically in orchestrators such as Kubernetes)
+| The server may be bound to the container hostname instead of all interfaces. Set the environment variable `HOSTNAME=0.0.0.0` on the container.
+
+| Pages show no data / `ECONNREFUSED`
+| `CONNECTOR_API_URL` is wrong or the backend is unreachable from the Admin Console host or container. Test with `curl` from that location.
+|===
+
+== Security recommendations
+
+* Always serve the Admin Console over HTTPS.
+* Restrict `connector.cors.allowed-origins` to the exact origins in use; never use `*`.
+* Restrict network access to the Admin Console (VPN, IP allow-list) when possible.
+* Run the process with an unprivileged user.
+* Install new releases regularly to benefit from dependency and security updates.
+
+== Upgrade procedure
+
+. Note the currently deployed version.
+. Docker: pull the new image tag, update the tag in your `docker run` command or Compose file, then run `docker compose up -d`.
+. Standalone bundle: stop the service, extract the new zip over a clean directory, then restart the service.
+. Run the checks described in <<Verification>>.
+. To roll back, redeploy the previous version.

@@ -48,7 +48,7 @@ The application is built with the Next.js `standalone` output. Each release prov
 | Container-based deployment (recommended)
 
 | Standalone bundle
-| `connector-testor-{project-version}.zip` (attached to the GitHub release)
+| `connector-ng-admin-console-{project-version}.zip` (attached to the GitHub release)
 | Deployment on a host with Node.js, without Docker
 |===
 
@@ -185,7 +185,7 @@ docker compose logs -f connector-admin-console
 
 === Building the image yourself (optional)
 
-From the application folder (`connector-testor`):
+From the application folder (`connector-ng-admin-console`):
 
 [source,bash,subs="attributes+"]
 ----
@@ -205,12 +205,12 @@ Use this method when Docker is not available.
 
 === Download and extract
 
-Download `connector-testor-{project-version}.zip` from the GitHub release page and extract it:
+Download `connector-ng-admin-console-{project-version}.zip` from the GitHub release page and extract it:
 
 [source,bash,subs="attributes+"]
 ----
 sudo mkdir -p /opt/connector-admin-console
-sudo unzip connector-testor-{project-version}.zip -d /opt/connector-admin-console
+sudo unzip connector-ng-admin-console-{project-version}.zip -d /opt/connector-admin-console
 ----
 
 The archive contains two folders:

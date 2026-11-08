@@ -36,7 +36,7 @@ jobs:
         uses: e-CODEX/workflows/.github/workflows/npm-publish-nextjs-release.yaml@e11c8f8c4b46fb8c75458c915f818d6b8e8bcfb9
         with:
             node-version: "22"
-            app-folder: "connector-testor"
+            app-folder: "connector-ng-admin-console"
             tag: ${{ needs.tag-version.outputs.tag }}
             environment: ${{ inputs.environment }}
             docs-artifact-name: ${{ needs.docs.outputs.artifact-name }}

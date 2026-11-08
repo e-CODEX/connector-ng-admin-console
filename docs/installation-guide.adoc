@@ -1,5 +1,4 @@
 = Connector Admin Console {project-version} – Installation Guide
-
 :author: eu-LISA
 :project-version: X.Y.Z
 :revnumber: {project-version}

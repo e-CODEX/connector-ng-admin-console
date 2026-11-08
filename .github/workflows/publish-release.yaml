@@ -24,11 +24,13 @@ jobs:
             node-version: "22"
             environment: ${{ inputs.environment }}
     docs:
-        name: Generate the installation guide PDF
+        name: Generate the documentation PDFs
         needs: tag-version
-        uses: e-CODEX/workflows/.github/workflows/asciidoc-pdf-release.yaml@e11c8f8c4b46fb8c75458c915f818d6b8e8bcfb9
+        uses: e-CODEX/workflows/.github/workflows/asciidoc-pdf-release.yaml@7c00ff420cc3fc7e60fd326fe8450c6c4d342aea
         with:
-            adoc-file: "docs/installation-guide.adoc"
+            adoc-files: |
+                docs/installation-guide.adoc
+                docs/changelog.adoc
             tag: ${{ needs.tag-version.outputs.tag }}
     publish:
         name: Publish the current release version

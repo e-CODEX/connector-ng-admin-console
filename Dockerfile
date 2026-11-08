@@ -15,6 +15,8 @@ LABEL maintainer="e-codex@eulisa.europa.eu"
 LABEL description="e-CODEX connector admin console"
 
 ENV NODE_ENV=production
+ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
 
 ARG BUILD_OUTPUT_FOLDER=/app
 
@@ -26,6 +28,6 @@ COPY --from=build ${BUILD_OUTPUT_FOLDER}/.next/standalone ${APP_FOLDER}
 COPY --from=build ${BUILD_OUTPUT_FOLDER}/.next/static ${APP_FOLDER}/.next/static
 COPY --from=build ${BUILD_OUTPUT_FOLDER}/public ${APP_FOLDER}/public
 
-EXPOSE 3000
+EXPOSE ${PORT}
 
 CMD ["node", "server.js"]

@@ -89,6 +89,11 @@ const OUTBOUND_STEPS: TimelineStep[] = [
         text: "The message is submitted to the gateway.",
     },
     {
+        key: "receivedByOppositeConnector",
+        chips: <StatusChip state="receivedByOppositeConnector"/>,
+        text: "The message was received by the opposite connector.",
+    },
+    {
         key: "outcome",
         chips: (
             <>

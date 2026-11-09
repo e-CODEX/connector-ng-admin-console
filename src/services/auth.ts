@@ -57,7 +57,7 @@ export function createAuthService(baseUrl: string, call: RestApiCall) {
             })
         },
         async updatePasswordAfterLogin(currentPassword: string, newPassword: string, refreshToken?: string): Promise<void> {
-            return call<void>(baseUrl, "api/v1/auth/change-password", {
+            return call<void>(baseUrl, "api/v1/auth/me/change-password", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

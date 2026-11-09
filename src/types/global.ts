@@ -49,6 +49,18 @@ export type ConnectorEvidenceType =
     | "RETRIEVAL"
     | "NON_RETRIEVAL";
 
+export type ConnectorMessageStatus =
+    | 'CREATED'
+    | 'FAILED'
+    | 'SUBMITTED'
+    | 'DELIVERED'
+    | 'CONFIRMED'
+    | 'REJECTED'
+    | 'DELETED'
+    | 'READY_FOR_PULL'
+    | 'RECEIVED_BY_OPPOSITE_CONNECTOR'
+    | 'PULLED';
+
 export const ACCEPTED_TRUSTSTORES = [
     "application/x-pkcs12",
     "application/pkcs12",

@@ -10,7 +10,7 @@
 
 import { ConnectorAttachmentResponse } from "@/types/response/attachments";
 import { ConnectorProcessingModeAction, ConnectorProcessingModeParty, ConnectorProcessingModeService } from "@/types/response/processing-mode";
-import { BusinessDocumentAesType, ConnectorEvidenceType, MessageDirection } from "@/types/global";
+import { BusinessDocumentAesType, ConnectorEvidenceType, ConnectorMessageStatus, MessageDirection } from "@/types/global";
 
 
 export interface ConnectorMessage {
@@ -20,6 +20,7 @@ export interface ConnectorMessage {
     backendName: string;
     gatewayName: string;
     direction: MessageDirection;
+    status: ConnectorMessageStatus,
     as4Properties: ConnectorAS4Properties;
     delivered: boolean;
     createdAt: string;

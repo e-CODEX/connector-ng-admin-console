@@ -30,7 +30,7 @@ import { Search, Upload } from "lucide-react";
 
 const ALL_BUSINESS_DOMAIN_SELECTOR = "All Business domains";
 
-const granularity: DateTimeRangeGranularity = "day";
+const granularity: DateTimeRangeGranularity = "minute";
 
 type AppliedCriteria = {
     dateRange: RangeValue<ZonedDateTime> | null;

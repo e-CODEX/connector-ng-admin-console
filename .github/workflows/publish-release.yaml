@@ -26,11 +26,13 @@ jobs:
     docs:
         name: Generate the documentation PDFs
         needs: tag-version
-        uses: e-CODEX/workflows/.github/workflows/asciidoc-pdf-release.yaml@7c00ff420cc3fc7e60fd326fe8450c6c4d342aea
+        uses: e-CODEX/workflows/.github/workflows/asciidoc-pdf-release.yaml@cc0bccb6fe74e113f8774df6e5061a51954d1c6a
         with:
             adoc-files: |
                 docs/installation-guide.adoc
                 docs/changelog.adoc
+            adoc-attributes: |
+                connector-version=7.1.0
             tag: ${{ needs.tag-version.outputs.tag }}
     publish:
         name: Publish the current release version

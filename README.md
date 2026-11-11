@@ -1,3 +1,7 @@
+## Prerequisites
+
+This version of the Admin Console is compatible with **e-CODEX Connector NG 7.1.0**, which must be installed and reachable from the machine running the app (see `CONNECTOR_API_URL` below).
+
 ## Getting Started
 
 ### Environment variables
@@ -31,6 +35,7 @@ DEFAULT_FINAL_RECIPIENT=bob
 **`TESTING_CONSOLE`**: gives access to more services and actions. Messages are sent as prepared SOAP requests, which are handled by the BFF. This is why `CONNECTOR_BFF_URL` has to be set in this mode, and can be left out in `ADMIN_CONSOLE` mode.
 
 The BFF is a separate project, available at [e-CODEX/connector-ng-bff](https://github.com/e-CODEX/connector-ng-bff). It is meant for testing purposes only.
+
 ### Install dependencies
 
 ```bash

@@ -122,7 +122,7 @@ export default function OutboundMessageComponent() {
     }));
     const [errors, setErrors] = useState<SendMessageValidationErrors>({});
 
-    const { logs, isSending, submitMessage } = useOutboundMessageSender(appModeFeatures.sendAsTestMessage);
+    const { logs, clearLogs, isSending, submitMessage } = useOutboundMessageSender(appModeFeatures.sendAsTestMessage);
 
     const businessDomainIdentifier = messageFormData.businessDomainIdentifier;
     const businessDomainIdentifiers = useBusinessDomainIdentifiers();
@@ -241,7 +241,7 @@ export default function OutboundMessageComponent() {
                     isModeLocked={appModeFeatures.restrictToTestEntries}
                 />
 
-                <OutboundMessageConsolePanel contents={logs}/>
+                <OutboundMessageConsolePanel contents={logs} onClear={clearLogs} />
             </div>
         </div>
     );

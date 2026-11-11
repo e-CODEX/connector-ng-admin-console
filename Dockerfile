@@ -14,7 +14,6 @@ FROM node:${NODE_VERSION}
 LABEL maintainer="e-codex@eulisa.europa.eu"
 LABEL description="e-CODEX connector admin console"
 
-ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 

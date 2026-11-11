@@ -14,6 +14,8 @@ import { SendMessageFormData, SendParameters } from "@/types/send-message-form";
 import { useMessageService } from "@/hooks/use-http-service";
 import { toastError } from "@/utils";
 
+const READY_LOG: OutboundMessageConsoleContent = { message: "Ready.", level: "INFO" };
+
 export type LogLevel = OutboundMessageConsoleContent["level"];
 
 const pluralizeMessages = (count: number) => `${count} message${count === 1 ? "" : "s"}`;
@@ -31,6 +33,8 @@ export function useOutboundMessageSender(asTestMessage: boolean) {
     const log = useCallback((message: string, level: LogLevel = "INFO") => {
         setLogs((prev) => [...prev, { message: `[${new Date().toLocaleTimeString()}] ${message}`, level }]);
     }, []);
+
+    const clearLogs = useCallback(() => setLogs([READY_LOG]), []);
 
     const submitMessage = useCallback(
         async (messageFormData: SendMessageFormData, parameters: SendParameters) => {
@@ -59,5 +63,5 @@ export function useOutboundMessageSender(asTestMessage: boolean) {
         [messageService, asTestMessage, log],
     );
 
-    return { logs, log, isSending, submitMessage };
+    return { logs, log, clearLogs, isSending, submitMessage };
 }

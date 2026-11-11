@@ -29,9 +29,7 @@ import { AuthService, createAuthService } from "@/services/auth";
 const PROXY_BACKEND_API = "/api/backend"
 
 export function useActuatorService(): ActuatorService {
-    const { apiUrl } = useAppConfig();
-
-    return useMemo(() => createActuatorService(apiUrl), [apiUrl]);
+    return useMemo(() => createActuatorService(PROXY_BACKEND_API, restApiCall), []);
 }
 
 export function useAttachmentService(): AttachmentService {

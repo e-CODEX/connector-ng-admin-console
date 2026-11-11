@@ -8,18 +8,16 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { restApiCall } from "@/lib/rest";
+import { RestApiCall } from "@/lib/rest";
 import { ActuatorHealthResponse, AppInfo } from "@/types/response/actuator";
 
-export function createActuatorService(baseUrl: string) {
+export function createActuatorService(baseUrl: string, call: RestApiCall) {
     return {
-        async getHealthInfo():
-            Promise<ActuatorHealthResponse> {
-            return restApiCall<ActuatorHealthResponse>(baseUrl, "actuator/health");
+        async getHealthInfo(): Promise<ActuatorHealthResponse> {
+            return call<ActuatorHealthResponse>(baseUrl, "actuator/health");
         },
-        async getAppInfo():
-            Promise<AppInfo> {
-            return restApiCall<AppInfo>(baseUrl, "actuator/info");
+        async getAppInfo(): Promise<AppInfo> {
+            return call<AppInfo>(baseUrl, "actuator/info");
         }
     }
 }

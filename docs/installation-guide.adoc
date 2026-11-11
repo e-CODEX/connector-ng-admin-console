@@ -123,6 +123,10 @@ NOTE: To expose the Admin Console on another port with Docker, either remap it (
 | `https://connector.example.org:30000`
 | Base URL of the connector REST API.
 
+| `NODE_ENV`
+| `production`
+| Runtime mode. It is *not* set in the Docker image: provide it when you deploy. *Setting it to `production` is recommended for every production environment.*
+
 | `DEFAULT_ORIGINAL_SENDER`
 | `alice`
 | Original sender used by default for test messages. Optional; defaults to `alice`.
@@ -134,11 +138,14 @@ NOTE: To expose the Admin Console on another port with Docker, either remap it (
 | `PORT`
 | `3000`
 | Port the server listens on. Optional; defaults to `3000` (already set in the Docker image).
-
-| `NODE_ENV`
-| `production`
-| Already set to `production` in the Docker image.
 |===
+
+[WARNING]
+====
+Always set `NODE_ENV=production` when you deploy to a production environment.
+
+When `NODE_ENV` is not `production`, HTTPS is not enforced. This is convenient for local tests over plain HTTP (for example `http://localhost:3000`), but it must not be used in production.
+====
 
 TIP: Keep these values in an environment file or in your orchestrator's secrets/config. Never commit them to version control.
 
@@ -155,11 +162,14 @@ docker pull scm.ecodex.eu/docker/connector-ng-admin-console:{project-version}
 docker run -d --name connector-admin-console \
   -p 3000:3000 \
   -e CONNECTOR_API_URL=https://connector.example.org:8443 \
+  -e NODE_ENV=production \
   --restart unless-stopped \
   scm.ecodex.eu/docker/connector-ng-admin-console:{project-version}
 ----
 
 NOTE: Images are hosted on the e-CODEX registry `scm.ecodex.eu/docker/`.
+
+TIP: For a local test over plain HTTP, omit `-e NODE_ENV=production`. Do not do this in production.
 
 === Run with Docker Compose
 
@@ -174,6 +184,7 @@ services:
       - "3000:3000"
     environment:
       CONNECTOR_API_URL: https://connector.example.org:8443
+      NODE_ENV: production
 ----
 
 [source,bash]
@@ -321,7 +332,7 @@ connector.cors.allowed-origins=https://admin.example.org
 | `connector.cors.allowed-origins` does not exactly match the browser origin (protocol, host, port, trailing slash). Fix the value and restart the connector.
 
 | Login succeeds but the session is lost on every page
-| The application is served over plain HTTP while the session cookie is flagged `Secure`, or the proxy does not forward `X-Forwarded-Proto`. Use HTTPS and forward the header.
+| With `NODE_ENV=production`, HTTPS is enforced. The application is probably served over plain HTTP, or the proxy does not forward `X-Forwarded-Proto`. Use HTTPS and forward the header. For a local test over plain HTTP only, run without `NODE_ENV=production`.
 
 | `502 Bad Gateway` from the reverse proxy
 | The Admin Console is not running or not listening on the expected port. Check `docker logs connector-admin-console` or `journalctl -u connector-admin-console`.
@@ -338,6 +349,7 @@ connector.cors.allowed-origins=https://admin.example.org
 
 == Security recommendations
 
+* Always set `NODE_ENV=production` in production environments.
 * Always serve the Admin Console over HTTPS.
 * Restrict `connector.cors.allowed-origins` to the exact origins in use; never use `*`.
 * Restrict network access to the Admin Console (VPN, IP allow-list) when possible.

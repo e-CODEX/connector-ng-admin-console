@@ -8,4 +8,4 @@ on:
 jobs:
     checkstyle:
         name: Lint ES code
-        uses: e-CODEX/workflows/.github/workflows/es-linting.yaml@cbd0bc5ec6be26508e30a856b9f129e5b3eca858
+        uses: e-CODEX/workflows/.github/workflows/es-linting.yaml@be7193b2c21072308c0757bdfc02482069586a93

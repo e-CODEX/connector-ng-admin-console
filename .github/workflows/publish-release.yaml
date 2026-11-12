@@ -13,20 +13,20 @@ on:
 jobs:
     check-version:
         name: Check the current release version
-        uses: e-CODEX/workflows/.github/workflows/npm-validate-release-version.yaml@be7193b2c21072308c0757bdfc02482069586a93
+        uses: e-CODEX/workflows/.github/workflows/npm-validate-release-version.yaml@562bef8b4f397734a70919fa377c9f7691587460
         with:
             node-version: 22
     tag-version:
         name: Tag the current release version
         needs: check-version
-        uses: e-CODEX/workflows/.github/workflows/npm-tag-release-version.yaml@be7193b2c21072308c0757bdfc02482069586a93
+        uses: e-CODEX/workflows/.github/workflows/npm-tag-release-version.yaml@562bef8b4f397734a70919fa377c9f7691587460
         with:
             node-version: 22
             environment: ${{ inputs.environment }}
     docs:
         name: Generate the documentation PDFs
         needs: tag-version
-        uses: e-CODEX/workflows/.github/workflows/asciidoc-pdf-release.yaml@be7193b2c21072308c0757bdfc02482069586a93
+        uses: e-CODEX/workflows/.github/workflows/asciidoc-pdf-release.yaml@562bef8b4f397734a70919fa377c9f7691587460
         with:
             adoc-files: |
                 docs/installation-guide.adoc
@@ -37,7 +37,7 @@ jobs:
     publish:
         name: Publish the current release version
         needs: [tag-version, docs]
-        uses: e-CODEX/workflows/.github/workflows/npm-publish-nextjs-release.yaml@be7193b2c21072308c0757bdfc02482069586a93
+        uses: e-CODEX/workflows/.github/workflows/npm-publish-nextjs-release.yaml@562bef8b4f397734a70919fa377c9f7691587460
         with:
             node-version: 22
             app-folder: "."

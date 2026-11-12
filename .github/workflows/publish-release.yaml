@@ -13,20 +13,20 @@ on:
 jobs:
     check-version:
         name: Check the current release version
-        uses: e-CODEX/workflows/.github/workflows/npm-validate-release-version.yaml@51e5e37345807abb3be06b032dd77b4b02077b53
+        uses: e-CODEX/workflows/.github/workflows/npm-validate-release-version.yaml@f3ce21a6993dc2d101435f2e3a777d74444db8f5
         with:
-            node-version: "22"
+            node-version: 22
     tag-version:
         name: Tag the current release version
         needs: check-version
-        uses: e-CODEX/workflows/.github/workflows/npm-tag-release-version.yaml@51e5e37345807abb3be06b032dd77b4b02077b53
+        uses: e-CODEX/workflows/.github/workflows/npm-tag-release-version.yaml@f3ce21a6993dc2d101435f2e3a777d74444db8f5
         with:
-            node-version: "22"
+            node-version: 22
             environment: ${{ inputs.environment }}
     docs:
         name: Generate the documentation PDFs
         needs: tag-version
-        uses: e-CODEX/workflows/.github/workflows/asciidoc-pdf-release.yaml@cc0bccb6fe74e113f8774df6e5061a51954d1c6a
+        uses: e-CODEX/workflows/.github/workflows/asciidoc-pdf-release.yaml@f3ce21a6993dc2d101435f2e3a777d74444db8f5
         with:
             adoc-files: |
                 docs/installation-guide.adoc
@@ -37,9 +37,9 @@ jobs:
     publish:
         name: Publish the current release version
         needs: [tag-version, docs]
-        uses: e-CODEX/workflows/.github/workflows/npm-publish-nextjs-release.yaml@e11c8f8c4b46fb8c75458c915f818d6b8e8bcfb9
+        uses: e-CODEX/workflows/.github/workflows/npm-publish-nextjs-release.yaml@f3ce21a6993dc2d101435f2e3a777d74444db8f5
         with:
-            node-version: "22"
+            node-version: 22
             app-folder: "connector-ng-admin-console"
             tag: ${{ needs.tag-version.outputs.tag }}
             environment: ${{ inputs.environment }}

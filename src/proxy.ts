@@ -8,11 +8,12 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest} from "next/server";
+import { NextResponse } from "next/server";
 import { createAuthService } from "@/services/auth";
 import { cookieOptions } from "@/utils";
 import { decodeJwt } from "jose";
-import { LoginResponse } from "@/types/response/user";
+import type { LoginResponse } from "@/types/response/user";
 import { cookies } from "next/headers";
 import { restApiCall } from "@/lib/rest";
 import { ACCESS_TOKEN_KEY, MUST_CHANGE_PASSWORD, REFRESH_TOKEN_KEY } from "@/utils/constants";

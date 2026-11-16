@@ -9,9 +9,9 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
-import { SendMessageFormData, SendParameters } from "@/types/send-message-form";
+import type { SendMessageFormData, SendParameters } from "@/types/send-message-form";
 import { generatePdfBlob } from "@/utils/file-utils";
-import { SoapOutboundMessageRequest } from "@/types/request/message";
+import type { SoapOutboundMessageRequest } from "@/types/request/message";
 import { appendBusinessContentToFormData, appendFormData } from "@/lib/rest/message-outbound/message-builder";
 
 

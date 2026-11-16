@@ -13,7 +13,7 @@
 import { Chip } from "@heroui/react";
 import { CircleHelp, FileSignature, KeyRound, type LucideIcon } from "lucide-react";
 import type { ComponentProps } from "react";
-import { BusinessDocumentAesType } from "@/types/global";
+import type { BusinessDocumentAesType } from "@/types/global";
 
 type ChipProps = ComponentProps<typeof Chip>;
 

@@ -12,7 +12,7 @@
 
 import { PageHeader } from "@/components/common/header/page-header";
 import React from "react";
-import { ConnectorBusinessDomain } from "@/types/response/business-domain";
+import type { ConnectorBusinessDomain } from "@/types/response/business-domain";
 import { Table, useOverlayState } from "@heroui/react";
 import { toastError, toastSuccess, truncate } from "@/utils";
 import { BusinessDomainCreationView } from "@/components/business-domain/creation/business-domain-creation-view";

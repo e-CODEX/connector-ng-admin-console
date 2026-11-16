@@ -8,7 +8,7 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { DownloadedFile, RestApiDownloadCall } from "@/lib/rest";
+import type { DownloadedFile, RestApiDownloadCall } from "@/lib/rest";
 
 export function createEvidenceService(baseUrl: string, call: RestApiDownloadCall) {
     return {

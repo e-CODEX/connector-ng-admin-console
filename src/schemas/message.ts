@@ -9,7 +9,7 @@
  */
 
 import { z } from "zod";
-import { ConnectorEvidenceType, OutboundMessageRequestMode } from "@/types/global";
+import type { ConnectorEvidenceType, OutboundMessageRequestMode } from "@/types/global";
 
 export const CONNECTOR_EVIDENCE_TYPES = [
     "SUBMISSION_ACCEPTANCE",

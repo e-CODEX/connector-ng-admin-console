@@ -8,7 +8,8 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { Button, Checkbox, Modal, Selection, Table } from "@heroui/react";
+import type { Selection} from "@heroui/react";
+import { Button, Checkbox, Modal, Table } from "@heroui/react";
 import React, { useEffect, useState } from "react";
 import { ArrowDownToLine, RefreshCw } from "lucide-react";
 import { toastError, toastSuccess } from "@/utils";

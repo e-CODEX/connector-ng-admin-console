@@ -8,7 +8,7 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import {
+import type {
     ConnectorProcessingMode,
     ConnectorProcessingModeAction,
     ConnectorProcessingModeDetail,
@@ -16,8 +16,8 @@ import {
     ConnectorProcessingModeService,
     ConnectorProcessingModeTruststore
 } from "@/types/response/processing-mode";
-import { DownloadedFile, RestApiCall, RestApiDownloadCall } from "@/lib/rest";
-import { ProcessingModeCreationRequest, ProcessingModeEditTruststoreRequest } from "@/types/request/processing-mode";
+import type { DownloadedFile, RestApiCall, RestApiDownloadCall } from "@/lib/rest";
+import type { ProcessingModeCreationRequest, ProcessingModeEditTruststoreRequest } from "@/types/request/processing-mode";
 
 export function createProcessingModeService(baseUrl: string, call: RestApiCall, download: RestApiDownloadCall) {
     return {

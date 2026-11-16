@@ -11,7 +11,7 @@
 "use client";
 
 import React from "react";
-import { ConnectorProcessingMode } from "@/types/response/processing-mode";
+import type { ConnectorProcessingMode } from "@/types/response/processing-mode";
 import { DetailRow } from "@/components/common/detail-row";
 import { CopyableIdentifier } from "@/components/common/copyable-identifier";
 import { DateTime } from "@/components/common/date-time";

@@ -11,7 +11,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { PaginatedResponse } from "@/types/response/paginated-response";
+import type { PaginatedResponse } from "@/types/response/paginated-response";
 
 export interface PagedListParams {
     page: number;

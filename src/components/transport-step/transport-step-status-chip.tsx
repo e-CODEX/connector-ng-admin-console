@@ -11,7 +11,7 @@
 import { CheckCircle2, Download, HelpCircle, Inbox, Send, XCircle, } from "lucide-react";
 import { Chip, Tooltip } from "@heroui/react";
 import type { ComponentProps, ComponentType } from "react";
-import { TransportStepStatus } from "@/types/global";
+import type { TransportStepStatus } from "@/types/global";
 
 interface TransportDeliveryPresentation {
     label: string;

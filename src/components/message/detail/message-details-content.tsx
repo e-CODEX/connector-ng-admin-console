@@ -11,16 +11,16 @@
 "use client";
 
 import { Table, useOverlayState } from "@heroui/react";
-import { ConnectorMessageDetailsResponse, ConnectorMessageEvidence } from "@/types/response/message";
+import type { ConnectorMessageDetailsResponse, ConnectorMessageEvidence } from "@/types/response/message";
 import { formatBytes, saveFile, toastError } from "@/utils";
 import React, { useState } from "react";
 import { DetailRow } from "@/components/common/detail-row";
 import { DetailSection } from "@/components/common/detail-section";
-import { ConnectorProcessingModeParty } from "@/types/response/processing-mode";
+import type { ConnectorProcessingModeParty } from "@/types/response/processing-mode";
 import { ArrowDownToLine } from "lucide-react";
 import { MessageDirectionChip } from "@/components/message/chip/message-direction-chip";
 import { MessageDeliveryStatusChip } from "@/components/message/chip/message-delivery-status-chip";
-import { ConnectorAttachmentResponse } from "@/types/response/attachments";
+import type { ConnectorAttachmentResponse } from "@/types/response/attachments";
 import { AttachmentDetailsView } from "@/components/attachment/attachment-details-view";
 import { BusinessDetailsBusinessContentSection } from "@/components/message/detail/business-details-business-content-section";
 import { DateTime } from "@/components/common/date-time";

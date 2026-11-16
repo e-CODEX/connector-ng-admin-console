@@ -10,7 +10,8 @@
 
 "use client";
 
-import { Button, Modal, useOverlayState } from "@heroui/react";
+import type { useOverlayState } from "@heroui/react";
+import { Button, Modal } from "@heroui/react";
 import type { ComponentProps, ReactNode } from "react";
 import { useState } from "react";
 

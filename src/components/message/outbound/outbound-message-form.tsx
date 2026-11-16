@@ -10,21 +10,22 @@
 
 "use client";
 
-import { SendMessageFormData } from "@/types/send-message-form";
+import type { SendMessageFormData } from "@/types/send-message-form";
 import { FormTextField } from "@/components/form/form-text-field";
-import { ConnectorProcessingModeAction, ConnectorProcessingModeParty, ConnectorProcessingModeService } from "@/types/response/processing-mode";
+import type { ConnectorProcessingModeAction, ConnectorProcessingModeParty, ConnectorProcessingModeService } from "@/types/response/processing-mode";
 import { ProcessingModeServiceSelector, serviceKeyOf } from "@/components/form/selector/pmode-service-selector";
 import { ProcessingModePartySelector } from "@/components/form/selector/pmode-party-selector";
 import { actionKeyOf, ProcessingModeActionSelector } from "@/components/form/selector/pmode-action-selector";
 import { useLinkPartners } from "@/hooks/use-link-partners";
 import { LinkPartnerSelector } from "@/components/form/selector/link-partner-selector";
-import { ConnectorLinkPartner } from "@/types/response/link-partner";
-import { As4PropertiesRequest, BusinessDocumentInfo, PartyInfoRequest, OutboundMessageContent } from "@/types/request/message";
+import type { ConnectorLinkPartner } from "@/types/response/link-partner";
+import type { As4PropertiesRequest, BusinessDocumentInfo, PartyInfoRequest, OutboundMessageContent } from "@/types/request/message";
 import { emptyAction, emptyParty, emptyService } from "@/components/message/outbound/outbound-message-defaults";
 import { FileSelectField } from "@/components/form/file-select-field";
 import React from "react";
-import { ACCEPTED_XMLS, BusinessDocumentAesType, DetachedSignatureMimeType } from "@/types/global";
-import { SendMessageValidationErrors } from "@/components/message/outbound/outbound-message";
+import type { BusinessDocumentAesType, DetachedSignatureMimeType } from "@/types/global";
+import { ACCEPTED_XMLS } from "@/types/global";
+import type { SendMessageValidationErrors } from "@/components/message/outbound/outbound-message";
 
 export type FormUpdater = (prev: SendMessageFormData) => SendMessageFormData;
 

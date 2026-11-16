@@ -9,7 +9,7 @@
  */
 
 import { ConfigurationSecretValue } from "@/components/configuration/configuration-secret-value";
-import { PrivateKey } from "@/types/response/configuration";
+import type { PrivateKey } from "@/types/response/configuration";
 import { ConfigurationDetailRow } from "@/components/configuration/configuration-detail-row";
 
 interface ConfigurationPrivateKeyViewProps {

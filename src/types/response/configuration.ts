@@ -8,8 +8,8 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { ConnectorBusinessDomain } from "@/types/response/business-domain";
-import { BusinessDocumentAesType, KeystoreType } from "@/types/global";
+import type { ConnectorBusinessDomain } from "@/types/response/business-domain";
+import type { BusinessDocumentAesType, KeystoreType } from "@/types/global";
 
 export interface LinkPartnerConfiguration {
     backend: BackendPartner[];

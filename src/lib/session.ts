@@ -10,14 +10,15 @@
 
 import "server-only";
 import { cache } from "react";
-import { ConnectorUser } from "@/types/response/user";
+import type { ConnectorUser } from "@/types/response/user";
 import { redirect } from "next/navigation";
 import { getAppConfig } from "@/config/config.server";
-import { USER_ROLE } from "@/types/global";
+import type { USER_ROLE } from "@/types/global";
 import { authedRestApiCall } from "@/lib/rest/authed-rest-api";
 import { createAuthService } from "@/services/auth";
 import { BackendUnavailableError, isBackendDown } from "@/lib/rest/backend-down";
-import { ACCESS_TOKEN_KEY, BACKEND_DOWN, BACKEND_DOWN_TAG } from "@/utils/constants";
+import type { BACKEND_DOWN} from "@/utils/constants";
+import { ACCESS_TOKEN_KEY, BACKEND_DOWN_TAG } from "@/utils/constants";
 import { cookies } from "next/headers";
 
 export const getCurrentUser = cache(async (): Promise<ConnectorUser | null> => {

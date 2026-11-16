@@ -9,7 +9,7 @@
  */
 
 import React, { useEffect, useState } from "react";
-import { MessageProcessingConfiguration } from "@/types/response/configuration";
+import type { MessageProcessingConfiguration } from "@/types/response/configuration";
 import { toastError } from "@/utils";
 import { ConfigurationBlock } from "@/components/configuration/configuration-block";
 import { ConfigurationDetailRow } from "@/components/configuration/configuration-detail-row";

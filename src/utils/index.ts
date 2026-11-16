@@ -9,15 +9,19 @@
  */
 
 import { toast } from "@heroui/react";
-import { ConnectorMessageStatsItem } from "@/types/response/stats";
-import { DownloadedFile } from "@/lib/rest";
-import { ALL_SELECTOR, USER_ROLE } from "@/types/global";
-import { ConnectorUser } from "@/types/response/user";
+import type { ConnectorMessageStatsItem } from "@/types/response/stats";
+import type { DownloadedFile } from "@/lib/rest";
+import type { USER_ROLE } from "@/types/global";
+import { ALL_SELECTOR } from "@/types/global";
+
+import type { ConnectorUser } from "@/types/response/user";
 
 export const truncate = (value: string, visibleChars = 36): string => {
     if (value == null) return "";
-    return value.length > visibleChars ? `${value.slice(0, visibleChars)}\u2026` : value;
-}
+    return value.length > visibleChars
+        ? `${value.slice(0, visibleChars)}\u2026`
+        : value;
+};
 
 export function formatBytes(bytes: number, decimals = 1): string {
     if (!Number.isFinite(bytes) || bytes < 0) return "—";
@@ -42,17 +46,25 @@ export function asNumber(value: unknown): number {
 
 export const toastSuccess = (message: string) => {
     toastMessage("Success", message, "success");
-}
+};
 
-export function toastError(error: unknown, fallback = "An unexpected error occurred.") {
+export function toastError(
+    error: unknown,
+    fallback = "An unexpected error occurred.",
+) {
     toastErrorMessage(error instanceof Error ? error.message : fallback);
 }
 
 export const toastErrorMessage = (message: string) => {
     toastMessage("Error", message, "danger");
-}
+};
 
-const toastMessage = (title: string, description: string, variant: "default" | "accent" | "success" | "warning" | "danger" | undefined) => {
+const toastMessage = (
+    title: string,
+    description: string,
+    variant:
+        "default" | "accent" | "success" | "warning" | "danger" | undefined,
+) => {
     toast(title, {
         variant,
         description,
@@ -62,7 +74,7 @@ const toastMessage = (title: string, description: string, variant: "default" | "
             variant: "tertiary",
         },
     });
-}
+};
 
 export const deliveryRate = (s: ConnectorMessageStatsItem) =>
     s.total > 0 ? Math.round((s.delivered / s.total) * 1000) / 10 : 0;
@@ -93,9 +105,13 @@ export const cookieOptions = (maxAge?: number) => ({
     maxAge,
 });
 
-export const asFilter = (value: string) => value === ALL_SELECTOR || value === "*" || value === "" ? undefined : value;
+export const asFilter = (value: string) =>
+    value === ALL_SELECTOR || value === "*" || value === "" ? undefined : value;
 
-export function hasRole(user: ConnectorUser | null | undefined, role: USER_ROLE): boolean {
+export function hasRole(
+    user: ConnectorUser | null | undefined,
+    role: USER_ROLE,
+): boolean {
     return user?.roles?.includes(role) ?? false;
 }
 

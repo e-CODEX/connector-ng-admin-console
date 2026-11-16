@@ -10,9 +10,10 @@
 
 "use client";
 
-import { Modal, useOverlayState } from "@heroui/react";
+import type { useOverlayState } from "@heroui/react";
+import { Modal } from "@heroui/react";
 import React from "react";
-import { BusinessDomainCreationRequest } from "@/types/request/business-domain";
+import type { BusinessDomainCreationRequest } from "@/types/request/business-domain";
 import { Plus } from "lucide-react";
 import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";
 import { BusinessDomainCreationForm } from "@/components/business-domain/creation/business-domain-creation-form";

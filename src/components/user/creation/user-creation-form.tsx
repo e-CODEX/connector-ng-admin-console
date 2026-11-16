@@ -11,14 +11,14 @@
 "use client";
 
 import { Button, FieldError, Form, Input, Label, Modal, Spinner, Switch, TextField } from "@heroui/react";
-import { UserCreationRequest } from "@/types/request/user";
+import type { UserCreationRequest } from "@/types/request/user";
 import React, { useState } from "react";
 import { Plus } from "lucide-react";
 import { userCreationSchema } from "@/schemas/auth";
 import { UserRoleSelector } from "@/components/form/selector/user-role-selector";
 import { useUserRoles } from "@/hooks/use-user-roles";
 import { PasswordField } from "@/components/form/password-text-field";
-import { USER_ROLE } from "@/types/global";
+import type { USER_ROLE } from "@/types/global";
 
 const FORM_ID = "add-user-form";
 const DEFAULT_ROLES: USER_ROLE[] = ["ROLE_USER"];

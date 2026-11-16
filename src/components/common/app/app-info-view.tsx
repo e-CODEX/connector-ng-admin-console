@@ -10,7 +10,7 @@
 
 "use client"
 
-import { AppBuildInfo } from "@/types/response/actuator";
+import type { AppBuildInfo } from "@/types/response/actuator";
 import { Chip } from "@heroui/react";
 import { AppHealthIndicatorView } from "@/components/common/app/app-health-indicator-view";
 import { useActuatorService } from "@/hooks/use-http-service";

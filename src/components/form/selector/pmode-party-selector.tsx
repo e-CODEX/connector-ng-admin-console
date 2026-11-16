@@ -8,8 +8,9 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { FieldError, Key, Label, ListBox, Select } from "@heroui/react";
-import { ConnectorProcessingModeParty } from "@/types/response/processing-mode";
+import type { Key} from "@heroui/react";
+import { FieldError, Label, ListBox, Select } from "@heroui/react";
+import type { ConnectorProcessingModeParty } from "@/types/response/processing-mode";
 import { useEffect, useMemo } from "react";
 
 export interface ProcessingModePartySelectorProps {

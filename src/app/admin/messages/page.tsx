@@ -11,7 +11,7 @@
 "use client"
 
 import React, { useState } from "react";
-import { ConnectorMessage } from "@/types/response/message";
+import type { ConnectorMessage } from "@/types/response/message";
 import { Table, useOverlayState } from "@heroui/react";
 import { PaginationControls } from "@/components/paging/pagination-controls";
 import { MessageTransportStepsDetailView } from "@/components/message/detail/message-transport-steps-detail-view";
@@ -30,7 +30,7 @@ import { useBusinessDomainIdentifiers } from "@/hooks/use-business-domain-identi
 import { asBusinessDomainSelectorFilter } from "@/components/form/selector/business-domain-selector";
 import { usePagedList } from "@/hooks/use-paged-list";
 import { useProcessingModeServices } from "@/hooks/use-processing-mode-services";
-import { ConnectorProcessingModeService } from "@/types/response/processing-mode";
+import type { ConnectorProcessingModeService } from "@/types/response/processing-mode";
 import { DateTime } from "@/components/common/date-time";
 import { useMessageService } from "@/hooks/use-http-service";
 import { CopyableIdentifier } from "@/components/common/copyable-identifier";
@@ -39,16 +39,16 @@ import { DetailActionButton } from "@/components/common/action-button/detail-act
 import { asFilter, toastError, toastSuccess } from "@/utils";
 import { ALL_SELECTOR } from "@/types/global";
 import type { RangeValue } from "react-aria-components";
-import { ZonedDateTime } from "@internationalized/date";
+import type { ZonedDateTime } from "@internationalized/date";
 import { buildDefaultRange, toDateRange } from "@/types/period";
-import { DateTimeRangeGranularity } from "@/components/form/selector/date-time-range-selector";
+import type { DateTimeRangeGranularity } from "@/components/form/selector/date-time-range-selector";
 import { useAppConfig } from "@/hooks/use-app-config";
 import { MessageEvidenceTriggerModeView } from "@/components/message/evidence-trigger/message-evidence-trigger-mode-view";
-import { MessageEvidenceTriggerResponse } from "@/types/response/evidence-trigger";
+import type { MessageEvidenceTriggerResponse } from "@/types/response/evidence-trigger";
 import { MessagePendingView } from "@/components/message/pending/message-pending-view";
 import { MessageLifecycleView } from "@/components/message/message-lifecycle-view";
 import { LoadErrorState } from "@/components/common/load-error-state";
-import { SendEvidenceTriggerRequest } from "@/services/message";
+import type { SendEvidenceTriggerRequest } from "@/services/message";
 
 const IDENTIFIER_LENGTH = 8;
 

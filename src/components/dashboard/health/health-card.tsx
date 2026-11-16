@@ -9,10 +9,10 @@
  */
 "use client";
 
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { Card, Chip } from "@heroui/react";
 import { capitalize } from "@/utils";
-import { HealthStatus } from "@/types/global";
+import type { HealthStatus } from "@/types/global";
 import { Circle } from "lucide-react";
 
 export interface HealthCardProps {

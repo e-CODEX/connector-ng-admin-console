@@ -10,8 +10,10 @@
 
 "use client";
 
-import { Button, DateField, DateRangePicker, Label, RangeCalendar, TimeField, TimeValue, useLocale } from "@heroui/react";
-import { DateFormatter, DateValue, getLocalTimeZone, isSameDay, now, Time, toCalendarDate, ZonedDateTime } from "@internationalized/date";
+import type { TimeValue} from "@heroui/react";
+import { Button, DateField, DateRangePicker, Label, RangeCalendar, TimeField, useLocale } from "@heroui/react";
+import type { DateValue, ZonedDateTime } from "@internationalized/date";
+import { DateFormatter, getLocalTimeZone, isSameDay, now, Time, toCalendarDate } from "@internationalized/date";
 
 export type DateTimeRangeGranularity = "day" | "hour" | "minute" | "second";
 

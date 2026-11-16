@@ -8,9 +8,9 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { ConnectorAttachmentResponse } from "@/types/response/attachments";
-import { ConnectorProcessingModeAction, ConnectorProcessingModeParty, ConnectorProcessingModeService } from "@/types/response/processing-mode";
-import { BusinessDocumentAesType, ConnectorEvidenceType, ConnectorMessageStatus, MessageDirection } from "@/types/global";
+import type { ConnectorAttachmentResponse } from "@/types/response/attachments";
+import type { ConnectorProcessingModeAction, ConnectorProcessingModeParty, ConnectorProcessingModeService } from "@/types/response/processing-mode";
+import type { BusinessDocumentAesType, ConnectorEvidenceType, ConnectorMessageStatus, MessageDirection } from "@/types/global";
 
 
 export interface ConnectorMessage {

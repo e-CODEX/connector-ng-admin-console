@@ -8,12 +8,12 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { Card, Chip } from "@heroui/react";
 import { CircleCheck } from "lucide-react";
 import { DashboardMetricTile } from "@/components/dashboard/dashboard-metric-tile";
 import { MessageStatsDeliveryRateBar } from "@/components/dashboard/message/stats/message-stats-delivery-rate-bar";
-import { ConnectorMessageStatsItem } from "@/types/response/stats";
+import type { ConnectorMessageStatsItem } from "@/types/response/stats";
 import { deliveryRate } from "@/utils";
 
 export interface MessageDirectionStatsPanelProps {

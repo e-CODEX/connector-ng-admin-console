@@ -10,7 +10,8 @@
 
 import { Button, Tooltip } from "@heroui/react";
 import { Eye } from "lucide-react";
-import React, { ComponentProps, ComponentType } from "react";
+import type { ComponentProps, ComponentType } from "react";
+import React from "react";
 
 export interface DetailButtonProps
     extends Omit<ComponentProps<typeof Button>, "isIconOnly" | "children"> {

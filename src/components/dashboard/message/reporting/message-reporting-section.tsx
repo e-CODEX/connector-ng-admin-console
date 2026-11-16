@@ -10,7 +10,8 @@
 
 "use client";
 
-import { Period, periodToParams } from "@/types/period";
+import type { Period} from "@/types/period";
+import { periodToParams } from "@/types/period";
 import { usePolledFetch } from "@/hooks/pooled-fetch";
 import { Spinner } from "@heroui/react";
 import { MessageReportingStats } from "@/components/dashboard/message/reporting/message-reporting-stats";

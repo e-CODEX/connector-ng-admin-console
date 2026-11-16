@@ -10,10 +10,11 @@
 
 "use client";
 
-import { Modal, useOverlayState } from "@heroui/react";
-import { UserEditionRequest } from "@/types/request/user";
+import type { useOverlayState } from "@heroui/react";
+import { Modal } from "@heroui/react";
+import type { UserEditionRequest } from "@/types/request/user";
 import React from "react";
-import { ConnectorUser } from "@/types/response/user";
+import type { ConnectorUser } from "@/types/response/user";
 import { UserEditionForm } from "@/components/user/edition/user-edition-form";
 import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";
 import { UserPen } from "lucide-react";

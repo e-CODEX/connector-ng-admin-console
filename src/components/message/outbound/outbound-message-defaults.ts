@@ -8,7 +8,7 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { As4PropertiesRequest, PartyInfoRequest, OutboundMessageContent } from "@/types/request/message";
+import type { As4PropertiesRequest, PartyInfoRequest, OutboundMessageContent } from "@/types/request/message";
 
 export type As4Selections = Pick<As4PropertiesRequest, "service" | "action" | "fromParty" | "toParty">;
 export const emptyService = (): As4PropertiesRequest["service"] => ({ name: "", type: "" });

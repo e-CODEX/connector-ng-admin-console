@@ -10,7 +10,7 @@
 
 import { useContext } from "react";
 import { UserContext } from "@/app/providers";
-import { ConnectorUser } from "@/types/response/user";
+import type { ConnectorUser } from "@/types/response/user";
 
 export function useOptionalUser(): ConnectorUser | null {
     return useContext(UserContext);

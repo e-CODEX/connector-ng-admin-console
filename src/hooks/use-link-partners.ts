@@ -12,8 +12,8 @@
 
 import { useEffect, useState } from "react";
 import { toastError } from "@/utils";
-import { ConnectorLinkPartner } from "@/types/response/link-partner";
-import { LinkPartnerType } from "@/types/global";
+import type { ConnectorLinkPartner } from "@/types/response/link-partner";
+import type { LinkPartnerType } from "@/types/global";
 import { useLinkPartnerService } from "@/hooks/use-http-service";
 
 export function useLinkPartners(linkType: LinkPartnerType, allLabel?: string) {

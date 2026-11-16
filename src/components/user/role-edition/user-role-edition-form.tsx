@@ -11,14 +11,14 @@
 "use client";
 
 import { Button, Form, Modal, Spinner } from "@heroui/react";
-import { UserRoleEditionRequest } from "@/types/request/user";
+import type { UserRoleEditionRequest } from "@/types/request/user";
 import React, { useState } from "react";
 import { Pen } from "lucide-react";
 import { userRoleEditionSchema } from "@/schemas/auth";
-import { ConnectorUser } from "@/types/response/user";
+import type { ConnectorUser } from "@/types/response/user";
 import { UserRoleSelector } from "@/components/form/selector/user-role-selector";
 import { useUserRoles } from "@/hooks/use-user-roles";
-import { USER_ROLE } from "@/types/global";
+import type { USER_ROLE } from "@/types/global";
 
 const FORM_ID = "edit-user-roles-form";
 

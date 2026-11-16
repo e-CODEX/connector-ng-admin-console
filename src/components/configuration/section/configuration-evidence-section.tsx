@@ -13,7 +13,7 @@
 import { ConfigurationDetailRow } from "@/components/configuration/configuration-detail-row";
 import { ConfigurationSignatureView } from "@/components/configuration/view/configuration-signature-view";
 import { ConfigurationBlock } from "@/components/configuration/configuration-block";
-import { EvidenceConfiguration } from "@/types/response/configuration";
+import type { EvidenceConfiguration } from "@/types/response/configuration";
 import React, { useEffect, useState } from "react";
 import { toastError } from "@/utils";
 import { SpinnerView } from "@/components/common/spinner-view";

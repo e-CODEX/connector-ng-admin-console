@@ -8,8 +8,8 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { RestApiCall } from "@/lib/rest";
-import {
+import type { RestApiCall } from "@/lib/rest";
+import type {
     BusinessDocumentConfiguration,
     BusinessDomainConfiguration,
     ContainerConfiguration,

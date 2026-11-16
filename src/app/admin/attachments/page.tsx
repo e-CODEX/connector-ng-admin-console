@@ -12,7 +12,7 @@
 
 import { PageHeader } from "@/components/common/header/page-header";
 import React, { useState } from "react";
-import { ConnectorAttachmentResponse } from "@/types/response/attachments";
+import type { ConnectorAttachmentResponse } from "@/types/response/attachments";
 import { Table, useOverlayState } from "@heroui/react";
 import { asFilter, formatBytes, saveFile, toastError, truncate } from "@/utils";
 import { PaginationControls } from "@/components/paging/pagination-controls";
@@ -30,12 +30,12 @@ import { DetailActionButton } from "@/components/common/action-button/detail-act
 import { DownloadActionButton } from "@/components/common/action-button/download-action-button";
 import { MessageFiltersPanel } from "@/components/attachment/attachment-filters-panel";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
-import { AttachmentTypesFilter } from "@/components/form/selector/attachment-type-multi-selector";
+import type { AttachmentTypesFilter } from "@/components/form/selector/attachment-type-multi-selector";
 import { ALL_SELECTOR } from "@/types/global";
-import { AttachmentStoragesFilter } from "@/components/form/selector/attachment-storage-multi-selector";
-import { DateTimeRangeGranularity } from "@/components/form/selector/date-time-range-selector";
+import type { AttachmentStoragesFilter } from "@/components/form/selector/attachment-storage-multi-selector";
+import type { DateTimeRangeGranularity } from "@/components/form/selector/date-time-range-selector";
 import type { RangeValue } from "react-aria-components";
-import { ZonedDateTime } from "@internationalized/date";
+import type { ZonedDateTime } from "@internationalized/date";
 import { buildDefaultRange, toDateRange } from "@/types/period";
 import { AttachmentStatusChip } from "@/components/attachment/attachment-status-chip";
 import { LoadErrorState } from "@/components/common/load-error-state";

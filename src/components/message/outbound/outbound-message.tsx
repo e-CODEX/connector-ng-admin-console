@@ -12,11 +12,12 @@
 
 import { useState } from "react";
 import { PageHeader } from "@/components/common/header/page-header";
-import { FormUpdater, OutboundMessageForm } from "@/components/message/outbound/outbound-message-form";
+import type { FormUpdater} from "@/components/message/outbound/outbound-message-form";
+import { OutboundMessageForm } from "@/components/message/outbound/outbound-message-form";
 import { OutboundMessageSendParametersSection } from "@/components/message/outbound/outbound-message-send-params-section";
 import { OutboundMessageActionBar } from "@/components/message/outbound/outbound-message-action-bar";
 import { OutboundMessageConsolePanel } from "@/components/message/outbound/outbound-message-console-panel";
-import { SendMessageFormData, SendParameters, } from "@/types/send-message-form";
+import type { SendMessageFormData, SendParameters, } from "@/types/send-message-form";
 import { Send } from "lucide-react";
 import { useBusinessDomainIdentifiers } from "@/hooks/use-business-domain-identifiers";
 import { BusinessDomainSelector } from "@/components/form/selector/business-domain-selector";
@@ -25,7 +26,7 @@ import { useProcessingModeActions } from "@/hooks/use-processing-mode-actions";
 import { useProcessingModeParties } from "@/hooks/use-processing-mode-parties";
 import { Form, Switch } from "@heroui/react";
 import { useAppConfig } from "@/hooks/use-app-config";
-import { AppMode, OutboundMessageRequestMode } from "@/types/global";
+import type { AppMode, OutboundMessageRequestMode } from "@/types/global";
 import { useOutboundMessageSender } from "@/hooks/use-outbound-message-sender";
 import { emptyAs4Selections, emptyBusinessDocument } from "@/components/message/outbound/outbound-message-defaults";
 

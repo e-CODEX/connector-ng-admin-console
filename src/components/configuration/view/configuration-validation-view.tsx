@@ -8,7 +8,7 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { Validation } from "@/types/response/configuration";
+import type { Validation } from "@/types/response/configuration";
 import { ConfigurationKeystoreView } from "@/components/configuration/view/configuration-keystore-view";
 import { ConfigurationBlock } from "@/components/configuration/configuration-block";
 import { ConfigurationDetailRow } from "@/components/configuration/configuration-detail-row";

@@ -8,8 +8,8 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { RestApiCall } from "@/lib/rest";
-import { ConnectorLinkPartner } from "@/types/response/link-partner";
+import type { RestApiCall } from "@/lib/rest";
+import type { ConnectorLinkPartner } from "@/types/response/link-partner";
 
 export type ListLinkPartnersParams = {
     linkType: string;

@@ -10,9 +10,10 @@
 
 "use client";
 
-import { Modal, useOverlayState } from "@heroui/react";
+import type { useOverlayState } from "@heroui/react";
+import { Modal } from "@heroui/react";
 import React from "react";
-import { ConnectorTransportStep } from "@/types/response/transport-step";
+import type { ConnectorTransportStep } from "@/types/response/transport-step";
 import { TransportStepDetailsContent } from "@/components/transport-step/transport-step-details-content";
 import { Route } from "lucide-react";
 import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";

@@ -8,19 +8,20 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { PaginatedResponse } from "@/types/response/paginated-response";
-import { ConnectorMessage, ConnectorMessageDetailsResponse, ConnectorPendingMessagesResponse } from "@/types/response/message";
-import { ConnectorTransportStep } from "@/types/response/transport-step";
-import { SendMessageFormData, SendMessageResponse, SendParameters, } from "@/types/send-message-form";
+import type { PaginatedResponse } from "@/types/response/paginated-response";
+import type { ConnectorMessage, ConnectorMessageDetailsResponse, ConnectorPendingMessagesResponse } from "@/types/response/message";
+import type { ConnectorTransportStep } from "@/types/response/transport-step";
+import type { SendMessageFormData, SendMessageResponse, SendParameters, } from "@/types/send-message-form";
 import { createSoapOutboundMessagePayload } from "@/lib/rest/message-outbound/soap-message-builder";
 import { createRestOutboundMessagePayLoad } from "@/lib/rest/message-outbound/rest-message-builder";
-import { ConnectorMessageStats } from "@/types/response/stats";
-import { ConnectorMessageReportResponse } from "@/types/response/reporting";
-import { DownloadedFile, RestApiCall, restApiCall, RestApiDownloadCall } from "@/lib/rest";
+import type { ConnectorMessageStats } from "@/types/response/stats";
+import type { ConnectorMessageReportResponse } from "@/types/response/reporting";
+import type { DownloadedFile, RestApiCall, RestApiDownloadCall } from "@/lib/rest";
+import { restApiCall } from "@/lib/rest";
 import { createAttachmentService } from "@/services/attachment";
-import { MessageEvidenceTriggerRequest } from "@/types/request/evidence-trigger";
-import { OutboundMessageRequestMode } from "@/types/global";
-import { MessageEvidenceTriggerResponse } from "@/types/response/evidence-trigger";
+import type { MessageEvidenceTriggerRequest } from "@/types/request/evidence-trigger";
+import type { OutboundMessageRequestMode } from "@/types/global";
+import type { MessageEvidenceTriggerResponse } from "@/types/response/evidence-trigger";
 
 const MESSAGE_REPORT_EXPORT_FORMATS = {
     CSV: "csv",

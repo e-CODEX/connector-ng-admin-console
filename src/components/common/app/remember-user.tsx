@@ -11,7 +11,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { ConnectorUser } from "@/types/response/user";
+import type { ConnectorUser } from "@/types/response/user";
 import { forgetUser, rememberUser } from "@/hooks/use-last-known-user";
 
 export function RememberUser({ user }: { user: ConnectorUser | null }) {

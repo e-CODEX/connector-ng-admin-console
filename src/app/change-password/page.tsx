@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Button, Form } from "@heroui/react";
 import { toastErrorMessage } from "@/utils";
-import { ChangePasswordRequest } from "@/types/request/user";
+import type { ChangePasswordRequest } from "@/types/request/user";
 import { changePasswordSchema } from "@/schemas/auth";
 import { PasswordField } from "@/components/form/password-text-field";
 

@@ -8,8 +8,8 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { OutboundMessageRequestMode } from "@/types/global";
-import { RestOutboundMessageRequest } from "@/types/request/message";
+import type { OutboundMessageRequestMode } from "@/types/global";
+import type { RestOutboundMessageRequest } from "@/types/request/message";
 
 export type SendMessageFormData = Pick<
     RestOutboundMessageRequest,

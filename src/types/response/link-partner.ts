@@ -8,7 +8,7 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { LinkPartnerType } from "@/types/global";
+import type { LinkPartnerType } from "@/types/global";
 
 export interface ConnectorLinkPartner {
     name: string;

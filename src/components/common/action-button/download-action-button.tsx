@@ -10,7 +10,8 @@
 
 import React from "react";
 import { ArrowDownToLine } from "lucide-react";
-import { ActionButton, DetailButtonProps } from "@/components/common/action-button/action-button";
+import type { DetailButtonProps } from "@/components/common/action-button/action-button";
+import { ActionButton } from "@/components/common/action-button/action-button";
 
 export function DownloadActionButton({ ...buttonProps }: DetailButtonProps) {
     return (

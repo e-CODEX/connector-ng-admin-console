@@ -10,10 +10,11 @@
 
 "use client";
 
-import { Modal, useOverlayState } from "@heroui/react";
+import type { useOverlayState } from "@heroui/react";
+import { Modal } from "@heroui/react";
 import React from "react";
-import { ConnectorProcessingMode } from "@/types/response/processing-mode";
-import { ProcessingModeEditTruststoreRequest } from "@/types/request/processing-mode";
+import type { ConnectorProcessingMode } from "@/types/response/processing-mode";
+import type { ProcessingModeEditTruststoreRequest } from "@/types/request/processing-mode";
 import { ProcessingModeTruststoreEditionForm } from "@/components/processing-mode/edit/processing-mode-truststore-edition-form";
 import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";
 import { Pen } from "lucide-react";

@@ -15,10 +15,11 @@ import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation";
 import { ThemeSwitcher } from "@/components/common/theme-switcher";
-import { Building2, Layers, LucideIcon, Mail, Paperclip, Route, Send, Settings, Workflow } from "lucide-react";
+import type { LucideIcon} from "lucide-react";
+import { Building2, Layers, Mail, Paperclip, Route, Send, Settings, Workflow } from "lucide-react";
 import { useOptionalUser } from "@/hooks/useUser";
 import { UserMenu } from "@/components/common/menu/user-menu";
-import { USER_ROLE } from "@/types/global";
+import type { USER_ROLE } from "@/types/global";
 import { useLastKnownUser } from "@/hooks/use-last-known-user";
 
 const AUTH_ROUTES = ["/login", "/change-password"];

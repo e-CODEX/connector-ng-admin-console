@@ -12,8 +12,8 @@ import { BusinessContentRow } from "@/components/business-document/business-cont
 import { FileCode, FileText, Signature } from "lucide-react";
 import { formatBytes } from "@/utils";
 import { BusinessDocumentAesTypeChip } from "@/components/business-document/business-document-aes-type-chip";
-import { ConnectorMessageBusinessContent } from "@/types/response/message";
-import { ConnectorAttachmentResponse } from "@/types/response/attachments";
+import type { ConnectorMessageBusinessContent } from "@/types/response/message";
+import type { ConnectorAttachmentResponse } from "@/types/response/attachments";
 
 interface BusinessContentSectionProps {
     businessContent: ConnectorMessageBusinessContent

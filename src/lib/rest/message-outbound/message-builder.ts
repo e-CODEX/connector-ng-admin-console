@@ -8,8 +8,8 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { SendMessageFormData } from "@/types/send-message-form";
-import { RestOutboundMessageRequest, SoapOutboundMessageRequest } from "@/types/request/message";
+import type { SendMessageFormData } from "@/types/send-message-form";
+import type { RestOutboundMessageRequest, SoapOutboundMessageRequest } from "@/types/request/message";
 import { getXmlContentAsBlob } from "@/utils/file-utils";
 import { readFixtureAsBlob } from "@/actions/fixture-actions";
 

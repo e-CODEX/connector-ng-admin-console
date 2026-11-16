@@ -8,9 +8,9 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { ConnectorUser, ConnectorUserRole } from "@/types/response/user";
-import { RestApiCall } from "@/lib/rest";
-import { UserCreationRequest, UserEditionRequest, UserRoleEditionRequest } from "@/types/request/user";
+import type { ConnectorUser, ConnectorUserRole } from "@/types/response/user";
+import type { RestApiCall } from "@/lib/rest";
+import type { UserCreationRequest, UserEditionRequest, UserRoleEditionRequest } from "@/types/request/user";
 
 export function createUserService(baseUrl: string, call: RestApiCall) {
     return {

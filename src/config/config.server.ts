@@ -10,8 +10,10 @@
 
 import "server-only";
 
-import { AppConfig, isAppMode } from "@/config/config";
-import { APP_MODES, AppMode } from "@/types/global";
+import type { AppConfig} from "@/config/config";
+import { isAppMode } from "@/config/config";
+import type { AppMode } from "@/types/global";
+import { APP_MODES } from "@/types/global";
 
 export function getAppConfig(): AppConfig {
     return {

@@ -8,7 +8,7 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { USER_ROLE } from "@/types/global";
+import type { USER_ROLE } from "@/types/global";
 
 export interface ConnectorUser {
     uuid: string;

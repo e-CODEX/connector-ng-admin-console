@@ -8,9 +8,10 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { FieldError, Key, Label, ListBox, Select } from "@heroui/react";
+import type { Key} from "@heroui/react";
+import { FieldError, Label, ListBox, Select } from "@heroui/react";
 import { useMemo } from "react";
-import { MessageDirection } from "@/types/global";
+import type { MessageDirection } from "@/types/global";
 
 export const ALL_DIRECTIONS = "*" as const;
 

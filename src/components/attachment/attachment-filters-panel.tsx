@@ -10,11 +10,14 @@
 
 import { Label, SearchField } from "@heroui/react";
 import { SearchCriteriaBox } from "@/components/form/search-criteria-box";
-import { AttachmentTypeMultiSelector, AttachmentTypesFilter } from "@/components/form/selector/attachment-type-multi-selector";
-import { AttachmentStorageMultiSelector, AttachmentStoragesFilter } from "@/components/form/selector/attachment-storage-multi-selector";
+import type { AttachmentTypesFilter } from "@/components/form/selector/attachment-type-multi-selector";
+import { AttachmentTypeMultiSelector } from "@/components/form/selector/attachment-type-multi-selector";
+import type { AttachmentStoragesFilter } from "@/components/form/selector/attachment-storage-multi-selector";
+import { AttachmentStorageMultiSelector } from "@/components/form/selector/attachment-storage-multi-selector";
 import type { RangeValue } from "react-aria-components";
-import { ZonedDateTime } from "@internationalized/date";
-import { DateTimeRangeGranularity, DateTimeRangeSelector } from "@/components/form/selector/date-time-range-selector";
+import type { ZonedDateTime } from "@internationalized/date";
+import type { DateTimeRangeGranularity} from "@/components/form/selector/date-time-range-selector";
+import { DateTimeRangeSelector } from "@/components/form/selector/date-time-range-selector";
 import React from "react";
 
 interface MessageFiltersPanelProps {

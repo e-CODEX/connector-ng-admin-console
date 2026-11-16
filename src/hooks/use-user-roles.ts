@@ -10,7 +10,7 @@
 
 import { useEffect, useState } from "react";
 import { useUserService } from "@/hooks/use-http-service";
-import { ConnectorUserRole } from "@/types/response/user";
+import type { ConnectorUserRole } from "@/types/response/user";
 
 type UserRolesState = {
     userRoles: ConnectorUserRole[];

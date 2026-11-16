@@ -10,15 +10,15 @@
 
 "use client";
 
-import { ConnectorMessage } from "@/types/response/message";
+import type { ConnectorMessage } from "@/types/response/message";
 import { Button, Description, FieldError, Form, Label, Modal, Radio, RadioGroup, Spinner } from "@heroui/react";
 import React, { useState } from "react";
 import clsx from "clsx";
 import { MailCheck } from "lucide-react";
 import { messageEvidenceTriggerSchema } from "@/schemas/message";
-import { SendEvidenceTriggerRequest } from "@/services/message";
-import { ConnectorEvidenceType, OutboundMessageRequestMode } from "@/types/global";
-import { MessageEvidenceTriggerResponse } from "@/types/response/evidence-trigger";
+import type { SendEvidenceTriggerRequest } from "@/services/message";
+import type { ConnectorEvidenceType, OutboundMessageRequestMode } from "@/types/global";
+import type { MessageEvidenceTriggerResponse } from "@/types/response/evidence-trigger";
 
 interface MessageEvidenceTriggerModeFormProps {
     message: ConnectorMessage;

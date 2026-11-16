@@ -9,7 +9,7 @@
  */
 
 import { Surface } from "@heroui/react";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 interface ConfigurationBlockProps {
     title: string;

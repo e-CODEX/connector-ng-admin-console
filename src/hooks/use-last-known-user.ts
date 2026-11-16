@@ -11,7 +11,7 @@
 "use client";
 
 import { useMemo, useSyncExternalStore } from "react";
-import { ConnectorUser } from "@/types/response/user";
+import type { ConnectorUser } from "@/types/response/user";
 
 export type NavUser = Pick<ConnectorUser, "username" | "email" | "roles">;
 

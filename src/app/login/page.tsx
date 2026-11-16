@@ -12,7 +12,7 @@
 
 import { Button, FieldError, Form, Input, Label, Spinner, TextField } from "@heroui/react";
 import React, { useState } from "react";
-import { LoginRequest } from "@/types/request/user";
+import type { LoginRequest } from "@/types/request/user";
 import { loginSchema } from "@/schemas/auth";
 import { toastErrorMessage } from "@/utils";
 import { LockOpen } from "lucide-react";

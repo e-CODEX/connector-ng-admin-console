@@ -13,7 +13,7 @@
 import React, { useEffect, useState } from "react";
 import { Button, useOverlayState } from "@heroui/react";
 import { RectangleEllipsis, User, UserPen } from "lucide-react";
-import { ConnectorUser } from "@/types/response/user";
+import type { ConnectorUser } from "@/types/response/user";
 import { useAuthService } from "@/hooks/use-http-service";
 import { toastError, toastErrorMessage, toastSuccess } from "@/utils";
 import { DateTime } from "@/components/common/date-time";
@@ -21,7 +21,7 @@ import { PageHeader } from "@/components/common/header/page-header";
 import { RoleChip } from "@/components/user/user-role-chip";
 import { UserEditionView } from "@/components/user/edition/user-edition-view";
 import { UserPasswordEditionView } from "@/components/user/password-edition/user-password-edition-view";
-import { ChangePasswordRequest, UserEditionRequest } from "@/types/request/user";
+import type { ChangePasswordRequest, UserEditionRequest } from "@/types/request/user";
 import { BooleanChip } from "@/components/common/boolean-chip";
 import { LoadErrorState } from "@/components/common/load-error-state";
 

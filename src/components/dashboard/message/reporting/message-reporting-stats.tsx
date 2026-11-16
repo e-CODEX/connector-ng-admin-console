@@ -8,7 +8,7 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { ConnectorMessageReportResponse } from "@/types/response/reporting";
+import type { ConnectorMessageReportResponse } from "@/types/response/reporting";
 import { useMemo, useState } from "react";
 import { MessageReportingKpi } from "@/components/dashboard/message/reporting/message-reporting-kpi";
 import { MessageReportingTh } from "@/components/dashboard/message/reporting/message-reporting-th";

@@ -15,7 +15,8 @@ import { Avatar, Description, Dropdown, Label, Separator } from "@heroui/react";
 import { LogOut, User, Users } from "lucide-react";
 import React from "react";
 import { toastErrorMessage } from "@/utils";
-import { forgetUser, NavUser } from "@/hooks/use-last-known-user";
+import type { NavUser } from "@/hooks/use-last-known-user";
+import { forgetUser } from "@/hooks/use-last-known-user";
 
 const LOGOUT_FAILED_MESSAGE = "Logout Failed";
 

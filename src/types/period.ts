@@ -9,8 +9,9 @@
  */
 
 import type { RangeValue } from "react-aria-components";
-import { ZonedDateTime, now, getLocalTimeZone } from "@internationalized/date";
-import { DateTimeRangeGranularity } from "@/components/form/selector/date-time-range-selector";
+import type { ZonedDateTime} from "@internationalized/date";
+import { now, getLocalTimeZone } from "@internationalized/date";
+import type { DateTimeRangeGranularity } from "@/components/form/selector/date-time-range-selector";
 
 export type Period =
     | "LAST_HOUR"

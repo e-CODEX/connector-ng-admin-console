@@ -10,7 +10,7 @@
 
 "use client";
 
-import { ConnectorMessageStatsItem } from "@/types/response/stats";
+import type { ConnectorMessageStatsItem } from "@/types/response/stats";
 import { deliveryRate } from "@/utils";
 
 interface MessageStatsDeliveryRateBarProps {

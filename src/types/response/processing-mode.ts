@@ -8,7 +8,7 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { KeystoreType, PartyRoleType } from "@/types/global";
+import type { KeystoreType, PartyRoleType } from "@/types/global";
 
 export interface ConnectorProcessingMode {
     uuid: string;

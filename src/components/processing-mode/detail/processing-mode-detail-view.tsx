@@ -10,10 +10,11 @@
 
 "use client";
 
-import { Button, Modal, Spinner, useOverlayState } from "@heroui/react";
+import type { useOverlayState } from "@heroui/react";
+import { Button, Modal, Spinner } from "@heroui/react";
 import { saveFile, toastError } from "@/utils";
 import React, { useEffect, useState } from "react";
-import { ConnectorProcessingMode, ConnectorProcessingModeDetail } from "@/types/response/processing-mode";
+import type { ConnectorProcessingMode, ConnectorProcessingModeDetail } from "@/types/response/processing-mode";
 import { ProcessingModeDetailsSection } from "@/components/processing-mode/detail/processing-mode-detail-section";
 import { ArrowDownToLine, Workflow } from "lucide-react";
 import { useProcessingModeService } from "@/hooks/use-http-service";

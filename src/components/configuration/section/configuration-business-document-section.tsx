@@ -11,7 +11,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { BusinessDocumentConfiguration } from "@/types/response/configuration";
+import type { BusinessDocumentConfiguration } from "@/types/response/configuration";
 import { toastError } from "@/utils";
 import { ConfigurationBlock } from "@/components/configuration/configuration-block";
 import { ConfigurationDetailRow } from "@/components/configuration/configuration-detail-row";

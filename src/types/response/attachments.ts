@@ -8,7 +8,7 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { AttachmentStorageType, AttachmentType } from "@/types/global";
+import type { AttachmentStorageType, AttachmentType } from "@/types/global";
 
 export interface ConnectorAttachmentResponse {
     identifier: string;

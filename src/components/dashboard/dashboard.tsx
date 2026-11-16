@@ -15,7 +15,8 @@ import { MessageStatsSection } from "@/components/dashboard/message/stats/messag
 import { PageHeaderButton } from "@/components/common/header/page-header-button";
 import { useState } from "react";
 import { PeriodFilterSelector } from "@/components/form/selector/period-filter-selector";
-import { DEFAULT_PERIOD, Period } from "@/types/period";
+import type { Period } from "@/types/period";
+import { DEFAULT_PERIOD } from "@/types/period";
 import { MessageReportingSection } from "@/components/dashboard/message/reporting/message-reporting-section";
 import { DashboardSectionBox } from "@/components/dashboard/dashboard-section-box";
 import { BackendHealthSection } from "@/components/dashboard/health/backend-health-section";

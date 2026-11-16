@@ -8,8 +8,10 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { Button, ButtonProps, Tooltip } from "@heroui/react";
-import React, { ComponentType } from "react";
+import type { ButtonProps} from "@heroui/react";
+import { Button, Tooltip } from "@heroui/react";
+import type { ComponentType } from "react";
+import React from "react";
 
 interface PageHeaderButtonProps extends Omit<ButtonProps, "children"> {
     icon: ComponentType<{ className?: string }>;

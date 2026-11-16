@@ -11,7 +11,7 @@
 "use client";
 
 import { Label, ListBox, Select, } from "@heroui/react";
-import { OutboundMessageRequestMode } from "@/types/global";
+import type { OutboundMessageRequestMode } from "@/types/global";
 
 interface ModeSelectFieldProps {
     value: OutboundMessageRequestMode;

@@ -10,7 +10,7 @@
 
 "use client";
 
-import { ConnectorProcessingModeAction } from "@/types/response/processing-mode";
+import type { ConnectorProcessingModeAction } from "@/types/response/processing-mode";
 import { useDomainScopedList } from "@/hooks/use-domain-scoped-list";
 import { useProcessingModeService } from "@/hooks/use-http-service";
 

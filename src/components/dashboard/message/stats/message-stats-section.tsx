@@ -12,7 +12,8 @@ import { MessageDirectionStatsPanel } from "@/components/dashboard/message/stats
 import { ArrowDownLeft, ArrowUpRight, MessagesSquare } from "lucide-react";
 import { usePolledFetch } from "@/hooks/pooled-fetch";
 import { Spinner } from "@heroui/react";
-import { Period, periodToParams } from "@/types/period";
+import type { Period} from "@/types/period";
+import { periodToParams } from "@/types/period";
 import { useMessageService } from "@/hooks/use-http-service";
 
 interface MessageStatsSectionProps {

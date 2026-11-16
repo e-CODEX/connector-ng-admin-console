@@ -11,7 +11,7 @@
 import { FileText, ShieldCheck } from "lucide-react";
 import { Chip } from "@heroui/react";
 import type { ComponentType } from "react";
-import { TransportStepMessageType } from "@/types/global";
+import type { TransportStepMessageType } from "@/types/global";
 
 interface MessageTypePresentation {
     label: string;

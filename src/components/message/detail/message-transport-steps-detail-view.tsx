@@ -10,10 +10,11 @@
 
 "use client";
 
-import { Modal, useOverlayState } from "@heroui/react";
-import { ConnectorMessage } from "@/types/response/message";
+import type { useOverlayState } from "@heroui/react";
+import { Modal } from "@heroui/react";
+import type { ConnectorMessage } from "@/types/response/message";
 import React, { useEffect, useState } from "react";
-import { ConnectorTransportStep } from "@/types/response/transport-step";
+import type { ConnectorTransportStep } from "@/types/response/transport-step";
 import { TransportStepDetailsContent } from "@/components/transport-step/transport-step-details-content";
 import { toastError } from "@/utils";
 import { SpinnerView } from "@/components/common/spinner-view";

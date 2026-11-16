@@ -10,7 +10,7 @@
 
 "use client";
 
-import { ProcessingModeCreationRequest } from "@/types/request/processing-mode";
+import type { ProcessingModeCreationRequest } from "@/types/request/processing-mode";
 import { useBusinessDomainIdentifiers } from "@/hooks/use-business-domain-identifiers";
 import React, { useState } from "react";
 import { toastError } from "@/utils";
@@ -18,7 +18,8 @@ import { Button, Description, FieldError, Fieldset, Form, Input, Label, Modal, S
 import { BusinessDomainSelector } from "@/components/form/selector/business-domain-selector";
 import { FileSelectField } from "@/components/form/file-select-field";
 import { PasswordField } from "@/components/form/password-text-field";
-import { processingModeCreationSchema, ProcessingModeCreationValues, toFieldErrors } from "@/schemas/processing-mode-creation";
+import type { ProcessingModeCreationValues} from "@/schemas/processing-mode-creation";
+import { processingModeCreationSchema, toFieldErrors } from "@/schemas/processing-mode-creation";
 import { ArrowUpToLine } from "lucide-react";
 import { ACCEPTED_TRUSTSTORES, ACCEPTED_XMLS } from "@/types/global";
 

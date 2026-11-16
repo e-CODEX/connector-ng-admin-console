@@ -12,7 +12,7 @@
 
 import { useEffect, useState } from "react";
 import { Chip } from "@heroui/react";
-import { HealthStatus } from "@/types/global";
+import type { HealthStatus } from "@/types/global";
 import { useActuatorService } from "@/hooks/use-http-service";
 
 type ChipColor = "success" | "danger" | "warning" | "default";

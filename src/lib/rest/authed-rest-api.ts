@@ -11,7 +11,8 @@
 import "server-only";
 
 import { bearerHeader } from "@/lib/rest/bearer-header";
-import { restApiCall, RestApiOptions } from "@/lib/rest/index";
+import type { RestApiOptions } from "@/lib/rest/index";
+import { restApiCall } from "@/lib/rest/index";
 
 export async function authedRestApiCall<T>(
     baseUrl: string,

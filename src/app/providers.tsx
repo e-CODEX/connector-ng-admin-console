@@ -12,8 +12,8 @@
 
 import { ThemeProvider } from "next-themes";
 import React, { createContext } from "react";
-import { AppConfig } from "@/config/config";
-import { ConnectorUser } from "@/types/response/user";
+import type { AppConfig } from "@/config/config";
+import type { ConnectorUser } from "@/types/response/user";
 
 interface ProvidersProps {
     children: React.ReactNode;

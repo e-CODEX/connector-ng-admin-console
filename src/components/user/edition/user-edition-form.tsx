@@ -11,11 +11,11 @@
 "use client";
 
 import { Button, FieldError, Form, Input, Label, Modal, Spinner, Switch, TextField } from "@heroui/react";
-import { UserEditionRequest } from "@/types/request/user";
+import type { UserEditionRequest } from "@/types/request/user";
 import React, { useState } from "react";
 import { Pen } from "lucide-react";
 import { userEditionSchema } from "@/schemas/auth";
-import { ConnectorUser } from "@/types/response/user";
+import type { ConnectorUser } from "@/types/response/user";
 import { isAdmin } from "@/utils";
 
 const FORM_ID = "edit-user-form";

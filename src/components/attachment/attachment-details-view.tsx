@@ -10,10 +10,11 @@
 
 "use client";
 
-import { Button, Modal, Spinner, useOverlayState } from "@heroui/react";
+import type { useOverlayState } from "@heroui/react";
+import { Button, Modal, Spinner } from "@heroui/react";
 import { formatBytes, saveFile, toastError } from "@/utils";
 import React, { useState } from "react";
-import { ConnectorAttachmentResponse } from "@/types/response/attachments";
+import type { ConnectorAttachmentResponse } from "@/types/response/attachments";
 import { DetailRow } from "@/components/common/detail-row";
 import { AttachmentStorageChip } from "@/components/attachment/attachment-storage-chip";
 import { ArrowDownToLine, Paperclip } from "lucide-react";

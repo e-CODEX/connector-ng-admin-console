@@ -13,7 +13,7 @@ import { Chip, Tooltip } from "@heroui/react";
 import type { ComponentProps, ComponentType } from "react";
 import type { ConnectorMessage } from "@/types/response/message";
 import { DateTime, formatDateTime } from "@/components/common/date-time";
-import { ConnectorMessageStatus } from "@/types/global";
+import type { ConnectorMessageStatus } from "@/types/global";
 
 
 export type DeliveryState =

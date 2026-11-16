@@ -11,7 +11,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { LinkPartnerConfiguration } from "@/types/response/configuration";
+import type { LinkPartnerConfiguration } from "@/types/response/configuration";
 import { toastError } from "@/utils";
 import { Table } from "@heroui/react";
 import { ConfigurationBlock } from "@/components/configuration/configuration-block";

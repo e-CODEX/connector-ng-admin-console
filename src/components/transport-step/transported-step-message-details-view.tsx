@@ -10,8 +10,9 @@
 
 "use client";
 
-import { Modal, useOverlayState } from "@heroui/react";
-import { ConnectorMessageDetailsResponse } from "@/types/response/message";
+import type { useOverlayState } from "@heroui/react";
+import { Modal } from "@heroui/react";
+import type { ConnectorMessageDetailsResponse } from "@/types/response/message";
 import React, { useEffect, useState } from "react";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { LoadErrorState } from "@/components/common/load-error-state";
@@ -19,7 +20,7 @@ import { MessageDetailsContent } from "@/components/message/detail/message-detai
 import { Mail } from "lucide-react";
 import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";
 import { useTransportStepService } from "@/hooks/use-http-service";
-import { ConnectorTransportStep } from "@/types/response/transport-step";
+import type { ConnectorTransportStep } from "@/types/response/transport-step";
 
 interface TransportedStepMessageDetailsViewProps {
     transportStep: ConnectorTransportStep | null;

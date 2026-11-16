@@ -11,7 +11,7 @@
 import { Chip } from "@heroui/react";
 import { CircleCheck, CircleX, type LucideIcon, MailCheck, MailOpen, MailWarning, MailX, TriangleAlert, } from "lucide-react";
 import type { ComponentProps } from "react";
-import { ConnectorEvidenceType } from "@/types/global";
+import type { ConnectorEvidenceType } from "@/types/global";
 
 type ChipColor = NonNullable<ComponentProps<typeof Chip>["color"]>;
 type ChipVariant = NonNullable<ComponentProps<typeof Chip>["variant"]>;

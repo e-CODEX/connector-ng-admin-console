@@ -8,7 +8,8 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest} from "next/server";
+import { NextResponse } from "next/server";
 import { getAppConfig } from "@/config/config.server";
 import { bearerHeader } from "@/lib/rest/bearer-header";
 import { isBackendDown } from "@/lib/rest/backend-down";

@@ -11,7 +11,7 @@
 "use client";
 
 import { Button, Form, Modal, Spinner } from "@heroui/react";
-import { ChangePasswordRequest } from "@/types/request/user";
+import type { ChangePasswordRequest } from "@/types/request/user";
 import React, { useState } from "react";
 import { KeyRound } from "lucide-react";
 import { changePasswordSchema } from "@/schemas/auth";

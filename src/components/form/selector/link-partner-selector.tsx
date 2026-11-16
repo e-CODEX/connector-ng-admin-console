@@ -9,8 +9,9 @@
  */
 
 import { useEffect, useMemo } from "react";
-import { FieldError, Key, Label, ListBox, Select } from "@heroui/react";
-import { ConnectorLinkPartner } from "@/types/response/link-partner";
+import type { Key} from "@heroui/react";
+import { FieldError, Label, ListBox, Select } from "@heroui/react";
+import type { ConnectorLinkPartner } from "@/types/response/link-partner";
 
 export interface LinkPartnerSelectorProps {
     partners: ConnectorLinkPartner[];

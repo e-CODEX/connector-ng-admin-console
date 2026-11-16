@@ -15,7 +15,8 @@
 import { Button, Chip, Modal, type useOverlayState } from "@heroui/react";
 import { Info, Timer } from "lucide-react";
 import type { ReactNode } from "react";
-import { DELIVERY_STATUS, DeliveryState } from "@/components/message/chip/message-delivery-status-chip";
+import type { DeliveryState } from "@/components/message/chip/message-delivery-status-chip";
+import { DELIVERY_STATUS } from "@/components/message/chip/message-delivery-status-chip";
 import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";
 
 const RETENTION_DAYS = 7;

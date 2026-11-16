@@ -10,9 +10,10 @@
 
 "use client";
 
-import { Button, FieldError, Form, Input, Label, ListBox, Modal, Select, Spinner, Switch, TextField, useOverlayState } from "@heroui/react";
+import type { useOverlayState } from "@heroui/react";
+import { Button, FieldError, Form, Input, Label, ListBox, Modal, Select, Spinner, Switch, TextField } from "@heroui/react";
 import React, { useState } from "react";
-import { BusinessDomainCreationRequest } from "@/types/request/business-domain";
+import type { BusinessDomainCreationRequest } from "@/types/request/business-domain";
 import { Plus } from "lucide-react";
 
 const FORM_ID = "add-business-domain-form";

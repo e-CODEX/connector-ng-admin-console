@@ -8,9 +8,9 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { PaginatedResponse } from "@/types/response/paginated-response";
-import { ConnectorAttachmentResponse } from "@/types/response/attachments";
-import { DownloadedFile, RestApiCall, RestApiDownloadCall } from "@/lib/rest";
+import type { PaginatedResponse } from "@/types/response/paginated-response";
+import type { ConnectorAttachmentResponse } from "@/types/response/attachments";
+import type { DownloadedFile, RestApiCall, RestApiDownloadCall } from "@/lib/rest";
 
 export type ListAttachmentsParams = {
     page?: number;

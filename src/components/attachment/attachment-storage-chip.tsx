@@ -11,7 +11,7 @@
 import { Cloud, HardDrive, HelpCircle } from "lucide-react";
 import { Chip } from "@heroui/react";
 import type { ComponentType } from "react";
-import { AttachmentStorageType } from "@/types/global";
+import type { AttachmentStorageType } from "@/types/global";
 
 interface AttachmentTypePresentation {
     label: string;

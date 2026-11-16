@@ -10,9 +10,9 @@
 
 "use client";
 
-import { ConnectorProcessingModeParty } from "@/types/response/processing-mode";
+import type { ConnectorProcessingModeParty } from "@/types/response/processing-mode";
 import { useDomainScopedList } from "@/hooks/use-domain-scoped-list";
-import { PartyRoleType } from "@/types/global";
+import type { PartyRoleType } from "@/types/global";
 import { useProcessingModeService } from "@/hooks/use-http-service";
 
 export function useProcessingModeParties(businessDomainIdentifier: string, allSelector?: string) {

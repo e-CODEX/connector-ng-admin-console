@@ -8,7 +8,7 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { ConnectorEvidenceType } from "@/types/global";
+import type { ConnectorEvidenceType } from "@/types/global";
 
 export interface MessageEvidenceTriggerRequest {
     referenceToMessageIdentifier: string;

@@ -11,7 +11,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { ContainerConfiguration } from "@/types/response/configuration";
+import type { ContainerConfiguration } from "@/types/response/configuration";
 import { toastError } from "@/utils";
 import { ConfigurationBlock } from "@/components/configuration/configuration-block";
 import { ConfigurationSignatureView } from "@/components/configuration/view/configuration-signature-view";

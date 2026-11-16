@@ -10,8 +10,9 @@
 
 "use client";
 
-import { Modal, useOverlayState } from "@heroui/react";
-import { UserCreationRequest } from "@/types/request/user";
+import type { useOverlayState } from "@heroui/react";
+import { Modal } from "@heroui/react";
+import type { UserCreationRequest } from "@/types/request/user";
 import React from "react";
 import { UserCreationForm } from "@/components/user/creation/user-creation-form";
 import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";

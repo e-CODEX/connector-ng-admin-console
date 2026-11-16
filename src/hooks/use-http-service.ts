@@ -12,19 +12,31 @@
 
 import { useMemo } from "react";
 import { useAppConfig } from "@/hooks/use-app-config";
-import { ActuatorService, createActuatorService } from "@/services/actuator";
-import { AttachmentService, createAttachmentService } from "@/services/attachment";
-import { BusinessDomainService, createBusinessDomainService } from "@/services/business-domain";
-import { ConfigurationService, createConfigurationService } from "@/services/configuration";
-import { createEvidenceService, EvidenceService } from "@/services/evidence";
-import { createLinkPartnersService, LinkPartnersService } from "@/services/link-partner";
-import { createMessageService, MessageService } from "@/services/message";
-import { createProcessingModeService, ProcessingModeService } from "@/services/processing-mode";
-import { createQueueService, QueueService } from "@/services/queue";
-import { createTransportStepsService, TransportStepsService } from "@/services/transport-step";
-import { createUserService, UserService } from "@/services/user";
+import type { ActuatorService} from "@/services/actuator";
+import { createActuatorService } from "@/services/actuator";
+import type { AttachmentService} from "@/services/attachment";
+import { createAttachmentService } from "@/services/attachment";
+import type { BusinessDomainService} from "@/services/business-domain";
+import { createBusinessDomainService } from "@/services/business-domain";
+import type { ConfigurationService} from "@/services/configuration";
+import { createConfigurationService } from "@/services/configuration";
+import type { EvidenceService } from "@/services/evidence";
+import { createEvidenceService } from "@/services/evidence";
+import type { LinkPartnersService } from "@/services/link-partner";
+import { createLinkPartnersService } from "@/services/link-partner";
+import type { MessageService } from "@/services/message";
+import { createMessageService } from "@/services/message";
+import type { ProcessingModeService } from "@/services/processing-mode";
+import { createProcessingModeService } from "@/services/processing-mode";
+import type { QueueService } from "@/services/queue";
+import { createQueueService } from "@/services/queue";
+import type { TransportStepsService } from "@/services/transport-step";
+import { createTransportStepsService } from "@/services/transport-step";
+import type { UserService } from "@/services/user";
+import { createUserService } from "@/services/user";
 import { restApiCall, restApiDownload } from "@/lib/rest";
-import { AuthService, createAuthService } from "@/services/auth";
+import type { AuthService} from "@/services/auth";
+import { createAuthService } from "@/services/auth";
 
 const PROXY_BACKEND_API = "/api/backend"
 

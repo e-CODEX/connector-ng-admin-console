@@ -8,7 +8,7 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { TransportStepMessageType, TransportStepStatus } from "@/types/global";
+import type { TransportStepMessageType, TransportStepStatus } from "@/types/global";
 
 export interface ConnectorTransportStep {
     identifier: string;

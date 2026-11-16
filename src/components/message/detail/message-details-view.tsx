@@ -10,8 +10,9 @@
 
 "use client";
 
-import { Modal, useOverlayState } from "@heroui/react";
-import { ConnectorMessage, ConnectorMessageDetailsResponse } from "@/types/response/message";
+import type { useOverlayState } from "@heroui/react";
+import { Modal } from "@heroui/react";
+import type { ConnectorMessage, ConnectorMessageDetailsResponse } from "@/types/response/message";
 import React, { useEffect, useState } from "react";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { MessageDetailsContent } from "@/components/message/detail/message-details-content";

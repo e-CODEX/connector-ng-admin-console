@@ -13,7 +13,7 @@
 import { PageHeader } from "@/components/common/header/page-header";
 import React, { useState } from "react";
 import { Table, useOverlayState } from "@heroui/react";
-import { ConnectorProcessingMode } from "@/types/response/processing-mode";
+import type { ConnectorProcessingMode } from "@/types/response/processing-mode";
 import { saveFile, toastError, toastSuccess } from "@/utils";
 import { ProcessingModeDetailsView } from "@/components/processing-mode/detail/processing-mode-detail-view";
 import { PageHeaderButton } from "@/components/common/header/page-header-button";

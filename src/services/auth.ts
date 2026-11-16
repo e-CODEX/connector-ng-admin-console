@@ -8,8 +8,8 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { ConnectorUser, LoginResponse } from "@/types/response/user";
-import { RestApiCall } from "@/lib/rest";
+import type { ConnectorUser, LoginResponse } from "@/types/response/user";
+import type { RestApiCall } from "@/lib/rest";
 
 export function createAuthService(baseUrl: string, call: RestApiCall) {
     return {

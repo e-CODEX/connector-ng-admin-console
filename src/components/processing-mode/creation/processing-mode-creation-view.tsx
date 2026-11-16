@@ -10,9 +10,10 @@
 
 "use client";
 
-import { Modal, useOverlayState } from "@heroui/react";
+import type { useOverlayState } from "@heroui/react";
+import { Modal } from "@heroui/react";
 import React from "react";
-import { ProcessingModeCreationRequest } from "@/types/request/processing-mode";
+import type { ProcessingModeCreationRequest } from "@/types/request/processing-mode";
 import { ProcessingModeCreationForm } from "@/components/processing-mode/creation/processing-mode-creation-form";
 import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";
 import { Plus } from "lucide-react";

@@ -8,7 +8,8 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { APP_MODES, AppMode } from "@/types/global";
+import type { AppMode } from "@/types/global";
+import { APP_MODES } from "@/types/global";
 
 export type AppConfig = {
     appMode: AppMode;

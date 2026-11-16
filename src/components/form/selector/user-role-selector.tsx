@@ -9,8 +9,8 @@
  */
 
 import { FieldError, Label, ListBox, Select } from "@heroui/react";
-import { ConnectorUserRole } from "@/types/response/user";
-import { USER_ROLE } from "@/types/global";
+import type { ConnectorUserRole } from "@/types/response/user";
+import type { USER_ROLE } from "@/types/global";
 
 interface UserRoleSelectorProps {
     roles: ConnectorUserRole[];

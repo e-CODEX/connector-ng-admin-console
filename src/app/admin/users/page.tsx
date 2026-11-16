@@ -13,7 +13,7 @@
 import { useUserService } from "@/hooks/use-http-service";
 import { useList } from "@/hooks/use-list";
 import { useOptionalUser } from "@/hooks/useUser";
-import { ConnectorUser } from "@/types/response/user";
+import type { ConnectorUser } from "@/types/response/user";
 import { KeyRound, RefreshCw, RotateCcwKey, User, UserLock, UserMinus, UserPen, UserPlus } from "lucide-react";
 import { PageHeaderButton } from "@/components/common/header/page-header-button";
 import { PageHeader } from "@/components/common/header/page-header";
@@ -28,7 +28,7 @@ import { toastError, toastSuccess } from "@/utils";
 import { DateTime } from "@/components/common/date-time";
 import { ActionButton } from "@/components/common/action-button/action-button";
 import { ConfirmModal } from "@/components/common/confirmation-modal";
-import { UserCreationRequest, UserEditionRequest, UserRoleEditionRequest } from "@/types/request/user";
+import type { UserCreationRequest, UserEditionRequest, UserRoleEditionRequest } from "@/types/request/user";
 import { RoleChip } from "@/components/user/user-role-chip";
 import { UserEditionView } from "@/components/user/edition/user-edition-view";
 import { UserRoleEditionView } from "@/components/user/role-edition/user-role-edition-view";

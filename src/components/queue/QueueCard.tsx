@@ -8,7 +8,7 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { ConnectorQueueStats } from "@/types/response/queue";
+import type { ConnectorQueueStats } from "@/types/response/queue";
 import { Card } from "@heroui/react";
 
 interface QueueCardProps {

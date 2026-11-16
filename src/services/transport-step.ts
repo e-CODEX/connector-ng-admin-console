@@ -8,10 +8,10 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { PaginatedResponse } from "@/types/response/paginated-response";
-import { ConnectorTransportStep } from "@/types/response/transport-step";
-import { RestApiCall } from "@/lib/rest";
-import { ConnectorMessageDetailsResponse } from "@/types/response/message";
+import type { PaginatedResponse } from "@/types/response/paginated-response";
+import type { ConnectorTransportStep } from "@/types/response/transport-step";
+import type { RestApiCall } from "@/lib/rest";
+import type { ConnectorMessageDetailsResponse } from "@/types/response/message";
 
 export type ListTransportStepsParams = {
     page?: number;

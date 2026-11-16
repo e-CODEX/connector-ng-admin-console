@@ -11,7 +11,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { ConnectorQueueStats } from "@/types/response/queue";
+import type { ConnectorQueueStats } from "@/types/response/queue";
 import { PageHeaderButton } from "@/components/common/header/page-header-button";
 import { PageHeader } from "@/components/common/header/page-header";
 import { QueueCard } from "@/components/queue/QueueCard";

@@ -12,7 +12,8 @@
 
 import type { Key } from "@heroui/react";
 import { ListBox, Select } from "@heroui/react";
-import { Period, PERIOD_OPTIONS } from "@/types/period";
+import type { Period} from "@/types/period";
+import { PERIOD_OPTIONS } from "@/types/period";
 
 
 interface PeriodFilterProps {

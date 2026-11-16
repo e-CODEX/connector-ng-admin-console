@@ -8,7 +8,7 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { Signature } from "@/types/response/configuration";
+import type { Signature } from "@/types/response/configuration";
 import { Chip } from "@heroui/react";
 import { ConfigurationBlock } from "@/components/configuration/configuration-block";
 import { ConfigurationKeystoreView } from "@/components/configuration/view/configuration-keystore-view";

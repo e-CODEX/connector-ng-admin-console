@@ -8,7 +8,7 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { ConnectorTransportStep } from "@/types/response/transport-step";
+import type { ConnectorTransportStep } from "@/types/response/transport-step";
 import { DetailRow } from "@/components/common/detail-row";
 import { Table } from "@heroui/react";
 import { DetailSection } from "@/components/common/detail-section";

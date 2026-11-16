@@ -8,7 +8,7 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { HealthStatus } from "@/types/global";
+import type { HealthStatus } from "@/types/global";
 
 export interface ActuatorHealthResponse {
     status: HealthStatus;

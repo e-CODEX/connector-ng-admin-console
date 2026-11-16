@@ -9,7 +9,7 @@
  */
 
 import { Chip } from "@heroui/react";
-import { Keystore } from "@/types/response/configuration";
+import type { Keystore } from "@/types/response/configuration";
 import { ConfigurationSecretValue } from "@/components/configuration/configuration-secret-value";
 import { ConfigurationDetailRow } from "@/components/configuration/configuration-detail-row";
 

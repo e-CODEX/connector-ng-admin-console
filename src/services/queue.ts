@@ -8,8 +8,8 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { RestApiCall } from "@/lib/rest";
-import { ConnectorQueueStats } from "@/types/response/queue";
+import type { RestApiCall } from "@/lib/rest";
+import type { ConnectorQueueStats } from "@/types/response/queue";
 
 export function createQueueService(baseUrl: string, call: RestApiCall) {
     return {

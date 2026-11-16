@@ -8,9 +8,10 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { FieldError, Key, Label, ListBox, Select } from "@heroui/react";
+import type { Key} from "@heroui/react";
+import { FieldError, Label, ListBox, Select } from "@heroui/react";
 import { useMemo, useState } from "react";
-import { TransportStepStatus } from "@/types/global";
+import type { TransportStepStatus } from "@/types/global";
 
 export const ALL_TYPES = "All" as const;
 

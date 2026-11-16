@@ -8,9 +8,10 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { ConnectorBusinessDomain } from "@/types/response/business-domain";
-import { BusinessDomainCreationRequest } from "@/types/request/business-domain";
-import { RestApiCall, restApiCall } from "@/lib/rest";
+import type { ConnectorBusinessDomain } from "@/types/response/business-domain";
+import type { BusinessDomainCreationRequest } from "@/types/request/business-domain";
+import type { RestApiCall} from "@/lib/rest";
+import { restApiCall } from "@/lib/rest";
 
 
 export function createBusinessDomainService(baseUrl: string, call: RestApiCall) {

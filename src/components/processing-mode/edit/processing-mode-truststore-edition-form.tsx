@@ -16,10 +16,11 @@ import { Button, Description, Fieldset, Form, Modal, Spinner } from "@heroui/rea
 import { FileSelectField } from "@/components/form/file-select-field";
 import { toFieldErrors } from "@/schemas/processing-mode-creation";
 import { ArrowUpToLine } from "lucide-react";
-import { processingModeTruststoreEditionSchema, ProcessingModeTruststoreEditionValues } from "@/schemas/processing-mode-truststore-edition";
-import { ConnectorProcessingMode } from "@/types/response/processing-mode";
+import type { ProcessingModeTruststoreEditionValues } from "@/schemas/processing-mode-truststore-edition";
+import { processingModeTruststoreEditionSchema } from "@/schemas/processing-mode-truststore-edition";
+import type { ConnectorProcessingMode } from "@/types/response/processing-mode";
 import { ProcessingModeDetailHeaderSection } from "@/components/processing-mode/detail/processing-mode-detail-header-section";
-import { ProcessingModeEditTruststoreRequest } from "@/types/request/processing-mode";
+import type { ProcessingModeEditTruststoreRequest } from "@/types/request/processing-mode";
 import { PasswordField } from "@/components/form/password-text-field";
 import { ACCEPTED_TRUSTSTORES } from "@/types/global";
 

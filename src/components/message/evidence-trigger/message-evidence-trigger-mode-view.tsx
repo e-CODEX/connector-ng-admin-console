@@ -8,15 +8,16 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { ConnectorMessage } from "@/types/response/message";
-import { Modal, useOverlayState } from "@heroui/react";
+import type { ConnectorMessage } from "@/types/response/message";
+import type { useOverlayState } from "@heroui/react";
+import { Modal } from "@heroui/react";
 import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";
 import { MailCheck } from "lucide-react";
 import React from "react";
 import { MessageEvidenceTriggerModeForm } from "@/components/message/evidence-trigger/message-evidence-trigger-mode-form";
-import { SendEvidenceTriggerRequest } from "@/services/message";
-import { ConnectorEvidenceType } from "@/types/global";
-import { MessageEvidenceTriggerResponse } from "@/types/response/evidence-trigger";
+import type { SendEvidenceTriggerRequest } from "@/services/message";
+import type { ConnectorEvidenceType } from "@/types/global";
+import type { MessageEvidenceTriggerResponse } from "@/types/response/evidence-trigger";
 
 interface MessageEvidenceTriggerModeViewProps {
     message: ConnectorMessage | null;

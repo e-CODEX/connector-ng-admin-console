@@ -9,8 +9,8 @@
  */
 
 import { useCallback, useRef, useState } from "react";
-import { OutboundMessageConsoleContent } from "@/components/message/outbound/outbound-message-console-panel";
-import { SendMessageFormData, SendParameters } from "@/types/send-message-form";
+import type { OutboundMessageConsoleContent } from "@/components/message/outbound/outbound-message-console-panel";
+import type { SendMessageFormData, SendParameters } from "@/types/send-message-form";
 import { useMessageService } from "@/hooks/use-http-service";
 import { toastError } from "@/utils";
 

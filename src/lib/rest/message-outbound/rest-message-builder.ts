@@ -9,10 +9,10 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
-import { SendMessageFormData, SendParameters } from "@/types/send-message-form";
-import { RestOutboundMessageRequest } from "@/types/request/message";
+import type { SendMessageFormData, SendParameters } from "@/types/send-message-form";
+import type { RestOutboundMessageRequest } from "@/types/request/message";
 import { generatePdfBlob } from "@/utils/file-utils";
-import { AttachmentService } from "@/services/attachment";
+import type { AttachmentService } from "@/services/attachment";
 import { appendBusinessContentToFormData, appendFormData } from "@/lib/rest/message-outbound/message-builder";
 
 /**

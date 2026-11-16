@@ -10,7 +10,7 @@
 
 "use client";
 
-import { SendParameters } from "@/types/send-message-form";
+import type { SendParameters } from "@/types/send-message-form";
 import { FormTextField } from "@/components/form/form-text-field";
 import { OutboundMessageRequestModeSelector } from "@/components/message/outbound/outbound-message-request-mode-selector";
 

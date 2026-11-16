@@ -8,7 +8,8 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { Modal, useOverlayState } from "@heroui/react";
+import type { useOverlayState } from "@heroui/react";
+import { Modal } from "@heroui/react";
 import React from "react";
 import { MailClock } from "lucide-react";
 import { ModalHeaderIcon } from "@/components/common/header/modal-header-icon";

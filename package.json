@@ -9,6 +9,9 @@
         "lint": "eslint .",
         "lint:fix": "eslint . --fix"
     },
+    "lint-staged": {
+        "*.{js,jsx,ts,tsx,mjs}": "eslint --fix --no-warn-ignored"
+    },
     "dependencies": {
         "@heroui/navbar": "^2.2.30",
         "@heroui/react": "^3.2.1",
@@ -41,6 +44,8 @@
         "eslint-plugin-react": "^7.37.5",
         "eslint-plugin-react-hooks": "^7.1.1",
         "eslint-plugin-unused-imports": "^4.4.1",
+        "husky": "^9.1.7",
+        "lint-staged": "^16.4.0",
         "prettier": "^3.10.1",
         "tailwindcss": "^4",
         "typescript": "^5"

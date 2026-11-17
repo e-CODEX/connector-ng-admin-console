@@ -14,19 +14,22 @@
         "isolatedModules": true,
         "jsx": "react-jsx",
         "incremental": true,
+        "types": ["node", "vitest/globals", "@testing-library/jest-dom/vitest"],
         "plugins": [
             {
                 "name": "next"
             }
         ],
         "paths": {
-            "@/*": ["./src/*"]
+            "@/*": ["./src/*"],
+            "@test/*": ["./test/*"]
         }
     },
     "include": [
         "next-env.d.ts",
         "src/**/*.ts",
         "src/**/*.tsx",
+        "test/**/*",
         ".next/types/**/*.ts",
         ".next/dev/types/**/*.ts",
         "src/**/*.mts"

@@ -30,15 +30,17 @@ export function ActionButton({
                              }: DetailButtonProps) {
     return (
         <Tooltip delay={0}>
-            <Button
-                isIconOnly
-                size={size}
-                variant={variant}
-                aria-label={label}
-                {...buttonProps}
-            >
-                <Icon className={`size-4 ${iconAccent}`}/>
-            </Button>
+            <Tooltip.Trigger>
+                <Button
+                    isIconOnly
+                    size={size}
+                    variant={variant}
+                    aria-label={label}
+                    {...buttonProps}
+                >
+                    <Icon className={`size-4 ${iconAccent}`}/>
+                </Button>
+            </Tooltip.Trigger>
             <Tooltip.Content showArrow>
                 <Tooltip.Arrow/>
                 <p>{label}</p>

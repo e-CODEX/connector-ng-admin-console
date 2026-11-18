@@ -8,7 +8,10 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import type { TransportStepMessageType, TransportStepStatus } from "@/types/global";
+import type {
+    TransportStepMessageType,
+    TransportStepStatus,
+} from "@/types/global";
 
 export interface ConnectorTransportStep {
     identifier: string;
@@ -19,11 +22,12 @@ export interface ConnectorTransportStep {
     status: TransportStepStatus;
     statuses: Statuses[];
     messageType: TransportStepMessageType;
+    isRetryable: boolean;
     createdAt: string;
     updatedAt: string;
 }
 
 interface Statuses {
-    status: TransportStepStatus
+    status: TransportStepStatus;
     createdAt: string;
 }

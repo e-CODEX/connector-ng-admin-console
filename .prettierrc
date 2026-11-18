@@ -2,5 +2,19 @@
     "tabWidth": 4,
     "useTabs": false,
     "singleQuote": false,
-    "semi": true
+    "semi": true,
+    "overrides": [
+        {
+            "files": ["*.ts"],
+            "options": {
+                "printWidth": 120
+            }
+        },
+        {
+            "files": ["*.tsx"],
+            "options": {
+                "printWidth": 180
+            }
+        }
+    ]
 }

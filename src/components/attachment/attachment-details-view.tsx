@@ -50,8 +50,7 @@ export function AttachmentDetailsView({ attachment, state }: AttachmentDetailsVi
     };
 
     return (
-        <Modal state={state}>
-            <Modal.Backdrop isDismissable={false}>
+        <Modal.Backdrop isDismissable={false} isOpen={state.isOpen} onOpenChange={state.setOpen}>
                 <Modal.Container size="lg">
                     <Modal.Dialog className="sm:max-w-200">
                         <Modal.CloseTrigger/>
@@ -115,7 +114,6 @@ export function AttachmentDetailsView({ attachment, state }: AttachmentDetailsVi
                         </Modal.Footer>
                     </Modal.Dialog>
                 </Modal.Container>
-            </Modal.Backdrop>
-        </Modal>
+        </Modal.Backdrop>
     );
 }

@@ -69,35 +69,33 @@ export function MessageDetailsView({ message, state }: MessageDetailsViewProps) 
     const retry = () => setReloadToken((t) => t + 1);
 
     return (
-        <Modal state={state}>
-            <Modal.Backdrop isDismissable={false}>
-                <Modal.Container>
-                    <Modal.Dialog className="sm:max-w-300">
-                        <Modal.CloseTrigger/>
+        <Modal.Backdrop isOpen={state.isOpen} onOpenChange={state.setOpen} isDismissable={false}>
+            <Modal.Container>
+                <Modal.Dialog className="sm:max-w-300">
+                    <Modal.CloseTrigger/>
 
-                        <Modal.Header>
-                            <ModalHeaderIcon icon={Mail} tone="accent"/>
-                            <Modal.Heading className="font-semibold">Business Message Details</Modal.Heading>
-                        </Modal.Header>
+                    <Modal.Header>
+                        <ModalHeaderIcon icon={Mail} tone="accent"/>
+                        <Modal.Heading className="font-semibold">Business Message Details</Modal.Heading>
+                    </Modal.Header>
 
-                        <Modal.Body>
-                            <div className="flex flex-col">
-                                {loading ? (
-                                    <SpinnerView className="mt-60"/>
-                                ) : loadFailed ? (
-                                    <LoadErrorState
-                                        className="min-h-100"
-                                        title="Could not load message details"
-                                        onRetry={retry}
-                                    />
-                                ) : (
-                                    <MessageDetailsContent message={details} loading={loading}/>
-                                )}
-                            </div>
-                        </Modal.Body>
-                    </Modal.Dialog>
-                </Modal.Container>
-            </Modal.Backdrop>
-        </Modal>
+                    <Modal.Body>
+                        <div className="flex flex-col">
+                            {loading ? (
+                                <SpinnerView className="mt-60"/>
+                            ) : loadFailed ? (
+                                <LoadErrorState
+                                    className="min-h-100"
+                                    title="Could not load message details"
+                                    onRetry={retry}
+                                />
+                            ) : (
+                                <MessageDetailsContent message={details} loading={loading}/>
+                            )}
+                        </div>
+                    </Modal.Body>
+                </Modal.Dialog>
+            </Modal.Container>
+        </Modal.Backdrop>
     );
 }

@@ -65,12 +65,12 @@ export const AppMainNavbar = ({ backendDown = false }: { backendDown?: boolean }
                 <NavbarBrand className="gap-3 max-w-fit">
                     <Link href="/" className="flex items-center">
                         <Image
-                            className="rounded-md"
+                            className="rounded-md w-100 h-auto"
                             src="/logo.png"
                             alt="Logo"
                             loading="eager"
-                            width={400}
-                            height={80}
+                            width={880}
+                            height={166}
                         />
                     </Link>
                 </NavbarBrand>

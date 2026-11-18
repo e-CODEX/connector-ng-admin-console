@@ -25,24 +25,22 @@ interface ProcessingModeCreationViewProps {
 
 export function ProcessingModeCreationView({ state, onSubmit }: ProcessingModeCreationViewProps) {
     return (
-        <Modal state={state}>
-            <Modal.Backdrop isDismissable={false} isKeyboardDismissDisabled>
-                <Modal.Container size="lg">
-                    <Modal.Dialog className="sm:min-w-200">
-                        <Modal.CloseTrigger/>
+        <Modal.Backdrop isOpen={state.isOpen} onOpenChange={state.setOpen} isDismissable={false} isKeyboardDismissDisabled>
+            <Modal.Container size="lg">
+                <Modal.Dialog className="sm:min-w-200">
+                    <Modal.CloseTrigger/>
 
-                        <Modal.Header>
-                            <ModalHeaderIcon icon={Plus} tone="accent"/>
-                            <Modal.Heading className="font-semibold">Load A Processing Mode</Modal.Heading>
-                        </Modal.Header>
+                    <Modal.Header>
+                        <ModalHeaderIcon icon={Plus} tone="accent"/>
+                        <Modal.Heading className="font-semibold">Load A Processing Mode</Modal.Heading>
+                    </Modal.Header>
 
-                        <ProcessingModeCreationForm
-                            key={String(state.isOpen)}
-                            onSubmit={onSubmit}
-                        />
-                    </Modal.Dialog>
-                </Modal.Container>
-            </Modal.Backdrop>
-        </Modal>
+                    <ProcessingModeCreationForm
+                        key={String(state.isOpen)}
+                        onSubmit={onSubmit}
+                    />
+                </Modal.Dialog>
+            </Modal.Container>
+        </Modal.Backdrop>
     );
 }

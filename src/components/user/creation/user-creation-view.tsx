@@ -25,24 +25,22 @@ interface UserCreationViewProps {
 
 export function UserCreationView({ state, onSubmit }: UserCreationViewProps) {
     return (
-        <Modal state={state}>
-            <Modal.Backdrop isDismissable={false} isKeyboardDismissDisabled>
-                <Modal.Container size="lg">
-                    <Modal.Dialog className="sm:max-w-150">
-                        <Modal.CloseTrigger/>
+        <Modal.Backdrop isOpen={state.isOpen} onOpenChange={state.setOpen} isDismissable={false} isKeyboardDismissDisabled>
+            <Modal.Container size="lg">
+                <Modal.Dialog className="sm:max-w-150">
+                    <Modal.CloseTrigger/>
 
-                        <Modal.Header>
-                            <ModalHeaderIcon icon={UserPlus} tone="accent"/>
-                            <Modal.Heading className="font-semibold">Create A User</Modal.Heading>
-                        </Modal.Header>
+                    <Modal.Header>
+                        <ModalHeaderIcon icon={UserPlus} tone="accent"/>
+                        <Modal.Heading className="font-semibold">Create A User</Modal.Heading>
+                    </Modal.Header>
 
-                        <UserCreationForm
-                            key={String(state.isOpen)}
-                            onSubmit={onSubmit}
-                        />
-                    </Modal.Dialog>
-                </Modal.Container>
-            </Modal.Backdrop>
-        </Modal>
+                    <UserCreationForm
+                        key={String(state.isOpen)}
+                        onSubmit={onSubmit}
+                    />
+                </Modal.Dialog>
+            </Modal.Container>
+        </Modal.Backdrop>
     )
 }

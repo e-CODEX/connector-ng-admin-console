@@ -59,28 +59,28 @@ export function ConfirmModal({
     };
 
     return (
-        <Modal state={state}>
-            <Modal.Backdrop
-                isDismissable={isDismissable}
-                isKeyboardDismissDisabled
-            >
-                <Modal.Container size={size}>
-                    <Modal.Dialog role="alertdialog">
-                        <Modal.Header>
-                            <Modal.Heading>{title}</Modal.Heading>
-                        </Modal.Header>
-                        <Modal.Body>{message}</Modal.Body>
-                        <Modal.Footer>
-                            <Button variant="tertiary" onPress={handleCancel} isDisabled={isPending}>
-                                {cancelLabel}
-                            </Button>
-                            <Button variant={confirmVariant} onPress={handleConfirm} isPending={isPending}>
-                                {confirmLabel}
-                            </Button>
-                        </Modal.Footer>
-                    </Modal.Dialog>
-                </Modal.Container>
-            </Modal.Backdrop>
-        </Modal>
+        <Modal.Backdrop
+            isOpen={state.isOpen}
+            onOpenChange={state.setOpen}
+            isDismissable={isDismissable}
+            isKeyboardDismissDisabled
+        >
+            <Modal.Container size={size}>
+                <Modal.Dialog role="alertdialog">
+                    <Modal.Header>
+                        <Modal.Heading>{title}</Modal.Heading>
+                    </Modal.Header>
+                    <Modal.Body>{message}</Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="tertiary" onPress={handleCancel} isDisabled={isPending}>
+                            {cancelLabel}
+                        </Button>
+                        <Button variant={confirmVariant} onPress={handleConfirm} isPending={isPending}>
+                            {confirmLabel}
+                        </Button>
+                    </Modal.Footer>
+                </Modal.Dialog>
+            </Modal.Container>
+        </Modal.Backdrop>
     );
 }

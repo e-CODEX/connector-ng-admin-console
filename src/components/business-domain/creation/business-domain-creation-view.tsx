@@ -25,21 +25,19 @@ interface BusinessDomainCreationViewProps {
 
 export function BusinessDomainCreationView({ state, onSubmit }: BusinessDomainCreationViewProps) {
     return (
-        <Modal state={state}>
-            <Modal.Backdrop isDismissable={false} isKeyboardDismissDisabled>
-                <Modal.Container size="lg">
-                    <Modal.Dialog className="sm:max-w-150">
-                        <Modal.CloseTrigger/>
+        <Modal.Backdrop isOpen={state.isOpen} onOpenChange={state.setOpen} isDismissable={false} isKeyboardDismissDisabled>
+            <Modal.Container size="lg">
+                <Modal.Dialog className="sm:max-w-150">
+                    <Modal.CloseTrigger/>
 
-                        <Modal.Header>
-                            <ModalHeaderIcon icon={Plus} tone="accent"/>
-                            <Modal.Heading className="font-semibold">Create A Business Domain</Modal.Heading>
-                        </Modal.Header>
+                    <Modal.Header>
+                        <ModalHeaderIcon icon={Plus} tone="accent"/>
+                        <Modal.Heading className="font-semibold">Create A Business Domain</Modal.Heading>
+                    </Modal.Header>
 
-                        <BusinessDomainCreationForm state={state} onSubmit={onSubmit}/>
-                    </Modal.Dialog>
-                </Modal.Container>
-            </Modal.Backdrop>
-        </Modal>
+                    <BusinessDomainCreationForm state={state} onSubmit={onSubmit}/>
+                </Modal.Dialog>
+            </Modal.Container>
+        </Modal.Backdrop>
     );
 }

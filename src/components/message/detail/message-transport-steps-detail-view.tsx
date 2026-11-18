@@ -63,34 +63,32 @@ export function MessageTransportStepsDetailView({ message, state }: MessageTrans
     }, [state.isOpen, identifier, messageService]);
 
     return (
-        <Modal state={state}>
-            <Modal.Backdrop isDismissable={false}>
-                <Modal.Container>
-                    <Modal.Dialog className="sm:max-w-200">
-                        <Modal.CloseTrigger/>
+        <Modal.Backdrop isOpen={state.isOpen} onOpenChange={state.setOpen} isDismissable={false}>
+            <Modal.Container>
+                <Modal.Dialog className="sm:max-w-200">
+                    <Modal.CloseTrigger/>
 
-                        <Modal.Header>
-                            <ModalHeaderIcon icon={Route} tone="accent"/>
-                            <Modal.Heading className="font-semibold">Message Transport Steps Details</Modal.Heading>
-                        </Modal.Header>
+                    <Modal.Header>
+                        <ModalHeaderIcon icon={Route} tone="accent"/>
+                        <Modal.Heading className="font-semibold">Message Transport Steps Details</Modal.Heading>
+                    </Modal.Header>
 
-                        <Modal.Body>
-                            {loading ? (
-                                <SpinnerView className="mt-60"/>
-                            ) : (
-                                <>
-                                    {transportStep && <TransportStepDetailsContent transportStep={transportStep}/>}
-                                </>
-                            )}
-                            {error && (
-                                <div className="flex justify-center py-6">
-                                    <div className="text-destructive">{error}</div>
-                                </div>
-                            )}
-                        </Modal.Body>
-                    </Modal.Dialog>
-                </Modal.Container>
-            </Modal.Backdrop>
-        </Modal>
+                    <Modal.Body>
+                        {loading ? (
+                            <SpinnerView className="mt-60"/>
+                        ) : (
+                            <>
+                                {transportStep && <TransportStepDetailsContent transportStep={transportStep}/>}
+                            </>
+                        )}
+                        {error && (
+                            <div className="flex justify-center py-6">
+                                <div className="text-destructive">{error}</div>
+                            </div>
+                        )}
+                    </Modal.Body>
+                </Modal.Dialog>
+            </Modal.Container>
+        </Modal.Backdrop>
     );
 }

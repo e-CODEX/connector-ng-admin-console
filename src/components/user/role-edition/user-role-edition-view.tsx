@@ -27,25 +27,23 @@ interface UserRoleEditionViewProps {
 
 export function UserRoleEditionView({ state, user, onSubmit }: UserRoleEditionViewProps) {
     return (
-        <Modal state={state}>
-            <Modal.Backdrop isDismissable={false} isKeyboardDismissDisabled>
-                <Modal.Container size="lg">
-                    <Modal.Dialog className="sm:max-w-150">
-                        <Modal.CloseTrigger/>
+        <Modal.Backdrop isOpen={state.isOpen} onOpenChange={state.setOpen} isDismissable={false} isKeyboardDismissDisabled>
+            <Modal.Container size="lg">
+                <Modal.Dialog className="sm:max-w-150">
+                    <Modal.CloseTrigger/>
 
-                        <Modal.Header>
-                            <ModalHeaderIcon icon={KeyRound} tone="accent"/>
-                            <Modal.Heading className="font-semibold">Edit User Roles</Modal.Heading>
-                        </Modal.Header>
+                    <Modal.Header>
+                        <ModalHeaderIcon icon={KeyRound} tone="accent"/>
+                        <Modal.Heading className="font-semibold">Edit User Roles</Modal.Heading>
+                    </Modal.Header>
 
-                        <UserRoleEditionForm
-                            key={String(state.isOpen)}
-                            user={user}
-                            onSubmit={onSubmit}
-                        />
-                    </Modal.Dialog>
-                </Modal.Container>
-            </Modal.Backdrop>
-        </Modal>
+                    <UserRoleEditionForm
+                        key={String(state.isOpen)}
+                        user={user}
+                        onSubmit={onSubmit}
+                    />
+                </Modal.Dialog>
+            </Modal.Container>
+        </Modal.Backdrop>
     )
 }

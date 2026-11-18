@@ -19,6 +19,7 @@ export default defineConfig([
     },
     globalIgnores([
         ".next/**",
+        ".next-e2e/**",
         "dist/**",
         "build/**",
         "out/**",

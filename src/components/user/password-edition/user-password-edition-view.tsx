@@ -25,24 +25,22 @@ interface UserPasswordEditionProps {
 
 export function UserPasswordEditionView({ state, onSubmit }: UserPasswordEditionProps) {
     return (
-        <Modal state={state}>
-            <Modal.Backdrop isDismissable={false} isKeyboardDismissDisabled>
-                <Modal.Container size="lg">
-                    <Modal.Dialog className="sm:max-w-150">
-                        <Modal.CloseTrigger/>
+        <Modal.Backdrop isOpen={state.isOpen} onOpenChange={state.setOpen} isDismissable={false} isKeyboardDismissDisabled>
+            <Modal.Container size="lg">
+                <Modal.Dialog className="sm:max-w-150">
+                    <Modal.CloseTrigger/>
 
-                        <Modal.Header>
-                            <ModalHeaderIcon icon={RectangleEllipsis} tone="accent"/>
-                            <Modal.Heading className="font-semibold">Edit User Password</Modal.Heading>
-                        </Modal.Header>
+                    <Modal.Header>
+                        <ModalHeaderIcon icon={RectangleEllipsis} tone="accent"/>
+                        <Modal.Heading className="font-semibold">Edit User Password</Modal.Heading>
+                    </Modal.Header>
 
-                        <UserPasswordEditionForm
-                            key={String(state.isOpen)}
-                            onSubmit={onSubmit}
-                        />
-                    </Modal.Dialog>
-                </Modal.Container>
-            </Modal.Backdrop>
-        </Modal>
+                    <UserPasswordEditionForm
+                        key={String(state.isOpen)}
+                        onSubmit={onSubmit}
+                    />
+                </Modal.Dialog>
+            </Modal.Container>
+        </Modal.Backdrop>
     )
 }

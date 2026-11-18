@@ -85,23 +85,21 @@ export function TransportedStepMessageDetailsView({ transportStep, state }: Tran
     };
 
     return (
-        <Modal state={state}>
-            <Modal.Backdrop isDismissable={false}>
-                <Modal.Container>
-                    <Modal.Dialog className="sm:max-w-300">
-                        <Modal.CloseTrigger/>
+        <Modal.Backdrop isOpen={state.isOpen} onOpenChange={state.setOpen} isDismissable={false}>
+            <Modal.Container>
+                <Modal.Dialog className="sm:max-w-300">
+                    <Modal.CloseTrigger/>
 
-                        <Modal.Header>
-                            <ModalHeaderIcon icon={Mail} tone="accent"/>
-                            <Modal.Heading className="font-semibold">{modalTitle}</Modal.Heading>
-                        </Modal.Header>
+                    <Modal.Header>
+                        <ModalHeaderIcon icon={Mail} tone="accent"/>
+                        <Modal.Heading className="font-semibold">{modalTitle}</Modal.Heading>
+                    </Modal.Header>
 
-                        <Modal.Body>
-                            <div className="flex flex-col">{renderBody()}</div>
-                        </Modal.Body>
-                    </Modal.Dialog>
-                </Modal.Container>
-            </Modal.Backdrop>
-        </Modal>
+                    <Modal.Body>
+                        <div className="flex flex-col">{renderBody()}</div>
+                    </Modal.Body>
+                </Modal.Dialog>
+            </Modal.Container>
+        </Modal.Backdrop>
     );
 }

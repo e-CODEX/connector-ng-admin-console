@@ -99,40 +99,38 @@ export function ProcessingModeDetailsView({ processingMode, state }: ProcessingM
     };
 
     return (
-        <Modal state={state}>
-            <Modal.Backdrop isDismissable={false}>
-                <Modal.Container size="lg">
-                    <Modal.Dialog className="sm:max-w-300">
-                        <Modal.CloseTrigger/>
+        <Modal.Backdrop isOpen={state.isOpen} onOpenChange={state.setOpen} isDismissable={false}>
+            <Modal.Container size="lg">
+                <Modal.Dialog className="sm:max-w-300">
+                    <Modal.CloseTrigger/>
 
-                        <Modal.Header>
-                            <ModalHeaderIcon icon={Workflow} tone="accent"/>
-                            <Modal.Heading className="font-semibold">Processing Mode Details</Modal.Heading>
-                        </Modal.Header>
+                    <Modal.Header>
+                        <ModalHeaderIcon icon={Workflow} tone="accent"/>
+                        <Modal.Heading className="font-semibold">Processing Mode Details</Modal.Heading>
+                    </Modal.Header>
 
-                        <Modal.Body>
-                            <div className="flex flex-col">{renderBody()}</div>
-                        </Modal.Body>
+                    <Modal.Body>
+                        <div className="flex flex-col">{renderBody()}</div>
+                    </Modal.Body>
 
-                        <Modal.Footer>
-                            <Button
-                                variant="secondary"
-                                className="w-full"
-                                isPending={downloading}
-                                isDisabled={loading || !details}
-                                onPress={onDownloadClicked}
-                            >
-                                {({ isPending }) => (
-                                    <>
-                                        {isPending ? <Spinner color="current" size="sm"/> : <ArrowDownToLine className="size-4"/>}
-                                        {isPending ? "Downloading…" : "Download"}
-                                    </>
-                                )}
-                            </Button>
-                        </Modal.Footer>
-                    </Modal.Dialog>
-                </Modal.Container>
-            </Modal.Backdrop>
-        </Modal>
+                    <Modal.Footer>
+                        <Button
+                            variant="secondary"
+                            className="w-full"
+                            isPending={downloading}
+                            isDisabled={loading || !details}
+                            onPress={onDownloadClicked}
+                        >
+                            {({ isPending }) => (
+                                <>
+                                    {isPending ? <Spinner color="current" size="sm"/> : <ArrowDownToLine className="size-4"/>}
+                                    {isPending ? "Downloading…" : "Download"}
+                                </>
+                            )}
+                        </Button>
+                    </Modal.Footer>
+                </Modal.Dialog>
+            </Modal.Container>
+        </Modal.Backdrop>
     );
 }

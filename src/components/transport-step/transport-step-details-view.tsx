@@ -25,24 +25,22 @@ interface TransportStepDetailsViewProps {
 
 export function TransportStepDetailsView({ transportStep, state }: TransportStepDetailsViewProps) {
     return (
-        <Modal state={state}>
-            <Modal.Backdrop isDismissable={false}>
-                <Modal.Container size="lg">
-                    <Modal.Dialog className="sm:max-w-200">
-                        <Modal.CloseTrigger/>
+        <Modal.Backdrop isOpen={state.isOpen} onOpenChange={state.setOpen} isDismissable={false}>
+            <Modal.Container size="lg">
+                <Modal.Dialog className="sm:max-w-200">
+                    <Modal.CloseTrigger/>
 
-                        <Modal.Header>
-                            <ModalHeaderIcon icon={Route} tone="accent"/>
-                            <Modal.Heading className="font-semibold">Transport Step Details</Modal.Heading>
-                        </Modal.Header>
+                    <Modal.Header>
+                        <ModalHeaderIcon icon={Route} tone="accent"/>
+                        <Modal.Heading className="font-semibold">Transport Step Details</Modal.Heading>
+                    </Modal.Header>
 
-                        <Modal.Body>
-                            {transportStep && <TransportStepDetailsContent transportStep={transportStep}/>}
-                        </Modal.Body>
+                    <Modal.Body>
+                        {transportStep && <TransportStepDetailsContent transportStep={transportStep}/>}
+                    </Modal.Body>
 
-                    </Modal.Dialog>
-                </Modal.Container>
-            </Modal.Backdrop>
-        </Modal>
+                </Modal.Dialog>
+            </Modal.Container>
+        </Modal.Backdrop>
     );
 }

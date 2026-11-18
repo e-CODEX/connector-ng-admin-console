@@ -27,25 +27,23 @@ interface ProcessingModEditTruststoreViewProps {
 
 export function ProcessingModeEditTruststoreView({ processingMode, state, onSubmit }: ProcessingModEditTruststoreViewProps) {
     return (
-        <Modal state={state}>
-            <Modal.Backdrop isDismissable={false} isKeyboardDismissDisabled>
-                <Modal.Container size="lg">
-                    <Modal.Dialog className="sm:min-w-250">
-                        <Modal.CloseTrigger/>
+        <Modal.Backdrop isOpen={state.isOpen} onOpenChange={state.setOpen} isDismissable={false} isKeyboardDismissDisabled>
+            <Modal.Container size="lg">
+                <Modal.Dialog className="sm:min-w-250">
+                    <Modal.CloseTrigger/>
 
-                        <Modal.Header>
-                            <ModalHeaderIcon icon={Pen} tone="accent"/>
-                            <Modal.Heading className="font-semibold">Edit Processing Mode Truststore</Modal.Heading>
-                        </Modal.Header>
+                    <Modal.Header>
+                        <ModalHeaderIcon icon={Pen} tone="accent"/>
+                        <Modal.Heading className="font-semibold">Edit Processing Mode Truststore</Modal.Heading>
+                    </Modal.Header>
 
-                        <ProcessingModeTruststoreEditionForm
-                            key={String(state.isOpen)}
-                            onSubmit={onSubmit}
-                            processingMode={processingMode}
-                        />
-                    </Modal.Dialog>
-                </Modal.Container>
-            </Modal.Backdrop>
-        </Modal>
+                    <ProcessingModeTruststoreEditionForm
+                        key={String(state.isOpen)}
+                        onSubmit={onSubmit}
+                        processingMode={processingMode}
+                    />
+                </Modal.Dialog>
+            </Modal.Container>
+        </Modal.Backdrop>
     );
 }

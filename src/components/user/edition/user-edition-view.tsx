@@ -28,26 +28,24 @@ interface UserEditionViewProps {
 
 export function UserEditionView({ state, user, onSubmit, isAdminContext = false }: UserEditionViewProps) {
     return (
-        <Modal state={state}>
-            <Modal.Backdrop isDismissable={false} isKeyboardDismissDisabled>
-                <Modal.Container size="lg">
-                    <Modal.Dialog className="sm:max-w-150">
-                        <Modal.CloseTrigger/>
+        <Modal.Backdrop isOpen={state.isOpen} onOpenChange={state.setOpen} isDismissable={false} isKeyboardDismissDisabled>
+            <Modal.Container size="lg">
+                <Modal.Dialog className="sm:max-w-150">
+                    <Modal.CloseTrigger/>
 
-                        <Modal.Header>
-                            <ModalHeaderIcon icon={UserPen} tone="accent"/>
-                            <Modal.Heading className="font-semibold">Edit User</Modal.Heading>
-                        </Modal.Header>
+                    <Modal.Header>
+                        <ModalHeaderIcon icon={UserPen} tone="accent"/>
+                        <Modal.Heading className="font-semibold">Edit User</Modal.Heading>
+                    </Modal.Header>
 
-                        <UserEditionForm
-                            key={String(state.isOpen)}
-                            user={user}
-                            isAdminContext={isAdminContext}
-                            onSubmit={onSubmit}
-                        />
-                    </Modal.Dialog>
-                </Modal.Container>
-            </Modal.Backdrop>
-        </Modal>
+                    <UserEditionForm
+                        key={String(state.isOpen)}
+                        user={user}
+                        isAdminContext={isAdminContext}
+                        onSubmit={onSubmit}
+                    />
+                </Modal.Dialog>
+            </Modal.Container>
+        </Modal.Backdrop>
     )
 }

@@ -21,20 +21,18 @@ interface MessageReportingViewProps {
 
 export function MessageReportingView({ state }: MessageReportingViewProps) {
     return (
-        <Modal state={state}>
-            <Modal.Backdrop isDismissable={false} isKeyboardDismissDisabled>
-                <Modal.Container>
-                    <Modal.Dialog className="sm:max-w-350 sm:min-h-200">
-                        <Modal.CloseTrigger/>
-                        <Modal.Header>
-                            <ModalHeaderIcon icon={ChartPie} tone="accent"/>
-                            <Modal.Heading className="font-semibold">Message Reporting</Modal.Heading>
-                        </Modal.Header>
-                        {state.isOpen && <MessageReportingContent/>}
-                    </Modal.Dialog>
-                </Modal.Container>
-            </Modal.Backdrop>
-        </Modal>
+        <Modal.Backdrop isOpen={state.isOpen} onOpenChange={state.setOpen} isDismissable={false} isKeyboardDismissDisabled>
+            <Modal.Container>
+                <Modal.Dialog className="sm:max-w-350 sm:min-h-200">
+                    <Modal.CloseTrigger/>
+                    <Modal.Header>
+                        <ModalHeaderIcon icon={ChartPie} tone="accent"/>
+                        <Modal.Heading className="font-semibold">Message Reporting</Modal.Heading>
+                    </Modal.Header>
+                    {state.isOpen && <MessageReportingContent/>}
+                </Modal.Dialog>
+            </Modal.Container>
+        </Modal.Backdrop>
     );
 }
 

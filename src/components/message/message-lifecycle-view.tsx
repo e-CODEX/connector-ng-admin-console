@@ -165,58 +165,56 @@ interface MessageLifecycleViewProps {
 
 export function MessageLifecycleView({ state }: MessageLifecycleViewProps) {
     return (
-        <Modal state={state}>
-            <Modal.Backdrop isDismissable={false} isKeyboardDismissDisabled>
-                <Modal.Container>
-                    <Modal.Dialog className="sm:max-w-250 sm:min-h-200">
-                        <Modal.CloseTrigger/>
-                        <Modal.Header>
-                            <ModalHeaderIcon icon={Info} tone="accent"/>
-                            <Modal.Heading className="font-semibold">
-                                Message lifecycle
-                            </Modal.Heading>
-                        </Modal.Header>
+        <Modal.Backdrop isOpen={state.isOpen} onOpenChange={state.setOpen} isDismissable={false} isKeyboardDismissDisabled>
+            <Modal.Container>
+                <Modal.Dialog className="sm:max-w-250 sm:min-h-200">
+                    <Modal.CloseTrigger/>
+                    <Modal.Header>
+                        <ModalHeaderIcon icon={Info} tone="accent"/>
+                        <Modal.Heading className="font-semibold">
+                            Message lifecycle
+                        </Modal.Heading>
+                    </Modal.Header>
 
-                        <Modal.Body className="flex flex-col gap-6">
-                            <div className="grid gap-8 md:grid-cols-2">
-                                <Section title="Outbound message" subtitle="Backend → Gateway">
-                                    <Timeline steps={OUTBOUND_STEPS}/>
-                                </Section>
+                    <Modal.Body className="flex flex-col gap-6">
+                        <div className="grid gap-8 md:grid-cols-2">
+                            <Section title="Outbound message" subtitle="Backend → Gateway">
+                                <Timeline steps={OUTBOUND_STEPS}/>
+                            </Section>
 
-                                <Section title="Inbound message" subtitle="Gateway → Backend">
-                                    <Timeline steps={INBOUND_STEPS}/>
-                                </Section>
+                            <Section title="Inbound message" subtitle="Gateway → Backend">
+                                <Timeline steps={INBOUND_STEPS}/>
+                            </Section>
+                        </div>
+
+                        <div className="flex items-start gap-3 rounded-xl bg-surface-secondary p-3">
+                            <Timer
+                                className="mt-0.5 size-4 shrink-0 text-warning"
+                                aria-hidden
+                            />
+                            <div className="flex flex-col gap-1">
+                                <h3 className="text-sm font-semibold">
+                                    {RETENTION_DAYS}-day timeout
+                                </h3>
+                                <p className="text-sm text-muted">
+                                    If no confirmation or rejection arrives within{" "}
+                                    {RETENTION_DAYS} days, its files are removed automatically and
+                                    the message is considered <strong>Deleted</strong>.
+                                </p>
                             </div>
+                        </div>
 
-                            <div className="flex items-start gap-3 rounded-xl bg-surface-secondary p-3">
-                                <Timer
-                                    className="mt-0.5 size-4 shrink-0 text-warning"
-                                    aria-hidden
-                                />
-                                <div className="flex flex-col gap-1">
-                                    <h3 className="text-sm font-semibold">
-                                        {RETENTION_DAYS}-day timeout
-                                    </h3>
-                                    <p className="text-sm text-muted">
-                                        If no confirmation or rejection arrives within{" "}
-                                        {RETENTION_DAYS} days, its files are removed automatically and
-                                        the message is considered <strong>Deleted</strong>.
-                                    </p>
-                                </div>
-                            </div>
+                        <p className="text-xs text-muted">
+                            <strong>Deleted</strong> and <strong>Rejected</strong> always take
+                            precedence over the other states when both apply.
+                        </p>
+                    </Modal.Body>
 
-                            <p className="text-xs text-muted">
-                                <strong>Deleted</strong> and <strong>Rejected</strong> always take
-                                precedence over the other states when both apply.
-                            </p>
-                        </Modal.Body>
-
-                        <Modal.Footer>
-                            <Button onPress={state.close}>Got it</Button>
-                        </Modal.Footer>
-                    </Modal.Dialog>
-                </Modal.Container>
-            </Modal.Backdrop>
-        </Modal>
+                    <Modal.Footer>
+                        <Button onPress={state.close}>Got it</Button>
+                    </Modal.Footer>
+                </Modal.Dialog>
+            </Modal.Container>
+        </Modal.Backdrop>
     );
 }

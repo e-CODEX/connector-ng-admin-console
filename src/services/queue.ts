@@ -30,7 +30,7 @@ export function createQueueService(baseUrl: string, call: RestApiCall) {
             });
         },
         async listQueueDlqMessages(params: ListQueueMessagesParams): Promise<PaginatedResponse<ConnectorQueueMessage>> {
-            return call<PaginatedResponse<ConnectorQueueMessage>>(baseUrl, "api/v1/admin/jms/queues/dlq-messages", {
+            return call<PaginatedResponse<ConnectorQueueMessage>>(baseUrl, "api/v1/admin/jms/queues/messages", {
                 params,
             });
         },

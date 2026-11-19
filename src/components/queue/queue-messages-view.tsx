@@ -40,41 +40,33 @@ export function QueueMessagesView({ queue }: QueueMessagesViewProps) {
     const loadDlqMessages = ({ page, size }: PagedListParams) => queueService.listQueueDlqMessages({ page, size, queue: queueName, dlq: true });
 
     return (
-        <section aria-labelledby="queue-messages-title" className="mt-8">
-            <div className="mb-3 min-w-0">
-                <h2 id="queue-messages-title" className="truncate text-lg font-semibold">
-                    {queueDescription}
-                </h2>
-                <p className="font-mono text-sm text-muted">{queueName}</p>
+        <section aria-labelledby="queue-messages-title" className="min-w-0 rounded-xl border border-border bg-surface p-4">
+            <div className="mb-3 flex items-center gap-3">
+                <div className="flex min-w-0 flex-1 items-baseline gap-2">
+                    <h2 id="queue-messages-title" className="truncate text-base font-semibold" title={queueDescription}>
+                        {queueDescription}
+                    </h2>
+                    <span className="truncate font-mono text-xs text-muted" title={queueName}>
+                        {queueName}
+                    </span>
+                </div>
+                <PageHeaderButton variant="secondary" tooltip="Refresh" icon={RefreshCw} onPress={() => tableRef.current?.refresh()} isDisabled={busy} isSpinning={busy} />
             </div>
 
             <Tabs className="w-full" selectedKey={selectedTab} onSelectionChange={setSelectedTab}>
-                <div className="flex items-center gap-3">
-                    <Tabs.ListContainer className="min-w-0 flex-1">
-                        <Tabs.List aria-label={`${queueDescription} messages`}>
-                            <Tabs.Tab id={MESSAGES_TAB}>
-                                Pending ({formatCount(pendingCount)})
-                                <Tabs.Indicator />
-                            </Tabs.Tab>
-                            <Tabs.Tab id={DLQ_TAB}>
-                                Dead letters ({formatCount(dlqCount)})
-                                <Tabs.Indicator />
-                            </Tabs.Tab>
-                        </Tabs.List>
-                    </Tabs.ListContainer>
-                    <PageHeaderButton variant="secondary" tooltip="Refresh" icon={RefreshCw} onPress={() => tableRef.current?.refresh()} isDisabled={busy} isSpinning={busy} />
-                </div>
+                <Tabs.ListContainer className="w-fit">
+                    <Tabs.List aria-label={`${queueDescription} messages`}>
+                        <Tabs.Tab id={DLQ_TAB} className="whitespace-nowrap">
+                            Dead letters ({formatCount(dlqCount)})
+                            <Tabs.Indicator />
+                        </Tabs.Tab>
+                        <Tabs.Tab id={MESSAGES_TAB} className="whitespace-nowrap">
+                            Pending ({formatCount(pendingCount)})
+                            <Tabs.Indicator />
+                        </Tabs.Tab>
+                    </Tabs.List>
+                </Tabs.ListContainer>
 
-                <Tabs.Panel className="pt-4" id={MESSAGES_TAB}>
-                    <QueueMessagesTable
-                        ref={tableRef}
-                        onBusyChange={setBusy}
-                        load={loadMessages}
-                        ariaLabel={`Messages of ${queueDescription}`}
-                        emptyText="No pending message"
-                        errorTitle="Could not load queue messages"
-                    />
-                </Tabs.Panel>
                 <Tabs.Panel className="pt-4" id={DLQ_TAB}>
                     <QueueMessagesTable
                         ref={tableRef}
@@ -84,6 +76,16 @@ export function QueueMessagesView({ queue }: QueueMessagesViewProps) {
                         emptyText="No dead letter message"
                         errorTitle="Could not load dead letter messages"
                         showFailureCause
+                    />
+                </Tabs.Panel>
+                <Tabs.Panel className="pt-4" id={MESSAGES_TAB}>
+                    <QueueMessagesTable
+                        ref={tableRef}
+                        onBusyChange={setBusy}
+                        load={loadMessages}
+                        ariaLabel={`Messages of ${queueDescription}`}
+                        emptyText="No pending message"
+                        errorTitle="Could not load queue messages"
                     />
                 </Tabs.Panel>
             </Tabs>

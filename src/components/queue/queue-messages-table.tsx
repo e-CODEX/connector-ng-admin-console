@@ -12,7 +12,7 @@
 
 import type { Ref } from "react";
 import React, { useEffect, useImperativeHandle } from "react";
-import { Table } from "@heroui/react";
+import { Chip, Table } from "@heroui/react";
 import { Inbox } from "lucide-react";
 import type { ConnectorQueueMessage } from "@/types/response/queue";
 import type { PaginatedResponse } from "@/types/response/paginated-response";
@@ -23,7 +23,6 @@ import { SpinnerView } from "@/components/common/spinner-view";
 import { EmptyState } from "@/components/common/empty-state";
 import { CopyableIdentifier } from "@/components/common/copyable-identifier";
 import { DateTime } from "@/components/common/date-time";
-import { BooleanChip } from "@/components/common/boolean-chip";
 import { PaginationControls } from "@/components/paging/pagination-controls";
 
 export interface QueueMessagesTableHandle {
@@ -85,7 +84,9 @@ export function QueueMessagesTable({ ref, onBusyChange, load, ariaLabel, emptyTe
                                         </Table.Cell>
                                         <Table.Cell>{message.messageType}</Table.Cell>
                                         <Table.Cell>
-                                            <BooleanChip value={message.redelivered} />
+                                            <Chip size="sm" variant="soft" color={message.redelivered ? "warning" : "default"}>
+                                                <Chip.Label>{message.redelivered ? "Yes" : "No"}</Chip.Label>
+                                            </Chip>
                                         </Table.Cell>
                                         <Table.Cell className="tabular-nums">{message.deliveryCount}</Table.Cell>
                                         {showFailureCause && (

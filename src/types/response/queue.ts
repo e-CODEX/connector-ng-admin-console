@@ -14,3 +14,14 @@ export interface ConnectorQueueStats {
     pendingCount: number;
     dlqCount: number;
 }
+
+export interface ConnectorQueueMessage {
+    messageId: string;
+    timestamp: string;
+    correlationId: string;
+    messageType: string;
+    redelivered: boolean;
+    deliveryCount: number;
+    failureCause: string;
+    properties: Record<string, string>;
+}

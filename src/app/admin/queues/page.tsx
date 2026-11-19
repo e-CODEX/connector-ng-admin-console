@@ -14,13 +14,14 @@ import React, { useState } from "react";
 import type { ConnectorQueueStats } from "@/types/response/queue";
 import { PageHeaderButton } from "@/components/common/header/page-header-button";
 import { PageHeader } from "@/components/common/header/page-header";
-import { QueueCard } from "@/components/queue/QueueCard";
+import { QueueCard } from "@/components/queue/queue-card";
 import { Layers, RefreshCw } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { useList } from "@/hooks/use-list";
 import { useQueueService } from "@/hooks/use-http-service";
 import { LoadErrorState } from "@/components/common/load-error-state";
+import { QueueMessagesView } from "@/components/queue/queue-messages-view";
 
 export default function QueueAdminPage() {
     const [selectedQueue, setSelectedQueue] = useState<string | null>(null);
@@ -29,16 +30,13 @@ export default function QueueAdminPage() {
 
     const list = useList<ConnectorQueueStats>(queueService.loadQueueStats);
 
-    // Nothing to show yet: first load, or a refresh of an empty list.
+    const selectedStats = list.items.find((queueStats) => queueStats.queueName === selectedQueue);
+
     const showSpinner = list.loading || (list.refreshing && list.items.length === 0);
 
     return (
         <div>
-            <PageHeader
-                icon={Layers}
-                title="JMS Queues Statuses"
-                subtitle="Manage JMS Queues"
-            >
+            <PageHeader icon={Layers} title="JMS Queues Statuses" subtitle="Manage JMS Queues">
                 <PageHeaderButton
                     variant="secondary"
                     tooltip="Refresh"
@@ -50,31 +48,28 @@ export default function QueueAdminPage() {
             </PageHeader>
 
             {showSpinner ? (
-                <SpinnerView className="mt-60"/>
+                <SpinnerView className="mt-60" />
             ) : list.loadError ? (
-                <LoadErrorState
-                    title="Could not load JMS queues statuses"
-                    onRetry={list.retry}
-                />
+                <LoadErrorState title="Could not load JMS queues statuses" onRetry={list.retry} />
             ) : list.items.length === 0 ? (
-                <EmptyState text="No queue stats available" className="mt-70"/>
+                <EmptyState text="No queue stats available" className="mt-70" />
             ) : (
                 <div
                     aria-busy={list.refreshing}
-                    className={`grid grid-cols-1 gap-x-5 gap-y-2 transition-opacity sm:grid-cols-4 ${
-                        list.refreshing ? "pointer-events-none opacity-50" : ""
-                    }`}
+                    className={`grid grid-cols-1 gap-x-2 gap-y-2 transition-opacity sm:grid-cols-6 ${list.refreshing ? "pointer-events-none opacity-50" : ""}`}
                 >
                     {list.items.map((queueStats) => (
                         <QueueCard
                             key={queueStats.queueName}
                             stats={queueStats}
                             selected={selectedQueue === queueStats.queueName}
-                            onSelect={() => setSelectedQueue(queueStats.queueName)}
+                            onSelect={() => setSelectedQueue((current) => (current === queueStats.queueName ? null : queueStats.queueName))}
                         />
                     ))}
                 </div>
             )}
+
+            {selectedStats && <QueueMessagesView key={selectedStats.queueName} queue={selectedStats} />}
         </div>
     );
 }

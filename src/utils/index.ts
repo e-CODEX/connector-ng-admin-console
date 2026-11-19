@@ -18,9 +18,7 @@ import type { ConnectorUser } from "@/types/response/user";
 
 export const truncate = (value: string, visibleChars = 36): string => {
     if (value == null) return "";
-    return value.length > visibleChars
-        ? `${value.slice(0, visibleChars)}\u2026`
-        : value;
+    return value.length > visibleChars ? `${value.slice(0, visibleChars)}\u2026` : value;
 };
 
 export function formatBytes(bytes: number, decimals = 1): string {
@@ -29,15 +27,18 @@ export function formatBytes(bytes: number, decimals = 1): string {
 
     const units = ["B", "KB", "MB", "GB", "TB", "PB"];
     const k = 1024;
-    const i = Math.min(
-        Math.floor(Math.log(bytes) / Math.log(k)),
-        units.length - 1,
-    );
+    const i = Math.min(Math.floor(Math.log(bytes) / Math.log(k)), units.length - 1);
     const value = bytes / Math.pow(k, i);
 
     // No decimals for whole bytes; trim trailing zeros otherwise
     const formatted = i === 0 ? String(value) : value.toFixed(decimals);
     return `${parseFloat(formatted)} ${units[i]}`;
+}
+
+const COUNT_FORMAT = new Intl.NumberFormat("en-US");
+
+export function formatCount(value: number): string {
+    return COUNT_FORMAT.format(value);
 }
 
 export function asNumber(value: unknown): number {
@@ -48,10 +49,7 @@ export const toastSuccess = (message: string) => {
     toastMessage("Success", message, "success");
 };
 
-export function toastError(
-    error: unknown,
-    fallback = "An unexpected error occurred.",
-) {
+export function toastError(error: unknown, fallback = "An unexpected error occurred.") {
     toastErrorMessage(error instanceof Error ? error.message : fallback);
 }
 
@@ -62,8 +60,7 @@ export const toastErrorMessage = (message: string) => {
 const toastMessage = (
     title: string,
     description: string,
-    variant:
-        "default" | "accent" | "success" | "warning" | "danger" | undefined,
+    variant: "default" | "accent" | "success" | "warning" | "danger" | undefined,
 ) => {
     toast(title, {
         variant,
@@ -108,10 +105,7 @@ export const cookieOptions = (maxAge?: number) => ({
 export const asFilter = (value: string) =>
     value === ALL_SELECTOR || value === "*" || value === "" ? undefined : value;
 
-export function hasRole(
-    user: ConnectorUser | null | undefined,
-    role: USER_ROLE,
-): boolean {
+export function hasRole(user: ConnectorUser | null | undefined, role: USER_ROLE): boolean {
     return user?.roles?.includes(role) ?? false;
 }
 

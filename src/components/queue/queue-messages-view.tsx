@@ -67,7 +67,7 @@ export function QueueMessagesView({ queue, onDlqChanged }: QueueMessagesViewProp
     };
 
     return (
-        <section aria-labelledby="queue-messages-title" className="min-w-0 rounded-xl border border-border bg-surface p-4">
+        <section aria-labelledby="queue-messages-title" className="h-full min-w-0 rounded-xl border border-border bg-surface p-4">
             <div className="mb-3 flex items-center gap-3">
                 <div className="flex min-w-0 flex-1 items-baseline gap-2">
                     <h2 id="queue-messages-title" className="truncate text-base font-semibold" title={queueDescription}>
@@ -116,7 +116,7 @@ export function QueueMessagesView({ queue, onDlqChanged }: QueueMessagesViewProp
                         onBusyChange={setBusy}
                         load={loadMessages}
                         ariaLabel={`Messages of ${queueDescription}`}
-                        emptyText="No pending message"
+                        emptyText="No pending JMS message"
                         errorTitle="Could not load queue messages"
                     />
                 </Tabs.Panel>

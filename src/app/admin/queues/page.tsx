@@ -59,8 +59,9 @@ export default function QueueAdminPage() {
             ) : list.items.length === 0 || !selectedStats ? (
                 <EmptyState text="No queue stats available" className="mt-70" />
             ) : (
-                <div className="grid items-start gap-4 lg:grid-cols-[28rem_minmax(0,1fr)]">
-                    <div aria-busy={list.refreshing} className={`transition-opacity lg:sticky lg:top-24 ${list.refreshing ? "pointer-events-none opacity-50" : ""}`}>
+                <div className="grid gap-4 lg:grid-cols-[28rem_minmax(0,1fr)]">
+                    {/* Both columns stretch to the taller one, so the list and the messages panel always end level. */}
+                    <div aria-busy={list.refreshing} className={`h-full transition-opacity ${list.refreshing ? "pointer-events-none opacity-50" : ""}`}>
                         <QueueList groups={groups} selectedQueue={selectedStats.queueName} onSelect={setSelectedQueue} />
                     </div>
 

@@ -35,7 +35,9 @@ export default function QueueAdminPage() {
     const orderedQueues = groups.flatMap((group) => group.queues);
     const selectedStats = orderedQueues.find((queue) => queue.queueName === selectedQueue) ?? orderedQueues.find((queue) => queue.dlqCount > 0) ?? orderedQueues[0];
 
-    const showSpinner = list.loading || (list.refreshing && list.items.length === 0);
+    // Only when nothing is shown yet: a reload (header refresh, or after a replay) must keep the
+    // open messages panel mounted, with its tab, page and selection.
+    const showSpinner = (list.loading || list.refreshing) && list.items.length === 0;
 
     return (
         <div>
@@ -62,7 +64,7 @@ export default function QueueAdminPage() {
                         <QueueList groups={groups} selectedQueue={selectedStats.queueName} onSelect={setSelectedQueue} />
                     </div>
 
-                    <QueueMessagesView key={selectedStats.queueName} queue={selectedStats} />
+                    <QueueMessagesView key={selectedStats.queueName} queue={selectedStats} onReplayed={list.refresh} />
                 </div>
             )}
         </div>

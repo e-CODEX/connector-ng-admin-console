@@ -14,10 +14,10 @@ import React, { useRef, useState } from "react";
 import type { Key } from "react-aria-components";
 import { Tabs } from "@heroui/react";
 import { RefreshCw } from "lucide-react";
-import type { ConnectorQueueStats } from "@/types/response/queue";
+import type { ConnectorQueueReplayResult, ConnectorQueueStats } from "@/types/response/queue";
 import type { PagedListParams } from "@/hooks/use-paged-list";
 import { useQueueService } from "@/hooks/use-http-service";
-import { QueueMessagesTable, type QueueMessagesTableHandle } from "@/components/queue/queue-messages-table";
+import { QueueMessagesTable, type QueueMessagesReplay, type QueueMessagesTableHandle, type QueueReplayOutcome } from "@/components/queue/queue-messages-table";
 import { PageHeaderButton } from "@/components/common/header/page-header-button";
 import { formatCount } from "@/utils";
 
@@ -26,9 +26,10 @@ const DLQ_TAB = "dlq";
 
 interface QueueMessagesViewProps {
     queue: ConnectorQueueStats;
+    onReplayed?: () => void;
 }
 
-export function QueueMessagesView({ queue }: QueueMessagesViewProps) {
+export function QueueMessagesView({ queue, onReplayed }: QueueMessagesViewProps) {
     const queueService = useQueueService();
     const { queueName, queueDescription, pendingCount, dlqCount } = queue;
 
@@ -38,6 +39,32 @@ export function QueueMessagesView({ queue }: QueueMessagesViewProps) {
 
     const loadMessages = ({ page, size }: PagedListParams) => queueService.listQueueMessages({ page, size, queue: queueName, dlq: false });
     const loadDlqMessages = ({ page, size }: PagedListParams) => queueService.listQueueDlqMessages({ page, size, queue: queueName, dlq: true });
+
+    const replay: QueueMessagesReplay = {
+        targetLabel: queueDescription,
+        replayMessage: async (messageId) => {
+            await queueService.replayDlqMessage(messageId, { messageId, queue: queueName });
+            onReplayed?.();
+        },
+        replayMessages: async (messageIds) => {
+            const response: ConnectorQueueReplayResult | ConnectorQueueReplayResult[] | undefined = await queueService.replayDlqMessages({
+                messageIds,
+                queue: queueName,
+            });
+            // Accept one result or a list of them. No body at all (204): the call succeeded, so count all as replayed.
+            const results = response == null ? [{ replayed: messageIds, notFound: [], failed: [] }] : Array.isArray(response) ? response : [response];
+            const outcome: QueueReplayOutcome = {
+                replayed: results.flatMap((result) => result.replayed ?? []),
+                notFound: results.flatMap((result) => result.notFound ?? []),
+                failed: results.flatMap((result) => result.failed ?? []),
+            };
+            // The dead-letter count changed only if something actually left the queue.
+            if (outcome.replayed.length > 0 || outcome.notFound.length > 0) {
+                onReplayed?.();
+            }
+            return outcome;
+        },
+    };
 
     return (
         <section aria-labelledby="queue-messages-title" className="min-w-0 rounded-xl border border-border bg-surface p-4">
@@ -76,6 +103,7 @@ export function QueueMessagesView({ queue }: QueueMessagesViewProps) {
                         emptyText="No dead letter message"
                         errorTitle="Could not load dead letter messages"
                         showFailureCause
+                        replay={replay}
                     />
                 </Tabs.Panel>
                 <Tabs.Panel className="pt-4" id={MESSAGES_TAB}>

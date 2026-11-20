@@ -12,9 +12,9 @@
 
 import type { Ref } from "react";
 import React, { useEffect, useImperativeHandle, useState } from "react";
-import type { Selection } from "@heroui/react";
 import { Button, Checkbox, Chip, Table, useOverlayState } from "@heroui/react";
-import { Inbox, RotateCcw } from "lucide-react";
+import { CheckboxContext, CheckboxFieldContext } from "react-aria-components";
+import { Inbox, RotateCcw, Trash2 } from "lucide-react";
 import type { ConnectorQueueMessage } from "@/types/response/queue";
 import type { PaginatedResponse } from "@/types/response/paginated-response";
 import type { PagedListParams } from "@/hooks/use-paged-list";
@@ -29,7 +29,7 @@ import { ActionButton } from "@/components/common/action-button/action-button";
 import { ConfirmModal } from "@/components/common/confirmation-modal";
 import { toastError, toastErrorMessage, toastSuccess, toastWarning } from "@/utils";
 
-const EMPTY_SELECTION: Selection = new Set();
+const EMPTY_SELECTION: ReadonlySet<string> = new Set();
 
 export interface QueueMessagesTableHandle {
     refresh: () => void;
@@ -56,6 +56,7 @@ interface QueueMessagesTableProps {
     errorTitle: string;
     showFailureCause?: boolean;
     replay?: QueueMessagesReplay;
+    onDeleteMessage?: (messageId: string) => Promise<void>;
 }
 
 type ReplayTarget = { kind: "single"; messageId: string } | { kind: "bulk"; messageIds: string[] };
@@ -82,16 +83,30 @@ function reportBulkReplay({ replayed, notFound, failed }: QueueReplayOutcome) {
     }
 }
 
-export function QueueMessagesTable({ ref, onBusyChange, load, ariaLabel, emptyText, errorTitle, showFailureCause = false, replay }: QueueMessagesTableProps) {
+export function QueueMessagesTable({ ref, onBusyChange, load, ariaLabel, emptyText, errorTitle, showFailureCause = false, replay, onDeleteMessage }: QueueMessagesTableProps) {
     const pagedList = usePagedList<ConnectorQueueMessage>(load);
     const busy = pagedList.loading || pagedList.refreshing;
 
-    const [selectedKeys, setSelectedKeys] = useState<Selection>(EMPTY_SELECTION);
+    const [selectedKeys, setSelectedKeys] = useState<ReadonlySet<string>>(EMPTY_SELECTION);
     const [replayTarget, setReplayTarget] = useState<ReplayTarget | null>(null);
     const confirmReplay = useOverlayState();
+    const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+    const confirmDelete = useOverlayState();
+    const hasRowActions = Boolean(replay || onDeleteMessage);
 
-    const selectedIds =
-        selectedKeys === "all" ? pagedList.items.map((message) => message.messageId) : pagedList.items.map((message) => message.messageId).filter((id) => selectedKeys.has(id));
+    const selectedIds = pagedList.items.map((message) => message.messageId).filter((id) => selectedKeys.has(id));
+
+    const allSelected = pagedList.items.length > 0 && selectedIds.length === pagedList.items.length;
+
+    const toggleAll = (selected: boolean) => setSelectedKeys(selected ? new Set(pagedList.items.map((message) => message.messageId)) : EMPTY_SELECTION);
+
+    const toggleOne = (messageId: string, selected: boolean) =>
+        setSelectedKeys((current) => {
+            const next = new Set(current);
+            if (selected) next.add(messageId);
+            else next.delete(messageId);
+            return next;
+        });
 
     useImperativeHandle(ref, () => ({ refresh: pagedList.refresh }));
 
@@ -136,6 +151,25 @@ export function QueueMessagesTable({ ref, onBusyChange, load, ariaLabel, emptyTe
         }
     };
 
+    const askDelete = (messageId: string) => {
+        setDeleteTarget(messageId);
+        confirmDelete.open();
+    };
+
+    const onDeleteConfirmed = async () => {
+        if (!onDeleteMessage || !deleteTarget) return;
+
+        try {
+            await onDeleteMessage(deleteTarget);
+            toastSuccess("The message was deleted.");
+            pagedList.refresh();
+        } catch (error) {
+            toastError(error, "The message could not be deleted.");
+        } finally {
+            confirmDelete.close();
+        }
+    };
+
     if (pagedList.loadError) {
         return <LoadErrorState title={errorTitle} onRetry={pagedList.retry} className="py-8" />;
     }
@@ -166,11 +200,16 @@ export function QueueMessagesTable({ ref, onBusyChange, load, ariaLabel, emptyTe
             <div aria-busy={pagedList.loading} className={`transition-opacity ${pagedList.loading && pagedList.items.length > 0 ? "pointer-events-none opacity-50" : ""}`}>
                 <Table variant="secondary">
                     <Table.ScrollContainer>
-                        <Table.Content aria-label={ariaLabel} selectionMode={replay ? "multiple" : "none"} selectedKeys={selectedKeys} onSelectionChange={setSelectedKeys}>
+                        <Table.Content aria-label={ariaLabel}>
                             <Table.Header>
                                 {replay ? (
                                     <Table.Column>
-                                        <SelectionCheckbox label="Select all messages on this page" />
+                                        <SelectionCheckbox
+                                            label="Select all messages on this page"
+                                            isSelected={allSelected}
+                                            isIndeterminate={selectedIds.length > 0 && !allSelected}
+                                            onChange={toggleAll}
+                                        />
                                     </Table.Column>
                                 ) : null}
                                 <Table.Column isRowHeader>Message ID</Table.Column>
@@ -180,7 +219,7 @@ export function QueueMessagesTable({ ref, onBusyChange, load, ariaLabel, emptyTe
                                 <Table.Column>Redelivered</Table.Column>
                                 <Table.Column>Delivery count</Table.Column>
                                 {showFailureCause ? <Table.Column>Failure cause</Table.Column> : null}
-                                {replay ? <Table.Column>Actions</Table.Column> : null}
+                                {hasRowActions ? <Table.Column>Actions</Table.Column> : null}
                             </Table.Header>
                             <Table.Body
                                 renderEmptyState={() => (pagedList.loading ? <SpinnerView className="py-16" /> : <EmptyState icon={Inbox} text={emptyText} className="py-16" />)}
@@ -189,7 +228,11 @@ export function QueueMessagesTable({ ref, onBusyChange, load, ariaLabel, emptyTe
                                     <Table.Row key={message.messageId} id={message.messageId}>
                                         {replay ? (
                                             <Table.Cell>
-                                                <SelectionCheckbox label={`Select message ${message.messageId}`} />
+                                                <SelectionCheckbox
+                                                    label={`Select message ${message.messageId}`}
+                                                    isSelected={selectedKeys.has(message.messageId)}
+                                                    onChange={(selected) => toggleOne(message.messageId, selected)}
+                                                />
                                             </Table.Cell>
                                         ) : null}
                                         <Table.Cell>
@@ -215,9 +258,27 @@ export function QueueMessagesTable({ ref, onBusyChange, load, ariaLabel, emptyTe
                                                 </span>
                                             </Table.Cell>
                                         ) : null}
-                                        {replay ? (
+                                        {hasRowActions ? (
                                             <Table.Cell>
-                                                <ActionButton label="Replay" icon={RotateCcw} onPress={() => askReplay({ kind: "single", messageId: message.messageId })} />
+                                                <div className="flex items-center gap-1">
+                                                    {replay ? (
+                                                        <ActionButton
+                                                            label="Replay"
+                                                            icon={RotateCcw}
+                                                            isDisabled={allSelected}
+                                                            onPress={() => askReplay({ kind: "single", messageId: message.messageId })}
+                                                        />
+                                                    ) : null}
+                                                    {onDeleteMessage ? (
+                                                        <ActionButton
+                                                            label="Delete"
+                                                            icon={Trash2}
+                                                            iconAccent="text-danger"
+                                                            isDisabled={allSelected}
+                                                            onPress={() => askDelete(message.messageId)}
+                                                        />
+                                                    ) : null}
+                                                </div>
                                             </Table.Cell>
                                         ) : null}
                                     </Table.Row>
@@ -262,18 +323,47 @@ export function QueueMessagesTable({ ref, onBusyChange, load, ariaLabel, emptyTe
                     onCancel={confirmReplay.close}
                 />
             )}
+
+            {onDeleteMessage && (
+                <ConfirmModal
+                    isDismissable={false}
+                    state={confirmDelete}
+                    title="Delete message"
+                    message={
+                        <>
+                            Message <span className="break-all font-mono">{deleteTarget}</span> will be permanently removed from the dead-letter queue. It will not be processed and
+                            cannot be recovered. Continue?
+                        </>
+                    }
+                    confirmLabel="Delete"
+                    confirmVariant="danger"
+                    onConfirm={onDeleteConfirmed}
+                    onCancel={confirmDelete.close}
+                />
+            )}
         </div>
     );
 }
 
-function SelectionCheckbox({ label }: { label: string }) {
+interface SelectionCheckboxProps {
+    label: string;
+    isSelected: boolean;
+    isIndeterminate?: boolean;
+    onChange: (selected: boolean) => void;
+}
+
+function SelectionCheckbox({ label, isSelected, isIndeterminate = false, onChange }: SelectionCheckboxProps) {
     return (
-        <Checkbox slot="selection" aria-label={label}>
-            <Checkbox.Content>
-                <Checkbox.Control>
-                    <Checkbox.Indicator />
-                </Checkbox.Control>
-            </Checkbox.Content>
-        </Checkbox>
+        <CheckboxFieldContext.Provider value={null}>
+            <CheckboxContext.Provider value={null}>
+                <Checkbox aria-label={label} isSelected={isSelected} isIndeterminate={isIndeterminate} onChange={onChange}>
+                    <Checkbox.Content>
+                        <Checkbox.Control>
+                            <Checkbox.Indicator />
+                        </Checkbox.Control>
+                    </Checkbox.Content>
+                </Checkbox>
+            </CheckboxContext.Provider>
+        </CheckboxFieldContext.Provider>
     );
 }

@@ -26,10 +26,10 @@ const DLQ_TAB = "dlq";
 
 interface QueueMessagesViewProps {
     queue: ConnectorQueueStats;
-    onReplayed?: () => void;
+    onDlqChanged?: () => void;
 }
 
-export function QueueMessagesView({ queue, onReplayed }: QueueMessagesViewProps) {
+export function QueueMessagesView({ queue, onDlqChanged }: QueueMessagesViewProps) {
     const queueService = useQueueService();
     const { queueName, queueDescription, pendingCount, dlqCount } = queue;
 
@@ -44,7 +44,7 @@ export function QueueMessagesView({ queue, onReplayed }: QueueMessagesViewProps)
         targetLabel: queueDescription,
         replayMessage: async (messageId) => {
             await queueService.replayDlqMessage(messageId, { messageId, queue: queueName });
-            onReplayed?.();
+            onDlqChanged?.();
         },
         replayMessages: async (messageIds) => {
             const response: ConnectorQueueReplayResult | ConnectorQueueReplayResult[] | undefined = await queueService.replayDlqMessages({
@@ -60,14 +60,14 @@ export function QueueMessagesView({ queue, onReplayed }: QueueMessagesViewProps)
             };
             // The dead-letter count changed only if something actually left the queue.
             if (outcome.replayed.length > 0 || outcome.notFound.length > 0) {
-                onReplayed?.();
+                onDlqChanged?.();
             }
             return outcome;
         },
     };
 
     return (
-        <section aria-labelledby="queue-messages-title" className="min-w-0 rounded-xl border border-border bg-surface p-4">
+        <section aria-labelledby="queue-messages-title" className="h-full min-w-0 rounded-xl border border-border bg-surface p-4">
             <div className="mb-3 flex items-center gap-3">
                 <div className="flex min-w-0 flex-1 items-baseline gap-2">
                     <h2 id="queue-messages-title" className="truncate text-base font-semibold" title={queueDescription}>
@@ -104,6 +104,10 @@ export function QueueMessagesView({ queue, onReplayed }: QueueMessagesViewProps)
                         errorTitle="Could not load dead letter messages"
                         showFailureCause
                         replay={replay}
+                        onDeleteMessage={async (messageId) => {
+                            await queueService.deleteDlqQueueMessage(messageId, queueName);
+                            onDlqChanged?.();
+                        }}
                     />
                 </Tabs.Panel>
                 <Tabs.Panel className="pt-4" id={MESSAGES_TAB}>
@@ -112,7 +116,7 @@ export function QueueMessagesView({ queue, onReplayed }: QueueMessagesViewProps)
                         onBusyChange={setBusy}
                         load={loadMessages}
                         ariaLabel={`Messages of ${queueDescription}`}
-                        emptyText="No pending message"
+                        emptyText="No pending JMS message"
                         errorTitle="Could not load queue messages"
                     />
                 </Tabs.Panel>

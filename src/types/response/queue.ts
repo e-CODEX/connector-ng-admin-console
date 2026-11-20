@@ -28,3 +28,9 @@ export interface ConnectorQueueMessage {
     failureCause: string;
     properties: Record<string, string>;
 }
+
+export interface ConnectorQueueReplayResult {
+    replayed: string[];
+    notFound: string[];
+    failed: string[];
+}

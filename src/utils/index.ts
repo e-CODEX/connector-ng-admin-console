@@ -53,6 +53,10 @@ export function toastError(error: unknown, fallback = "An unexpected error occur
     toastErrorMessage(error instanceof Error ? error.message : fallback);
 }
 
+export const toastWarning = (message: string) => {
+    toastMessage("Warning", message, "warning");
+};
+
 export const toastErrorMessage = (message: string) => {
     toastMessage("Error", message, "danger");
 };

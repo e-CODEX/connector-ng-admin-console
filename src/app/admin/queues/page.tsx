@@ -64,7 +64,7 @@ export default function QueueAdminPage() {
                         <QueueList groups={groups} selectedQueue={selectedStats.queueName} onSelect={setSelectedQueue} />
                     </div>
 
-                    <QueueMessagesView key={selectedStats.queueName} queue={selectedStats} onReplayed={list.refresh} />
+                    <QueueMessagesView key={selectedStats.queueName} queue={selectedStats} onDlqChanged={list.refresh} />
                 </div>
             )}
         </div>

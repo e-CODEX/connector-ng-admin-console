@@ -26,10 +26,10 @@ const DLQ_TAB = "dlq";
 
 interface QueueMessagesViewProps {
     queue: ConnectorQueueStats;
-    onReplayed?: () => void;
+    onDlqChanged?: () => void;
 }
 
-export function QueueMessagesView({ queue, onReplayed }: QueueMessagesViewProps) {
+export function QueueMessagesView({ queue, onDlqChanged }: QueueMessagesViewProps) {
     const queueService = useQueueService();
     const { queueName, queueDescription, pendingCount, dlqCount } = queue;
 
@@ -44,7 +44,7 @@ export function QueueMessagesView({ queue, onReplayed }: QueueMessagesViewProps)
         targetLabel: queueDescription,
         replayMessage: async (messageId) => {
             await queueService.replayDlqMessage(messageId, { messageId, queue: queueName });
-            onReplayed?.();
+            onDlqChanged?.();
         },
         replayMessages: async (messageIds) => {
             const response: ConnectorQueueReplayResult | ConnectorQueueReplayResult[] | undefined = await queueService.replayDlqMessages({
@@ -60,7 +60,7 @@ export function QueueMessagesView({ queue, onReplayed }: QueueMessagesViewProps)
             };
             // The dead-letter count changed only if something actually left the queue.
             if (outcome.replayed.length > 0 || outcome.notFound.length > 0) {
-                onReplayed?.();
+                onDlqChanged?.();
             }
             return outcome;
         },
@@ -104,6 +104,10 @@ export function QueueMessagesView({ queue, onReplayed }: QueueMessagesViewProps)
                         errorTitle="Could not load dead letter messages"
                         showFailureCause
                         replay={replay}
+                        onDeleteMessage={async (messageId) => {
+                            await queueService.deleteDlqQueueMessage(messageId, queueName);
+                            onDlqChanged?.();
+                        }}
                     />
                 </Tabs.Panel>
                 <Tabs.Panel className="pt-4" id={MESSAGES_TAB}>

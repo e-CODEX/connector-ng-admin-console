@@ -70,6 +70,15 @@ export function createQueueService(baseUrl: string, call: RestApiCall) {
                 body: JSON.stringify(payload),
             });
         },
+        async deleteDlqQueueMessage(jmsMessageId: string, queue: string): Promise<void> {
+            return call<void>(baseUrl, `api/v1/admin/jms/queues/dlq/messages/${encodeURIComponent(jmsMessageId)}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                params: { queue },
+            });
+        },
     };
 }
 

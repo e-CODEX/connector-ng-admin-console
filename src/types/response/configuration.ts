@@ -57,7 +57,7 @@ export interface LinkPartnerProperties {
 // business domain config
 
 export interface BusinessDomainConfiguration {
-    defaults: ConnectorBusinessDomain[]
+    defaults: ConnectorBusinessDomain[];
 }
 
 // message verification
@@ -81,11 +81,14 @@ export interface QueueConfiguration {
     outboundMessageStagingQueue: string;
     outboundEvidenceTriggerQueue: string;
     outboundMessageProcessingQueue: string;
+    inboundMessageStagingQueue: string;
     inboundMessageProcessingQueue: string;
     inboundEvidenceTriggerQueue: string;
     backendDeliveryQueue: string;
     gatewaySubmissionQueue: string;
-    gatewaySubmissionReplyQueue: string
+    gatewaySubmissionReplyQueue: string;
+    gatewayReceptionQueue: string;
+    resolvedMessageCleanupProcessingQueue: string;
 }
 
 // routing config

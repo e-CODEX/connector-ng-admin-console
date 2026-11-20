@@ -8,9 +8,23 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
+export type CONNECTOR_QUEUE_STATS_CATEGORY = "CONNECTOR" | "GATEWAY";
+
 export interface ConnectorQueueStats {
     queueName: string;
     queueDescription: string;
     pendingCount: number;
     dlqCount: number;
+    category: CONNECTOR_QUEUE_STATS_CATEGORY;
+}
+
+export interface ConnectorQueueMessage {
+    messageId: string;
+    timestamp: string;
+    correlationId: string;
+    messageType: string;
+    redelivered: boolean;
+    deliveryCount: number;
+    failureCause: string;
+    properties: Record<string, string>;
 }

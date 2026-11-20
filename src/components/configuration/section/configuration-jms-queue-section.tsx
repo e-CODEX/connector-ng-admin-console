@@ -26,21 +26,21 @@ export function ConfigurationJmsQueueSection() {
 
     useEffect(() => {
         const loadConfig = async () => {
-            setLoading(true)
+            setLoading(true);
             try {
-                const data = await configurationService.getQueueConfiguration()
-                setConfig(data || [])
+                const data = await configurationService.getQueueConfiguration();
+                setConfig(data || []);
             } catch (error) {
-                toastError(error)
+                toastError(error);
             } finally {
-                setLoading(false)
+                setLoading(false);
             }
-        }
+        };
 
         (async () => {
-            await loadConfig()
-        })()
-    }, [configurationService])
+            await loadConfig();
+        })();
+    }, [configurationService]);
 
     if (!config) {
         return null;
@@ -48,49 +48,30 @@ export function ConfigurationJmsQueueSection() {
 
     return (
         <div>
-            {
-                loading ? (
-                    <SpinnerView className="mt-60"/>
-                ) : (
-                    <div className="flex flex-col gap-4">
-                        <ConfigurationBlock title="Connector Queue" note="">
-                            <ConfigurationDetailRow label="Outbound message staging queue">
-                                {config.outboundMessageStagingQueue}
-                            </ConfigurationDetailRow>
+            {loading ? (
+                <SpinnerView className="mt-60" />
+            ) : (
+                <div className="flex flex-col gap-4">
+                    <ConfigurationBlock title="Connector Queue" note="">
+                        <ConfigurationDetailRow label="Outbound message staging queue">{config.outboundMessageStagingQueue}</ConfigurationDetailRow>
+                        <ConfigurationDetailRow label="Outbound evidence trigger queue">{config.outboundEvidenceTriggerQueue}</ConfigurationDetailRow>
+                        <ConfigurationDetailRow label="Outbound message processing queue">{config.outboundMessageProcessingQueue}</ConfigurationDetailRow>
 
-                            <ConfigurationDetailRow label="Outbound evidence trigger queue">
-                                {config.outboundEvidenceTriggerQueue}
-                            </ConfigurationDetailRow>
+                        <ConfigurationDetailRow label="Inbound message staging queue">{config.inboundMessageStagingQueue}</ConfigurationDetailRow>
+                        <ConfigurationDetailRow label="Inbound message processing queue">{config.inboundMessageProcessingQueue}</ConfigurationDetailRow>
+                        <ConfigurationDetailRow label="Inbound evidence trigger queue">{config.inboundEvidenceTriggerQueue}</ConfigurationDetailRow>
 
-                            <ConfigurationDetailRow label="Outbound message processing queue">
-                                {config.outboundMessageProcessingQueue}
-                            </ConfigurationDetailRow>
+                        <ConfigurationDetailRow label="Backend delivery queue">{config.backendDeliveryQueue}</ConfigurationDetailRow>
+                        <ConfigurationDetailRow label="Resolved messages clean up queue">{config.resolvedMessageCleanupProcessingQueue}</ConfigurationDetailRow>
+                    </ConfigurationBlock>
 
-                            <ConfigurationDetailRow label="Inbound message processing queue">
-                                {config.inboundMessageProcessingQueue}
-                            </ConfigurationDetailRow>
-
-                            <ConfigurationDetailRow label="Inbound evidence trigger queue">
-                                {config.inboundEvidenceTriggerQueue}
-                            </ConfigurationDetailRow>
-
-                            <ConfigurationDetailRow label="Backend delivery queue">
-                                {config.backendDeliveryQueue}
-                            </ConfigurationDetailRow>
-                        </ConfigurationBlock>
-
-                        <ConfigurationBlock title="Gateway Queue" note="">
-                            <ConfigurationDetailRow label="Gateway message submission queue">
-                                {config.gatewaySubmissionQueue}
-                            </ConfigurationDetailRow>
-
-                            <ConfigurationDetailRow label="Gateway message submission reply queue">
-                                {config.gatewaySubmissionReplyQueue}
-                            </ConfigurationDetailRow>
-                        </ConfigurationBlock>
-                    </div>
-                )
-            }
+                    <ConfigurationBlock title="Gateway Queue" note="">
+                        <ConfigurationDetailRow label="Gateway message submission queue">{config.gatewaySubmissionQueue}</ConfigurationDetailRow>
+                        <ConfigurationDetailRow label="Gateway message submission reply queue">{config.gatewaySubmissionReplyQueue}</ConfigurationDetailRow>
+                        <ConfigurationDetailRow label="Gateway message reception queue">{config.gatewayReceptionQueue}</ConfigurationDetailRow>
+                    </ConfigurationBlock>
+                </div>
+            )}
         </div>
     );
 }

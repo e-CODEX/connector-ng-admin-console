@@ -126,6 +126,14 @@ NOTE: To expose the Admin Console on another port with Docker, either remap it (
 | `https://connector.example.org:30000`
 | Base URL of the connector REST API.
 
+| `BASIC_AUTH_USER`
+| `basic`
+| User for HTTP Basic authentication on the connector's actuator endpoints. The Admin Console uses it to read the backend health and build information shown in the footer. *Required.*
+
+| `BASIC_AUTH_PASSWORD`
+| `change-me`
+| Password of `BASIC_AUTH_USER`. *Required.* Treat it as a secret.
+
 | `NODE_ENV`
 | `production`
 | Runtime mode. It is *not* set in the Docker image: provide it when you deploy. *Setting it to `production` is recommended for every production environment.*
@@ -150,6 +158,8 @@ Always set `NODE_ENV=production` when you deploy to a production environment.
 When `NODE_ENV` is not `production`, HTTPS is not enforced. This is convenient for local tests over plain HTTP (for example `http://localhost:3000`), but it must not be used in production.
 ====
 
+IMPORTANT: `BASIC_AUTH_USER` and `BASIC_AUTH_PASSWORD` are mandatory. If either is missing or empty, the Admin Console fails to render any page and logs `Missing required environment variable: BASIC_AUTH_USER` (or `BASIC_AUTH_PASSWORD`).
+
 TIP: Keep these values in an environment file or in your orchestrator's secrets/config. Never commit them to version control.
 
 == Installation with Docker (recommended)
@@ -165,6 +175,8 @@ docker pull scm.ecodex.eu/docker/connector-ng-admin-console:{project-version}
 docker run -d --name connector-admin-console \
   -p 3000:3000 \
   -e CONNECTOR_API_URL=https://connector.example.org:8443 \
+  -e BASIC_AUTH_USER=basic \
+  -e BASIC_AUTH_PASSWORD=change-me \
   -e NODE_ENV=production \
   --restart unless-stopped \
   scm.ecodex.eu/docker/connector-ng-admin-console:{project-version}
@@ -173,6 +185,8 @@ docker run -d --name connector-admin-console \
 NOTE: Images are hosted on the e-CODEX registry `scm.ecodex.eu/docker/`.
 
 TIP: For a local test over plain HTTP, omit `-e NODE_ENV=production`. Do not do this in production.
+
+TIP: Values passed with `-e` end up in your shell history. In production, prefer `--env-file /path/to/admin-console.env` (with restricted file permissions) for `BASIC_AUTH_PASSWORD`.
 
 === Run with Docker Compose
 
@@ -187,6 +201,8 @@ services:
       - "3000:3000"
     environment:
       CONNECTOR_API_URL: https://connector.example.org:8443
+      BASIC_AUTH_USER: basic
+      BASIC_AUTH_PASSWORD: $\{BASIC_AUTH_PASSWORD}
       NODE_ENV: production
 ----
 
@@ -195,6 +211,8 @@ services:
 docker compose up -d
 docker compose logs -f connector-admin-console
 ----
+
+NOTE: `$\{BASIC_AUTH_PASSWORD}` is read by Docker Compose from the shell environment or from a `.env` file next to `compose.yaml`, so the password is not written in the Compose file itself.
 
 === Building the image yourself (optional)
 
@@ -237,6 +255,8 @@ The archive contains two folders:
 ----
 cd /opt/connector-admin-console/standalone
 CONNECTOR_API_URL=https://connector.example.org:8443 \
+BASIC_AUTH_USER=basic \
+BASIC_AUTH_PASSWORD=change-me \
 NODE_ENV=production \
 node server.js
 ----
@@ -248,8 +268,12 @@ Create `/etc/connector-admin-console/env`:
 [source,properties]
 ----
 CONNECTOR_API_URL=https://connector.example.org:8443
+BASIC_AUTH_USER=basic
+BASIC_AUTH_PASSWORD=change-me
 NODE_ENV=production
 ----
+
+Since this file holds the actuator password, make it readable by the service user only (for example `chmod 600`, owned by `connector`).
 
 Create `/etc/systemd/system/connector-admin-console.service`:
 
@@ -348,6 +372,12 @@ connector.cors.allowed-origins=https://admin.example.org
 
 | Pages show no data / `ECONNREFUSED`
 | `CONNECTOR_API_URL` is wrong or the backend is unreachable from the Admin Console host or container. Test with `curl` from that location.
+
+| Every page shows an error; the logs contain `Missing required environment variable: BASIC_AUTH_USER` (or `BASIC_AUTH_PASSWORD`)
+| The actuator credentials are not set, or set to an empty value. Set both `BASIC_AUTH_USER` and `BASIC_AUTH_PASSWORD`, then restart the Admin Console.
+
+| Pages load, but the health and build information in the footer is missing or shows the backend as down
+| The actuator credentials are wrong: the connector answers `401 Unauthorized` on its actuator endpoints. Check them with `curl -u <user>:<password> <CONNECTOR_API_URL>/actuator/health` from the Admin Console host or container.
 |===
 
 == Security recommendations
@@ -355,6 +385,7 @@ connector.cors.allowed-origins=https://admin.example.org
 * Always set `NODE_ENV=production` in production environments.
 * Always serve the Admin Console over HTTPS.
 * Restrict `connector.cors.allowed-origins` to the exact origins in use; never use `*`.
+* For `BASIC_AUTH_USER`, use a dedicated connector account that can only access the actuator endpoints, and store `BASIC_AUTH_PASSWORD` as a secret.
 * Restrict network access to the Admin Console (VPN, IP allow-list) when possible.
 * Run the process with an unprivileged user.
 * Install new releases regularly to benefit from dependency and security updates.

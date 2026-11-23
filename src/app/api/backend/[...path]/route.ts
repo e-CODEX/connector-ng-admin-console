@@ -8,15 +8,17 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import type { NextRequest} from "next/server";
+import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { getAppConfig } from "@/config/config.server";
 import { bearerHeader } from "@/lib/rest/bearer-header";
 import { isBackendDown } from "@/lib/rest/backend-down";
 
 async function proxy(req: NextRequest, path: string[]) {
-    const { apiUrl } = getAppConfig();
-    const authorization = await bearerHeader();
+    const { apiUrl, basicAuthUser, basicAuthPassword } = getAppConfig();
+
+    const authorization =
+        path[0] === "actuator" ? basicHeader(basicAuthUser!, basicAuthPassword!) : await bearerHeader();
     const target = `${apiUrl}/${path.join("/")}${req.nextUrl.search}`;
 
     let res: Response;
@@ -25,9 +27,7 @@ async function proxy(req: NextRequest, path: string[]) {
             method: req.method,
             headers: {
                 ...authorization,
-                ...(req.headers.get("content-type")
-                    ? { "Content-Type": req.headers.get("content-type")! }
-                    : {}),
+                ...(req.headers.get("content-type") ? { "Content-Type": req.headers.get("content-type")! } : {}),
             },
             body: ["GET", "HEAD"].includes(req.method) ? undefined : req.body,
             // @ts-expect-error — duplex required when streaming a request body
@@ -59,9 +59,13 @@ async function proxy(req: NextRequest, path: string[]) {
     });
 }
 
-const handler =
-          (req: NextRequest, ctx: { params: Promise<{ path: string[] }> }) =>
-              ctx.params.then(({ path }) => proxy(req, path));
+function basicHeader(user: string, password: string): { Authorization: string } {
+    const token = Buffer.from(`${user}:${password}`, "utf-8").toString("base64");
+    return { Authorization: `Basic ${token}` };
+}
+
+const handler = (req: NextRequest, ctx: { params: Promise<{ path: string[] }> }) =>
+    ctx.params.then(({ path }) => proxy(req, path));
 
 export const GET = handler;
 export const POST = handler;

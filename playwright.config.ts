@@ -65,6 +65,9 @@ export default defineConfig({
             env: {
                 CONNECTOR_API_URL: `http://localhost:${MOCK_BACKEND_PORT}`,
                 NEXT_DIST_DIR: DIST_DIR,
+                // Required by the app; the mock backend doesn't check them. Real env vars (e.g. from CI) win.
+                BASIC_AUTH_USER: process.env.BASIC_AUTH_USER ?? "e2e-actuator",
+                BASIC_AUTH_PASSWORD: process.env.BASIC_AUTH_PASSWORD ?? "e2e-actuator-password",
                 PORT: String(APP_PORT),
                 HOSTNAME: "localhost",
             },

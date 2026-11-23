@@ -17,6 +17,8 @@ export type AppConfig = {
     bffUrl: string;
     defaultOriginalSender: string;
     defaultFinalRecipient: string;
+    basicAuthUser?: string;
+    basicAuthPassword?: string;
 };
 
 export function isAppMode(value: unknown): value is AppMode {

@@ -13,6 +13,10 @@ APP_MODE=ADMIN_CONSOLE
 
 CONNECTOR_API_URL=http://localhost:30000
 
+# HTTP Basic credentials of the connector's actuator endpoints (required)
+BASIC_AUTH_USER=actuator
+BASIC_AUTH_PASSWORD=change-me
+
 # only needed with APP_MODE=TESTING_CONSOLE
 CONNECTOR_BFF_URL=http://localhost:4000
 
@@ -24,9 +28,13 @@ DEFAULT_FINAL_RECIPIENT=bob
 |---------------------------|-----------------------------------------------------------|
 | `APP_MODE`                | `ADMIN_CONSOLE` or `TESTING_CONSOLE`, see below           |
 | `CONNECTOR_API_URL`       | URL of the connector REST API                             |
+| `BASIC_AUTH_USER`         | User for HTTP Basic authentication on the connector's actuator endpoints (health and build info shown in the footer). **Required** |
+| `BASIC_AUTH_PASSWORD`     | Password of `BASIC_AUTH_USER`. **Required**; keep it secret |
 | `CONNECTOR_BFF_URL`       | URL of the BFF, **only needed in `TESTING_CONSOLE` mode** |
 | `DEFAULT_ORIGINAL_SENDER` | Original sender used by default for test messages         |
 | `DEFAULT_FINAL_RECIPIENT` | Final recipient used by default for test messages         |
+
+`BASIC_AUTH_USER` and `BASIC_AUTH_PASSWORD` are required: if either is missing or empty, the app fails to render any page and the server logs `Missing required environment variable: BASIC_AUTH_USER` (or `BASIC_AUTH_PASSWORD`).
 
 ### Modes
 

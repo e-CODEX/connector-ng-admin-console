@@ -2,6 +2,24 @@
 
 All notable changes to this project are documented in this file.
 
+## 1.1.0-SNAPSHOT - [0000-00-00]
+
+### Release Notes
+
+#### Added
+- **Transport steps** — Show whether a message transport step is retryable.
+- **JMS queues** — Browse the connector's JMS queues and inspect their pending and dead-letter messages.
+- **JMS message details** — View the details of each message in the connector's JMS queues.
+- **DLQ replay** — Resend failed messages from a JMS dead-letter queue to their original destination in one click.
+- **DLQ message deletion** — Delete unwanted messages from the dead-letter queue directly from the admin UI.
+
+#### Technical
+- **Lint** — Improve linting rules and fix reported issues.
+- **Unit tests** — Lay the groundwork for the test suite.
+- **E2E tests** — Lay the groundwork for the end-to-end test suite.
+- **Warnings** — Fix the logo and modal warnings.
+- **Basic auth** — Add support for HTTP `Basic` authentication.
+
 ## 1.0.0 - 2026-11-12
 
 ### Release Notes

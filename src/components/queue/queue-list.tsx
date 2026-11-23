@@ -60,7 +60,7 @@ interface QueueListProps {
 
 export function QueueList({ groups, selectedQueue, onSelect }: QueueListProps) {
     return (
-        <nav aria-label="JMS queues" className="h-full overflow-hidden rounded-xl border border-border bg-surface">
+        <nav aria-label="JMS queues" className="h-full overflow-hidden rounded-sm border border-border bg-surface">
             <div aria-hidden="true" className="flex justify-end gap-4 border-b border-border px-3 py-2 text-[11px] font-medium uppercase tracking-wider text-muted">
                 <span className="w-12 text-right">Dead</span>
                 <span className="w-12 text-right">Pending</span>

@@ -18,11 +18,13 @@ export interface ConnectorQueueStats {
     category: CONNECTOR_QUEUE_STATS_CATEGORY;
 }
 
+export type ConnectorQueueMessageType = "MAP" | "TEXT" | "BYTES" | "OBJECT" | "STREAM" | "UNKNOWN";
+
 export interface ConnectorQueueMessage {
     messageId: string;
     timestamp: string;
     correlationId: string;
-    messageType: string;
+    messageType: ConnectorQueueMessageType;
     redelivered: boolean;
     deliveryCount: number;
     failureCause: string;
@@ -33,4 +35,11 @@ export interface ConnectorQueueReplayResult {
     replayed: string[];
     notFound: string[];
     failed: string[];
+}
+
+export interface ConnectorQueueMessageDetail {
+    message: ConnectorQueueMessage;
+    payload: Record<string, object>;
+    text: string;
+    truncated: boolean;
 }

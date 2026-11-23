@@ -11,6 +11,7 @@
 import type { RestApiCall } from "@/lib/rest";
 import {
     type ConnectorQueueMessage,
+    type ConnectorQueueMessageDetail,
     type ConnectorQueueReplayResult,
     type ConnectorQueueStats,
 } from "@/types/response/queue";
@@ -26,6 +27,11 @@ export type ListQueueMessagesParams = {
 export type ReplayDLQueueMessageParams = {
     messageId: string; // jms message ID
     queue: string;
+};
+
+export type RetrieveQueueMessageParams = {
+    queue: string;
+    dlq: boolean;
 };
 
 export type ReplayDLQueueMessagesRequest = {
@@ -78,6 +84,19 @@ export function createQueueService(baseUrl: string, call: RestApiCall) {
                 },
                 params: { queue },
             });
+        },
+        async retrieveQueueMessage(
+            jmsMessageId: string,
+            params: RetrieveQueueMessageParams,
+        ): Promise<ConnectorQueueMessageDetail> {
+            // Read-only: a GET (not DELETE), so viewing a message never removes it from the queue.
+            return call<ConnectorQueueMessageDetail>(
+                baseUrl,
+                `api/v1/admin/jms/queues/messages/${encodeURIComponent(jmsMessageId)}`,
+                {
+                    params,
+                },
+            );
         },
     };
 }

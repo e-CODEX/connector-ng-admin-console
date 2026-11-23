@@ -15,7 +15,7 @@ import React, { useEffect, useImperativeHandle, useState } from "react";
 import { Button, Checkbox, Chip, Table, useOverlayState } from "@heroui/react";
 import { CheckboxContext, CheckboxFieldContext } from "react-aria-components";
 import { Inbox, RotateCcw, Trash2 } from "lucide-react";
-import type { ConnectorQueueMessage } from "@/types/response/queue";
+import type { ConnectorQueueMessage, ConnectorQueueMessageDetail } from "@/types/response/queue";
 import type { PaginatedResponse } from "@/types/response/paginated-response";
 import type { PagedListParams } from "@/hooks/use-paged-list";
 import { usePagedList } from "@/hooks/use-paged-list";
@@ -27,6 +27,8 @@ import { DateTime } from "@/components/common/date-time";
 import { PaginationControls } from "@/components/paging/pagination-controls";
 import { ActionButton } from "@/components/common/action-button/action-button";
 import { ConfirmModal } from "@/components/common/confirmation-modal";
+import { DetailActionButton } from "@/components/common/action-button/detail-action-button";
+import { QueueMessageDetailsView } from "@/components/queue/queue-message-details-view";
 import { toastError, toastErrorMessage, toastSuccess, toastWarning } from "@/utils";
 
 const EMPTY_SELECTION: ReadonlySet<string> = new Set();
@@ -57,6 +59,7 @@ interface QueueMessagesTableProps {
     showFailureCause?: boolean;
     replay?: QueueMessagesReplay;
     onDeleteMessage?: (messageId: string) => Promise<void>;
+    loadMessageDetail?: (messageId: string) => Promise<ConnectorQueueMessageDetail>;
 }
 
 type ReplayTarget = { kind: "single"; messageId: string } | { kind: "bulk"; messageIds: string[] };
@@ -83,7 +86,18 @@ function reportBulkReplay({ replayed, notFound, failed }: QueueReplayOutcome) {
     }
 }
 
-export function QueueMessagesTable({ ref, onBusyChange, load, ariaLabel, emptyText, errorTitle, showFailureCause = false, replay, onDeleteMessage }: QueueMessagesTableProps) {
+export function QueueMessagesTable({
+    ref,
+    onBusyChange,
+    load,
+    ariaLabel,
+    emptyText,
+    errorTitle,
+    showFailureCause = false,
+    replay,
+    onDeleteMessage,
+    loadMessageDetail,
+}: QueueMessagesTableProps) {
     const pagedList = usePagedList<ConnectorQueueMessage>(load);
     const busy = pagedList.loading || pagedList.refreshing;
 
@@ -92,7 +106,14 @@ export function QueueMessagesTable({ ref, onBusyChange, load, ariaLabel, emptyTe
     const confirmReplay = useOverlayState();
     const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
     const confirmDelete = useOverlayState();
-    const hasRowActions = Boolean(replay || onDeleteMessage);
+    const [detailsMessageId, setDetailsMessageId] = useState<string | null>(null);
+    const detailsModal = useOverlayState();
+    const hasRowActions = Boolean(replay || onDeleteMessage || loadMessageDetail);
+
+    const showDetails = (messageId: string) => {
+        setDetailsMessageId(messageId);
+        detailsModal.open();
+    };
 
     const selectedIds = pagedList.items.map((message) => message.messageId).filter((id) => selectedKeys.has(id));
 
@@ -261,6 +282,8 @@ export function QueueMessagesTable({ ref, onBusyChange, load, ariaLabel, emptyTe
                                         {hasRowActions ? (
                                             <Table.Cell>
                                                 <div className="flex items-center gap-1">
+                                                    {/* Read-only, so it stays available even when every row is selected. */}
+                                                    {loadMessageDetail ? <DetailActionButton onPress={() => showDetails(message.messageId)} /> : null}
                                                     {replay ? (
                                                         <ActionButton
                                                             label="Replay"
@@ -321,6 +344,30 @@ export function QueueMessagesTable({ ref, onBusyChange, load, ariaLabel, emptyTe
                     confirmLabel="Replay"
                     onConfirm={onReplayConfirmed}
                     onCancel={confirmReplay.close}
+                />
+            )}
+
+            {loadMessageDetail && (
+                <QueueMessageDetailsView
+                    state={detailsModal}
+                    messageId={detailsMessageId}
+                    load={loadMessageDetail}
+                    onReplay={
+                        replay
+                            ? (messageId) => {
+                                  detailsModal.close();
+                                  askReplay({ kind: "single", messageId });
+                              }
+                            : undefined
+                    }
+                    onDelete={
+                        onDeleteMessage
+                            ? (messageId) => {
+                                  detailsModal.close();
+                                  askDelete(messageId);
+                              }
+                            : undefined
+                    }
                 />
             )}
 

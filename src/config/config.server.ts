@@ -10,7 +10,7 @@
 
 import "server-only";
 
-import type { AppConfig} from "@/config/config";
+import type { AppConfig } from "@/config/config";
 import { isAppMode } from "@/config/config";
 import type { AppMode } from "@/types/global";
 import { APP_MODES } from "@/types/global";
@@ -22,11 +22,29 @@ export function getAppConfig(): AppConfig {
         bffUrl: process.env.CONNECTOR_BFF_URL ?? "http://localhost:4000",
         defaultOriginalSender: process.env.DEFAULT_ORIGINAL_SENDER ?? "alice",
         defaultFinalRecipient: process.env.DEFAULT_FINAL_RECIPIENT ?? "bob",
-    }
+        basicAuthUser: requireEnv("BASIC_AUTH_USER"),
+        basicAuthPassword: requireEnv("BASIC_AUTH_PASSWORD"),
+    };
 }
 
 function parseAppMode(mode: string | undefined): AppMode {
-    if (mode === undefined || mode === "") return "ADMIN_CONSOLE";
-    if (isAppMode(mode)) return mode;
+    if (mode === undefined || mode === "") {
+        return "ADMIN_CONSOLE";
+    }
+
+    if (isAppMode(mode)) {
+        return mode;
+    }
+
     throw new Error(`Invalid APP MPODE: ["${mode}"]. Expected one of: ${APP_MODES.join(", ")}`);
+}
+
+function requireEnv(name: string): string {
+    const value = process.env[name];
+
+    if (value === undefined || value.trim() === "") {
+        throw new Error(`Missing required environment variable: ${name}`);
+    }
+
+    return value;
 }

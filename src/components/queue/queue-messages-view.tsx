@@ -40,6 +40,9 @@ export function QueueMessagesView({ queue, onDlqChanged }: QueueMessagesViewProp
     const loadMessages = ({ page, size }: PagedListParams) => queueService.listQueueMessages({ page, size, queue: queueName, dlq: false });
     const loadDlqMessages = ({ page, size }: PagedListParams) => queueService.listQueueDlqMessages({ page, size, queue: queueName, dlq: true });
 
+    const loadMessageDetail = (messageId: string) => queueService.retrieveQueueMessage(messageId, { queue: queueName, dlq: false });
+    const loadDlqMessageDetail = (messageId: string) => queueService.retrieveQueueMessage(messageId, { queue: queueName, dlq: true });
+
     const replay: QueueMessagesReplay = {
         targetLabel: queueDescription,
         replayMessage: async (messageId) => {
@@ -67,7 +70,7 @@ export function QueueMessagesView({ queue, onDlqChanged }: QueueMessagesViewProp
     };
 
     return (
-        <section aria-labelledby="queue-messages-title" className="h-full min-w-0 rounded-xl border border-border bg-surface p-4">
+        <section aria-labelledby="queue-messages-title" className="h-full min-w-0 rounded-sm border border-border bg-surface p-4">
             <div className="mb-3 flex items-center gap-3">
                 <div className="flex min-w-0 flex-1 items-baseline gap-2">
                     <h2 id="queue-messages-title" className="truncate text-base font-semibold" title={queueDescription}>
@@ -98,6 +101,7 @@ export function QueueMessagesView({ queue, onDlqChanged }: QueueMessagesViewProp
                     <QueueMessagesTable
                         ref={tableRef}
                         onBusyChange={setBusy}
+                        loadMessageDetail={loadDlqMessageDetail}
                         load={loadDlqMessages}
                         ariaLabel={`Dead letter messages of ${queueDescription}`}
                         emptyText="No dead letter message"
@@ -114,6 +118,7 @@ export function QueueMessagesView({ queue, onDlqChanged }: QueueMessagesViewProp
                     <QueueMessagesTable
                         ref={tableRef}
                         onBusyChange={setBusy}
+                        loadMessageDetail={loadMessageDetail}
                         load={loadMessages}
                         ariaLabel={`Messages of ${queueDescription}`}
                         emptyText="No pending JMS message"

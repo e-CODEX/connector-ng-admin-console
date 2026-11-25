@@ -11,11 +11,12 @@
 "use client";
 
 import { useMemo, useSyncExternalStore } from "react";
+import { LAST_KNOWN_USER_KEY } from "@/utils/constants";
 import type { ConnectorUser } from "@/types/response/user";
 
 export type NavUser = Pick<ConnectorUser, "username" | "email" | "roles">;
 
-const KEY = "connector-ui:last-known-user";
+const KEY = LAST_KNOWN_USER_KEY;
 
 function subscribe(callback: () => void) {
     window.addEventListener("storage", callback);

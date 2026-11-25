@@ -117,7 +117,8 @@ async function handle(req: IncomingMessage, res: ServerResponse) {
         }
         case "POST /api/v1/auth/refresh": {
             const { refreshToken } = await readJson(req);
-            return typeof refreshToken === "string" && refreshToken.length > 0
+            // "revoked" lets tests simulate a refresh token the backend no longer accepts.
+            return typeof refreshToken === "string" && refreshToken.length > 0 && refreshToken !== "revoked"
                 ? send(res, 200, loginResponse())
                 : send(res, 401, {
                       status: 401,

@@ -9,6 +9,7 @@
  */
 
 import { RestApiError } from "@/lib/rest/rest-api-error";
+import { handleSessionExpired, isSessionExpiredResponse } from "@/lib/rest/session-expired";
 
 const REQUEST_TIMEOUT_MS = 15_000;
 
@@ -51,6 +52,11 @@ async function restApiFetch(
         // Don't let a blackholed backend hang the page or the proxy. A caller-supplied signal wins.
         signal: init.signal ?? AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     });
+
+    if (isSessionExpiredResponse(response.status, baseUrl)) {
+        // Sign out instead of surfacing a "server did not respond" error for an expired session.
+        return handleSessionExpired();
+    }
 
     if (!response.ok) {
         throw new RestApiError(response.status, await extractErrorMessage(response));

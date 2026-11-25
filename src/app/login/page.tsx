@@ -15,7 +15,8 @@ import React, { useState } from "react";
 import type { LoginRequest } from "@/types/request/user";
 import { loginSchema } from "@/schemas/auth";
 import { toastErrorMessage } from "@/utils";
-import { LockOpen } from "lucide-react";
+import { Clock, LockOpen } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 
 const FORM_ID = "login-form";
 
@@ -26,6 +27,8 @@ type FieldErrors = Partial<Record<keyof LoginRequest, string>>;
 
 export default function LoginForm() {
     const [loading, setLoading] = useState(false);
+    // Set when the app signed the user out because the session expired or could not be renewed.
+    const sessionExpired = useSearchParams().get("expired") === "1";
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [errors, setErrors] = useState<FieldErrors>({});
@@ -79,6 +82,12 @@ export default function LoginForm() {
     return (
         <div className="flex grow items-center justify-center">
             <div className="w-full max-w-sm px-4">
+                {sessionExpired && (
+                    <p role="status" className="mb-6 flex items-center gap-2 rounded-lg bg-warning-soft px-3 py-2 text-sm text-warning-soft-foreground">
+                        <Clock className="size-4 shrink-0" aria-hidden="true" />
+                        Your session has expired. Please sign in again.
+                    </p>
+                )}
                 <Form
                     id={FORM_ID}
                     onSubmit={handleSubmit}

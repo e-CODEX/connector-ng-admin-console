@@ -115,10 +115,9 @@ export async function restApiCall<T>(
     options: RestApiOptions = {},
 ): Promise<T> {
     const response = await restApiFetch(baseUrl, path, options);
-    if (response.status === 204) {
-        return undefined as T;   // no content
-    }
-    return response.json();
+    // Some endpoints answer 200/202 with an empty body, not only 204.
+    const body = response.status === 204 ? "" : await response.text();
+    return (body ? JSON.parse(body) : undefined) as T;
 }
 
 export interface DownloadedFile {

@@ -11,7 +11,7 @@
 "use client";
 
 import type { useOverlayState } from "@heroui/react";
-import { Button, Modal } from "@heroui/react";
+import { Button, Modal, Spinner } from "@heroui/react";
 import type { ComponentProps, ReactNode } from "react";
 import { useState } from "react";
 
@@ -76,7 +76,12 @@ export function ConfirmModal({
                             {cancelLabel}
                         </Button>
                         <Button variant={confirmVariant} onPress={handleConfirm} isPending={isPending}>
-                            {confirmLabel}
+                            {({ isPending: pending }) => (
+                                <>
+                                    {pending && <Spinner color="current" size="sm" />}
+                                    {confirmLabel}
+                                </>
+                            )}
                         </Button>
                     </Modal.Footer>
                 </Modal.Dialog>

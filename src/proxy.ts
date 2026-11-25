@@ -8,7 +8,7 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import type { NextRequest} from "next/server";
+import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { createAuthService } from "@/services/auth";
 import { cookieOptions } from "@/utils";
@@ -16,7 +16,7 @@ import { decodeJwt } from "jose";
 import type { LoginResponse } from "@/types/response/user";
 import { cookies } from "next/headers";
 import { restApiCall } from "@/lib/rest";
-import { ACCESS_TOKEN_KEY, MUST_CHANGE_PASSWORD, REFRESH_TOKEN_KEY } from "@/utils/constants";
+import { ACCESS_TOKEN_KEY, LOGIN_EXPIRED_PATH, MUST_CHANGE_PASSWORD, REFRESH_TOKEN_KEY } from "@/utils/constants";
 import { isBackendDown } from "@/lib/rest/backend-down";
 
 const REFRESH_THRESHOLD_SECONDS = 10;
@@ -60,10 +60,28 @@ async function updateRequestCookies(request: NextRequest, refreshed: LoginRespon
     cookieStore.set(REFRESH_TOKEN_KEY, refreshToken, cookieOptions(refreshExpiresIn));
 }
 
+/**
+ * The session is gone or cannot be renewed. Page navigations go to the login page.
+ */
+async function sessionExpiredResponse(request: NextRequest, { known }: { known: boolean }) {
+    const loginPath = known ? LOGIN_EXPIRED_PATH : LOGIN_PATH;
+    const response = request.nextUrl.pathname.startsWith("/api/")
+        ? NextResponse.json({ message: "Your session has expired." }, { status: 401 })
+        : NextResponse.redirect(new URL(loginPath, request.url));
+
+    response.cookies.delete(ACCESS_TOKEN_KEY);
+    response.cookies.delete(REFRESH_TOKEN_KEY);
+
+    const cookieStore = await cookies();
+    cookieStore.delete(ACCESS_TOKEN_KEY);
+    cookieStore.delete(REFRESH_TOKEN_KEY);
+
+    return response;
+}
+
 export async function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
-    const loginUrl = new URL(LOGIN_PATH, request.url);
     const homeUrl = new URL("/", request.url);
     const changePasswordUrl = new URL(CHANGE_PASSWORD_PATH, request.url);
 
@@ -104,20 +122,12 @@ export async function proxy(request: NextRequest) {
             }
 
             // The refresh token was rejected: really log out.
-            const response = NextResponse.redirect(loginUrl);
-            response.cookies.delete(ACCESS_TOKEN_KEY);
-            response.cookies.delete(REFRESH_TOKEN_KEY);
-
-            const cookieStore = await cookies();
-            cookieStore.delete(ACCESS_TOKEN_KEY);
-            cookieStore.delete(REFRESH_TOKEN_KEY);
-
-            return response;
+            return sessionExpiredResponse(request, { known: true });
         }
     }
 
     if (!accessToken) {
-        return NextResponse.redirect(loginUrl);
+        return sessionExpiredResponse(request, { known: false });
     }
 
     return NextResponse.next();
@@ -126,5 +136,5 @@ export async function proxy(request: NextRequest) {
 export const config = {
     matcher: [
         "/((?!forbidden|api/auth|api/backend/actuator/(?:health|info)$|_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|svg|webp|ico)$).*)",
-    ]
+    ],
 };

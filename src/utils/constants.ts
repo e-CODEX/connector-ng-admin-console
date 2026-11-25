@@ -12,5 +12,8 @@ export const ACCESS_TOKEN_KEY = "accessToken";
 export const REFRESH_TOKEN_KEY = "refreshToken";
 export const MUST_CHANGE_PASSWORD = "mustChangePassword";
 export const BACKEND_DOWN_TAG = "down";
+export const LAST_KNOWN_USER_KEY = "connector-ui:last-known-user";
+export const SESSION_EXPIRED_PATH = "/api/auth/session-expired";
+export const LOGIN_EXPIRED_PATH = "/login?expired=1";
 
 export type BACKEND_DOWN = "down";

@@ -10,10 +10,10 @@
 
 import type { NextRequest} from "next/server";
 import { NextResponse } from "next/server";
-import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from "@/utils/constants";
+import { ACCESS_TOKEN_KEY, LOGIN_EXPIRED_PATH, REFRESH_TOKEN_KEY } from "@/utils/constants";
 
 export async function GET(request: NextRequest) {
-    const response = NextResponse.redirect(new URL("/login", request.url));
+    const response = NextResponse.redirect(new URL(LOGIN_EXPIRED_PATH, request.url));
     response.cookies.delete(ACCESS_TOKEN_KEY);
     response.cookies.delete(REFRESH_TOKEN_KEY);
     return response;

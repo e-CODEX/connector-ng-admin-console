@@ -297,8 +297,9 @@ export default function TransportStepsAdminPage() {
                 message={
                     retryTarget && (
                         <>
-                            Message <span className="break-all font-mono">{retryTarget.transportedMessageIdentifier}</span> will be sent again to{" "}
-                            <strong>{retryTarget.linkPartnerName}</strong> (transport step <span className="break-all font-mono">{retryTarget.identifier}</span>). Continue?
+                            Message <span className="break-all font-medium text-orange-500">{retryTarget.transportedMessageIdentifier}</span> will be sent again to{" "}
+                            <strong>{retryTarget.linkPartnerName}</strong> (transport step <span className="break-all font-mono text-orange-500">{retryTarget.identifier}</span>).
+                            Continue?
                         </>
                     )
                 }

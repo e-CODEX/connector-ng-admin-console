@@ -15,7 +15,7 @@ import { RestApiError } from "@/lib/rest/rest-api-error";
 import { restApiCall } from "@/lib/rest";
 import { createAuthService } from "@/services/auth";
 import { cookieOptions } from "@/utils";
-import { ACCESS_TOKEN_KEY, MUST_CHANGE_PASSWORD, REFRESH_TOKEN_KEY } from "@/utils/constants";
+import { ACCESS_TOKEN_KEY, MUST_CHANGE_PASSWORD, REFRESH_TOKEN_KEY, SESSION_EXPIRED_MARKER } from "@/utils/constants";
 
 export async function POST(request: Request) {
     const { username, password } = await request.json();
@@ -29,6 +29,8 @@ export async function POST(request: Request) {
 
         cookieStore.set(ACCESS_TOKEN_KEY, accessToken, cookieOptions(expiresIn));
         cookieStore.set(REFRESH_TOKEN_KEY, refreshToken, cookieOptions(refreshExpiresIn));
+        // A new session: a later sign-out must not be reported as "expired" because of an old marker.
+        cookieStore.delete(SESSION_EXPIRED_MARKER);
 
         if (mustChangePassword) {
             cookieStore.set(MUST_CHANGE_PASSWORD, "1", cookieOptions());

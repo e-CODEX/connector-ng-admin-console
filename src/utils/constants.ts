@@ -15,5 +15,7 @@ export const BACKEND_DOWN_TAG = "down";
 export const LAST_KNOWN_USER_KEY = "connector-ui:last-known-user";
 export const SESSION_EXPIRED_PATH = "/api/auth/session-expired";
 export const LOGIN_EXPIRED_PATH = "/login?expired=1";
+export const SESSION_EXPIRED_MARKER = "sessionExpired";
+export const SESSION_EXPIRED_MARKER_MAX_AGE_SECONDS = 300;
 
 export type BACKEND_DOWN = "down";

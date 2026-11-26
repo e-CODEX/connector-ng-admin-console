@@ -15,13 +15,12 @@ import React, { useState } from "react";
 import type { ConnectorAttachmentResponse } from "@/types/response/attachments";
 import { Table, useOverlayState } from "@heroui/react";
 import { asFilter, formatBytes, saveFile, toastError, truncate } from "@/utils";
-import { PaginationControls } from "@/components/paging/pagination-controls";
+import { PagedListView } from "@/components/paging/paged-list-view";
 import { AttachmentDetailsView } from "@/components/attachment/attachment-details-view";
 import { PageHeaderButton } from "@/components/common/header/page-header-button";
 import { AttachmentStorageChip } from "@/components/attachment/attachment-storage-chip";
 import { Paperclip, RefreshCw } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
-import { SpinnerView } from "@/components/common/spinner-view";
 import { usePagedList } from "@/hooks/use-paged-list";
 import { DateTime } from "@/components/common/date-time";
 import { useAttachmentService } from "@/hooks/use-http-service";
@@ -38,7 +37,6 @@ import type { RangeValue } from "react-aria-components";
 import type { ZonedDateTime } from "@internationalized/date";
 import { buildDefaultRange, toDateRange } from "@/types/period";
 import { AttachmentStatusChip } from "@/components/attachment/attachment-status-chip";
-import { LoadErrorState } from "@/components/common/load-error-state";
 
 const granularity: DateTimeRangeGranularity = "minute";
 
@@ -152,91 +150,61 @@ export default function AttachmentsAdminPage() {
                 onDateRangeChange={(next) => setDateRange(next as RangeValue<ZonedDateTime> | null)}
             />
 
-            {pagedList.loadError ? (
-                <LoadErrorState
-                    title="Could not load attachments"
-                    onRetry={pagedList.retry}
-                />
-            ) : (
-                <>
-                    <div
-                        aria-busy={pagedList.loading}
-                        className={`transition-opacity ${pagedList.loading && pagedList.items.length > 0 ? "pointer-events-none opacity-50" : ""}`}
-                    >
-                        <Table variant="secondary">
-                            <Table.ScrollContainer>
-                                <Table.Content aria-label="Connector messages attachments">
-                                    <Table.Header>
-                                        <Table.Header>
-                                            <Table.Column isRowHeader>Identifier</Table.Column>
-                                            <Table.Column>Name</Table.Column>
-                                            <Table.Column>Content Type</Table.Column>
-                                            <Table.Column>Description</Table.Column>
-                                            <Table.Column>Size</Table.Column>
-                                            <Table.Column>Storage</Table.Column>
-                                            <Table.Column>Type</Table.Column>
-                                            <Table.Column>Status</Table.Column>
-                                            <Table.Column>Created at</Table.Column>
-                                            <Table.Column>Action.s</Table.Column>
-                                        </Table.Header>
-                                    </Table.Header>
-                                    <Table.Body
-                                        renderEmptyState={() =>
-                                            pagedList.loading ? (
-                                                <SpinnerView className="py-16"/>
-                                            ) : (
-                                                <EmptyState text="No attachment available" className="py-16"/>
-                                            )
-                                        }
-                                    >
-                                        {pagedList.items.map((attachment) => (
-                                            <Table.Row key={attachment.identifier}>
-                                                <Table.Cell>
-                                                    <CopyableIdentifier identifier={attachment.identifier} visibleChars={15}/>
-                                                </Table.Cell>
-                                                <Table.Cell>{attachment.name}</Table.Cell>
-                                                <Table.Cell>{attachment.contentType}</Table.Cell>
-                                                <Table.Cell>{truncate(attachment.description)}</Table.Cell>
-                                                <Table.Cell>{formatBytes(attachment.size)}</Table.Cell>
-                                                <Table.Cell>
-                                                    <AttachmentStorageChip type={attachment.storage}/>
-                                                </Table.Cell>
-                                                <Table.Cell>{attachment.type}</Table.Cell>
-                                                <Table.Cell>
-                                                    <AttachmentStatusChip deletedAt={attachment.deletedAt} showDeletedAt/>
-                                                </Table.Cell>
-                                                <Table.Cell>
-                                                    <DateTime value={attachment.createdAt} precision="second"/>
-                                                </Table.Cell>
-                                                <Table.Cell>
-                                                    <div className="flex items-center gap-1">
-                                                        <DetailActionButton onPress={() => onDetailsClick(attachment)}/>
-                                                        <DownloadActionButton
-                                                            isDisabled={attachment.deletedAt !== null}
-                                                            onPress={() => onDownloadClicked(attachment)}/>
-                                                    </div>
-                                                </Table.Cell>
-                                            </Table.Row>
-                                        ))}
-                                    </Table.Body>
-                                </Table.Content>
-                            </Table.ScrollContainer>
-                        </Table>
-                    </div>
-
-                    {pagedList.totalElements > 0 && (
-                        <div className="mt-4 flex justify-center">
-                            <PaginationControls
-                                page={pagedList.page}
-                                pageSize={pagedList.pageSize}
-                                totalElements={pagedList.totalElements}
-                                onPageChange={pagedList.setPage}
-                                onPageSizeChange={pagedList.setPageSize}
-                            />
-                        </div>
-                    )}
-                </>
-            )}
+            <PagedListView list={pagedList} errorMessage="Could not load attachments">
+                <Table variant="secondary">
+                    <Table.ScrollContainer>
+                        <Table.Content aria-label="Connector messages attachments">
+                            <Table.Header>
+                                <Table.Header>
+                                    <Table.Column isRowHeader>Identifier</Table.Column>
+                                    <Table.Column>Name</Table.Column>
+                                    <Table.Column>Content Type</Table.Column>
+                                    <Table.Column>Description</Table.Column>
+                                    <Table.Column>Size</Table.Column>
+                                    <Table.Column>Storage</Table.Column>
+                                    <Table.Column>Type</Table.Column>
+                                    <Table.Column>Status</Table.Column>
+                                    <Table.Column>Created at</Table.Column>
+                                    <Table.Column>Action.s</Table.Column>
+                                </Table.Header>
+                            </Table.Header>
+                            <Table.Body
+                                renderEmptyState={() => <EmptyState text="No attachment available" className="py-16"/>}
+                            >
+                                {pagedList.items.map((attachment) => (
+                                    <Table.Row key={attachment.identifier}>
+                                        <Table.Cell>
+                                            <CopyableIdentifier identifier={attachment.identifier} visibleChars={15}/>
+                                        </Table.Cell>
+                                        <Table.Cell>{attachment.name}</Table.Cell>
+                                        <Table.Cell>{attachment.contentType}</Table.Cell>
+                                        <Table.Cell>{truncate(attachment.description)}</Table.Cell>
+                                        <Table.Cell>{formatBytes(attachment.size)}</Table.Cell>
+                                        <Table.Cell>
+                                            <AttachmentStorageChip type={attachment.storage}/>
+                                        </Table.Cell>
+                                        <Table.Cell>{attachment.type}</Table.Cell>
+                                        <Table.Cell>
+                                            <AttachmentStatusChip deletedAt={attachment.deletedAt} showDeletedAt/>
+                                        </Table.Cell>
+                                        <Table.Cell>
+                                            <DateTime value={attachment.createdAt} precision="second"/>
+                                        </Table.Cell>
+                                        <Table.Cell>
+                                            <div className="flex items-center gap-1">
+                                                <DetailActionButton onPress={() => onDetailsClick(attachment)}/>
+                                                <DownloadActionButton
+                                                    isDisabled={attachment.deletedAt !== null}
+                                                    onPress={() => onDownloadClicked(attachment)}/>
+                                            </div>
+                                        </Table.Cell>
+                                    </Table.Row>
+                                ))}
+                            </Table.Body>
+                        </Table.Content>
+                    </Table.ScrollContainer>
+                </Table>
+            </PagedListView>
 
             <AttachmentDetailsView attachment={selectedAttachment} state={detailsModal}/>
         </div>

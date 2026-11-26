@@ -13,7 +13,7 @@
 import React, { useState } from "react";
 import type { ConnectorMessage } from "@/types/response/message";
 import { Table, useOverlayState } from "@heroui/react";
-import { PaginationControls } from "@/components/paging/pagination-controls";
+import { PagedListView } from "@/components/paging/paged-list-view";
 import { MessageTransportStepsDetailView } from "@/components/message/detail/message-transport-steps-detail-view";
 import { PageHeader } from "@/components/common/header/page-header";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
@@ -25,7 +25,6 @@ import { MessageDirectionChip } from "@/components/message/chip/message-directio
 import { MessageDeliveryStatusChip } from "@/components/message/chip/message-delivery-status-chip";
 import { ChartPie, Info, Mail, MailCheck, MailClock, RefreshCw, Route } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
-import { SpinnerView } from "@/components/common/spinner-view";
 import { useBusinessDomainIdentifiers } from "@/hooks/use-business-domain-identifiers";
 import { asBusinessDomainSelectorFilter } from "@/components/form/selector/business-domain-selector";
 import { usePagedList } from "@/hooks/use-paged-list";
@@ -47,7 +46,6 @@ import { MessageEvidenceTriggerModeView } from "@/components/message/evidence-tr
 import type { MessageEvidenceTriggerResponse } from "@/types/response/evidence-trigger";
 import { MessagePendingView } from "@/components/message/pending/message-pending-view";
 import { MessageLifecycleView } from "@/components/message/message-lifecycle-view";
-import { LoadErrorState } from "@/components/common/load-error-state";
 import type { SendEvidenceTriggerRequest } from "@/services/message";
 
 const IDENTIFIER_LENGTH = 8;
@@ -233,115 +231,83 @@ export default function MessagesAdminPage() {
                 onDateRangeChange={(next) => setDateRange(next as RangeValue<ZonedDateTime> | null)}
             />
 
-            {pagedList.loadError ? (
-                <LoadErrorState
-                    title="Could not load messages"
-                    onRetry={pagedList.retry}
-                />
-            ) : (
-                <>
-                    <div
-                        aria-busy={pagedList.loading}
-                        className={`transition-opacity ${
-                            pagedList.loading && pagedList.items.length > 0 ? "pointer-events-none opacity-50" : ""
-                        }`}
-                    >
-                        <Table variant="secondary">
-                            <Table.ScrollContainer>
-                                <Table.Content aria-label="Connector business messages">
-                                    <Table.Header>
-                                        <Table.Column isRowHeader>Identifier</Table.Column>
-                                        <Table.Column>Conversation ID</Table.Column>
-                                        <Table.Column>Business domain</Table.Column>
-                                        <Table.Column>Backend ID</Table.Column>
-                                        <Table.Column>From</Table.Column>
-                                        <Table.Column>To</Table.Column>
-                                        <Table.Column>Backend</Table.Column>
-                                        <Table.Column>Gateway</Table.Column>
-                                        <Table.Column>Service</Table.Column>
-                                        <Table.Column>Action</Table.Column>
-                                        <Table.Column>Direction</Table.Column>
-                                        <Table.Column>Status</Table.Column>
-                                        <Table.Column>Created at</Table.Column>
-                                        <Table.Column>Actions</Table.Column>
-                                    </Table.Header>
-                                    <Table.Body
-                                        renderEmptyState={() =>
-                                            pagedList.loading ? (
-                                                <SpinnerView className="py-16"/>
-                                            ) : (
-                                                <EmptyState text="No message available" className="py-16"/>
-                                            )
-                                        }
-                                    >
-                                        {pagedList.items.map((message) => (
-                                            <Table.Row key={message.identifier}>
-                                                <Table.Cell>
-                                                    <CopyableIdentifier identifier={message.identifier} visibleChars={IDENTIFIER_LENGTH}/>
-                                                </Table.Cell>
-                                                <Table.Cell>
-                                                    <CopyableIdentifier
-                                                        identifier={message.as4Properties.conversationIdentifier}
-                                                        visibleChars={IDENTIFIER_LENGTH}/>
-                                                </Table.Cell>
-                                                <Table.Cell>{message.businessDomainIdentifier}</Table.Cell>
-                                                <Table.Cell>
-                                                    <CopyableIdentifier
-                                                        identifier={message.backendMessageIdentifier}
-                                                        visibleChars={IDENTIFIER_LENGTH}/>
-                                                </Table.Cell>
-                                                <Table.Cell>{message.as4Properties.fromParty.identifier}</Table.Cell>
-                                                <Table.Cell>{message.as4Properties.toParty.identifier}</Table.Cell>
-                                                <Table.Cell>{message.backendName}</Table.Cell>
-                                                <Table.Cell>{message.gatewayName}</Table.Cell>
-                                                <Table.Cell>{message.as4Properties.service.name}</Table.Cell>
-                                                <Table.Cell>{message.as4Properties.action.name}</Table.Cell>
-                                                <Table.Cell>
-                                                    <MessageDirectionChip labelVariant="short" direction={message.direction}/>
-                                                </Table.Cell>
-                                                <Table.Cell>
-                                                    <MessageDeliveryStatusChip message={message}/>
-                                                </Table.Cell>
-                                                <Table.Cell>
-                                                    <DateTime value={message.createdAt} precision="millis"/>
-                                                </Table.Cell>
-                                                <Table.Cell>
-                                                    <div className="flex items-center gap-1">
-                                                        <DetailActionButton onPress={() => onDetailsClick(message)}/>
-                                                        <ActionButton
-                                                            label="Transport steps"
-                                                            icon={Route}
-                                                            onPress={() => onTransportStepsClick(message)}/>
-                                                        {canTriggerDeliveryEvidence(message) && (
-                                                            <ActionButton
-                                                                label="Send delivery evidence"
-                                                                icon={MailCheck}
-                                                                iconAccent="text-success"
-                                                                onPress={() => onDeliveryAckClick(message)}/>
-                                                        )}
-                                                    </div>
-                                                </Table.Cell>
-                                            </Table.Row>
-                                        ))}
-                                    </Table.Body>
-                                </Table.Content>
-                            </Table.ScrollContainer>
-                        </Table>
-                    </div>
-
-                    {pagedList.totalElements > 0 && (
-                        <div className="mt-4 flex justify-center">
-                            <PaginationControls
-                                page={pagedList.page}
-                                pageSize={pagedList.pageSize}
-                                totalElements={pagedList.totalElements}
-                                onPageChange={pagedList.setPage}
-                                onPageSizeChange={pagedList.setPageSize}
-                            />
-                        </div>
-                    )}
-                </>
-            )}
+            <PagedListView list={pagedList} errorMessage="Could not load messages">
+                <Table variant="secondary">
+                    <Table.ScrollContainer>
+                        <Table.Content aria-label="Connector business messages">
+                            <Table.Header>
+                                <Table.Column isRowHeader>Identifier</Table.Column>
+                                <Table.Column>Conversation ID</Table.Column>
+                                <Table.Column>Business domain</Table.Column>
+                                <Table.Column>Backend ID</Table.Column>
+                                <Table.Column>From</Table.Column>
+                                <Table.Column>To</Table.Column>
+                                <Table.Column>Backend</Table.Column>
+                                <Table.Column>Gateway</Table.Column>
+                                <Table.Column>Service</Table.Column>
+                                <Table.Column>Action</Table.Column>
+                                <Table.Column>Direction</Table.Column>
+                                <Table.Column>Status</Table.Column>
+                                <Table.Column>Created at</Table.Column>
+                                <Table.Column>Actions</Table.Column>
+                            </Table.Header>
+                            <Table.Body
+                                renderEmptyState={() => <EmptyState text="No message available" className="py-16"/>}
+                            >
+                                {pagedList.items.map((message) => (
+                                    <Table.Row key={message.identifier}>
+                                        <Table.Cell>
+                                            <CopyableIdentifier identifier={message.identifier} visibleChars={IDENTIFIER_LENGTH}/>
+                                        </Table.Cell>
+                                        <Table.Cell>
+                                            <CopyableIdentifier
+                                                identifier={message.as4Properties.conversationIdentifier}
+                                                visibleChars={IDENTIFIER_LENGTH}/>
+                                        </Table.Cell>
+                                        <Table.Cell>{message.businessDomainIdentifier}</Table.Cell>
+                                        <Table.Cell>
+                                            <CopyableIdentifier
+                                                identifier={message.backendMessageIdentifier}
+                                                visibleChars={IDENTIFIER_LENGTH}/>
+                                        </Table.Cell>
+                                        <Table.Cell>{message.as4Properties.fromParty.identifier}</Table.Cell>
+                                        <Table.Cell>{message.as4Properties.toParty.identifier}</Table.Cell>
+                                        <Table.Cell>{message.backendName}</Table.Cell>
+                                        <Table.Cell>{message.gatewayName}</Table.Cell>
+                                        <Table.Cell>{message.as4Properties.service.name}</Table.Cell>
+                                        <Table.Cell>{message.as4Properties.action.name}</Table.Cell>
+                                        <Table.Cell>
+                                            <MessageDirectionChip labelVariant="short" direction={message.direction}/>
+                                        </Table.Cell>
+                                        <Table.Cell>
+                                            <MessageDeliveryStatusChip message={message}/>
+                                        </Table.Cell>
+                                        <Table.Cell>
+                                            <DateTime value={message.createdAt} precision="millis"/>
+                                        </Table.Cell>
+                                        <Table.Cell>
+                                            <div className="flex items-center gap-1">
+                                                <DetailActionButton onPress={() => onDetailsClick(message)}/>
+                                                <ActionButton
+                                                    label="Transport steps"
+                                                    icon={Route}
+                                                    onPress={() => onTransportStepsClick(message)}/>
+                                                {canTriggerDeliveryEvidence(message) && (
+                                                    <ActionButton
+                                                        label="Send delivery evidence"
+                                                        icon={MailCheck}
+                                                        iconAccent="text-success"
+                                                        onPress={() => onDeliveryAckClick(message)}/>
+                                                )}
+                                            </div>
+                                        </Table.Cell>
+                                    </Table.Row>
+                                ))}
+                            </Table.Body>
+                        </Table.Content>
+                    </Table.ScrollContainer>
+                </Table>
+            </PagedListView>
 
             <MessageLifecycleView state={helpModal}/>
 

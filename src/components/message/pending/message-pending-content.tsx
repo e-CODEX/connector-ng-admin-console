@@ -10,7 +10,7 @@
 
 import type { Selection} from "@heroui/react";
 import { Button, Checkbox, Modal, Table } from "@heroui/react";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { ArrowDownToLine, RefreshCw } from "lucide-react";
 import { toastError, toastSuccess } from "@/utils";
 import { EmptyState } from "@/components/common/empty-state";
@@ -18,7 +18,8 @@ import { SpinnerView } from "@/components/common/spinner-view";
 import { useMessageService } from "@/hooks/use-http-service";
 import { CopyableIdentifier } from "@/components/common/copyable-identifier";
 import { DownloadActionButton } from "@/components/common/action-button/download-action-button";
-import { LoadErrorState } from "@/components/common/load-error-state";
+import { PagedListView } from "@/components/paging/paged-list-view";
+import { useList } from "@/hooks/use-list";
 
 const EMPTY_SELECTION: Selection = new Set();
 
@@ -28,49 +29,23 @@ interface MessagePendingContentProps {
 
 export function MessagePendingContent({ onDownloaded }: MessagePendingContentProps) {
     const messageService = useMessageService();
-    const [loading, setLoading] = useState(true);
     const [downloading, setDownloading] = useState(false);
-    const [messageIds, setMessageIds] = useState<string[]>([]);
-    const [reloadToken, setReloadToken] = useState(0);
     const [selectedKeys, setSelectedKeys] = useState<Selection>(EMPTY_SELECTION);
-    const [loadFailed, setLoadFailed] = useState(false);
+
+    const list = useList<string>(async () => (await messageService.listPendingMessages()).messageIds, [messageService]);
+    const { items: messageIds, loading, loadError } = list;
 
     const selectedIds = selectedKeys === "all"
         ? messageIds
         : messageIds.filter((id) => selectedKeys.has(id));
 
-    useEffect(() => {
-        let cancelled = false;
-
-        (async () => {
-            try {
-                const data = await messageService.listPendingMessages();
-                if (cancelled) {
-                    return;
-                }
-                setMessageIds(data.messageIds);
-                setLoadFailed(false);
-            } catch {
-                if (cancelled) {
-                    return;
-                }
-                setMessageIds([]);
-                setLoadFailed(true);
-            } finally {
-                if (!cancelled) setLoading(false);
-            }
-        })();
-
-        return () => {
-            cancelled = true;
-        };
-    }, [messageService, reloadToken]);
+    const reload = () => {
+        void list.refresh();
+    };
 
     const onRefreshClicked = () => {
         setSelectedKeys(EMPTY_SELECTION);
-        setLoadFailed(false);
-        setLoading(true);
-        setReloadToken((token) => token + 1);
+        reload();
     };
 
     const onDownloadClicked = async (transportIdentifier: string) => {
@@ -79,7 +54,7 @@ export function MessagePendingContent({ onDownloaded }: MessagePendingContentPro
         try {
             await messageService.downloadPendingMessage(transportIdentifier);
             setSelectedKeys(EMPTY_SELECTION);
-            setReloadToken((token) => token + 1);
+            reload();
             toastSuccess(`Message related to transport ID [${transportIdentifier}] downloaded successfully.`);
             onDownloaded?.();
         } catch (error) {
@@ -100,7 +75,7 @@ export function MessagePendingContent({ onDownloaded }: MessagePendingContentPro
                 await messageService.downloadAllPendingMessages();
                 toastSuccess("All pending messages downloaded successfully.");
                 setSelectedKeys(EMPTY_SELECTION);
-                setReloadToken((token) => token + 1);
+                reload();
                 onDownloaded?.();
             } catch (error) {
                 toastError(error);
@@ -125,7 +100,7 @@ export function MessagePendingContent({ onDownloaded }: MessagePendingContentPro
         } finally {
             if (succeededIds.length > 0) {
                 setSelectedKeys(new Set(selectedIds.filter((id) => !succeededIds.includes(id))));
-                setReloadToken((token) => token + 1);
+                reload();
                 onDownloaded?.();
             }
             setDownloading(false);
@@ -135,79 +110,64 @@ export function MessagePendingContent({ onDownloaded }: MessagePendingContentPro
     return (
         <>
             <Modal.Body className="relative flex min-h-64 flex-1 flex-col">
-                {loadFailed ? (
-                    <LoadErrorState
-                        className="min-h-64 flex-1"
-                        title="Could not load pending messages"
-                        onRetry={onRefreshClicked}
-                    />
-                ) : (
-                    <div
-                        aria-busy={loading}
-                        className={`transition-opacity ${
-                            loading && messageIds.length > 0 ? "pointer-events-none opacity-50" : ""
-                        }`}
-                    >
-                        <Table variant="secondary">
-                            <Table.ScrollContainer>
-                                <Table.Content
-                                    aria-label="Pending messages"
-                                    selectionMode="multiple"
-                                    selectedKeys={selectedKeys}
-                                    onSelectionChange={setSelectedKeys}
+                <PagedListView
+                    list={{ ...list, retry: onRefreshClicked }}
+                    errorMessage="Could not load pending messages"
+                    placeholderClassName="min-h-64 flex-1"
+                >
+                    <Table variant="secondary">
+                        <Table.ScrollContainer>
+                            <Table.Content
+                                aria-label="Pending messages"
+                                selectionMode="multiple"
+                                selectedKeys={selectedKeys}
+                                onSelectionChange={setSelectedKeys}
+                            >
+                                <Table.Header>
+                                    <Table.Column>
+                                        <Checkbox slot="selection" aria-label="Select all">
+                                            <Checkbox.Content>
+                                                <Checkbox.Control>
+                                                    <Checkbox.Indicator/>
+                                                </Checkbox.Control>
+                                            </Checkbox.Content>
+                                        </Checkbox>
+                                    </Table.Column>
+                                    <Table.Column>#</Table.Column>
+                                    <Table.Column isRowHeader>Message Transport Step Identifier</Table.Column>
+                                    <Table.Column>Action.s</Table.Column>
+                                </Table.Header>
+                                <Table.Body
+                                    renderEmptyState={() => <EmptyState text="No pending messages for pulling" className="py-16"/>}
                                 >
-                                    <Table.Header>
-                                        <Table.Column>
-                                            <Checkbox slot="selection" aria-label="Select all">
-                                                <Checkbox.Content>
-                                                    <Checkbox.Control>
-                                                        <Checkbox.Indicator/>
-                                                    </Checkbox.Control>
-                                                </Checkbox.Content>
-                                            </Checkbox>
-                                        </Table.Column>
-                                        <Table.Column>#</Table.Column>
-                                        <Table.Column isRowHeader>Message Transport Step Identifier</Table.Column>
-                                        <Table.Column>Action.s</Table.Column>
-                                    </Table.Header>
-                                    <Table.Body
-                                        renderEmptyState={() =>
-                                            loading ? (
-                                                <SpinnerView className="py-16"/>
-                                            ) : (
-                                                <EmptyState text="No pending messages for pulling" className="py-16"/>
-                                            )
-                                        }
-                                    >
-                                        {messageIds.map((identifier, index) => (
-                                            <Table.Row key={identifier} id={identifier}>
-                                                <Table.Cell>
-                                                    <Checkbox variant="secondary" slot="selection" aria-label={`Select ${identifier}`}>
-                                                        <Checkbox.Content>
-                                                            <Checkbox.Control>
-                                                                <Checkbox.Indicator/>
-                                                            </Checkbox.Control>
-                                                        </Checkbox.Content>
-                                                    </Checkbox>
-                                                </Table.Cell>
-                                                <Table.Cell>{index + 1}</Table.Cell>
-                                                <Table.Cell>
-                                                    <CopyableIdentifier identifier={identifier} visibleChars={100}/>
-                                                </Table.Cell>
-                                                <Table.Cell>
-                                                    <DownloadActionButton
-                                                        isDisabled={downloading}
-                                                        onPress={() => onDownloadClicked(identifier)}
-                                                    />
-                                                </Table.Cell>
-                                            </Table.Row>
-                                        ))}
-                                    </Table.Body>
-                                </Table.Content>
-                            </Table.ScrollContainer>
-                        </Table>
-                    </div>
-                )}
+                                    {messageIds.map((identifier, index) => (
+                                        <Table.Row key={identifier} id={identifier}>
+                                            <Table.Cell>
+                                                <Checkbox variant="secondary" slot="selection" aria-label={`Select ${identifier}`}>
+                                                    <Checkbox.Content>
+                                                        <Checkbox.Control>
+                                                            <Checkbox.Indicator/>
+                                                        </Checkbox.Control>
+                                                    </Checkbox.Content>
+                                                </Checkbox>
+                                            </Table.Cell>
+                                            <Table.Cell>{index + 1}</Table.Cell>
+                                            <Table.Cell>
+                                                <CopyableIdentifier identifier={identifier} visibleChars={100}/>
+                                            </Table.Cell>
+                                            <Table.Cell>
+                                                <DownloadActionButton
+                                                    isDisabled={downloading}
+                                                    onPress={() => onDownloadClicked(identifier)}
+                                                />
+                                            </Table.Cell>
+                                        </Table.Row>
+                                    ))}
+                                </Table.Body>
+                            </Table.Content>
+                        </Table.ScrollContainer>
+                    </Table>
+                </PagedListView>
 
                 {downloading && (
                     <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/60">
@@ -216,7 +176,7 @@ export function MessagePendingContent({ onDownloaded }: MessagePendingContentPro
                 )}
             </Modal.Body>
             <Modal.Footer>
-                {!loadFailed && (
+                {!loadError && (
                     <Button
                         variant="secondary"
                         aria-label="Refresh pending messages"
@@ -231,7 +191,7 @@ export function MessagePendingContent({ onDownloaded }: MessagePendingContentPro
                 <Button
                     variant="primary"
                     aria-label="Download selected messages"
-                    isDisabled={loading || downloading || loadFailed || messageIds.length === 0}
+                    isDisabled={loading || downloading || loadError || messageIds.length === 0}
                     onPress={onDownloadSelectedClicked}
                 >
                     <ArrowDownToLine/>

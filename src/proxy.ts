@@ -16,7 +16,14 @@ import { decodeJwt } from "jose";
 import type { LoginResponse } from "@/types/response/user";
 import { cookies } from "next/headers";
 import { restApiCall } from "@/lib/rest";
-import { ACCESS_TOKEN_KEY, LOGIN_EXPIRED_PATH, MUST_CHANGE_PASSWORD, REFRESH_TOKEN_KEY } from "@/utils/constants";
+import {
+    ACCESS_TOKEN_KEY,
+    LOGIN_EXPIRED_PATH,
+    MUST_CHANGE_PASSWORD,
+    REFRESH_TOKEN_KEY,
+    SESSION_EXPIRED_MARKER,
+    SESSION_EXPIRED_MARKER_MAX_AGE_SECONDS,
+} from "@/utils/constants";
 import { isBackendDown } from "@/lib/rest/backend-down";
 
 const REFRESH_THRESHOLD_SECONDS = 10;
@@ -64,17 +71,24 @@ async function updateRequestCookies(request: NextRequest, refreshed: LoginRespon
  * The session is gone or cannot be renewed. Page navigations go to the login page.
  */
 async function sessionExpiredResponse(request: NextRequest, { known }: { known: boolean }) {
-    const loginPath = known ? LOGIN_EXPIRED_PATH : LOGIN_PATH;
+    // The token cookies are deleted as soon as an expiry is detected, so a following request (e.g. a link
+    // prefetched on hover, then the click) would look like a first visit: the short-lived marker remembers it.
+    const expired = known || request.cookies.get(SESSION_EXPIRED_MARKER)?.value === "1";
+    const loginPath = expired ? LOGIN_EXPIRED_PATH : LOGIN_PATH;
     const response = request.nextUrl.pathname.startsWith("/api/")
         ? NextResponse.json({ message: "Your session has expired." }, { status: 401 })
         : NextResponse.redirect(new URL(loginPath, request.url));
 
-    response.cookies.delete(ACCESS_TOKEN_KEY);
-    response.cookies.delete(REFRESH_TOKEN_KEY);
-
+    // Written to both: once the `cookies()` store has been touched (e.g. by the failed refresh call), its cookies
+    // replace the ones set on `response`, which would drop the marker.
     const cookieStore = await cookies();
-    cookieStore.delete(ACCESS_TOKEN_KEY);
-    cookieStore.delete(REFRESH_TOKEN_KEY);
+    for (const store of [response.cookies, cookieStore]) {
+        store.delete(ACCESS_TOKEN_KEY);
+        store.delete(REFRESH_TOKEN_KEY);
+        if (known) {
+            store.set(SESSION_EXPIRED_MARKER, "1", cookieOptions(SESSION_EXPIRED_MARKER_MAX_AGE_SECONDS));
+        }
+    }
 
     return response;
 }

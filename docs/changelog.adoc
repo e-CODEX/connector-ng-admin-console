@@ -40,6 +40,7 @@ All notable changes to this project are documented in this file.
 * *Basic auth* -- Add support for HTTP `Basic` authentication.
 * *REST client* -- Accept successful backend responses with an empty body.
 * *Confirmation modal* -- Show a spinner on the confirm button while the action is running.
+* *List views* -- Share the loading, error and pagination handling across all list pages.
 
 == 1.0.0
 

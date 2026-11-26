@@ -32,7 +32,7 @@ import type { UserCreationRequest, UserEditionRequest, UserRoleEditionRequest } 
 import { RoleChip } from "@/components/user/user-role-chip";
 import { UserEditionView } from "@/components/user/edition/user-edition-view";
 import { UserRoleEditionView } from "@/components/user/role-edition/user-role-edition-view";
-import { LoadErrorState } from "@/components/common/load-error-state";
+import { PagedListView } from "@/components/paging/paged-list-view";
 
 export default function UserAdminPage() {
     const [selectedUser, setSelectedUser] = useState<ConnectorUser | null>(null);
@@ -145,113 +145,95 @@ export default function UserAdminPage() {
                 />
             </PageHeader>
 
-            {list.loadError ? (
-                <LoadErrorState
-                    title="Could not load users"
-                    onRetry={list.retry}
-                />
-            ) : (
-                <div
-                    aria-busy={list.loading}
-                    className={`transition-opacity ${
-                        list.loading && list.items.length > 0 ? "pointer-events-none opacity-50" : ""
-                    }`}
-                >
-                    <Table variant="secondary">
-                        <Table.ScrollContainer>
-                            <Table.Content aria-label="Connector users">
-                                <Table.Header>
-                                    <Table.Column isRowHeader>Identifier</Table.Column>
-                                    <Table.Column>Username</Table.Column>
-                                    <Table.Column>Email</Table.Column>
-                                    <Table.Column>Roles</Table.Column>
-                                    <Table.Column>Enabled</Table.Column>
-                                    <Table.Column>Must change password</Table.Column>
-                                    <Table.Column>Created at</Table.Column>
-                                    <Table.Column>Updated at</Table.Column>
-                                    <Table.Column>Actions</Table.Column>
-                                </Table.Header>
-                                <Table.Body
-                                    renderEmptyState={() =>
-                                        list.loading || list.refreshing ? (
-                                            <SpinnerView className="py-16"/>
-                                        ) : (
-                                            <EmptyState text="No user available" className="py-16"/>
-                                        )
-                                    }
-                                >
-                                    {list.items.map((user) => {
-                                        const self = isSelf(user);
-                                        return (
-                                            <Table.Row key={user.uuid}>
-                                                <Table.Cell>
-                                                    <CopyableIdentifier identifier={user.uuid}/>
-                                                </Table.Cell>
-                                                <Table.Cell>{user.username}</Table.Cell>
-                                                <Table.Cell>{user.email}</Table.Cell>
-                                                <Table.Cell>
-                                                    <div className="flex flex-wrap gap-1">
-                                                        {user.roles?.map((role) => (
-                                                            <RoleChip key={role} role={role}/>
-                                                        ))}
-                                                    </div>
-                                                </Table.Cell>
-                                                <Table.Cell>
-                                                    <BooleanChip value={user.enabled}/>
-                                                </Table.Cell>
-                                                <Table.Cell>
-                                                    <BooleanChip value={user.mustChangePassword}/>
-                                                </Table.Cell>
-                                                <Table.Cell><DateTime value={user.createdAt}/></Table.Cell>
-                                                <Table.Cell><DateTime value={user.updatedAt}/></Table.Cell>
-                                                <Table.Cell>
-                                                    <div className="flex items-center gap-1">
+            <PagedListView list={list} errorMessage="Could not load users">
+                <Table variant="secondary">
+                    <Table.ScrollContainer>
+                        <Table.Content aria-label="Connector users">
+                            <Table.Header>
+                                <Table.Column isRowHeader>Identifier</Table.Column>
+                                <Table.Column>Username</Table.Column>
+                                <Table.Column>Email</Table.Column>
+                                <Table.Column>Roles</Table.Column>
+                                <Table.Column>Enabled</Table.Column>
+                                <Table.Column>Must change password</Table.Column>
+                                <Table.Column>Created at</Table.Column>
+                                <Table.Column>Updated at</Table.Column>
+                                <Table.Column>Actions</Table.Column>
+                            </Table.Header>
+                            <Table.Body
+                                renderEmptyState={() => <EmptyState text="No user available" className="py-16"/>}
+                            >
+                                {list.items.map((user) => {
+                                    const self = isSelf(user);
+                                    return (
+                                        <Table.Row key={user.uuid}>
+                                            <Table.Cell>
+                                                <CopyableIdentifier identifier={user.uuid}/>
+                                            </Table.Cell>
+                                            <Table.Cell>{user.username}</Table.Cell>
+                                            <Table.Cell>{user.email}</Table.Cell>
+                                            <Table.Cell>
+                                                <div className="flex flex-wrap gap-1">
+                                                    {user.roles?.map((role) => (
+                                                        <RoleChip key={role} role={role}/>
+                                                    ))}
+                                                </div>
+                                            </Table.Cell>
+                                            <Table.Cell>
+                                                <BooleanChip value={user.enabled}/>
+                                            </Table.Cell>
+                                            <Table.Cell>
+                                                <BooleanChip value={user.mustChangePassword}/>
+                                            </Table.Cell>
+                                            <Table.Cell><DateTime value={user.createdAt}/></Table.Cell>
+                                            <Table.Cell><DateTime value={user.updatedAt}/></Table.Cell>
+                                            <Table.Cell>
+                                                <div className="flex items-center gap-1">
+                                                    <ActionButton
+                                                        label="Edit user"
+                                                        icon={UserPen}
+                                                        onPress={() => openFor(editModal, user)}/>
+
+                                                    {!self && (
                                                         <ActionButton
-                                                            label="Edit user"
-                                                            icon={UserPen}
-                                                            onPress={() => openFor(editModal, user)}/>
+                                                            label="Edit user role"
+                                                            icon={KeyRound}
+                                                            onPress={() => openFor(editRolesModal, user)}/>
+                                                    )}
 
-                                                        {!self && (
-                                                            <ActionButton
-                                                                label="Edit user role"
-                                                                icon={KeyRound}
-                                                                onPress={() => openFor(editRolesModal, user)}/>
-                                                        )}
+                                                    {!self && user.enabled && (
+                                                        <ActionButton
+                                                            label="Disable"
+                                                            icon={UserLock}
+                                                            iconAccent="text-warning"
+                                                            onPress={() => openFor(blockConfirmationModal, user)}/>
+                                                    )}
 
-                                                        {!self && user.enabled && (
-                                                            <ActionButton
-                                                                label="Disable"
-                                                                icon={UserLock}
-                                                                iconAccent="text-warning"
-                                                                onPress={() => openFor(blockConfirmationModal, user)}/>
-                                                        )}
+                                                    {!self && (
+                                                        <ActionButton
+                                                            label="Delete"
+                                                            icon={UserMinus}
+                                                            iconAccent="text-danger"
+                                                            onPress={() => openFor(deleteConfirmationModal, user)}/>
+                                                    )}
 
-                                                        {!self && (
-                                                            <ActionButton
-                                                                label="Delete"
-                                                                icon={UserMinus}
-                                                                iconAccent="text-danger"
-                                                                onPress={() => openFor(deleteConfirmationModal, user)}/>
-                                                        )}
-
-                                                        {!self && !user.mustChangePassword && (
-                                                            <ActionButton
-                                                                label="Require password change"
-                                                                icon={RotateCcwKey}
-                                                                iconAccent="text-muted"
-                                                                onPress={() => openFor(mustChangePasswordModal, user)}/>
-                                                        )}
-                                                    </div>
-                                                </Table.Cell>
-                                            </Table.Row>
-                                        );
-                                    })}
-                                </Table.Body>
-                            </Table.Content>
-                        </Table.ScrollContainer>
-                    </Table>
-                </div>
-            )}
+                                                    {!self && !user.mustChangePassword && (
+                                                        <ActionButton
+                                                            label="Require password change"
+                                                            icon={RotateCcwKey}
+                                                            iconAccent="text-muted"
+                                                            onPress={() => openFor(mustChangePasswordModal, user)}/>
+                                                    )}
+                                                </div>
+                                            </Table.Cell>
+                                        </Table.Row>
+                                    );
+                                })}
+                            </Table.Body>
+                        </Table.Content>
+                    </Table.ScrollContainer>
+                </Table>
+            </PagedListView>
 
             <UserCreationView state={addModal} onSubmit={handleCreationSubmission}/>
 

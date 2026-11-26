@@ -21,7 +21,7 @@ import { TransportStepDetailsView } from "@/components/transport-step/transport-
 import { PageHeaderButton } from "@/components/common/header/page-header-button";
 import { TransportStepMessageTypeChip } from "@/components/message/chip/message-type-chip";
 import { TransportDeliveryStatusChip } from "@/components/transport-step/transport-step-status-chip";
-import { CheckCheck, Mail, MailClock, RefreshCw, Route } from "lucide-react";
+import { CheckCheck, Mail, MailClock, RefreshCw, RotateCcw, Route } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { SpinnerView } from "@/components/common/spinner-view";
 import { usePagedList } from "@/hooks/use-paged-list";
@@ -42,8 +42,10 @@ import { useAppConfig } from "@/hooks/use-app-config";
 import { MessagePendingView } from "@/components/message/pending/message-pending-view";
 import { LoadErrorState } from "@/components/common/load-error-state";
 import { BooleanChip } from "@/components/common/boolean-chip";
+import { ConfirmModal } from "@/components/common/confirmation-modal";
 
 const IDENTIFIER_LENGTH = 30;
+const RETRY_FEEDBACK_MS = 3000;
 
 const granularity: DateTimeRangeGranularity = "minute";
 
@@ -56,6 +58,7 @@ export default function TransportStepsAdminPage() {
     const [statusesQuery, setStatusesQuery] = useState({ statuses: [] as TransportStepStatusesFilter[] });
     const [dateRange, setDateRange] = useState<RangeValue<ZonedDateTime> | null>(buildDefaultRange);
     const [acknowledging, setAcknowledging] = useState(false);
+    const [retryTarget, setRetryTarget] = useState<ConnectorTransportStep | null>(null);
 
     const debouncedMessageOrRemoteSystemIdentifier = useDebouncedValue(messageOrRemoteSystemIdentifierQuery);
     const debouncedLinkPartnerName = useDebouncedValue(linkPartnerNameQuery);
@@ -82,6 +85,7 @@ export default function TransportStepsAdminPage() {
     const detailsModal = useOverlayState();
     const transportedMessageDetailsModal = useOverlayState();
     const pendingMessagesModal = useOverlayState();
+    const confirmRetryModal = useOverlayState();
 
     const onMessageOrRemoteSystemIdentifierChange = (value: string) => {
         setMessageOrRemoteSystemIdentifierQuery(value);
@@ -129,6 +133,33 @@ export default function TransportStepsAdminPage() {
         } finally {
             setAcknowledging(false);
         }
+    };
+
+    const onRetryClick = (step: ConnectorTransportStep) => {
+        setRetryTarget(step);
+        confirmRetryModal.open();
+    };
+
+    const onRetryConfirmed = async () => {
+        if (!retryTarget) return;
+        const startedAt = Date.now();
+        try {
+            await transportStepService.retry(retryTarget.identifier);
+            // Keep the spinner up for a moment so the retry is noticed before the modal closes.
+            const remaining = RETRY_FEEDBACK_MS - (Date.now() - startedAt);
+            if (remaining > 0) await new Promise((resolve) => setTimeout(resolve, remaining));
+            toastSuccess(`Transport step [${retryTarget.identifier}] submitted for retry.`);
+            confirmRetryModal.close();
+            setRetryTarget(null);
+            pagedList.refresh();
+        } catch (error) {
+            toastError(error);
+        }
+    };
+
+    const onRetryCancelled = () => {
+        confirmRetryModal.close();
+        setRetryTarget(null);
     };
 
     const canAcknowledgeReception = (step: ConnectorTransportStep): boolean => isTestingMode && step.status === "PULLED";
@@ -218,6 +249,9 @@ export default function TransportStepsAdminPage() {
                                                             icon={Mail}
                                                             onPress={() => onTransportedMessageDetailsClick(transportStep)}
                                                         />
+                                                        {transportStep.isRetryable && (
+                                                            <ActionButton label="Retry" icon={RotateCcw} iconAccent="text-info" onPress={() => onRetryClick(transportStep)} />
+                                                        )}
                                                         {canAcknowledgeReception(transportStep) && (
                                                             <ActionButton
                                                                 label="Acknowledge reception"
@@ -255,6 +289,24 @@ export default function TransportStepsAdminPage() {
             <TransportedStepMessageDetailsView transportStep={selectedTransportStep} state={transportedMessageDetailsModal} />
 
             <MessagePendingView state={pendingMessagesModal} onDownloaded={pagedList.refresh} />
+
+            <ConfirmModal
+                isDismissable={false}
+                state={confirmRetryModal}
+                title="Retry transport step"
+                message={
+                    retryTarget && (
+                        <>
+                            Message <span className="break-all font-medium text-orange-500">{retryTarget.transportedMessageIdentifier}</span> will be sent again to{" "}
+                            <strong>{retryTarget.linkPartnerName}</strong> (transport step <span className="break-all font-mono text-orange-500">{retryTarget.identifier}</span>).
+                            Continue?
+                        </>
+                    )
+                }
+                confirmLabel="Retry"
+                onConfirm={onRetryConfirmed}
+                onCancel={onRetryCancelled}
+            />
 
             {acknowledging && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/60">

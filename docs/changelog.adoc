@@ -25,10 +25,12 @@ All notable changes to this project are documented in this file.
 
 ==== Added
 * *Retryable transport steps* -- Show whether a message transport step is retryable.
+* *Transport step retry* -- Retry a retryable message transport step from the admin UI, after confirmation.
 * *JMS queues* -- Browse the connector's JMS queues and inspect their pending and dead-letter messages.
 * *JMS message details* -- View the details of each message in the connector's JMS queues.
 * *DLQ replay* -- Resend failed messages from a JMS dead-letter queue to their original destination in one click.
 * *DLQ message deletion* -- Delete unwanted messages from the dead-letter queue directly from the admin UI.
+* *Session expiry* -- Sign out and return to the login page when the session has expired, instead of showing a network error.
 
 ==== Technical
 * *Lint* -- Improve linting rules and fix reported issues.
@@ -36,6 +38,8 @@ All notable changes to this project are documented in this file.
 * *E2E tests* -- Lay the groundwork for the end-to-end test suite.
 * *Warnings* -- Fix the logo and modal warnings.
 * *Basic auth* -- Add support for HTTP `Basic` authentication.
+* *REST client* -- Accept successful backend responses with an empty body.
+* *Confirmation modal* -- Show a spinner on the confirm button while the action is running.
 
 == 1.0.0
 

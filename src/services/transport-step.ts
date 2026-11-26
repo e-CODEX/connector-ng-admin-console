@@ -21,21 +21,28 @@ export type ListTransportStepsParams = {
     statuses?: string[];
     from?: string;
     to?: string;
-}
+};
 
 export function createTransportStepsService(baseUrl: string, call: RestApiCall) {
     return {
         async listTransportSteps(params: ListTransportStepsParams): Promise<PaginatedResponse<ConnectorTransportStep>> {
-            return call<PaginatedResponse<ConnectorTransportStep>>(
-                baseUrl,
-                "api/v1/admin/transport-steps",
-                { params }
-            )
+            return call<PaginatedResponse<ConnectorTransportStep>>(baseUrl, "api/v1/admin/transport-steps", { params });
         },
         async retrieveTransportedMessage(identifier: string): Promise<ConnectorMessageDetailsResponse> {
-            return call<ConnectorMessageDetailsResponse>(baseUrl, `api/v1/admin/transport-steps/${encodeURIComponent(identifier)}/message`);
+            return call<ConnectorMessageDetailsResponse>(
+                baseUrl,
+                `api/v1/admin/transport-steps/${encodeURIComponent(identifier)}/message`,
+            );
         },
-    }
+        async retry(identifier: string): Promise<void> {
+            return call<void>(baseUrl, `api/v1/admin/transport-steps/${encodeURIComponent(identifier)}/retry`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+        },
+    };
 }
 
 export type TransportStepsService = ReturnType<typeof createTransportStepsService>;

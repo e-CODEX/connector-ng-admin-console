@@ -20,7 +20,6 @@ import { PageHeaderButton } from "@/components/common/header/page-header-button"
 import { ProcessingModeCreationView } from "@/components/processing-mode/creation/processing-mode-creation-view";
 import { Pen, Plus, RefreshCw, Workflow } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
-import { SpinnerView } from "@/components/common/spinner-view";
 import { useList } from "@/hooks/use-list";
 import { DateTime } from "@/components/common/date-time";
 import { useProcessingModeService } from "@/hooks/use-http-service";
@@ -29,7 +28,7 @@ import { DetailActionButton } from "@/components/common/action-button/detail-act
 import { DownloadActionButton } from "@/components/common/action-button/download-action-button";
 import { ActionButton } from "@/components/common/action-button/action-button";
 import { ProcessingModeEditTruststoreView } from "@/components/processing-mode/edit/processing-mode-edit-truststore-view";
-import { LoadErrorState } from "@/components/common/load-error-state";
+import { PagedListView } from "@/components/paging/paged-list-view";
 
 const basename = (p: string) => p.split(/[\\/]/).pop() ?? p;
 
@@ -87,67 +86,49 @@ export default function ProcessingModesAdminPage() {
                 />
             </PageHeader>
 
-            {list.loadError ? (
-                <LoadErrorState
-                    title="Could not load processing modes"
-                    onRetry={list.retry}
-                />
-            ) : (
-                <div
-                    aria-busy={list.loading}
-                    className={`transition-opacity ${
-                        list.loading && list.items.length > 0 ? "pointer-events-none opacity-50" : ""
-                    }`}
-                >
-                    <Table variant="secondary">
-                        <Table.ScrollContainer>
-                            <Table.Content aria-label="Connector processing modes">
-                                <Table.Header>
-                                    <Table.Column isRowHeader>Identifier</Table.Column>
-                                    <Table.Column>Business domain</Table.Column>
-                                    <Table.Column>Description</Table.Column>
-                                    <Table.Column>Filename</Table.Column>
-                                    <Table.Column>Created at</Table.Column>
-                                    <Table.Column>Actions</Table.Column>
-                                </Table.Header>
-                                <Table.Body
-                                    renderEmptyState={() =>
-                                        list.loading || list.refreshing ? (
-                                            <SpinnerView className="py-16"/>
-                                        ) : (
-                                            <EmptyState text="No processing mode available" className="py-16"/>
-                                        )
-                                    }
-                                >
-                                    {list.items.map((pMode) => (
-                                        <Table.Row key={pMode.uuid}>
-                                            <Table.Cell>
-                                                <CopyableIdentifier identifier={pMode.uuid}/>
-                                            </Table.Cell>
-                                            <Table.Cell>{pMode.businessDomainIdentifier}</Table.Cell>
-                                            <Table.Cell>{pMode.description}</Table.Cell>
-                                            <Table.Cell>{pMode.filename}</Table.Cell>
-                                            <Table.Cell>
-                                                <DateTime value={pMode.createdAt} precision="second"/>
-                                            </Table.Cell>
-                                            <Table.Cell>
-                                                <div className="flex items-center gap-1">
-                                                    <DetailActionButton onPress={() => onDetailsClick(pMode)}/>
-                                                    <ActionButton
-                                                        label="Edit truststore"
-                                                        icon={Pen}
-                                                        onPress={() => onUpdateTruststoreClick(pMode)}/>
-                                                    <DownloadActionButton onPress={() => onDownloadClicked(pMode)}/>
-                                                </div>
-                                            </Table.Cell>
-                                        </Table.Row>
-                                    ))}
-                                </Table.Body>
-                            </Table.Content>
-                        </Table.ScrollContainer>
-                    </Table>
-                </div>
-            )}
+            <PagedListView list={list} errorMessage="Could not load processing modes">
+                <Table variant="secondary">
+                    <Table.ScrollContainer>
+                        <Table.Content aria-label="Connector processing modes">
+                            <Table.Header>
+                                <Table.Column isRowHeader>Identifier</Table.Column>
+                                <Table.Column>Business domain</Table.Column>
+                                <Table.Column>Description</Table.Column>
+                                <Table.Column>Filename</Table.Column>
+                                <Table.Column>Created at</Table.Column>
+                                <Table.Column>Actions</Table.Column>
+                            </Table.Header>
+                            <Table.Body
+                                renderEmptyState={() => <EmptyState text="No processing mode available" className="py-16"/>}
+                            >
+                                {list.items.map((pMode) => (
+                                    <Table.Row key={pMode.uuid}>
+                                        <Table.Cell>
+                                            <CopyableIdentifier identifier={pMode.uuid}/>
+                                        </Table.Cell>
+                                        <Table.Cell>{pMode.businessDomainIdentifier}</Table.Cell>
+                                        <Table.Cell>{pMode.description}</Table.Cell>
+                                        <Table.Cell>{pMode.filename}</Table.Cell>
+                                        <Table.Cell>
+                                            <DateTime value={pMode.createdAt} precision="second"/>
+                                        </Table.Cell>
+                                        <Table.Cell>
+                                            <div className="flex items-center gap-1">
+                                                <DetailActionButton onPress={() => onDetailsClick(pMode)}/>
+                                                <ActionButton
+                                                    label="Edit truststore"
+                                                    icon={Pen}
+                                                    onPress={() => onUpdateTruststoreClick(pMode)}/>
+                                                <DownloadActionButton onPress={() => onDownloadClicked(pMode)}/>
+                                            </div>
+                                        </Table.Cell>
+                                    </Table.Row>
+                                ))}
+                            </Table.Body>
+                        </Table.Content>
+                    </Table.ScrollContainer>
+                </Table>
+            </PagedListView>
 
             <ProcessingModeCreationView
                 state={addModal}

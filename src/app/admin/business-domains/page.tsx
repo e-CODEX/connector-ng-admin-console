@@ -20,11 +20,10 @@ import { PageHeaderButton } from "@/components/common/header/page-header-button"
 import { BooleanChip } from "@/components/common/boolean-chip";
 import { Building2, BuildingComplexPlus, RefreshCw } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
-import { SpinnerView } from "@/components/common/spinner-view";
 import { useList } from "@/hooks/use-list";
 import { DateTime } from "@/components/common/date-time";
 import { useBusinessDomainService } from "@/hooks/use-http-service";
-import { LoadErrorState } from "@/components/common/load-error-state";
+import { PagedListView } from "@/components/paging/paged-list-view";
 
 export default function BusinessDomainsAdminPage() {
     const businessDomainService = useBusinessDomainService();
@@ -56,64 +55,46 @@ export default function BusinessDomainsAdminPage() {
                 />
             </PageHeader>
 
-            {list.loadError ? (
-                <LoadErrorState
-                    title="Could not load business domains"
-                    onRetry={list.retry}
-                />
-            ) : (
-                <div
-                    aria-busy={list.loading}
-                    className={`transition-opacity ${
-                        list.loading && list.items.length > 0 ? "pointer-events-none opacity-50" : ""
-                    }`}
-                >
-                    <Table variant="secondary">
-                        <Table.ScrollContainer>
-                            <Table.Content aria-label="Connector business domains">
-                                <Table.Header>
-                                    <Table.Column isRowHeader>Identifier</Table.Column>
-                                    <Table.Column>Description</Table.Column>
-                                    <Table.Column>Source</Table.Column>
-                                    <Table.Column>Enabled</Table.Column>
-                                    <Table.Column>Created at</Table.Column>
-                                    <Table.Column>Updated at</Table.Column>
-                                </Table.Header>
-                                <Table.Body
-                                    renderEmptyState={() =>
-                                        list.loading || list.refreshing ? (
-                                            <SpinnerView className="py-16"/>
-                                        ) : (
-                                            <EmptyState text="No business domain available" className="py-16"/>
-                                        )
-                                    }
-                                >
-                                    {list.items.map((businessDomain) => (
-                                        <Table.Row key={businessDomain.identifier}>
-                                            <Table.Cell>
-                                                <span className="inline-block truncate font-semibold">
-                                                    {truncate(businessDomain.identifier)}
-                                                </span>
-                                            </Table.Cell>
-                                            <Table.Cell>{businessDomain.description}</Table.Cell>
-                                            <Table.Cell>{businessDomain.source}</Table.Cell>
-                                            <Table.Cell>
-                                                <BooleanChip value={businessDomain.enabled}/>
-                                            </Table.Cell>
-                                            <Table.Cell>
-                                                <DateTime value={businessDomain.createdAt} precision="second"/>
-                                            </Table.Cell>
-                                            <Table.Cell>
-                                                <DateTime value={businessDomain.updatedAt} precision="second"/>
-                                            </Table.Cell>
-                                        </Table.Row>
-                                    ))}
-                                </Table.Body>
-                            </Table.Content>
-                        </Table.ScrollContainer>
-                    </Table>
-                </div>
-            )}
+            <PagedListView list={list} errorMessage="Could not load business domains">
+                <Table variant="secondary">
+                    <Table.ScrollContainer>
+                        <Table.Content aria-label="Connector business domains">
+                            <Table.Header>
+                                <Table.Column isRowHeader>Identifier</Table.Column>
+                                <Table.Column>Description</Table.Column>
+                                <Table.Column>Source</Table.Column>
+                                <Table.Column>Enabled</Table.Column>
+                                <Table.Column>Created at</Table.Column>
+                                <Table.Column>Updated at</Table.Column>
+                            </Table.Header>
+                            <Table.Body
+                                renderEmptyState={() => <EmptyState text="No business domain available" className="py-16"/>}
+                            >
+                                {list.items.map((businessDomain) => (
+                                    <Table.Row key={businessDomain.identifier}>
+                                        <Table.Cell>
+                                            <span className="inline-block truncate font-semibold">
+                                                {truncate(businessDomain.identifier)}
+                                            </span>
+                                        </Table.Cell>
+                                        <Table.Cell>{businessDomain.description}</Table.Cell>
+                                        <Table.Cell>{businessDomain.source}</Table.Cell>
+                                        <Table.Cell>
+                                            <BooleanChip value={businessDomain.enabled}/>
+                                        </Table.Cell>
+                                        <Table.Cell>
+                                            <DateTime value={businessDomain.createdAt} precision="second"/>
+                                        </Table.Cell>
+                                        <Table.Cell>
+                                            <DateTime value={businessDomain.updatedAt} precision="second"/>
+                                        </Table.Cell>
+                                    </Table.Row>
+                                ))}
+                            </Table.Body>
+                        </Table.Content>
+                    </Table.ScrollContainer>
+                </Table>
+            </PagedListView>
 
             <BusinessDomainCreationView
                 state={addModal}

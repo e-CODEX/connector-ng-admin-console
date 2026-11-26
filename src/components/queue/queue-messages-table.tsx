@@ -19,12 +19,10 @@ import type { ConnectorQueueMessage, ConnectorQueueMessageDetail } from "@/types
 import type { PaginatedResponse } from "@/types/response/paginated-response";
 import type { PagedListParams } from "@/hooks/use-paged-list";
 import { usePagedList } from "@/hooks/use-paged-list";
-import { LoadErrorState } from "@/components/common/load-error-state";
-import { SpinnerView } from "@/components/common/spinner-view";
 import { EmptyState } from "@/components/common/empty-state";
 import { CopyableIdentifier } from "@/components/common/copyable-identifier";
 import { DateTime } from "@/components/common/date-time";
-import { PaginationControls } from "@/components/paging/pagination-controls";
+import { PagedListView } from "@/components/paging/paged-list-view";
 import { ActionButton } from "@/components/common/action-button/action-button";
 import { ConfirmModal } from "@/components/common/confirmation-modal";
 import { DetailActionButton } from "@/components/common/action-button/detail-action-button";
@@ -191,10 +189,6 @@ export function QueueMessagesTable({
         }
     };
 
-    if (pagedList.loadError) {
-        return <LoadErrorState title={errorTitle} onRetry={pagedList.retry} className="py-8" />;
-    }
-
     const replayCount = replayTarget?.kind === "bulk" ? replayTarget.messageIds.length : 1;
 
     return (
@@ -218,7 +212,7 @@ export function QueueMessagesTable({
                 </div>
             )}
 
-            <div aria-busy={pagedList.loading} className={`transition-opacity ${pagedList.loading && pagedList.items.length > 0 ? "pointer-events-none opacity-50" : ""}`}>
+            <PagedListView list={{ ...pagedList, setPage: changePage, setPageSize: changePageSize }} errorMessage={errorTitle} placeholderClassName="py-8">
                 <Table variant="secondary">
                     <Table.ScrollContainer>
                         <Table.Content aria-label={ariaLabel}>
@@ -243,7 +237,7 @@ export function QueueMessagesTable({
                                 {hasRowActions ? <Table.Column>Actions</Table.Column> : null}
                             </Table.Header>
                             <Table.Body
-                                renderEmptyState={() => (pagedList.loading ? <SpinnerView className="py-16" /> : <EmptyState icon={Inbox} text={emptyText} className="py-16" />)}
+                                renderEmptyState={() => <EmptyState icon={Inbox} text={emptyText} className="py-16" />}
                             >
                                 {pagedList.items.map((message) => (
                                     <Table.Row key={message.messageId} id={message.messageId}>
@@ -310,19 +304,7 @@ export function QueueMessagesTable({
                         </Table.Content>
                     </Table.ScrollContainer>
                 </Table>
-            </div>
-
-            {pagedList.totalElements > 0 && (
-                <div className="mt-4 flex justify-center">
-                    <PaginationControls
-                        page={pagedList.page}
-                        pageSize={pagedList.pageSize}
-                        totalElements={pagedList.totalElements}
-                        onPageChange={changePage}
-                        onPageSizeChange={changePageSize}
-                    />
-                </div>
-            )}
+            </PagedListView>
 
             {replay && (
                 <ConfirmModal

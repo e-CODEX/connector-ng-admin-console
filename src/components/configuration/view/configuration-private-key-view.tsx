@@ -8,21 +8,28 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import { ConfigurationSecretValue } from "@/components/configuration/configuration-secret-value";
 import type { PrivateKey } from "@/types/response/configuration";
-import { ConfigurationDetailRow } from "@/components/configuration/configuration-detail-row";
+import { ConfigurationDetailList, ConfigurationDetailRow } from "@/components/configuration/configuration-detail-row";
+import { ConfigurationSecretValue } from "@/components/configuration/configuration-secret-value";
+import { ConfigurationValue } from "@/components/configuration/configuration-value";
 
 interface ConfigurationPrivateKeyViewProps {
-    privateKey: PrivateKey;
+    privateKey: PrivateKey | null | undefined;
 }
 
 export function ConfigurationPrivateKeyView({ privateKey }: ConfigurationPrivateKeyViewProps) {
+    if (!privateKey) {
+        return <p className="text-sm text-muted">No private key configured.</p>;
+    }
+
     return (
-        <dl>
-            <ConfigurationDetailRow label="Alias">{privateKey.alias}</ConfigurationDetailRow>
-            <ConfigurationDetailRow label="Password">
-                <ConfigurationSecretValue value={privateKey.password}/>
+        <ConfigurationDetailList>
+            <ConfigurationDetailRow label="Alias">
+                <ConfigurationValue value={privateKey.alias} mono copyable />
             </ConfigurationDetailRow>
-        </dl>
+            <ConfigurationDetailRow label="Password">
+                <ConfigurationSecretValue value={privateKey.password} />
+            </ConfigurationDetailRow>
+        </ConfigurationDetailList>
     );
 }

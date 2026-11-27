@@ -8,39 +8,54 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import type { Signature } from "@/types/response/configuration";
 import { Chip } from "@heroui/react";
-import { ConfigurationBlock } from "@/components/configuration/configuration-block";
+import type { Signature } from "@/types/response/configuration";
+import { ConfigurationSubsection } from "@/components/configuration/configuration-block";
+import { ConfigurationDetailList, ConfigurationDetailRow } from "@/components/configuration/configuration-detail-row";
 import { ConfigurationKeystoreView } from "@/components/configuration/view/configuration-keystore-view";
 import { ConfigurationPrivateKeyView } from "@/components/configuration/view/configuration-private-key-view";
 import { ConfigurationValidationView } from "@/components/configuration/view/configuration-validation-view";
 
+function AlgorithmChip({ value }: { value: string | null | undefined }) {
+    if (!value) return null;
+    return (
+        <Chip size="sm" variant="soft">
+            <Chip.Label>{value}</Chip.Label>
+        </Chip>
+    );
+}
+
 interface ConfigurationSignatureViewProps {
-    signature: Signature;
+    signature: Signature | null | undefined;
 }
 
 export function ConfigurationSignatureView({ signature }: ConfigurationSignatureViewProps) {
+    if (!signature) {
+        return <p className="text-sm text-muted">No signature configured.</p>;
+    }
+
     return (
-        <div className="flex flex-col gap-3">
-            <div className="flex flex-wrap gap-2">
-                <Chip size="sm">{signature.encryptionAlgorithm}</Chip>
-                <Chip size="sm">{signature.digestAlgorithm}</Chip>
-            </div>
-            {signature.keystore && (
-                <ConfigurationBlock title="Keystore">
-                    <ConfigurationKeystoreView keystore={signature.keystore}/>
-                </ConfigurationBlock>
-            )}
-            {signature.privateKey && (
-                <ConfigurationBlock title="Private key">
-                    <ConfigurationPrivateKeyView privateKey={signature.privateKey}/>
-                </ConfigurationBlock>
-            )}
-            {signature.validation && (
-                <ConfigurationBlock title="Validation">
-                    <ConfigurationValidationView validation={signature.validation}/>
-                </ConfigurationBlock>
-            )}
+        <div>
+            <ConfigurationDetailList>
+                <ConfigurationDetailRow label="Encryption algorithm">
+                    <AlgorithmChip value={signature.encryptionAlgorithm} />
+                </ConfigurationDetailRow>
+                <ConfigurationDetailRow label="Digest algorithm">
+                    <AlgorithmChip value={signature.digestAlgorithm} />
+                </ConfigurationDetailRow>
+            </ConfigurationDetailList>
+
+            <ConfigurationSubsection title="Keystore">
+                <ConfigurationKeystoreView keystore={signature.keystore} />
+            </ConfigurationSubsection>
+
+            <ConfigurationSubsection title="Private key">
+                <ConfigurationPrivateKeyView privateKey={signature.privateKey} />
+            </ConfigurationSubsection>
+
+            <ConfigurationSubsection title="Certificate validation">
+                <ConfigurationValidationView validation={signature.validation} />
+            </ConfigurationSubsection>
         </div>
     );
 }

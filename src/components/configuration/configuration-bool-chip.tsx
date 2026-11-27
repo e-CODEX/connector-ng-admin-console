@@ -18,9 +18,9 @@ interface ConfigurationBoolChipProps {
 
 export function ConfigurationBoolChip({ value, label }: ConfigurationBoolChipProps) {
     return (
-        <Chip variant="soft" size="sm" color={value ? "success" : "default"}>
-            {value ? <Check className="size-3"/> : <Minus className="size-3"/>}
-            {label}
+        <Chip variant="soft" size="sm" color={value ? "success" : "default"} aria-label={`${label}: ${value ? "enabled" : "disabled"}`}>
+            {value ? <Check className="size-3" aria-hidden="true" /> : <Minus className="size-3" aria-hidden="true" />}
+            <Chip.Label>{label}</Chip.Label>
         </Chip>
     );
 }

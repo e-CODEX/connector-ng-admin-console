@@ -10,74 +10,63 @@
 
 "use client";
 
-import React, { useEffect, useState } from "react";
-import type { RoutingConfiguration } from "@/types/response/configuration";
-import { toastError } from "@/utils";
-import { Table } from "@heroui/react";
-import { ConfigurationBlock } from "@/components/configuration/configuration-block";
-import { ConfigurationDetailRow } from "@/components/configuration/configuration-detail-row";
-import { BooleanChip } from "@/components/common/boolean-chip";
-import { SpinnerView } from "@/components/common/spinner-view";
+import { Chip, Table } from "@heroui/react";
+import { Road, Split } from "lucide-react";
 import { useConfigurationService } from "@/hooks/use-http-service";
+import { useConfiguration } from "@/hooks/use-configuration";
+import { ConfigurationSection } from "@/components/configuration/configuration-section";
+import { ConfigurationBlock } from "@/components/configuration/configuration-block";
+import { ConfigurationDetailList, ConfigurationDetailRow } from "@/components/configuration/configuration-detail-row";
+import { ConfigurationValue } from "@/components/configuration/configuration-value";
+import { BooleanChip } from "@/components/common/boolean-chip";
+import { EmptyState } from "@/components/common/empty-state";
 
 export function ConfigurationBackendRulesSection() {
-    const [loading, setLoading] = useState(true);
-    const [config, setConfig] = useState<RoutingConfiguration | null>(null);
-
     const configurationService = useConfigurationService();
-
-    useEffect(() => {
-        const loadConfig = async () => {
-            setLoading(true)
-            try {
-                const data = await configurationService.getRoutingConfiguration()
-                setConfig(data || [])
-            } catch (error) {
-                toastError(error)
-            } finally {
-                setLoading(false)
-            }
-        }
-
-        (async () => {
-            await loadConfig()
-        })()
-    }, [configurationService])
-
-    if (!config) {
-        return null;
-    }
+    const state = useConfiguration("routing", configurationService.getRoutingConfiguration);
 
     return (
-        <div>
-            {
-                loading ? (
-                    <SpinnerView className="mt-60"/>
-                ) : (
-                    <div className="flex flex-col gap-4">
-                        <ConfigurationBlock title="Global Configuration" note="">
-                            <ConfigurationDetailRow label="Enabled">
-                                <BooleanChip value={config.enabled}/>
-                            </ConfigurationDetailRow>
-                            <ConfigurationDetailRow label="Deafult backend name">
-                                {config.defaultBackendName}
-                            </ConfigurationDetailRow>
+        <ConfigurationSection state={state} errorTitle="Could not load the routing configuration">
+            {(config) => {
+                const rules = config.backendRules ?? [];
+                return (
+                    <>
+                        <ConfigurationBlock icon={Road} title="Routing" description="Which backend receives the incoming messages.">
+                            <ConfigurationDetailList>
+                                <ConfigurationDetailRow label="Routing">
+                                    <BooleanChip value={config.enabled} yesLabel="Enabled" noLabel="Disabled" />
+                                </ConfigurationDetailRow>
+                                <ConfigurationDetailRow label="Default backend name">
+                                    <ConfigurationValue value={config.defaultBackendName} mono />
+                                </ConfigurationDetailRow>
+                            </ConfigurationDetailList>
                         </ConfigurationBlock>
 
-                        <ConfigurationBlock title="Backend rules" note="">
-                            <Table aria-label="Routing rules">
+                        <ConfigurationBlock
+                            icon={Split}
+                            title="Backend rules"
+                            description="A message goes to the first backend link whose clause it matches, otherwise to the default backend."
+                            aside={
+                                <Chip size="sm" variant="soft">
+                                    <Chip.Label>{rules.length}</Chip.Label>
+                                </Chip>
+                            }
+                        >
+                            <Table variant="secondary">
                                 <Table.ScrollContainer>
-                                    <Table.Content aria-label="Routing rules">
+                                    <Table.Content aria-label="Backend rules">
                                         <Table.Header>
-                                            <Table.Column isRowHeader>Link</Table.Column>
+                                            <Table.Column isRowHeader>Backend link</Table.Column>
                                             <Table.Column>Match clause</Table.Column>
                                         </Table.Header>
-                                        <Table.Body>
-                                            {config.backendRules.map((rule) => (
-                                                <Table.Row key={rule.linkName}>
-                                                    <Table.Cell>{rule.linkName}</Table.Cell>
+                                        <Table.Body renderEmptyState={() => <EmptyState text="No backend rule configured" className="py-10" />}>
+                                            {rules.map((rule, index) => (
+                                                <Table.Row key={`${rule.linkName}-${index}`}>
                                                     <Table.Cell>
-                                                        <code className="font-mono text-sm">{rule.matchClause}</code>
+                                                        <ConfigurationValue value={rule.linkName} mono />
+                                                    </Table.Cell>
+                                                    <Table.Cell>
+                                                        <code className="rounded bg-surface-secondary px-1.5 py-0.5 font-mono text-sm">{rule.matchClause}</code>
                                                     </Table.Cell>
                                                 </Table.Row>
                                             ))}
@@ -86,9 +75,9 @@ export function ConfigurationBackendRulesSection() {
                                 </Table.ScrollContainer>
                             </Table>
                         </ConfigurationBlock>
-                    </div>
-                )
-            }
-        </div>
-    )
+                    </>
+                );
+            }}
+        </ConfigurationSection>
+    );
 }

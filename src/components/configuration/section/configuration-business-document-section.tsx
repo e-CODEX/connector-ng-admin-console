@@ -10,68 +10,45 @@
 
 "use client";
 
-import React, { useEffect, useState } from "react";
-import type { BusinessDocumentConfiguration } from "@/types/response/configuration";
-import { toastError } from "@/utils";
-import { ConfigurationBlock } from "@/components/configuration/configuration-block";
-import { ConfigurationDetailRow } from "@/components/configuration/configuration-detail-row";
-import { ConfigurationSignatureView } from "@/components/configuration/view/configuration-signature-view";
-import { SpinnerView } from "@/components/common/spinner-view";
+import { FileText, Signature } from "lucide-react";
 import { useConfigurationService } from "@/hooks/use-http-service";
+import { useConfiguration } from "@/hooks/use-configuration";
+import { ConfigurationSection } from "@/components/configuration/configuration-section";
+import { ConfigurationBlock } from "@/components/configuration/configuration-block";
+import { ConfigurationDetailList, ConfigurationDetailRow } from "@/components/configuration/configuration-detail-row";
+import { ConfigurationValue } from "@/components/configuration/configuration-value";
+import { ConfigurationSignatureView } from "@/components/configuration/view/configuration-signature-view";
 
 export function ConfigurationBusinessDocumentSection() {
-    const [loading, setLoading] = useState(true);
-    const [config, setConfig] = useState<BusinessDocumentConfiguration | null>(null);
-
     const configurationService = useConfigurationService();
-
-    useEffect(() => {
-        const loadConfig = async () => {
-            setLoading(true)
-            try {
-                const data = await configurationService.getBusinessDocumentConfiguration()
-                setConfig(data || [])
-            } catch (error) {
-                toastError(error)
-            } finally {
-                setLoading(false)
-            }
-        }
-
-        (async () => {
-            await loadConfig()
-        })()
-    }, [configurationService])
-
-    if (!config) {
-        return null;
-    }
+    const state = useConfiguration("business-documents", configurationService.getBusinessDocumentConfiguration);
 
     return (
-        <div>
-            {
-                loading ? (
-                    <SpinnerView className="mt-60"/>
-                ) : (
-                    <div className="flex flex-col gap-4">
-                        <ConfigurationBlock title="Business document" note="Configured business document">
+        <ConfigurationSection state={state} errorTitle="Could not load the business document configuration">
+            {(config) => (
+                <>
+                    <ConfigurationBlock icon={FileText} title="Business document" description="Defaults applied to the business documents the connector issues.">
+                        <ConfigurationDetailList>
                             <ConfigurationDetailRow label="Country">
-                                {config.country}
+                                <ConfigurationValue value={config.country} />
                             </ConfigurationDetailRow>
                             <ConfigurationDetailRow label="Service provider">
-                                {config.serviceProvider}
+                                <ConfigurationValue value={config.serviceProvider} />
                             </ConfigurationDetailRow>
-                            <ConfigurationDetailRow label="Default advanced system type">
-                                {config.defaultAdvancedSystemType}
+                            <ConfigurationDetailRow label="Default advanced electronic system type">
+                                <ConfigurationValue value={config.defaultAdvancedSystemType} mono />
                             </ConfigurationDetailRow>
-                            <ConfigurationDetailRow label="Authentication validation identity provider">
-                                {config.authenticationValidation.identityProvider}
+                            <ConfigurationDetailRow label="Authentication identity provider">
+                                <ConfigurationValue value={config.authenticationValidation?.identityProvider} />
                             </ConfigurationDetailRow>
-                            <ConfigurationSignatureView signature={config.signature}/>
-                        </ConfigurationBlock>
-                    </div>
-                )
-            }
-        </div>
-    )
+                        </ConfigurationDetailList>
+                    </ConfigurationBlock>
+
+                    <ConfigurationBlock icon={Signature} title="Signature" description="Used to sign the business documents.">
+                        <ConfigurationSignatureView signature={config.signature} />
+                    </ConfigurationBlock>
+                </>
+            )}
+        </ConfigurationSection>
+    );
 }

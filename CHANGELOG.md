@@ -15,10 +15,12 @@ All notable changes to this project are documented in this file.
 - **DLQ message deletion** — Delete unwanted messages from the dead-letter queue directly from the admin UI.
 - **Session expiry** — Sign out and return to the login page when the session has expired, instead of showing a network error.
 - **Clear search criteria** — Reset the search criteria of the messages, attachments and transport steps pages, and of the message reporting, to their defaults in one click.
+- **Configurations page** — Redesigned: clearer sections, copyable values, one table of link partners per backend link, JMS queues grouped and linked to the queues page, and the open tab kept in the URL.
 
 #### Fixed
 - **Filters** — Go back to the first page when a filter changes on the messages and attachments pages.
 - **Message reporting export** — Export the report with the criteria it was loaded with.
+- **Configurations page** — Show a spinner while a section loads, and a retry when it cannot be loaded, instead of an empty tab.
 
 #### Technical
 - **Lint** — Improve linting rules and fix reported issues.

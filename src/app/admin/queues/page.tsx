@@ -11,6 +11,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import type { ConnectorQueueStats } from "@/types/response/queue";
 import { PageHeaderButton } from "@/components/common/header/page-header-button";
 import { PageHeader } from "@/components/common/header/page-header";
@@ -24,7 +25,8 @@ import { QueueMessagesView } from "@/components/queue/queue-messages-view";
 import { groupByCategory, QueueList } from "@/components/queue/queue-list";
 
 export default function QueueAdminPage() {
-    const [selectedQueue, setSelectedQueue] = useState<string | null>(null);
+    const requestedQueue = useSearchParams().get("queue");
+    const [selectedQueue, setSelectedQueue] = useState<string | null>(requestedQueue);
 
     const queueService = useQueueService();
 

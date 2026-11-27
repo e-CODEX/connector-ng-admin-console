@@ -39,7 +39,7 @@ import { asFilter, toastError, toastSuccess } from "@/utils";
 import { ALL_SELECTOR } from "@/types/global";
 import type { RangeValue } from "react-aria-components";
 import type { ZonedDateTime } from "@internationalized/date";
-import { buildDefaultRange, toDateRange } from "@/types/period";
+import { buildDefaultRange, isDefaultRange, toDateRange } from "@/types/period";
 import type { DateTimeRangeGranularity } from "@/components/form/selector/date-time-range-selector";
 import { useAppConfig } from "@/hooks/use-app-config";
 import { MessageEvidenceTriggerModeView } from "@/components/message/evidence-trigger/message-evidence-trigger-mode-view";
@@ -131,6 +131,29 @@ export default function MessagesAdminPage() {
 
     const onProcessingModeServiceChange = (service: ConnectorProcessingModeService | null) => {
         setProcessingModeServiceQuery(service?.name ?? ALL_SELECTOR);
+        pagedList.setPage(1);
+    };
+
+    const hasCustomCriteria =
+        identifierQuery !== "" ||
+        backendNameQuery !== "" ||
+        messageDirectionQuery !== ALL_SELECTOR ||
+        businessDomainIdentifierQuery !== ALL_SELECTOR ||
+        processingModeServiceQuery !== ALL_SELECTOR ||
+        !isDefaultRange(dateRange);
+
+    const onClearCriteria = () => {
+        setIdentifierQuery("");
+        setBackendNameQuery("");
+        setMessageDirectionQuery(ALL_SELECTOR);
+        setBusinessDomainIdentifierQuery(ALL_SELECTOR);
+        setProcessingModeServiceQuery(ALL_SELECTOR);
+        setDateRange(buildDefaultRange());
+        pagedList.setPage(1);
+    };
+
+    const onDateRangeChange = (next: RangeValue<ZonedDateTime> | null) => {
+        setDateRange(next);
         pagedList.setPage(1);
     };
 
@@ -228,7 +251,9 @@ export default function MessagesAdminPage() {
                 onBusinessDomainIdentifierChange={onBusinessDomainIdentifierChange}
                 onProcessingModesServiceChange={onProcessingModeServiceChange}
                 onDirectionChange={onDirectionChange}
-                onDateRangeChange={(next) => setDateRange(next as RangeValue<ZonedDateTime> | null)}
+                onDateRangeChange={onDateRangeChange}
+                onClear={onClearCriteria}
+                canClear={hasCustomCriteria}
             />
 
             <PagedListView list={pagedList} errorMessage="Could not load messages">

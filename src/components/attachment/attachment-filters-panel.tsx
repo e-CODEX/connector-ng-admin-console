@@ -32,6 +32,8 @@ interface MessageFiltersPanelProps {
     onTypesChange: (types: AttachmentTypesFilter[] | []) => void;
     onStoragesChange: (storages: AttachmentStoragesFilter[] | []) => void;
     onDateRangeChange: (dateRange: RangeValue<ZonedDateTime> | null) => void;
+    onClear?: () => void;
+    canClear?: boolean;
     className?: string;
 }
 
@@ -47,10 +49,12 @@ export function MessageFiltersPanel({
                                         onTypesChange,
                                         onStoragesChange,
                                         onDateRangeChange,
-                                        className
+                                        className,
+                                        onClear,
+                                        canClear,
                                     }: MessageFiltersPanelProps) {
     return (
-        <SearchCriteriaBox className={className}>
+        <SearchCriteriaBox className={className} onClear={onClear} canClear={canClear}>
             <SearchField className="w-full sm:max-w-xs" value={messageIdentifier} onChange={onMessageIdentifierChange}>
                 <Label className="text-sm font-medium">Message Identifier</Label>
                 <SearchField.Group>

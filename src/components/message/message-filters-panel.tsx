@@ -37,6 +37,8 @@ interface MessageFiltersPanelProps {
     onProcessingModesServiceChange: (service: ConnectorProcessingModeService | null) => void;
     onDirectionChange: (direction: string | null) => void;
     onDateRangeChange: (dateRange: RangeValue<ZonedDateTime> | null) => void;
+    onClear?: () => void;
+    canClear?: boolean;
     className?: string;
 }
 
@@ -56,12 +58,14 @@ export function MessageFiltersPanel({
                                         onProcessingModesServiceChange,
                                         onDirectionChange,
                                         onDateRangeChange,
-                                        className
+                                        className,
+                                        onClear,
+                                        canClear,
                                     }: MessageFiltersPanelProps) {
     const showServiceSelector = businessDomainIdentifier !== "" && businessDomainIdentifier !== ALL_SELECTOR;
 
     return (
-        <SearchCriteriaBox className={className}>
+        <SearchCriteriaBox className={className} onClear={onClear} canClear={canClear}>
             <SearchField className="w-full sm:max-w-xs" value={identifier} onChange={onIdentifierChange}>
                 <Label className="text-sm font-medium">Identifier</Label>
                 <SearchField.Group>

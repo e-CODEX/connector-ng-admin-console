@@ -34,10 +34,13 @@ async function stubListWhileSignedIn(page: Page): Promise<() => void> {
     };
 }
 
-/** Replaces the session cookies by a refresh token the mock backend rejects. */
-async function revokeSession(context: BrowserContext) {
-    await context.clearCookies();
-    await context.addCookies([{ name: "refreshToken", value: "revoked", url: "http://localhost:3100" }]);
+/**
+ * Replaces the session cookies by a refresh token the mock backend rejects. The refresh token is swapped first so
+ * that a request sent in between (e.g. a link prefetch) never goes out without any session cookie at all.
+ */
+async function revokeSession(context: BrowserContext, baseURL: string) {
+    await context.addCookies([{ name: "refreshToken", value: "revoked", url: baseURL }]);
+    await context.clearCookies({ name: "accessToken" });
 }
 
 async function expectSignedOutWithNotice(page: Page) {
@@ -61,13 +64,13 @@ test.describe("expired session", () => {
         await expectSignedOutWithNotice(page);
     });
 
-    test("should_sign_out_when_the_refresh_token_is_rejected_during_an_action", async ({ page, context }) => {
+    test("should_sign_out_when_the_refresh_token_is_rejected_during_an_action", async ({ page, context, baseURL }) => {
         const endStub = await stubListWhileSignedIn(page);
         await page.goto(PAGE_URL);
         await expect(rowWith(page, /Form_A\.pdf/)).toBeVisible();
 
         endStub();
-        await revokeSession(context);
+        await revokeSession(context, baseURL!);
         await page.getByRole("button", { name: "Refresh" }).first().click();
 
         await expectSignedOutWithNotice(page);
@@ -89,13 +92,14 @@ test.describe("expired session", () => {
     test("should_go_to_login_with_notice_when_a_link_is_followed_with_a_rejected_refresh_token", async ({
         page,
         context,
+        baseURL,
     }) => {
         const endStub = await stubListWhileSignedIn(page);
         await page.goto(PAGE_URL);
         await expect(rowWith(page, /Form_A\.pdf/)).toBeVisible();
 
         endStub();
-        await revokeSession(context);
+        await revokeSession(context, baseURL!);
         await page.getByRole("link", { name: /Queues/ }).click();
 
         await expectSignedOutWithNotice(page);

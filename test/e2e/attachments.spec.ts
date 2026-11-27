@@ -73,6 +73,37 @@ test.describe("attachments page", () => {
 
             expect(listRequests.length).toBeLessThanOrEqual(3);
         });
+
+        test("should_reset_the_criteria_when_clear_is_clicked", async ({
+            page,
+        }) => {
+            await stubAttachments(page);
+            await page.goto(PAGE_URL);
+            await expect(rowWith(page, /Form_A\.pdf/)).toBeVisible();
+
+            const clear = page.getByRole("button", { name: "Clear search criteria" });
+            await expect(clear).toBeDisabled();
+
+            const filtered = page.waitForRequest(
+                (req) =>
+                    LIST_URL(new URL(req.url())) &&
+                    new URL(req.url()).searchParams.get("name") === "inv",
+            );
+            await page.getByLabel(/filename/i).fill("inv");
+            await filtered;
+            await expect(clear).toBeEnabled();
+
+            const unfiltered = page.waitForRequest(
+                (req) =>
+                    LIST_URL(new URL(req.url())) &&
+                    !new URL(req.url()).searchParams.has("name"),
+            );
+            await clear.click();
+            await unfiltered;
+
+            await expect(page.getByLabel(/filename/i)).toHaveValue("");
+            await expect(clear).toBeDisabled();
+        });
     });
 
     test.describe("error handling", () => {

@@ -28,6 +28,8 @@ interface TransportStepFiltersPanelProps {
     onLinkPartnerNameChange: (value: string) => void;
     onStatusesChange: (statuses: TransportStepStatusesFilter[] | []) => void;
     onDateRangeChange: (dateRange: RangeValue<ZonedDateTime> | null) => void;
+    onClear?: () => void;
+    canClear?: boolean;
     className?: string;
 }
 
@@ -42,9 +44,11 @@ export function TransportStepFiltersPanel({
                                               onStatusesChange,
                                               onDateRangeChange,
                                               className,
+                                              onClear,
+                                              canClear,
                                           }: TransportStepFiltersPanelProps) {
     return (
-        <SearchCriteriaBox className={className}>
+        <SearchCriteriaBox className={className} onClear={onClear} canClear={canClear}>
             <SearchField className="w-full sm:max-w-xs" value={messageOrRemoteSystemIdentifier}
                          onChange={onMessageOrRemoteSystemIdentifierChange}>
                 <Label className="text-sm font-medium">Step or message or remote system

@@ -14,6 +14,11 @@ All notable changes to this project are documented in this file.
 - **DLQ replay** — Resend failed messages from a JMS dead-letter queue to their original destination in one click.
 - **DLQ message deletion** — Delete unwanted messages from the dead-letter queue directly from the admin UI.
 - **Session expiry** — Sign out and return to the login page when the session has expired, instead of showing a network error.
+- **Clear search criteria** — Reset the search criteria of the messages, attachments and transport steps pages, and of the message reporting, to their defaults in one click.
+
+#### Fixed
+- **Filters** — Go back to the first page when a filter changes on the messages and attachments pages.
+- **Message reporting export** — Export the report with the criteria it was loaded with.
 
 #### Technical
 - **Lint** — Improve linting rules and fix reported issues.
@@ -24,6 +29,7 @@ All notable changes to this project are documented in this file.
 - **REST client** — Accept successful backend responses with an empty body.
 - **Confirmation modal** — Show a spinner on the confirm button while the action is running.
 - **List views** — Share the loading, error and pagination handling across all list pages.
+- **E2E tests** — Fix flaky session-expiry tests.
 
 ## 1.0.0 - 2026-11-12
 

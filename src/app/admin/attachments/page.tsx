@@ -35,7 +35,7 @@ import type { AttachmentStoragesFilter } from "@/components/form/selector/attach
 import type { DateTimeRangeGranularity } from "@/components/form/selector/date-time-range-selector";
 import type { RangeValue } from "react-aria-components";
 import type { ZonedDateTime } from "@internationalized/date";
-import { buildDefaultRange, toDateRange } from "@/types/period";
+import { buildDefaultRange, isDefaultRange, toDateRange } from "@/types/period";
 import { AttachmentStatusChip } from "@/components/attachment/attachment-status-chip";
 
 const granularity: DateTimeRangeGranularity = "minute";
@@ -79,6 +79,22 @@ export default function AttachmentsAdminPage() {
 
     const detailsModal = useRefreshOnClose(pagedList.refresh);
 
+    const hasCustomCriteria =
+        messageIdentifierQuery !== "" ||
+        filenameQuery !== "" ||
+        typesQuery.types.length > 0 ||
+        storagesQuery.storages.length > 0 ||
+        !isDefaultRange(dateRange);
+
+    const onClearCriteria = () => {
+        setMessageIdentifierQuery("");
+        setFilenameQuery("");
+        setTypesQuery({ types: [] });
+        setStoragesQuery({ storages: [] });
+        setDateRange(buildDefaultRange());
+        pagedList.setPage(1);
+    };
+
     const onMessageIdentifierChange = (value: string) => {
         setMessageIdentifierQuery(value);
         pagedList.setPage(1);
@@ -95,6 +111,7 @@ export default function AttachmentsAdminPage() {
         } else {
             setTypesQuery((prev) => ({ ...prev, types }));
         }
+        pagedList.setPage(1);
     };
 
     const onStoragesChange = (storages: AttachmentStoragesFilter[]) => {
@@ -103,6 +120,12 @@ export default function AttachmentsAdminPage() {
         } else {
             setStoragesQuery((prev) => ({ ...prev, storages }));
         }
+        pagedList.setPage(1);
+    };
+
+    const onDateRangeChange = (next: RangeValue<ZonedDateTime> | null) => {
+        setDateRange(next);
+        pagedList.setPage(1);
     };
 
     const onDetailsClick = (attachment: ConnectorAttachmentResponse) => {
@@ -147,7 +170,9 @@ export default function AttachmentsAdminPage() {
                 onFilenameChange={onFilenameChange}
                 onTypesChange={onTypesChange}
                 onStoragesChange={onStoragesChange}
-                onDateRangeChange={(next) => setDateRange(next as RangeValue<ZonedDateTime> | null)}
+                onDateRangeChange={onDateRangeChange}
+                onClear={onClearCriteria}
+                canClear={hasCustomCriteria}
             />
 
             <PagedListView list={pagedList} errorMessage="Could not load attachments">

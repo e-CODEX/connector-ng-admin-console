@@ -9,17 +9,11 @@
  */
 
 import type { RangeValue } from "react-aria-components";
-import type { ZonedDateTime} from "@internationalized/date";
+import type { ZonedDateTime } from "@internationalized/date";
 import { now, getLocalTimeZone } from "@internationalized/date";
 import type { DateTimeRangeGranularity } from "@/components/form/selector/date-time-range-selector";
 
-export type Period =
-    | "LAST_HOUR"
-    | "TODAY"
-    | "THIS_WEEK"
-    | "THIS_MONTH"
-    | "THIS_YEAR"
-    | "ALL";
+export type Period = "LAST_HOUR" | "TODAY" | "THIS_WEEK" | "THIS_MONTH" | "THIS_YEAR" | "ALL";
 
 export interface PeriodOption {
     id: Period;
@@ -79,8 +73,7 @@ export function getPeriodRange(period: Period, now: Date = new Date()): PeriodRa
     }
 }
 
-export function periodToParams(period: Period,):
-    { from?: string; to?: string } {
+export function periodToParams(period: Period): { from?: string; to?: string } {
     const { from, to } = getPeriodRange(period);
     return {
         from: from ? from.toISOString() : undefined,
@@ -91,10 +84,7 @@ export function periodToParams(period: Period,):
 const startOfDay = { hour: 0, minute: 0, second: 0, millisecond: 0 } as const;
 const endOfDay = { hour: 23, minute: 59, second: 59, millisecond: 0 } as const;
 
-export const toDateRange = (
-    selected: RangeValue<ZonedDateTime> | null,
-    rangeGranularity: DateTimeRangeGranularity,
-) => {
+export const toDateRange = (selected: RangeValue<ZonedDateTime> | null, rangeGranularity: DateTimeRangeGranularity) => {
     if (!selected) {
         return { from: "", to: "" };
     }
@@ -112,9 +102,15 @@ export const toDateRange = (
         from: from.toDate().toISOString(),
         to: to.toDate().toISOString(),
     };
-}
+};
 
-export const buildDefaultRange = () : RangeValue<ZonedDateTime> => {
+export const buildDefaultRange = (): RangeValue<ZonedDateTime> => {
     const todayZoned = now(getLocalTimeZone());
     return { start: todayZoned.set(startOfDay), end: todayZoned.set(endOfDay) };
-}
+};
+
+export const isDefaultRange = (range: RangeValue<ZonedDateTime> | null): boolean => {
+    if (!range) return false;
+    const defaultRange = buildDefaultRange();
+    return range.start.compare(defaultRange.start) === 0 && range.end.compare(defaultRange.end) === 0;
+};

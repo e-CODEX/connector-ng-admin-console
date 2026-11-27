@@ -35,7 +35,7 @@ import type { TransportStepStatusesFilter } from "@/components/form/selector/tra
 import type { DateTimeRangeGranularity } from "@/components/form/selector/date-time-range-selector";
 import type { RangeValue } from "react-aria-components";
 import type { ZonedDateTime } from "@internationalized/date";
-import { buildDefaultRange, toDateRange } from "@/types/period";
+import { buildDefaultRange, isDefaultRange, toDateRange } from "@/types/period";
 import { TransportedStepMessageDetailsView } from "@/components/transport-step/transported-step-message-details-view";
 import { ActionButton } from "@/components/common/action-button/action-button";
 import { useAppConfig } from "@/hooks/use-app-config";
@@ -107,6 +107,20 @@ export default function TransportStepsAdminPage() {
 
     const onDateRangeChange = (next: unknown) => {
         setDateRange(next as RangeValue<ZonedDateTime> | null);
+        pagedList.setPage(1);
+    };
+
+    const hasCustomCriteria =
+        messageOrRemoteSystemIdentifierQuery !== "" ||
+        linkPartnerNameQuery !== "" ||
+        statusesQuery.statuses.length > 0 ||
+        !isDefaultRange(dateRange);
+
+    const onClearCriteria = () => {
+        setMessageOrRemoteSystemIdentifierQuery("");
+        setLinkPartnerNameQuery("");
+        setStatusesQuery({ statuses: [] });
+        setDateRange(buildDefaultRange());
         pagedList.setPage(1);
     };
 
@@ -188,6 +202,8 @@ export default function TransportStepsAdminPage() {
                 onLinkPartnerNameChange={onLinkPartnerNameChange}
                 onStatusesChange={onStatusesChange}
                 onDateRangeChange={onDateRangeChange}
+                onClear={onClearCriteria}
+                canClear={hasCustomCriteria}
             />
 
             <PagedListView list={pagedList} errorMessage="Could not load messages transport steps">

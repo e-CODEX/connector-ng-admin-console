@@ -10,7 +10,7 @@
 
 "use client";
 
-import type { Key} from "@heroui/react";
+import type { Key } from "@heroui/react";
 import { Button, Description, Dropdown, Label, Modal, Table } from "@heroui/react";
 import { type RangeValue } from "react-aria-components";
 import React, { Fragment, useCallback, useEffect, useRef, useState } from "react";
@@ -18,7 +18,7 @@ import type { MessageReportExportFormat } from "@/services/message";
 import type { ZonedDateTime } from "@internationalized/date";
 import { saveFile, toastError } from "@/utils";
 import type { ConnectorMessageReportResponse } from "@/types/response/reporting";
-import type { DateTimeRangeGranularity} from "@/components/form/selector/date-time-range-selector";
+import type { DateTimeRangeGranularity } from "@/components/form/selector/date-time-range-selector";
 import { DateTimeRangeSelector } from "@/components/form/selector/date-time-range-selector";
 import { EmptyState } from "@/components/common/empty-state";
 import { SearchCriteriaBox } from "@/components/form/search-criteria-box";
@@ -26,7 +26,7 @@ import { SpinnerView } from "@/components/common/spinner-view";
 import { asBusinessDomainSelectorFilter, BusinessDomainSelector } from "@/components/form/selector/business-domain-selector";
 import { useBusinessDomainIdentifiers } from "@/hooks/use-business-domain-identifiers";
 import { useMessageService } from "@/hooks/use-http-service";
-import { buildDefaultRange, toDateRange } from "@/types/period";
+import { buildDefaultRange, isDefaultRange, toDateRange } from "@/types/period";
 import { LoadErrorState } from "@/components/common/load-error-state";
 import { Search, Upload } from "lucide-react";
 
@@ -38,6 +38,8 @@ type AppliedCriteria = {
     dateRange: RangeValue<ZonedDateTime> | null;
     domain: string;
 };
+
+const isDefaultCriteria = (dateRange: RangeValue<ZonedDateTime> | null, domain: string) => isDefaultRange(dateRange) && domain === ALL_BUSINESS_DOMAIN_SELECTOR;
 
 function toExportFormat(formatKey: Key): MessageReportExportFormat {
     switch (formatKey) {
@@ -119,6 +121,14 @@ export function MessageReportingContent() {
         void loadReports(dateRange, businessDomainIdentifierQuery);
     };
 
+    const onClearPress = () => {
+        const defaultRange = buildDefaultRange();
+        setDateRange(defaultRange);
+        setBusinessDomainIdentifierQuery(ALL_BUSINESS_DOMAIN_SELECTOR);
+        setRefreshing(true);
+        void loadReports(defaultRange, ALL_BUSINESS_DOMAIN_SELECTOR);
+    };
+
     const onExportClick = async (formatKey: Key) => {
         if (!applied || exporting) {
             return;
@@ -127,7 +137,7 @@ export function MessageReportingContent() {
         setExporting(true);
         try {
             const params = {
-                ...toDateRange(dateRange, granularity),
+                ...toDateRange(applied.dateRange, granularity),
                 format: toExportFormat(formatKey),
                 businessDomain: asBusinessDomainSelectorFilter(applied.domain, ALL_BUSINESS_DOMAIN_SELECTOR),
             };
@@ -145,13 +155,14 @@ export function MessageReportingContent() {
     const idle = !loading && !refreshing;
 
     // The selectors changed since the report on screen was loaded.
-    const dirty = !!applied
-        && (applied.dateRange !== dateRange || applied.domain !== businessDomainIdentifierQuery);
+    const dirty = !!applied && (applied.dateRange !== dateRange || applied.domain !== businessDomainIdentifierQuery);
+
+    const canClear = idle && (!isDefaultCriteria(dateRange, businessDomainIdentifierQuery) || (!!applied && !isDefaultCriteria(applied.dateRange, applied.domain)));
 
     return (
         <>
             <Modal.Body className="flex flex-1 flex-col">
-                <SearchCriteriaBox className="mt-0">
+                <SearchCriteriaBox className="mt-0" onClear={onClearPress} canClear={canClear}>
                     <DateTimeRangeSelector
                         label="Select a date range"
                         value={dateRange}
@@ -159,64 +170,34 @@ export function MessageReportingContent() {
                         shouldForceLeadingZeros={true}
                         onChange={(next) => setDateRange(next as RangeValue<ZonedDateTime> | null)}
                     />
-                    <BusinessDomainSelector
-                        identifiers={businessDomainIdentifiers}
-                        value={businessDomainIdentifierQuery}
-                        onValueChange={setBusinessDomainIdentifierQuery}
-                    />
+                    <BusinessDomainSelector identifiers={businessDomainIdentifiers} value={businessDomainIdentifierQuery} onValueChange={setBusinessDomainIdentifierQuery} />
 
                     <div className="flex flex-col">
                         <span className="mb-1 text-sm font-medium invisible" aria-hidden="true">
                             Search
                         </span>
-                        <Button
-                            variant="primary"
-                            isPending={refreshing}
-                            isDisabled={!dateRange}
-                            onPress={onApplyPress}
-                        >
-                            <Search/>
+                        <Button variant="primary" isPending={refreshing} isDisabled={!dateRange} onPress={onApplyPress}>
+                            <Search />
                             Search
                         </Button>
                     </div>
                 </SearchCriteriaBox>
 
-                {(loading || refreshing) && !messageReports && (
-                    <SpinnerView className="mt-60"/>
-                )}
+                {(loading || refreshing) && !messageReports && <SpinnerView className="mt-60" />}
 
-                {idle && loadFailed && (
-                    <LoadErrorState
-                        className="min-h-80 flex-1"
-                        title="Could not load message reports"
-                        onRetry={retry}
-                    />
-                )}
+                {idle && loadFailed && <LoadErrorState className="min-h-80 flex-1" title="Could not load message reports" onRetry={retry} />}
 
-                {idle && !loadFailed && messageReports !== undefined && !hasReports && (
-                    <EmptyState text="No report available" className="flex-1"/>
-                )}
+                {idle && !loadFailed && messageReports !== undefined && !hasReports && <EmptyState text="No report available" className="flex-1" />}
 
-                {dirty && hasReports && (
-                    <p className="mt-2 text-xs text-muted">
-                        Filters changed. Press Search to update the report.
-                    </p>
-                )}
+                {dirty && hasReports && <p className="mt-2 text-xs text-muted">Filters changed. Press Search to update the report.</p>}
 
                 {hasReports && (
-                    <div
-                        aria-busy={refreshing}
-                        className={`flex flex-col transition-opacity ${
-                            refreshing ? "pointer-events-none opacity-50" : ""
-                        }`}
-                    >
+                    <div aria-busy={refreshing} className={`flex flex-col transition-opacity ${refreshing ? "pointer-events-none opacity-50" : ""}`}>
                         {years.map((content) => (
                             <div key={content.year} className="flex flex-col gap-y-2">
                                 <div className="my-2 flex items-center gap-3">
-                                    <h2 className="text-lg font-semibold tracking-tight text-foreground">
-                                        {content.year}
-                                    </h2>
-                                    <span className="h-px flex-1 bg-default-200"/>
+                                    <h2 className="text-lg font-semibold tracking-tight text-foreground">{content.year}</h2>
+                                    <span className="h-px flex-1 bg-default-200" />
                                     <span className="text-xs font-medium text-muted">
                                         {content.months.length} month{content.months.length === 1 ? "" : "s"}
                                     </span>
@@ -255,15 +236,9 @@ export function MessageReportingContent() {
                                                             <Table.Cell colSpan={2} className="bg-warning-soft font-semibold">
                                                                 Total
                                                             </Table.Cell>
-                                                            <Table.Cell className="bg-warning-soft font-semibold">
-                                                                {month.totalInbound}
-                                                            </Table.Cell>
-                                                            <Table.Cell className="bg-warning-soft font-semibold">
-                                                                {month.totalOutbound}
-                                                            </Table.Cell>
-                                                            <Table.Cell className="bg-warning-soft font-semibold">
-                                                                {month.total}
-                                                            </Table.Cell>
+                                                            <Table.Cell className="bg-warning-soft font-semibold">{month.totalInbound}</Table.Cell>
+                                                            <Table.Cell className="bg-warning-soft font-semibold">{month.totalOutbound}</Table.Cell>
+                                                            <Table.Cell className="bg-warning-soft font-semibold">{month.total}</Table.Cell>
                                                         </Table.Row>
                                                     </Fragment>
                                                 ))}
@@ -279,20 +254,15 @@ export function MessageReportingContent() {
 
             <Modal.Footer>
                 <Dropdown>
-                    <Button
-                        variant="secondary"
-                        aria-label="Export report menu"
-                        isPending={exporting}
-                        isDisabled={!hasReports || loading || refreshing || exporting}
-                    >
-                        <Upload/>
+                    <Button variant="secondary" aria-label="Export report menu" isPending={exporting} isDisabled={!hasReports || loading || refreshing || exporting}>
+                        <Upload />
                         Export
                     </Button>
                     <Dropdown.Popover>
                         <Dropdown.Menu onAction={onExportClick}>
                             <Dropdown.Item id="export-excel" textValue="Excel">
                                 <div className="flex h-8 items-start justify-center pt-px">
-                                    <Upload className="size-4 shrink-0 text-muted"/>
+                                    <Upload className="size-4 shrink-0 text-muted" />
                                 </div>
                                 <div className="flex flex-col">
                                     <Label>Excel</Label>
@@ -301,7 +271,7 @@ export function MessageReportingContent() {
                             </Dropdown.Item>
                             <Dropdown.Item id="export-json" textValue="JSON">
                                 <div className="flex h-8 items-start justify-center pt-px">
-                                    <Upload className="size-4 shrink-0 text-muted"/>
+                                    <Upload className="size-4 shrink-0 text-muted" />
                                 </div>
                                 <div className="flex flex-col">
                                     <Label>JSON</Label>
@@ -310,7 +280,7 @@ export function MessageReportingContent() {
                             </Dropdown.Item>
                             <Dropdown.Item id="export-csv" textValue="CSV">
                                 <div className="flex h-8 items-start justify-center pt-px">
-                                    <Upload className="size-4 shrink-0 text-muted"/>
+                                    <Upload className="size-4 shrink-0 text-muted" />
                                 </div>
                                 <div className="flex flex-col">
                                     <Label>CSV</Label>

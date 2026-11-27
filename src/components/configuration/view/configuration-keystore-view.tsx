@@ -10,29 +10,34 @@
 
 import { Chip } from "@heroui/react";
 import type { Keystore } from "@/types/response/configuration";
+import { ConfigurationDetailList, ConfigurationDetailRow } from "@/components/configuration/configuration-detail-row";
 import { ConfigurationSecretValue } from "@/components/configuration/configuration-secret-value";
-import { ConfigurationDetailRow } from "@/components/configuration/configuration-detail-row";
+import { ConfigurationValue } from "@/components/configuration/configuration-value";
 
 interface ConfigurationKeystoreViewProps {
-    keystore: Keystore;
+    keystore: Keystore | null | undefined;
 }
 
 export function ConfigurationKeystoreView({ keystore }: ConfigurationKeystoreViewProps) {
+    if (!keystore) {
+        return <p className="text-sm text-muted">No keystore configured.</p>;
+    }
+
     return (
-        <div>
-            {keystore ? (
-                <dl>
-                    <ConfigurationDetailRow label="Path">{keystore.path}</ConfigurationDetailRow>
-                    <ConfigurationDetailRow label="Type">
-                        <Chip size="sm">{keystore.type}</Chip>
-                    </ConfigurationDetailRow>
-                    <ConfigurationDetailRow label="Password">
-                        <ConfigurationSecretValue value={keystore.password}/>
-                    </ConfigurationDetailRow>
-                </dl>
-            ) : (
-                <div className="flex flex-col gap-3">No keystore configuration available</div>
-            )}
-        </div>
+        <ConfigurationDetailList>
+            <ConfigurationDetailRow label="Path">
+                <ConfigurationValue value={keystore.path} mono copyable />
+            </ConfigurationDetailRow>
+            <ConfigurationDetailRow label="Type">
+                {keystore.type && (
+                    <Chip size="sm" variant="soft">
+                        <Chip.Label>{keystore.type}</Chip.Label>
+                    </Chip>
+                )}
+            </ConfigurationDetailRow>
+            <ConfigurationDetailRow label="Password">
+                <ConfigurationSecretValue value={keystore.password} />
+            </ConfigurationDetailRow>
+        </ConfigurationDetailList>
     );
 }

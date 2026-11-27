@@ -8,79 +8,71 @@
  * You may obtain a copy at: https://joinup.ec.europa.eu/software/page/eupl
  */
 
-import React, { useEffect, useState } from "react";
-import type { MessageProcessingConfiguration } from "@/types/response/configuration";
-import { toastError } from "@/utils";
-import { ConfigurationBlock } from "@/components/configuration/configuration-block";
-import { ConfigurationDetailRow } from "@/components/configuration/configuration-detail-row";
-import { BooleanChip } from "@/components/common/boolean-chip";
-import { SpinnerView } from "@/components/common/spinner-view";
+"use client";
+
+import { Chip } from "@heroui/react";
+import { Fingerprint, ShieldCheck } from "lucide-react";
+import type { MessageVerificationMode } from "@/types/response/configuration";
 import { useConfigurationService } from "@/hooks/use-http-service";
+import { useConfiguration } from "@/hooks/use-configuration";
+import { ConfigurationSection } from "@/components/configuration/configuration-section";
+import { ConfigurationBlock } from "@/components/configuration/configuration-block";
+import { ConfigurationDetailList, ConfigurationDetailRow } from "@/components/configuration/configuration-detail-row";
+import { ConfigurationValue } from "@/components/configuration/configuration-value";
+import { BooleanChip } from "@/components/common/boolean-chip";
+
+function VerificationModeChip({ mode }: { mode: MessageVerificationMode | null | undefined }) {
+    if (!mode) return null;
+    return (
+        <Chip size="sm" variant="soft" color={mode === "STRICT" ? "accent" : "warning"}>
+            <Chip.Label>{mode}</Chip.Label>
+        </Chip>
+    );
+}
 
 export function ConfigurationMessageProcessingSection() {
-    const [loading, setLoading] = useState(true);
-    const [config, setConfig] = useState<MessageProcessingConfiguration | null>(null);
-
     const configurationService = useConfigurationService();
-
-    useEffect(() => {
-        const loadConfig = async () => {
-            setLoading(true)
-            try {
-                const data = await configurationService.getMessageProcessingConfiguration()
-                setConfig(data || [])
-            } catch (error) {
-                toastError(error)
-            } finally {
-                setLoading(false)
-            }
-        }
-
-        (async () => {
-            await loadConfig()
-        })()
-    }, [configurationService])
-
-    if (!config) {
-        return null;
-    }
+    const state = useConfiguration("message-processing", configurationService.getMessageProcessingConfiguration);
 
     return (
-        <div>
-            {
-                loading ? (
-                    <SpinnerView className="mt-60"/>
-                ) : (
-                    <div className="flex flex-col gap-4">
-                        <ConfigurationBlock title="Message Processing" note="">
+        <ConfigurationSection state={state} errorTitle="Could not load the message processing configuration">
+            {(config) => (
+                <>
+                    <ConfigurationBlock icon={Fingerprint} title="Identifiers" description="How the connector builds the identifiers of the messages it handles.">
+                        <ConfigurationDetailList>
                             <ConfigurationDetailRow label="Connector identifier suffix">
-                                {config.identifierSuffix}
+                                <ConfigurationValue value={config.identifierSuffix} mono />
                             </ConfigurationDetailRow>
-                            <ConfigurationDetailRow label="Ebms identifier generation enabled">
-                                <BooleanChip value={config.ebmsIdGeneratorEnabled}/>
+                            <ConfigurationDetailRow label="ebMS identifier generation">
+                                <BooleanChip value={config.ebmsIdGeneratorEnabled} yesLabel="Enabled" noLabel="Disabled" />
                             </ConfigurationDetailRow>
-                            <ConfigurationDetailRow label="Ebms identifier suffix">
-                                {config.ebmsIdSuffix}
-                            </ConfigurationDetailRow>
-                            <ConfigurationDetailRow label="Send generated evidences to backend">
-                                <BooleanChip value={config.sendGeneratedEvidencesToBackend}/>
+                            <ConfigurationDetailRow label="ebMS identifier suffix">
+                                <ConfigurationValue value={config.ebmsIdSuffix} mono />
                             </ConfigurationDetailRow>
                             <ConfigurationDetailRow label="Transport step identifier suffix">
-                                {config.transportIdSuffix}
+                                <ConfigurationValue value={config.transportIdSuffix} mono />
                             </ConfigurationDetailRow>
-                            <ConfigurationDetailRow label="Auto trigger delivery evidence submission">
-                                <BooleanChip value={config.autoTriggerDeliveryEvidences}/>
+                        </ConfigurationDetailList>
+                    </ConfigurationBlock>
+
+                    <ConfigurationBlock icon={ShieldCheck} title="Verification and evidences" description="How strictly messages are checked, and how evidences are handled.">
+                        <ConfigurationDetailList>
+                            <ConfigurationDetailRow label="Outbound message verification">
+                                <VerificationModeChip mode={config.outboundMessageVerificationMode} />
                             </ConfigurationDetailRow>
-                            <ConfigurationDetailRow label="Outbound message verification mode">
-                                {config.outboundMessageVerificationMode}
+                            <ConfigurationDetailRow label="Inbound message verification">
+                                <VerificationModeChip mode={config.inboundMessageVerificationMode} />
                             </ConfigurationDetailRow>
-                            <ConfigurationDetailRow label="Inbound message verification mode">
-                                {config.inboundMessageVerificationMode}
+                            <ConfigurationDetailRow label="Send generated evidences to the backend">
+                                <BooleanChip value={config.sendGeneratedEvidencesToBackend} />
                             </ConfigurationDetailRow>
-                        </ConfigurationBlock>
-                    </div>
-                )
-            }
-        </div>
+                            <ConfigurationDetailRow label="Trigger delivery evidences automatically">
+                                <BooleanChip value={config.autoTriggerDeliveryEvidences} />
+                            </ConfigurationDetailRow>
+                        </ConfigurationDetailList>
+                    </ConfigurationBlock>
+                </>
+            )}
+        </ConfigurationSection>
     );
 }

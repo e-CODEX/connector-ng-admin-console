@@ -9,22 +9,51 @@
  */
 
 import { Surface } from "@heroui/react";
+import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
 interface ConfigurationBlockProps {
     title: string;
-    note?: string;
+    description?: string;
+    icon?: LucideIcon;
+    aside?: ReactNode;
     children: ReactNode;
 }
 
-export function ConfigurationBlock({ title, note, children }: ConfigurationBlockProps) {
+export function ConfigurationBlock({ title, description, icon: Icon, aside, children }: ConfigurationBlockProps) {
     return (
-        <Surface className="rounded-xl p-4">
-            <div className="mb-2 flex items-baseline gap-2">
-                <h4 className="text-sm font-medium">{title}</h4>
-                {note && <code className="font-mono text-xs text-neutral-400">{note}</code>}
-            </div>
+        <Surface className="rounded-xl p-4 sm:p-5">
+            <header className="mb-3 flex items-start gap-3">
+                {Icon && (
+                    <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-accent">
+                        <Icon className="size-4" aria-hidden="true" />
+                    </span>
+                )}
+                <div className="min-w-0 flex-1">
+                    <h3 className="font-semibold">{title}</h3>
+                    {description && <p className="text-sm text-muted">{description}</p>}
+                </div>
+                {aside && <div className="shrink-0">{aside}</div>}
+            </header>
             {children}
         </Surface>
+    );
+}
+
+interface ConfigurationSubsectionProps {
+    title: string;
+    aside?: ReactNode;
+    children: ReactNode;
+}
+
+export function ConfigurationSubsection({ title, aside, children }: ConfigurationSubsectionProps) {
+    return (
+        <section className="mt-4 border-t border-separator pt-4">
+            <div className="mb-2 flex items-center gap-2">
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-muted">{title}</h4>
+                {aside}
+            </div>
+            {children}
+        </section>
     );
 }

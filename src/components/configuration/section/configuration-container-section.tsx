@@ -10,55 +10,24 @@
 
 "use client";
 
-import React, { useEffect, useState } from "react";
-import type { ContainerConfiguration } from "@/types/response/configuration";
-import { toastError } from "@/utils";
+import { Package } from "lucide-react";
+import { useConfigurationService } from "@/hooks/use-http-service";
+import { useConfiguration } from "@/hooks/use-configuration";
+import { ConfigurationSection } from "@/components/configuration/configuration-section";
 import { ConfigurationBlock } from "@/components/configuration/configuration-block";
 import { ConfigurationSignatureView } from "@/components/configuration/view/configuration-signature-view";
-import { SpinnerView } from "@/components/common/spinner-view";
-import { useConfigurationService } from "@/hooks/use-http-service";
 
 export function ConfigurationContainerSection() {
-    const [loading, setLoading] = useState(true);
-    const [config, setConfig] = useState<ContainerConfiguration | null>(null);
-
     const configurationService = useConfigurationService();
-
-    useEffect(() => {
-        const loadConfig = async () => {
-            setLoading(true);
-            try {
-                const data = await configurationService.getContainerConfiguration();
-                setConfig(data || null);
-            } catch (error) {
-                toastError(error);
-            } finally {
-                setLoading(false);
-            }
-        }
-
-        (async () => {
-            await loadConfig();
-        })()
-    }, [configurationService])
-
-    if (!config) {
-        return null;
-    }
+    const state = useConfiguration("container", configurationService.getContainerConfiguration);
 
     return (
-        <div>
-            {
-                loading ? (
-                    <SpinnerView className="mt-60"/>
-                ) : (
-                    <div className="flex flex-col gap-4">
-                        <ConfigurationBlock title="Signature" note="">
-                            <ConfigurationSignatureView signature={config.signature}/>
-                        </ConfigurationBlock>
-                    </div>
-                )
-            }
-        </div>
-    )
+        <ConfigurationSection state={state} errorTitle="Could not load the container configuration">
+            {(config) => (
+                <ConfigurationBlock icon={Package} title="Container signature" description="Used to sign the ASiC containers that carry the messages.">
+                    <ConfigurationSignatureView signature={config.signature} />
+                </ConfigurationBlock>
+            )}
+        </ConfigurationSection>
+    );
 }

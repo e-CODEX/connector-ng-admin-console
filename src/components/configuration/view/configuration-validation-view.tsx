@@ -9,40 +9,50 @@
  */
 
 import type { Validation } from "@/types/response/configuration";
-import { ConfigurationKeystoreView } from "@/components/configuration/view/configuration-keystore-view";
-import { ConfigurationBlock } from "@/components/configuration/configuration-block";
-import { ConfigurationDetailRow } from "@/components/configuration/configuration-detail-row";
 import { ConfigurationBoolChip } from "@/components/configuration/configuration-bool-chip";
+import { ConfigurationDetailList, ConfigurationDetailRow } from "@/components/configuration/configuration-detail-row";
+import { ConfigurationValue } from "@/components/configuration/configuration-value";
+import { ConfigurationKeystoreView } from "@/components/configuration/view/configuration-keystore-view";
 
 interface ConfigurationValidationViewProps {
-    validation: Validation;
+    validation: Validation | null | undefined;
 }
 
 export function ConfigurationValidationView({ validation }: ConfigurationValidationViewProps) {
+    if (!validation) {
+        return <p className="text-sm text-muted">No certificate validation configured.</p>;
+    }
+
     return (
-        <div>
-            {validation ? (
-                <div className="flex flex-col gap-3">
-                    <div className="flex flex-wrap gap-2">
-                        <ConfigurationBoolChip value={validation.ocspEnabled} label="OCSP"/>
-                        <ConfigurationBoolChip value={validation.crlEnabled} label="CRL"/>
-                        <ConfigurationBoolChip value={validation.aiaEnabled} label="AIA"/>
-                        <ConfigurationBoolChip value={validation.truststoreEnabled} label="Truststore"/>
-                        <ConfigurationBoolChip value={validation.ignoreStoreEnabled} label="Ignore store"/>
+        <ConfigurationDetailList>
+            <ConfigurationDetailRow label="Checks">
+                <span className="flex flex-wrap gap-1.5">
+                    <ConfigurationBoolChip value={validation.ocspEnabled} label="OCSP" />
+                    <ConfigurationBoolChip value={validation.crlEnabled} label="CRL" />
+                    <ConfigurationBoolChip value={validation.aiaEnabled} label="AIA" />
+                    <ConfigurationBoolChip value={validation.truststoreEnabled} label="Truststore" />
+                    <ConfigurationBoolChip value={validation.ignoreStoreEnabled} label="Ignore store" />
+                </span>
+            </ConfigurationDetailRow>
+            <ConfigurationDetailRow label="Trusted list source">
+                <ConfigurationValue value={validation.trustedListSource} mono copyable />
+            </ConfigurationDetailRow>
+            {validation.truststoreEnabled && (
+                <div className="py-2">
+                    <p className="mb-1 text-sm font-medium">Truststore</p>
+                    <div className="rounded-lg bg-surface-secondary px-3">
+                        <ConfigurationKeystoreView keystore={validation.truststore} />
                     </div>
-                    <dl>
-                        <ConfigurationDetailRow label="Trusted list">{validation.trustedListSource || "—"}</ConfigurationDetailRow>
-                    </dl>
-                    {/* Keystore view reused at depth */}
-                    {validation.truststoreEnabled && (
-                        <ConfigurationBlock title="Truststore">
-                            <ConfigurationKeystoreView keystore={validation.truststore}/>
-                        </ConfigurationBlock>
-                    )}
                 </div>
-            ) : (
-                <div className="flex flex-col gap-3">No validation configuration available</div>
             )}
-        </div>
+            {validation.ignoreStoreEnabled && (
+                <div className="py-2">
+                    <p className="mb-1 text-sm font-medium">Ignore store</p>
+                    <div className="rounded-lg bg-surface-secondary px-3">
+                        <ConfigurationKeystoreView keystore={validation.ignoreStore} />
+                    </div>
+                </div>
+            )}
+        </ConfigurationDetailList>
     );
 }

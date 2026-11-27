@@ -10,68 +10,106 @@
 
 "use client";
 
-import React, { useEffect, useState } from "react";
+import NextLink from "next/link";
+import { Tooltip } from "@heroui/react";
+import type { LucideIcon } from "lucide-react";
+import { ArrowDownToLine, ArrowUpFromLine, ArrowUpRight, Network, Wrench } from "lucide-react";
 import type { QueueConfiguration } from "@/types/response/configuration";
-import { toastError } from "@/utils";
-import { ConfigurationBlock } from "@/components/configuration/configuration-block";
-import { ConfigurationDetailRow } from "@/components/configuration/configuration-detail-row";
-import { SpinnerView } from "@/components/common/spinner-view";
 import { useConfigurationService } from "@/hooks/use-http-service";
+import { useConfiguration } from "@/hooks/use-configuration";
+import { ConfigurationSection } from "@/components/configuration/configuration-section";
+import { ConfigurationBlock } from "@/components/configuration/configuration-block";
+import { ConfigurationDetailList, ConfigurationDetailRow } from "@/components/configuration/configuration-detail-row";
+import { ConfigurationValue } from "@/components/configuration/configuration-value";
 
-export function ConfigurationJmsQueueSection() {
-    const [loading, setLoading] = useState(true);
-    const [config, setConfig] = useState<QueueConfiguration | null>(null);
+interface QueueGroup {
+    title: string;
+    description: string;
+    icon: LucideIcon;
+    queues: { label: string; key: keyof QueueConfiguration }[];
+}
 
-    const configurationService = useConfigurationService();
+const GROUPS: QueueGroup[] = [
+    {
+        title: "Outbound",
+        description: "Messages sent by the backends, on their way to the gateway.",
+        icon: ArrowUpFromLine,
+        queues: [
+            { label: "Message staging", key: "outboundMessageStagingQueue" },
+            { label: "Message processing", key: "outboundMessageProcessingQueue" },
+            { label: "Evidence trigger", key: "outboundEvidenceTriggerQueue" },
+        ],
+    },
+    {
+        title: "Inbound",
+        description: "Messages received from the gateway, on their way to the backends.",
+        icon: ArrowDownToLine,
+        queues: [
+            { label: "Message staging", key: "inboundMessageStagingQueue" },
+            { label: "Message processing", key: "inboundMessageProcessingQueue" },
+            { label: "Evidence trigger", key: "inboundEvidenceTriggerQueue" },
+            { label: "Backend delivery", key: "backendDeliveryQueue" },
+        ],
+    },
+    {
+        title: "Gateway",
+        description: "Exchanges with the AS4 gateway.",
+        icon: Network,
+        queues: [
+            { label: "Message submission", key: "gatewaySubmissionQueue" },
+            { label: "Message submission reply", key: "gatewaySubmissionReplyQueue" },
+            { label: "Message reception", key: "gatewayReceptionQueue" },
+        ],
+    },
+    {
+        title: "Maintenance",
+        description: "Housekeeping of the messages that are done.",
+        icon: Wrench,
+        queues: [{ label: "Resolved messages clean-up", key: "resolvedMessageCleanupProcessingQueue" }],
+    },
+];
 
-    useEffect(() => {
-        const loadConfig = async () => {
-            setLoading(true);
-            try {
-                const data = await configurationService.getQueueConfiguration();
-                setConfig(data || []);
-            } catch (error) {
-                toastError(error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        (async () => {
-            await loadConfig();
-        })();
-    }, [configurationService]);
-
-    if (!config) {
-        return null;
-    }
+function QueueValue({ name }: { name: string | undefined }) {
+    if (!name) return <ConfigurationValue value={name} />;
 
     return (
-        <div>
-            {loading ? (
-                <SpinnerView className="mt-60" />
-            ) : (
-                <div className="flex flex-col gap-4">
-                    <ConfigurationBlock title="Connector Queue" note="">
-                        <ConfigurationDetailRow label="Outbound message staging queue">{config.outboundMessageStagingQueue}</ConfigurationDetailRow>
-                        <ConfigurationDetailRow label="Outbound evidence trigger queue">{config.outboundEvidenceTriggerQueue}</ConfigurationDetailRow>
-                        <ConfigurationDetailRow label="Outbound message processing queue">{config.outboundMessageProcessingQueue}</ConfigurationDetailRow>
+        <span className="inline-flex max-w-full items-center gap-1">
+            <ConfigurationValue value={name} mono copyable />
+            <Tooltip delay={0}>
+                <NextLink
+                    href={`/admin/queues?queue=${encodeURIComponent(name)}`}
+                    aria-label={`Open the ${name} queue`}
+                    className="inline-flex size-6 shrink-0 items-center justify-center rounded-md text-muted hover:bg-surface-secondary hover:text-foreground focus-visible:ring-2 focus-visible:ring-focus focus-visible:outline-none"
+                >
+                    <ArrowUpRight className="size-3.5" aria-hidden="true" />
+                </NextLink>
+                <Tooltip.Content>Open in JMS queues</Tooltip.Content>
+            </Tooltip>
+        </span>
+    );
+}
 
-                        <ConfigurationDetailRow label="Inbound message staging queue">{config.inboundMessageStagingQueue}</ConfigurationDetailRow>
-                        <ConfigurationDetailRow label="Inbound message processing queue">{config.inboundMessageProcessingQueue}</ConfigurationDetailRow>
-                        <ConfigurationDetailRow label="Inbound evidence trigger queue">{config.inboundEvidenceTriggerQueue}</ConfigurationDetailRow>
+export function ConfigurationJmsQueueSection() {
+    const configurationService = useConfigurationService();
+    const state = useConfiguration("jms-queues", configurationService.getQueueConfiguration);
 
-                        <ConfigurationDetailRow label="Backend delivery queue">{config.backendDeliveryQueue}</ConfigurationDetailRow>
-                        <ConfigurationDetailRow label="Resolved messages clean up queue">{config.resolvedMessageCleanupProcessingQueue}</ConfigurationDetailRow>
-                    </ConfigurationBlock>
-
-                    <ConfigurationBlock title="Gateway Queue" note="">
-                        <ConfigurationDetailRow label="Gateway message submission queue">{config.gatewaySubmissionQueue}</ConfigurationDetailRow>
-                        <ConfigurationDetailRow label="Gateway message submission reply queue">{config.gatewaySubmissionReplyQueue}</ConfigurationDetailRow>
-                        <ConfigurationDetailRow label="Gateway message reception queue">{config.gatewayReceptionQueue}</ConfigurationDetailRow>
-                    </ConfigurationBlock>
+    return (
+        <ConfigurationSection state={state} errorTitle="Could not load the JMS queues configuration">
+            {(config) => (
+                <div className="grid gap-4 xl:grid-cols-2">
+                    {GROUPS.map((group) => (
+                        <ConfigurationBlock key={group.title} icon={group.icon} title={group.title} description={group.description}>
+                            <ConfigurationDetailList>
+                                {group.queues.map((queue) => (
+                                    <ConfigurationDetailRow key={queue.key} label={queue.label}>
+                                        <QueueValue name={config[queue.key]} />
+                                    </ConfigurationDetailRow>
+                                ))}
+                            </ConfigurationDetailList>
+                        </ConfigurationBlock>
+                    ))}
                 </div>
             )}
-        </div>
+        </ConfigurationSection>
     );
 }

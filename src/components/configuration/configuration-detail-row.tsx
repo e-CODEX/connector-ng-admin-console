@@ -10,16 +10,22 @@
 
 import type { ReactNode } from "react";
 
+export function ConfigurationDetailList({ children }: { children: ReactNode }) {
+    return <dl className="flex flex-col">{children}</dl>;
+}
+
 interface ConfigurationDetailRowProps {
     label: string;
-    children: ReactNode;
+    children?: ReactNode;
 }
 
 export function ConfigurationDetailRow({ label, children }: ConfigurationDetailRowProps) {
+    const isEmpty = children === undefined || children === null || children === "";
+
     return (
-        <div className="grid grid-cols-[minmax(0,300px)_1fr] items-baseline gap-4 py-1.5">
-            <dt className="text-sm text-neutral-500 dark:text-neutral-400">{label}</dt>
-            <dd className="min-w-0 wrap-break-word font-mono text-sm">{children}</dd>
+        <div className="flex flex-col gap-0.5 border-b border-separator py-2 last:border-b-0 sm:grid sm:grid-cols-[minmax(0,16rem)_minmax(0,1fr)] sm:items-center sm:gap-4">
+            <dt className="text-sm text-muted">{label}</dt>
+            <dd className="min-w-0 text-sm wrap-break-word">{isEmpty ? <span className="text-muted">—</span> : children}</dd>
         </div>
     );
 }

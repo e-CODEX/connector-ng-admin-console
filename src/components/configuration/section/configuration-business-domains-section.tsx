@@ -10,82 +10,68 @@
 
 "use client";
 
-import React, { useEffect, useState } from "react";
-import type { BusinessDomainConfiguration } from "@/types/response/configuration";
-import { toastError } from "@/utils";
-import { Table } from "@heroui/react";
-import { ConfigurationBlock } from "@/components/configuration/configuration-block";
-import { BooleanChip } from "@/components/common/boolean-chip";
-import { SpinnerView } from "@/components/common/spinner-view";
+import { Chip, Table } from "@heroui/react";
+import { Building2 } from "lucide-react";
 import { useConfigurationService } from "@/hooks/use-http-service";
+import { useConfiguration } from "@/hooks/use-configuration";
+import { ConfigurationSection } from "@/components/configuration/configuration-section";
+import { ConfigurationBlock } from "@/components/configuration/configuration-block";
+import { ConfigurationValue } from "@/components/configuration/configuration-value";
+import { BooleanChip } from "@/components/common/boolean-chip";
+import { EmptyState } from "@/components/common/empty-state";
 
 export function ConfigurationBusinessDomainsSection() {
-    const [loading, setLoading] = useState(true);
-    const [config, setConfig] = useState<BusinessDomainConfiguration | null>(null);
-
     const configurationService = useConfigurationService();
-
-
-    useEffect(() => {
-        const loadConfig = async () => {
-            setLoading(true)
-            try {
-                const data = await configurationService.getBusinessDomainsConfig()
-                setConfig(data || [])
-            } catch (error) {
-                toastError(error)
-            } finally {
-                setLoading(false)
-            }
-        }
-
-        (async () => {
-            await loadConfig()
-        })()
-    }, [configurationService])
-
-    if (!config) {
-        return null;
-    }
+    const state = useConfiguration("business-domains", configurationService.getBusinessDomainsConfig);
 
     return (
-        <div>
-            {
-                loading ? (
-                    <SpinnerView className="mt-60"/>
-                ) : (
-                    <div className="flex flex-col gap-4">
-                        <ConfigurationBlock title="Business domains" note="Configured default business domains">
-                            <Table aria-label="Configured busniess domains">
-                                <Table.ScrollContainer>
-                                    <Table.Content aria-label="Configured busniess domains">
-                                        <Table.Header>
-                                            <Table.Column isRowHeader>Identifier</Table.Column>
-                                            <Table.Column>Description</Table.Column>
-                                            <Table.Column>Enabled</Table.Column>
-                                            <Table.Column>Processing Mode File</Table.Column>
-                                        </Table.Header>
-                                        <Table.Body>
-                                            {config.defaults.map((domain) => (
-                                                <Table.Row key={domain.identifier}>
-                                                    <Table.Cell>
-                                                        <span className="font-mono text-sm">{domain.identifier}</span>
-                                                    </Table.Cell>
-                                                    <Table.Cell>{domain.description}</Table.Cell>
-                                                    <Table.Cell>
-                                                        <BooleanChip value={domain.enabled}/>
-                                                    </Table.Cell>
-                                                    <Table.Cell>{domain.pmodeFile}</Table.Cell>
-                                                </Table.Row>
-                                            ))}
-                                        </Table.Body>
-                                    </Table.Content>
-                                </Table.ScrollContainer>
-                            </Table>
-                        </ConfigurationBlock>
-                    </div>
-                )
-            }
-        </div>
+        <ConfigurationSection state={state} errorTitle="Could not load the business domains configuration">
+            {(config) => {
+                const domains = config.defaults ?? [];
+                return (
+                    <ConfigurationBlock
+                        icon={Building2}
+                        title="Default business domains"
+                        description="Business domains created from the connector configuration at startup."
+                        aside={
+                            <Chip size="sm" variant="soft">
+                                <Chip.Label>{domains.length}</Chip.Label>
+                            </Chip>
+                        }
+                    >
+                        <Table variant="secondary">
+                            <Table.ScrollContainer>
+                                <Table.Content aria-label="Default business domains">
+                                    <Table.Header>
+                                        <Table.Column isRowHeader>Identifier</Table.Column>
+                                        <Table.Column>Description</Table.Column>
+                                        <Table.Column>Enabled</Table.Column>
+                                        <Table.Column>Processing mode file</Table.Column>
+                                    </Table.Header>
+                                    <Table.Body renderEmptyState={() => <EmptyState text="No default business domain configured" className="py-10" />}>
+                                        {domains.map((domain) => (
+                                            <Table.Row key={domain.identifier}>
+                                                <Table.Cell>
+                                                    <ConfigurationValue value={domain.identifier} mono />
+                                                </Table.Cell>
+                                                <Table.Cell>
+                                                    <ConfigurationValue value={domain.description} />
+                                                </Table.Cell>
+                                                <Table.Cell>
+                                                    <BooleanChip value={domain.enabled} />
+                                                </Table.Cell>
+                                                <Table.Cell>
+                                                    <ConfigurationValue value={domain.pmodeFile} mono copyable />
+                                                </Table.Cell>
+                                            </Table.Row>
+                                        ))}
+                                    </Table.Body>
+                                </Table.Content>
+                            </Table.ScrollContainer>
+                        </Table>
+                    </ConfigurationBlock>
+                );
+            }}
+        </ConfigurationSection>
     );
 }

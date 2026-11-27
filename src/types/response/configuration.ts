@@ -105,9 +105,15 @@ export interface RoutingConfiguration {
 }
 
 // container
+export interface ContainerZipConfiguration {
+    maxEntries: number;
+    maxEntrySize: number;
+    maxTotalSize: number;
+}
 
 export interface ContainerConfiguration {
     signature: Signature;
+    zip: ContainerZipConfiguration;
 }
 
 // evidence config

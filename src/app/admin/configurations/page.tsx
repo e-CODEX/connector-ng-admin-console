@@ -53,6 +53,14 @@ export default function ConfigurationsAdminPage() {
     const searchParams = useSearchParams();
     const [reloadToken, setReloadToken] = useState(0);
     const tabsRef = useRef<HTMLDivElement>(null);
+    // The indicator only animates once the tabs are mounted: in development, StrictMode mounts it twice, and react-aria
+    // then "animates" it from its first mount, which leaves it stuck over the first tab when the page opens on another one.
+    const [animateIndicator, setAnimateIndicator] = useState(false);
+
+    useEffect(() => {
+        const frame = requestAnimationFrame(() => setAnimateIndicator(true));
+        return () => cancelAnimationFrame(frame);
+    }, []);
 
     const requestedTab = searchParams.get("tab");
     const selectedTab = TABS.some((tab) => tab.id === requestedTab) ? requestedTab! : DEFAULT_TAB;
@@ -88,7 +96,7 @@ export default function ConfigurationsAdminPage() {
                                         <Icon className="size-4 shrink-0" aria-hidden="true" />
                                         {label}
                                     </span>
-                                    <Tabs.Indicator />
+                                    <Tabs.Indicator className={animateIndicator ? undefined : "transition-none"} />
                                 </Tabs.Tab>
                             ))}
                         </Tabs.List>
